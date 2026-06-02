@@ -5,6 +5,7 @@ import {
   faHeart,
   faDice,
 } from "@fortawesome/pro-duotone-svg-icons";
+import { PALETTE_VARIANTS, type PaletteVariant } from "@/types";
 
 /**
  * Coloring palette data, ported VERBATIM from CC web
@@ -13,18 +14,14 @@ import {
  * each, sequenced as a rainbow walk ending in mood-tinted neutrals. The
  * selected variant drives both the swatch grid AND the magic-tool auto
  * palette (single knob, two effects), same as web.
+ *
+ * PaletteVariant / PALETTE_VARIANTS are the canonical region-store types in
+ * @/types (kept icon-free); re-exported here for existing import sites.
  */
 
-export type PaletteVariant = "realistic" | "pastel" | "cute" | "surprise";
+export { PALETTE_VARIANTS, type PaletteVariant };
 
 export type Swatch = { name: string; hex: string };
-
-export const PALETTE_VARIANTS: PaletteVariant[] = [
-  "realistic",
-  "pastel",
-  "cute",
-  "surprise",
-];
 
 /** Variant pill icons — match web's variantIcons. */
 export const PALETTE_VARIANT_ICONS: Record<PaletteVariant, IconDefinition> = {

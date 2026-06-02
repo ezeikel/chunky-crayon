@@ -438,31 +438,49 @@ const deserializePath = (svgString: string): SkPath | null => {
  * Preserves sourceWidth/sourceHeight for cross-platform coordinate scaling
  */
 const serializeActions = (actions: DrawingAction[]): SerializedAction[] => {
-  return actions.map((action) => ({
-    type: action.type,
-    pathSvg: action.path ? serializePath(action.path) : undefined,
-    color: action.color,
-    brushType: action.brushType,
-    strokeWidth: action.strokeWidth,
-    startHue: action.startHue,
-    // Fill fields
-    fillX: action.fillX,
-    fillY: action.fillY,
-    targetColor: action.targetColor,
-    fillType: action.fillType,
-    patternType: action.patternType,
-    // Sticker fields
-    sticker: action.sticker,
-    stickerX: action.stickerX,
-    stickerY: action.stickerY,
-    stickerSize: action.stickerSize,
-    // Magic-fill fields
-    magicFills: action.magicFills,
-    // Cross-platform source dimensions - preserve so actions from different
-    // platforms keep their original coordinate space
-    sourceWidth: action.sourceWidth,
-    sourceHeight: action.sourceHeight,
-  }));
+  return actions
+    .filter(
+      // Region-store magic actions are NOT in the cross-platform
+      // SerializableCanvasAction schema (web has no replayable region action —
+      // it persists a magic-coloured page as a snapshot). Serializing them
+      // would produce mobile-only actions web can't replay, breaking
+      // cross-device restore. They stay render-only / session-undo; persisting
+      // a magic-coloured page across devices is the snapshot-sync work.
+      (
+        action,
+      ): action is DrawingAction & {
+        type: "stroke" | "fill" | "sticker" | "magic-fill";
+      } =>
+        action.type === "stroke" ||
+        action.type === "fill" ||
+        action.type === "sticker" ||
+        action.type === "magic-fill",
+    )
+    .map((action) => ({
+      type: action.type,
+      pathSvg: action.path ? serializePath(action.path) : undefined,
+      color: action.color,
+      brushType: action.brushType,
+      strokeWidth: action.strokeWidth,
+      startHue: action.startHue,
+      // Fill fields
+      fillX: action.fillX,
+      fillY: action.fillY,
+      targetColor: action.targetColor,
+      fillType: action.fillType,
+      patternType: action.patternType,
+      // Sticker fields
+      sticker: action.sticker,
+      stickerX: action.stickerX,
+      stickerY: action.stickerY,
+      stickerSize: action.stickerSize,
+      // Magic-fill fields
+      magicFills: action.magicFills,
+      // Cross-platform source dimensions - preserve so actions from different
+      // platforms keep their original coordinate space
+      sourceWidth: action.sourceWidth,
+      sourceHeight: action.sourceHeight,
+    }));
 };
 
 /**

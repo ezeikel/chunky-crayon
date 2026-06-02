@@ -121,7 +121,18 @@ export const STICKER_CATEGORIES: Record<StickerCategory, string[]> = {
 };
 
 export type DrawingAction = {
-  type: "stroke" | "fill" | "sticker" | "magic-fill";
+  // "magic-reveal" = region-store Magic Brush stroke (a path; the colour is
+  // re-derived per region from the pre-coloured layer at render time).
+  // "magic-auto" = region-store Auto Color (whole pre-coloured layer in one
+  // shot). "magic-fill" is the LEGACY auto-fill (kept for fallback + replay of
+  // old saved actions).
+  type:
+    | "stroke"
+    | "fill"
+    | "sticker"
+    | "magic-fill"
+    | "magic-reveal"
+    | "magic-auto";
   path?: SkPath;
   color: string;
   brushType?: BrushType;
@@ -140,8 +151,13 @@ export type DrawingAction = {
   stickerX?: number;
   stickerY?: number;
   stickerSize?: number;
-  // For magic auto-fill actions (stores all fills applied)
+  // For magic auto-fill actions (stores all fills applied) — LEGACY
   magicFills?: Array<{ x: number; y: number; color: string }>;
+  // For region-store magic actions (magic-reveal / magic-auto): the palette
+  // variant the action was made under. Render looks up THIS variant's
+  // pre-coloured image so undo/redo across a variant switch never recolours
+  // history. (magic-reveal carries `path`; magic-auto carries no geometry.)
+  variant?: PaletteVariant;
   // Cross-platform source dimensions - each action stores where it was recorded
   // so actions from web (CSS pixels ~880) and mobile (SVG viewBox ~1024) can coexist
   sourceWidth?: number;
