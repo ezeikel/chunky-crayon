@@ -186,14 +186,18 @@ jobs:
           CI: 'true'
           PLAYWRIGHT_BASE_URL: 'http://localhost:3000'
         working-directory: ./apps/chunky-crayon-web
-        # `next dev` on this large app is slow to first-serve on CI
-        # runners (Turbopack cold compile). A plain `wait-on http://...`
-        # times out because the port isn't bound + first route isn't
-        # compiled within the window. So: (1) wait for Next's own "Ready"
-        # log line (binds fast — the real "process up" signal), then
-        # (2) warm the homepage with a long-timeout curl to force the
-        # first on-demand compile before Playwright starts. The specs'
-        # gotoStable() helper absorbs per-route compiles after that.
+        # `next dev` on this large app is slow to first-serve on CI runners
+        # (Turbopack cold compile of the full i18n homepage, which also does DB
+        # reads). The "Ready" log line means the process is UP, but the first
+        # request to /en still triggers a multi-minute on-demand compile. The
+        # old flow warmed with a `curl ... || true` (failure swallowed) then
+        # gated on `wait-on --timeout 120000` — but /en's cold compile exceeds
+        # 120s on the runner, so wait-on timed out before the route ever served.
+        # Fix: make the warm request itself the readiness gate — poll /en until
+        # it returns HTTP 200 with a generous overall budget (up to ~6.5 min),
+        # failing loudly (dumping dev.log) if it never comes up. No separate
+        # wait-on. The specs' gotoStable() helper absorbs per-route compiles
+        # after the homepage is warm.
         run: |
           pnpm dev > /tmp/dev.log 2>&1 &
           DEV_PID=$!
@@ -207,10 +211,21 @@ jobs:
             fi
             sleep 3
           done
-          echo "Warming homepage (forces first Turbopack compile)..."
-          curl -s -o /dev/null --max-time 240 --retry 5 --retry-delay 5 \
-            --retry-all-errors http://localhost:3000/en || true
-          npx wait-on http://localhost:3000/en --timeout 120000
+          echo "Warming /en until it serves 200 (forces first Turbopack compile)..."
+          warm_ok=""
+          for i in $(seq 1 40); do
+            code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 30 http://localhost:3000/en || echo "000")
+            echo "  attempt $i: /en -> HTTP $code"
+            if [ "$code" = "200" ]; then warm_ok="yes"; break; fi
+            if ! kill -0 "$DEV_PID" 2>/dev/null; then
+              echo "::error::next dev exited during warmup"; cat /tmp/dev.log; exit 1
+            fi
+            sleep 10
+          done
+          if [ -z "$warm_ok" ]; then
+            echo "::error::/en never served 200 within the warmup budget"; tail -80 /tmp/dev.log; exit 1
+          fi
+          echo "/en is warm; running specs"
           pnpm test:e2e
 
       - name: Upload Playwright report
