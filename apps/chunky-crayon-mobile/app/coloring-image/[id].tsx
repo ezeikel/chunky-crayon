@@ -76,6 +76,13 @@ const ColoringImage = () => {
   const insets = useSafeAreaInsets();
   const { isFocusMode } = useFocusMode();
 
+  // Landscape: the coloring block must be exactly the ScrollView's VISIBLE
+  // viewport height (NOT the full screenHeight — that ignores the header +
+  // safe-area and made the canvas overflow again). Measure the ScrollView's
+  // own layout height and pin the block to it so the canvas measure-fits the
+  // visible area and MoreColoringPages flows below it (scroll to reach).
+  const [landscapeViewportH, setLandscapeViewportH] = useState(0);
+
   // Responsive layout hook
   const { layoutMode, coloringTier, useCompactHeader, canvasArea, deviceInfo } =
     useResponsiveLayout();
@@ -481,11 +488,18 @@ const ColoringImage = () => {
                 contentContainerStyle={styles.threeColScrollContent}
                 scrollEnabled={scroll}
                 showsVerticalScrollIndicator={false}
+                onLayout={(e) => {
+                  const h = e.nativeEvent.layout.height;
+                  setLandscapeViewportH((prev) => (prev === h ? prev : h));
+                }}
               >
                 <View
                   style={[
                     styles.landscapeColoringBlock,
-                    { minHeight: deviceInfo.screenHeight },
+                    // Pin to the measured viewport (fallback to screenHeight
+                    // pre-measure) so the canvas fits the VISIBLE area, not the
+                    // full window. MoreColoringPages flows below.
+                    { height: landscapeViewportH || deviceInfo.screenHeight },
                   ]}
                 >
                   <ColoringLayout
