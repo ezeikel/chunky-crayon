@@ -108,16 +108,19 @@ jobs:
     env:
       DATABASE_URL: ${{ secrets.PLAYWRIGHT_DATABASE_URL }}
       # `/en`'s render tree imports modules that construct SDK clients at
-      # MODULE LOAD with a non-null-asserted key — flags.ts (`new PostHog(
-      # process.env.NEXT_PUBLIC_POSTHOG_KEY!)`) and lib/stripe.ts (`new Stripe(
-      # process.env.STRIPE_SECRET!)`). With the key undefined the constructor
-      # throws at evaluation, so `next dev` serves /en as a 500 and no spec can
-      # run. The specs don't exercise real Stripe/PostHog, so non-empty
-      # PLACEHOLDER values are enough to get past the constructors. (If real CI
-      # secrets are ever added, prefer `${{ secrets.* }}` over these.)
+      # MODULE LOAD with the key required — flags.ts (`new PostHog(
+      # NEXT_PUBLIC_POSTHOG_KEY!)`), lib/stripe.ts (`new Stripe(STRIPE_SECRET!)`),
+      # and app/actions/email.ts (`new Resend(RESEND_API_KEY)`). With the key
+      # undefined the constructor throws at evaluation, so `next dev` serves /en
+      # as a 500 and no spec can run. The specs don't exercise real
+      # Stripe/PostHog/Resend, so non-empty PLACEHOLDER values get past the
+      # constructors. These are the only module-load SDK constructors on the /en
+      # path (verified by grep; OpenAI/moderation are lazy + not imported by /en).
+      # If real CI secrets are ever added, prefer `${{ secrets.* }}`.
       STRIPE_SECRET: 'sk_test_ci_placeholder'
       NEXT_PUBLIC_POSTHOG_KEY: 'phc_ci_placeholder'
       NEXT_PUBLIC_POSTHOG_HOST: 'https://eu.i.posthog.com'
+      RESEND_API_KEY: 're_ci_placeholder'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
