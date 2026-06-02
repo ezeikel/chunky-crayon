@@ -28,6 +28,8 @@ import {
   TextAlign,
   Fill,
   ImageFormat,
+  ColorType,
+  AlphaType,
   notifyChange,
   type SkImage,
 } from "@shopify/react-native-skia";
@@ -71,6 +73,11 @@ import {
 } from "@/utils/brushTextures";
 import { useFeatureStore } from "@/stores/featureStore";
 import { getRainbowColor } from "@/utils/colorUtils";
+import {
+  computePaintableMask,
+  countPainted,
+  progressPercent,
+} from "@/utils/measureProgress";
 import {
   saveCanvasState,
   loadCanvasState,
@@ -206,6 +213,106 @@ const ImageCanvas = ({
     }
     return canvasRef.current.makeImageSnapshot();
   }, []);
+
+  // ── Coloring-progress measure (the mobile analogue of web measureProgress) ──
+  // Reads the composite canvas pixels vs a cached line-art mask and feeds the
+  // 0-100 percentage to the store (CanvasTopBar renders it). Sampled at a stride
+  // (like web), debounced on commit, and gated by safeMakeSnapshot so it never
+  // runs mid-rotation. See utils/measureProgress.ts for the pure pixel logic.
+  const PROGRESS_STRIDE = 4;
+  // Cached paintable mask (line art is static per image). Keyed by image+dims.
+  const maskRef = useRef<{
+    key: string;
+    mask: Uint8Array;
+    paintable: number;
+  } | null>(null);
+  const measuringRef = useRef(false);
+  const progressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Read an SkImage's pixels as RGBA_8888 (R,G,B,A bytes) — web-identical layout.
+  const readRGBA = useCallback((img: SkImage): Uint8Array | null => {
+    try {
+      const cpu = img.makeNonTextureImage() ?? img; // GPU snapshot → CPU read
+      const w = cpu.width();
+      const h = cpu.height();
+      const bytes = cpu.readPixels(0, 0, {
+        width: w,
+        height: h,
+        colorType: ColorType.RGBA_8888,
+        alphaType: AlphaType.Unpremul,
+      }) as Uint8Array | null;
+      return bytes && bytes.length === w * h * 4 ? bytes : null;
+    } catch {
+      return null;
+    }
+  }, []);
+
+  // Build (once, cached) the paintable mask from a line-art-only raster rendered
+  // at the SAME pixel size as the composite snapshot so the index math aligns.
+  const getPaintableMask = useCallback(
+    (
+      sampleW: number,
+      sampleH: number,
+    ): { mask: Uint8Array; paintable: number } | null => {
+      if (!svg) return null;
+      const key = `${coloringImage.id}:${sampleW}x${sampleH}`;
+      if (maskRef.current?.key === key) return maskRef.current;
+      try {
+        const surface = Skia.Surface.MakeOffscreen(sampleW, sampleH);
+        if (!surface) return null;
+        const c = surface.getCanvas();
+        c.clear(Skia.Color("white"));
+        c.drawSvg(svg, sampleW, sampleH); // ONLY the line art — no fills
+        surface.flush();
+        const lineArt = surface.makeImageSnapshot().makeNonTextureImage();
+        if (!lineArt) return null;
+        const bytes = readRGBA(lineArt);
+        if (!bytes) return null;
+        const { mask, paintable } = computePaintableMask(
+          bytes,
+          sampleW,
+          sampleH,
+          PROGRESS_STRIDE,
+        );
+        maskRef.current = { key, mask, paintable };
+        return maskRef.current;
+      } catch {
+        return null;
+      }
+    },
+    [svg, coloringImage.id, readRGBA],
+  );
+
+  const runProgressMeasure = useCallback(() => {
+    if (measuringRef.current) return;
+    const snap = safeMakeSnapshot(); // null mid-rotation / 0-dim → skip
+    if (!snap) return;
+    measuringRef.current = true;
+    try {
+      const w = snap.width();
+      const h = snap.height();
+      if (w < 1 || h < 1) return;
+      const cached = getPaintableMask(w, h);
+      if (!cached || cached.paintable <= 0) {
+        if (cached) useCanvasStore.getState().setProgress(0);
+        return;
+      }
+      const composite = readRGBA(snap);
+      if (!composite) return;
+      const painted = countPainted(
+        composite,
+        cached.mask,
+        w,
+        h,
+        PROGRESS_STRIDE,
+      );
+      useCanvasStore
+        .getState()
+        .setProgress(progressPercent({ painted, paintable: cached.paintable }));
+    } finally {
+      measuringRef.current = false;
+    }
+  }, [safeMakeSnapshot, getPaintableMask, readRGBA]);
 
   const isInitializedRef = useRef(false);
 
@@ -599,6 +706,11 @@ const ImageCanvas = ({
       initializedForImageIdRef.current = currentImageId;
       isInitializedRef.current = true;
       console.log(`[CANVAS_INIT] Initialization complete`);
+      // Initial progress measure once restore completes. Required for the
+      // cross-device snapshot-restore path (paints a base layer but adds no
+      // history actions, so the history-keyed effect alone wouldn't fire).
+      // Delay a tick so the restored layers have rendered into the surface.
+      setTimeout(runProgressMeasure, 300);
     };
 
     initializeCanvas();
@@ -775,6 +887,21 @@ const ImageCanvas = ({
       }
     };
   }, [history, historyIndex, coloringImage.id, setDirty, svgDimensions]);
+
+  // Progress-measure trigger. Every committed change (stroke/fill/magic/undo/
+  // redo/reset/restore) mutates history|historyIndex, so this one debounced
+  // effect covers them all. Shorter than autosave (250ms) so the bar feels
+  // responsive; runProgressMeasure bails if a snapshot isn't safe (rotation) or
+  // the canvas isn't initialized. Start Over resets progress to 0 via the store;
+  // a re-measure on the now-blank canvas confirms it.
+  useEffect(() => {
+    if (!isInitializedRef.current) return;
+    if (progressTimerRef.current) clearTimeout(progressTimerRef.current);
+    progressTimerRef.current = setTimeout(runProgressMeasure, 250);
+    return () => {
+      if (progressTimerRef.current) clearTimeout(progressTimerRef.current);
+    };
+  }, [history, historyIndex, svgDimensions, runProgressMeasure]);
 
   const src = svgDimensions
     ? rect(0, 0, svgDimensions.width, svgDimensions.height)
