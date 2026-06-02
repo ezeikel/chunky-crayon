@@ -466,57 +466,68 @@ const ColoringImage = () => {
                 />
               </ScrollView>
             ) : (
-              /* Landscape three-column / middle. Wrapped in a ScrollView so a
-                 SHORT window (small iPad, split-view, future below-canvas
-                 content) can scroll instead of clipping — but at the normal
-                 full-height it doesn't scroll because contentContainer flexGrow
-                 fills the viewport and ColoringLayout measures that viewport to
-                 FIT the canvas (so it's fully visible at rest). scrollEnabled=
-                 {scroll} reuses the canvas's draw-disables-scroll arbitration
-                 (ImageCanvas setScroll(false) on draw-start) — the SAME proven
-                 pattern as the portrait + phone paths, so no new gesture
-                 conflict. */
+              /* Landscape three-column / middle. Like portrait, the coloring
+                 block fills the FIRST screenful (canvas fully visible, no scroll
+                 needed) and a "More Coloring Pages" grid hangs below — scroll
+                 down to reach it. The three-column block is pinned to one
+                 viewport height (canvasFillRowLandscape minHeight) so the canvas
+                 measure-fits the visible screen, then the strip flows below.
+                 scrollEnabled={scroll} reuses the canvas's draw-disables-scroll
+                 arbitration (ImageCanvas setScroll(false) on draw-start) — the
+                 SAME proven pattern as the portrait + phone paths, no new
+                 gesture conflict. */
               <ScrollView
                 style={styles.scrollView}
-                contentContainerStyle={styles.landscapeScrollContent}
+                contentContainerStyle={styles.threeColScrollContent}
                 scrollEnabled={scroll}
                 showsVerticalScrollIndicator={false}
               >
-                <ColoringLayout
-                  width={deviceInfo.screenWidth}
-                  height={deviceInfo.screenHeight}
-                  onZoomIn={handleZoomIn}
-                  onZoomOut={handleZoomOut}
-                  onResetZoom={handleResetZoom}
-                  zoom={scale}
-                  onStartOver={handleStartOver}
-                  onPrint={() => setShowPrintSheet(true)}
-                  onSave={() => setShowSaveSheet(true)}
-                  onMyArtwork={() => setShowMyArtworkSheet(true)}
-                  renderCanvas={(area) => (
-                    <View style={styles.canvasCardLandscape}>
-                      <ImageCanvas
-                        coloringImage={coloringImage}
-                        setScroll={setScroll}
-                        // The card adds CANVAS_CARD_PADDING all round; the canvas
-                        // must fit inside the card's CONTENT box, not the slot, or
-                        // it overflows the card by 2×padding. Deflate the measured
-                        // area accordingly (clamped >=1 so it never feeds a 0-dim
-                        // Skia snapshot).
-                        canvasArea={{
-                          width: Math.max(
-                            1,
-                            area.width - CANVAS_CARD_PADDING * 2,
-                          ),
-                          height: Math.max(
-                            1,
-                            area.height - CANVAS_CARD_PADDING * 2,
-                          ),
-                        }}
-                        layoutMode={layoutMode}
-                      />
-                    </View>
-                  )}
+                <View
+                  style={[
+                    styles.landscapeColoringBlock,
+                    { minHeight: deviceInfo.screenHeight },
+                  ]}
+                >
+                  <ColoringLayout
+                    width={deviceInfo.screenWidth}
+                    height={deviceInfo.screenHeight}
+                    onZoomIn={handleZoomIn}
+                    onZoomOut={handleZoomOut}
+                    onResetZoom={handleResetZoom}
+                    zoom={scale}
+                    onStartOver={handleStartOver}
+                    onPrint={() => setShowPrintSheet(true)}
+                    onSave={() => setShowSaveSheet(true)}
+                    onMyArtwork={() => setShowMyArtworkSheet(true)}
+                    renderCanvas={(area) => (
+                      <View style={styles.canvasCardLandscape}>
+                        <ImageCanvas
+                          coloringImage={coloringImage}
+                          setScroll={setScroll}
+                          // The card adds CANVAS_CARD_PADDING all round; the canvas
+                          // must fit inside the card's CONTENT box, not the slot, or
+                          // it overflows the card by 2×padding. Deflate the measured
+                          // area accordingly (clamped >=1 so it never feeds a 0-dim
+                          // Skia snapshot).
+                          canvasArea={{
+                            width: Math.max(
+                              1,
+                              area.width - CANVAS_CARD_PADDING * 2,
+                            ),
+                            height: Math.max(
+                              1,
+                              area.height - CANVAS_CARD_PADDING * 2,
+                            ),
+                          }}
+                          layoutMode={layoutMode}
+                        />
+                      </View>
+                    )}
+                  />
+                </View>
+                <MoreColoringPages
+                  currentId={coloringImage.id}
+                  containerWidth={deviceInfo.screenWidth}
                 />
               </ScrollView>
             )
@@ -777,13 +788,13 @@ const styles = StyleSheet.create({
   threeColScrollContent: {
     paddingBottom: 32,
   },
-  // Landscape three-column scroll content: flexGrow fills the viewport so at
-  // normal height the inner row gets the FULL visible height (ColoringLayout
-  // measures that to fit the canvas — no scroll needed at rest), but if the
-  // content ever exceeds the viewport (short window / split-view) it scrolls
-  // instead of clipping.
-  landscapeScrollContent: {
-    flexGrow: 1,
+  // Landscape: the coloring block is pinned to one viewport height so the
+  // canvas measure-fits the visible screen (ColoringLayout's row is flex:1, so
+  // this column container with a viewport minHeight gives it that full height),
+  // then MoreColoringPages flows below it inside the ScrollView. The minHeight
+  // is applied inline (= deviceInfo.screenHeight).
+  landscapeColoringBlock: {
+    flexDirection: "column",
   },
   scrollContentLandscape: {
     flexGrow: 1,
