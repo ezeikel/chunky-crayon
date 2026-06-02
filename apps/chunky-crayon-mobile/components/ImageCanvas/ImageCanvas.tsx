@@ -161,17 +161,42 @@ const ImageCanvas = ({
   const canvasDimsRef = useRef({ width: canvasWidth, height: canvasHeight });
   canvasDimsRef.current = { width: canvasWidth, height: canvasHeight };
 
-  // Guarded Skia snapshot. `makeImageSnapshot()` builds an offscreen Metal
-  // texture sized to the canvas; if the canvas is mid-layout (e.g. during an
-  // orientation change the column momentarily measures 0/NaN) Metal's
-  // MTLTextureDescriptor validation ABORTS the process (SIGABRT) — NOT a JS
-  // throw, so the surrounding try/catch can't save us. So we refuse to snapshot
-  // unless both dimensions are finite and >= 1. Returns null when unsafe; all
+  // Rotation-settle gate for snapshots. `makeImageSnapshot()` builds an
+  // offscreen Metal texture from the NATIVE RNSkView backing surface — NOT from
+  // our JS-computed canvasWidth/Height. During an orientation change UIKit
+  // re-lays-out that native surface, and for a few frames it can be 0-sized
+  // even though our logical canvasWidth/Height never drop below 1. Snapshotting
+  // in that window fails MTLTextureDescriptor validation and ABORTS the process
+  // (SIGABRT) — a native abort, NOT a JS throw, so try/catch cannot save us
+  // (this is exactly how the iPad rotation crash slipped past the old
+  // dimension-only guard). A JS dimension check can't see the native surface
+  // state, so instead we treat any window-dimension change (rotation / iPad
+  // resize) as "layout in flight" and refuse to snapshot until it settles.
+  const SNAPSHOT_SETTLE_MS = 350;
+  const layoutSettledRef = useRef(true);
+  const settleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    // screenWidth/screenHeight come from useWindowDimensions and flip the
+    // instant orientation changes — before the native surface re-lays-out.
+    layoutSettledRef.current = false;
+    if (settleTimerRef.current) clearTimeout(settleTimerRef.current);
+    settleTimerRef.current = setTimeout(() => {
+      layoutSettledRef.current = true;
+    }, SNAPSHOT_SETTLE_MS);
+    return () => {
+      if (settleTimerRef.current) clearTimeout(settleTimerRef.current);
+    };
+  }, [screenWidth, screenHeight]);
+
+  // Guarded Skia snapshot. Refuses to snapshot unless (a) the logical canvas
+  // dimensions are finite and >= 1 AND (b) the layout has settled since the
+  // last rotation/resize (see the gate above). Returns null when unsafe; all
   // callers already handle a null image.
   const safeMakeSnapshot = useCallback(() => {
     const { width, height } = canvasDimsRef.current;
     if (
       !canvasRef.current ||
+      !layoutSettledRef.current ||
       !Number.isFinite(width) ||
       !Number.isFinite(height) ||
       width < 1 ||
