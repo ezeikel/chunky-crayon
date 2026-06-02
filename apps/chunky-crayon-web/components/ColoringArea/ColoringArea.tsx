@@ -674,12 +674,26 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
       drawingCtx.drawImage(preColoredCanvas, 0, 0);
       drawingCtx.restore();
 
+      // Record a replayable region action so Auto Color round-trips
+      // cross-device (no geometry — colour is re-derived per region from the
+      // store at replay using this variant). Without this, an auto-coloured
+      // page only restores via the snapshot fallback.
+      addDrawingAction({
+        type: 'region',
+        mode: 'auto',
+        variant: paletteVariant,
+        timestamp: Date.now(),
+      });
+
       setIsAutoColoring(false);
       setHasAutoColored(true);
       setActiveTool('brush');
       playSound('sparkle');
       setHasUnsavedChanges(true);
     }, [
+      coloringImage.id,
+      paletteVariant,
+      addDrawingAction,
       playSound,
       pushToHistory,
       setHasUnsavedChanges,
@@ -1082,11 +1096,28 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
     const handleStartOver = useCallback(() => {
       if (!canvasRef.current || !coloringImage.id) return;
 
+      // Cancel any pending debounced autosave so it can't resurrect the row 1s
+      // after we delete it.
+      if (saveTimerRef.current) {
+        clearTimeout(saveTimerRef.current);
+        saveTimerRef.current = null;
+      }
+
       // Clear the canvas
       canvasRef.current.clearCanvas();
 
-      // Clear saved progress from localStorage
+      // Clear saved progress from localStorage (+ IndexedDB snapshot)
       clearColoringProgress(coloringImage.id);
+
+      // Delete the SERVER progress row too — otherwise it resurrects on the
+      // next load (and would sync back to the other device). Fire-and-forget;
+      // the route is idempotent.
+      fetch(
+        `/api/canvas/progress?imageId=${encodeURIComponent(coloringImage.id)}`,
+        { method: 'DELETE' },
+      ).catch((err) =>
+        console.warn('[ColoringArea] Failed to delete server progress', err),
+      );
 
       // Clear undo/redo history
       clearHistory();
@@ -1156,14 +1187,19 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
       saveTimerRef.current = setTimeout(() => {
         const canvas = canvasRef.current?.getCanvas();
         if (canvas) {
-          // Generate preview thumbnail for server storage
+          // Generate preview thumbnail (feed) + full-fidelity snapshot (restore
+          // raster — carries magic/legacy results the action list can't replay
+          // cross-device).
           const previewDataUrl =
             canvasRef.current?.generatePreviewThumbnail() ?? undefined;
+          const snapshotDataUrl =
+            canvasRef.current?.generateSnapshotDataUrl() ?? undefined;
           saveColoringProgress(
             coloringImage.id as string,
             canvas,
             drawingActions,
             previewDataUrl,
+            snapshotDataUrl,
           );
           setHasUnsavedChanges(false);
         }
@@ -1182,6 +1218,27 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
     ]);
 
     // Handle canvas ready - restore any saved progress
+    // Fetch a server snapshot URL into an <img> and paint it as the canvas
+    // base (crossOrigin so the R2 image doesn't taint the canvas).
+    const paintServerSnapshot = useCallback(
+      (url: string) =>
+        new Promise<void>((resolve) => {
+          const img = new Image();
+          img.crossOrigin = 'anonymous';
+          img.onload = () => {
+            canvasRef.current?.restoreFromImage(img);
+            requestAnimationFrame(() => canvasRef.current?.forceRepaint());
+            resolve();
+          };
+          img.onerror = () => {
+            console.warn('[ColoringArea] Failed to load server snapshot');
+            resolve();
+          };
+          img.src = url;
+        }),
+      [],
+    );
+
     const handleCanvasReady = useCallback(async () => {
       console.log(
         `[ColoringArea] handleCanvasReady called, coloringImage.id=${coloringImage.id}, canvasRef.current=${!!canvasRef.current}`,
@@ -1209,16 +1266,25 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
       );
 
       if (savedProgress && canvasRef.current) {
-        // Restore visual state from local snapshot if available (quick restore)
+        // Restore precedence (double-draw guard: a snapshot already CONTAINS
+        // every action's pixels, so when we paint a snapshot we must NOT also
+        // replay the actions — that would draw strokes twice / darker):
+        //   1. Local snapshot (same-device quick restore) → paint it, no replay.
+        //   2. Else replay actions (incl. region). If a region action can't
+        //      replay (region store not ready on this device) AND a server
+        //      snapshot exists, fall back to painting that snapshot.
+        //   3. Else server snapshot → paint it.
+        // In all cases, load actions into context (append target) WITHOUT
+        // re-rendering when a snapshot was the visual.
+        let paintedSnapshot = false;
+
         if (savedProgress.image) {
           canvasRef.current.restoreFromImage(savedProgress.image);
+          paintedSnapshot = true;
           console.log(`[ColoringArea] Restored canvas from local snapshot`);
         } else if (savedProgress.actions.length > 0) {
-          // Server data only (no local snapshot) - replay actions to restore canvas
-          console.log(
-            `[ColoringArea] Replaying ${savedProgress.actions.length} actions from server (source dimensions: ${savedProgress.sourceWidth}x${savedProgress.sourceHeight})`,
-          );
           let replayedCount = 0;
+          let regionMissed = false;
           for (const action of savedProgress.actions) {
             const success = canvasRef.current.replayAction(
               action,
@@ -1226,31 +1292,33 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
               savedProgress.sourceHeight,
             );
             if (success) replayedCount++;
+            else if (action.type === 'region') regionMissed = true;
           }
           console.log(
-            `[ColoringArea] Successfully replayed ${replayedCount}/${savedProgress.actions.length} actions`,
+            `[ColoringArea] Replayed ${replayedCount}/${savedProgress.actions.length} actions`,
           );
 
-          // Force canvas repaint after bulk replay to flush GPU cache
-          // This fixes display issues where canvas content doesn't appear until devtools toggle
-          if (replayedCount > 0) {
-            requestAnimationFrame(() => {
-              canvasRef.current?.forceRepaint();
-            });
+          // A region action couldn't be reconstructed (no region store) — paint
+          // the server snapshot over the partial replay so the page isn't blank.
+          if (regionMissed && savedProgress.snapshotUrl) {
+            await paintServerSnapshot(savedProgress.snapshotUrl);
+            paintedSnapshot = true;
+          } else if (replayedCount > 0) {
+            requestAnimationFrame(() => canvasRef.current?.forceRepaint());
           }
+        } else if (savedProgress.snapshotUrl) {
+          await paintServerSnapshot(savedProgress.snapshotUrl);
+          paintedSnapshot = true;
         }
 
-        // Restore drawing actions to context for future saves
-        // Use setDrawingActions directly to avoid triggering hasUnsavedChanges
-        // (addDrawingAction sets hasUnsavedChanges(true) which would trigger auto-save)
+        // Load actions into context so future edits append to them. (Painting a
+        // snapshot is the visual; the actions are still the editable record.)
         if (savedProgress.actions.length > 0) {
           setDrawingActions(savedProgress.actions);
-          console.log(
-            `[ColoringArea] Restored ${savedProgress.actions.length} drawing actions to context`,
-          );
         }
+        void paintedSnapshot; // (kept for clarity; no extra branch needed)
       }
-    }, [coloringImage.id, setDrawingActions]);
+    }, [coloringImage.id, setDrawingActions, paintServerSnapshot]);
 
     // Handle region revealed by magic brush
     const handleRegionRevealed = useCallback(

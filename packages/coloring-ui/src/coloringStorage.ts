@@ -46,13 +46,14 @@ const syncToServer = async (
   canvasWidth?: number,
   canvasHeight?: number,
   previewDataUrl?: string,
+  snapshotDataUrl?: string,
 ): Promise<{ success: boolean; version?: number; previewUrl?: string }> => {
   try {
     console.log(
       `[CANVAS_SYNC_WEB] Syncing to server - Image: ${coloringImageId}, Actions: ${actions.length}, Version: ${version}, Dimensions: ${canvasWidth}x${canvasHeight}`,
     );
 
-    // Convert serializable actions to API format (stroke actions only)
+    // Convert serializable actions to API format
     const apiActions = actions.map((action, index) =>
       serializableToApiAction(action, index),
     );
@@ -62,6 +63,9 @@ const syncToServer = async (
       headers: {
         "Content-Type": "application/json",
       },
+      // profileId is omitted — the server resolves the active profile from the
+      // web session (getActiveProfile). Snapshot is the cross-device restore
+      // raster for magic/legacy pages.
       body: JSON.stringify({
         coloringImageId,
         actions: apiActions,
@@ -69,6 +73,9 @@ const syncToServer = async (
         canvasWidth,
         canvasHeight,
         previewDataUrl,
+        snapshotDataUrl,
+        snapshotWidth: snapshotDataUrl ? 1024 : undefined,
+        snapshotHeight: snapshotDataUrl ? 1024 : undefined,
       }),
     });
 
@@ -101,7 +108,8 @@ const syncToServer = async (
           console.error(`[CANVAS_SYNC_WEB] Failed to update local version:`, e);
         }
 
-        // Retry with the correct version (pass through dimensions and preview)
+        // Retry with the correct version (pass through dimensions + preview +
+        // snapshot)
         return syncToServer(
           coloringImageId,
           actions,
@@ -109,6 +117,7 @@ const syncToServer = async (
           canvasWidth,
           canvasHeight,
           previewDataUrl,
+          snapshotDataUrl,
         );
       }
 
@@ -174,6 +183,7 @@ export const saveColoringProgress = (
   canvas: HTMLCanvasElement,
   drawingActions: SerializableCanvasAction[] = [],
   previewDataUrl?: string,
+  snapshotDataUrl?: string,
 ): boolean => {
   try {
     const imageDataUrl = canvas.toDataURL("image/png");
@@ -238,6 +248,7 @@ export const saveColoringProgress = (
       canvasWidth,
       canvasHeight,
       previewDataUrl,
+      snapshotDataUrl,
     )
       .then((result) => {
         if (result.success && result.version !== undefined) {
@@ -277,6 +288,7 @@ const loadFromServer = async (
   version: number;
   sourceWidth?: number;
   sourceHeight?: number;
+  snapshotUrl?: string;
 } | null> => {
   try {
     console.log(
@@ -394,6 +406,21 @@ const loadFromServer = async (
         console.log(
           `[CANVAS_SYNC_WEB] Created sticker action: ${action.data?.stickerId}, sourceWidth=${action.data?.sourceWidth}`,
         );
+      } else if (action.type === "region") {
+        // Magic Brush / Auto Color — replayed against the region store.
+        drawingActions.push({
+          type: "region",
+          mode: action.data?.mode === "reveal" ? "reveal" : "auto",
+          variant: action.data?.variant || "realistic",
+          pathSvg: action.data?.path as string | undefined,
+          brushSize: action.data?.brushSize as number | undefined,
+          timestamp: action.timestamp || Date.now(),
+          sourceWidth: action.data?.sourceWidth as number | undefined,
+          sourceHeight: action.data?.sourceHeight as number | undefined,
+        });
+        console.log(
+          `[CANVAS_SYNC_WEB] Created region action: mode=${action.data?.mode}, variant=${action.data?.variant}`,
+        );
       } else {
         console.warn(
           `[CANVAS_SYNC_WEB] Unknown or invalid action at index ${i}:`,
@@ -411,6 +438,7 @@ const loadFromServer = async (
       version: data.version || 0,
       sourceWidth,
       sourceHeight,
+      snapshotUrl: data.snapshotUrl as string | undefined,
     };
   } catch (error) {
     console.error("[CANVAS_SYNC_WEB] Network error loading progress:", error);
@@ -433,6 +461,9 @@ export type LoadProgressResult = {
   source: "server" | "local";
   sourceWidth?: number; // Original canvas width (for coordinate scaling)
   sourceHeight?: number; // Original canvas height (for coordinate scaling)
+  // Server-stored restore raster (R2 url) — the cross-device visual fallback
+  // for magic/legacy pages whose actions can't be replayed on this device.
+  snapshotUrl?: string;
 };
 
 /**
@@ -457,9 +488,14 @@ export const loadColoringProgress = async (
         : "null",
     );
 
-    if (serverData && serverData.actions.length > 0) {
+    // Use server data when it has actions OR a snapshot (a magic-only page may
+    // have a region action + snapshot, or just a snapshot on a legacy device).
+    if (
+      serverData &&
+      (serverData.actions.length > 0 || serverData.snapshotUrl)
+    ) {
       console.log(
-        `[CANVAS_SYNC_WEB] Using server data - ${serverData.actions.length} actions, version ${serverData.version}`,
+        `[CANVAS_SYNC_WEB] Using server data - ${serverData.actions.length} actions, version ${serverData.version}, snapshot=${!!serverData.snapshotUrl}`,
       );
 
       // Update local storage with server version for conflict resolution
@@ -498,15 +534,16 @@ export const loadColoringProgress = async (
         // Ignore local storage errors
       }
 
-      const result = {
+      const result: LoadProgressResult = {
         actions: serverData.actions,
         version: serverData.version,
         source: "server" as const,
         sourceWidth: serverData.sourceWidth,
         sourceHeight: serverData.sourceHeight,
+        snapshotUrl: serverData.snapshotUrl,
       };
       console.log(
-        `[CANVAS_SYNC_WEB] Returning server result: ${result.actions.length} actions, source=${result.source}, dimensions=${result.sourceWidth}x${result.sourceHeight}`,
+        `[CANVAS_SYNC_WEB] Returning server result: ${result.actions.length} actions, source=${result.source}, dimensions=${result.sourceWidth}x${result.sourceHeight}, snapshot=${!!result.snapshotUrl}`,
       );
       return result;
     }
