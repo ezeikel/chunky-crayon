@@ -1,6 +1,33 @@
 import { create } from "zustand";
 import { SkPath } from "@shopify/react-native-skia";
 import type { PaletteVariant } from "@/lib/coloring/palette";
+import { makeActionId } from "@one-colored-pixel/canvas-sync";
+import { getDeviceId } from "@/lib/auth";
+
+// Per-session monotonic creation counter — the `seq` ordering tiebreak for
+// same-millisecond actions in the append-merge.
+let actionSeqCounter = 0;
+const nextActionSeq = (): number => {
+  actionSeqCounter += 1;
+  return actionSeqCounter;
+};
+
+// Synchronously-readable device id for originDeviceId. getDeviceId() is async
+// (SecureStore), so we prime this cache once when the canvas mounts. Until
+// primed we use a stable per-session fallback — fine, because originDeviceId
+// only needs to be consistent within a session for the merge's skew guard.
+let cachedDeviceId = `session-${makeActionId()}`;
+let deviceIdPrimed = false;
+export const primeDeviceId = async (): Promise<void> => {
+  if (deviceIdPrimed) return;
+  try {
+    cachedDeviceId = await getDeviceId();
+    deviceIdPrimed = true;
+  } catch {
+    // keep the session fallback
+  }
+};
+export const getCachedDeviceId = (): string => cachedDeviceId;
 
 export type Tool = "brush" | "fill" | "eraser" | "sticker" | "magic" | "pan";
 export type BrushType =
@@ -121,18 +148,35 @@ export const STICKER_CATEGORIES: Record<StickerCategory, string[]> = {
 };
 
 export type DrawingAction = {
+  // Stable cross-device identity, stamped ONCE at creation (in addAction) and
+  // preserved through serialize → MMKV → sync → the append-merge. id is the
+  // merge dedup key (a UUID, never derived from array position which re-rolls on
+  // MAX_HISTORY shift / undo-truncate). createdAt is the creation timestamp —
+  // the primary merge ordering key, NOT re-stamped at serialize (the old
+  // Date.now()-at-convertToApiAction re-rolled it every save and broke dedup).
+  // seq is the per-session creation counter (ordering tiebreak for same-ms
+  // actions). originDeviceId lets the merge's terminal-collapse only eat
+  // same-device earlier actions. Optional on the in-memory type because legacy
+  // reloaded actions and the live-stroke preview path may lack them; addAction
+  // stamps any missing ones.
+  id?: string;
+  createdAt?: number;
+  seq?: number;
+  originDeviceId?: string;
   // "magic-reveal" = region-store Magic Brush stroke (a path; the colour is
   // re-derived per region from the pre-coloured layer at render time).
   // "magic-auto" = region-store Auto Color (whole pre-coloured layer in one
   // shot). "magic-fill" is the LEGACY auto-fill (kept for fallback + replay of
-  // old saved actions).
+  // old saved actions). "clear" = canvas reset (Start Over) — a real terminal
+  // so a reset durably collapses a stale offline peer's strokes during a merge.
   type:
     | "stroke"
     | "fill"
     | "sticker"
     | "magic-fill"
     | "magic-reveal"
-    | "magic-auto";
+    | "magic-auto"
+    | "clear";
   path?: SkPath;
   color: string;
   brushType?: BrushType;
@@ -276,6 +320,7 @@ type CanvasActions = {
 
   // History actions
   addAction: (action: DrawingAction) => void;
+  setHistory: (history: DrawingAction[]) => void;
   undo: () => void;
   redo: () => void;
   clearHistory: () => void;
@@ -365,8 +410,20 @@ export const useCanvasStore = create<CanvasState & CanvasActions>(
     addAction: (action) => {
       const { history, historyIndex, imageId } = get();
 
+      // Stamp the stable cross-device identity ONCE, here at the logical-action
+      // birth point (every committed action funnels through addAction). Never
+      // re-derived at serialize time. Existing id/createdAt (e.g. a reloaded
+      // action) are preserved.
+      const stamped: DrawingAction = {
+        ...action,
+        id: action.id ?? makeActionId(),
+        createdAt: action.createdAt ?? Date.now(),
+        seq: action.seq ?? nextActionSeq(),
+        originDeviceId: action.originDeviceId ?? cachedDeviceId,
+      };
+
       console.log(
-        `[CANVAS_STORE] ADD_ACTION - Type: ${action.type}, Color: ${action.color}`,
+        `[CANVAS_STORE] ADD_ACTION - Type: ${stamped.type}, Color: ${stamped.color}`,
       );
       console.log(
         `[CANVAS_STORE] ADD_ACTION - Current history: ${history.length} items, Index: ${historyIndex}, Image: ${imageId}`,
@@ -374,7 +431,7 @@ export const useCanvasStore = create<CanvasState & CanvasActions>(
 
       // Remove any redo history when new action is added
       const newHistory = history.slice(0, historyIndex + 1);
-      newHistory.push(action);
+      newHistory.push(stamped);
 
       // Trim history if too long
       if (newHistory.length > MAX_HISTORY) {
@@ -407,6 +464,11 @@ export const useCanvasStore = create<CanvasState & CanvasActions>(
         set({ historyIndex: historyIndex + 1 });
       }
     },
+
+    // Replace the whole history (used to rehydrate after a 409 append-merge so
+    // the next autosave serializes the merged union, not this device's set).
+    setHistory: (history) =>
+      set({ history, historyIndex: history.length - 1, isDirty: false }),
 
     clearHistory: () => set({ history: [], historyIndex: -1 }),
 

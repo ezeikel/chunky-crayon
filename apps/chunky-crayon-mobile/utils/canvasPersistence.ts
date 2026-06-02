@@ -10,6 +10,28 @@ import type {
   PatternType,
 } from "@/stores/canvasStore";
 import type { PaletteVariant } from "@/types";
+import {
+  makeActionId,
+  mergeCanvasActions,
+  type CanvasAction,
+} from "@one-colored-pixel/canvas-sync";
+
+// 409 merge/retry loop bound (same as web). After the cap we keep the merged
+// result locally + mark pending — never blind-clobber.
+const MAX_MERGE_RETRIES = 2;
+
+// After a 409 append-merge, the merged action set must be pushed back into the
+// live in-memory canvas store so the next autosave serializes the union (not
+// this device's set). The canvas screen registers a handler that replaces the
+// store history for the matching image.
+let _onMergedActions:
+  | ((imageId: string, actions: DrawingAction[]) => void)
+  | null = null;
+export const setMergedActionsHandler = (
+  fn: (imageId: string, actions: DrawingAction[]) => void,
+): void => {
+  _onMergedActions = fn;
+};
 
 const STORAGE_PREFIX = "chunky_crayon_canvas_";
 const METADATA_KEY = `${STORAGE_PREFIX}metadata`;
@@ -26,7 +48,14 @@ const getApiUrl = () => {
 };
 
 type SerializedAction = {
-  type: "stroke" | "fill" | "sticker" | "magic-fill" | "region";
+  type: "stroke" | "fill" | "sticker" | "magic-fill" | "region" | "clear";
+  // Stable cross-device identity, carried verbatim from the DrawingAction.
+  // Required for the append-merge: id = dedup key, createdAt = ordering key,
+  // seq = same-ms tiebreak, originDeviceId = skew-guard. Persisted in MMKV.
+  id?: string;
+  createdAt?: number;
+  seq?: number;
+  originDeviceId?: string;
   pathSvg?: string; // Serialized path as SVG
   color: string;
   brushType?: BrushType;
@@ -71,24 +100,28 @@ const CURRENT_VERSION = 1;
 const MAX_SAVED_CANVASES = 20; // Limit saved canvases to manage storage
 
 /**
- * Converts local SerializedAction to API-compatible CanvasAction format
- * @param action - The local action to convert
- * @param index - Index for generating unique ID
- * @param sourceWidth - SVG viewBox width for cross-platform coordinate scaling
- * @param sourceHeight - SVG viewBox height for cross-platform coordinate scaling
+ * Converts a local SerializedAction to the cross-platform API CanvasAction.
+ * Identity (id/timestamp/seq/originDeviceId) is read from the action's STABLE
+ * creation-stamped fields — never re-fabricated with Date.now() here (that was
+ * the bug: it re-rolled id + timestamp every save, breaking the append-merge
+ * dedup and the supersede-by-timestamp ordering).
+ * @param defaultSourceWidth - SVG viewBox width fallback for coordinate scaling
+ * @param defaultSourceHeight - SVG viewBox height fallback for coordinate scaling
  */
 const convertToApiAction = (
   action: SerializedAction,
-  index: number,
   defaultSourceWidth?: number,
   defaultSourceHeight?: number,
 ) => ({
-  id: `action-${Date.now()}-${index}`,
-  // Wire type union is stroke|fill|sticker|region. The eraser is already a
-  // stroke with brushType 'eraser' (no 'erase' type). Legacy 'magic-fill' is
-  // passed through verbatim; web drops unknown types on load (harmless).
-  type: action.type as "stroke" | "fill" | "sticker" | "region",
-  timestamp: Date.now(),
+  // Stable id stamped at creation; fall back to a fresh UUID only if a legacy
+  // action somehow lacks one (NOT a position-derived id).
+  id: action.id ?? makeActionId(),
+  // Wire type union is stroke|fill|sticker|region|clear. serializeActions has
+  // already folded magic-reveal/magic-auto AND legacy magic-fill into region,
+  // so the type is honest here — no cast needed.
+  type: action.type as "stroke" | "fill" | "sticker" | "region" | "clear",
+  // Creation timestamp, not the wall clock at serialize time.
+  timestamp: action.createdAt ?? Date.now(),
   data: {
     path: action.pathSvg,
     color: action.color,
@@ -106,6 +139,9 @@ const convertToApiAction = (
     // region fields (Magic Brush / Auto Color)
     mode: action.mode,
     variant: action.variant,
+    // Cross-device identity tiebreak + skew-guard fields.
+    seq: action.seq,
+    originDeviceId: action.originDeviceId,
     // CRITICAL: Use per-action source dimensions if available (preserves original coordinate space)
     // Only fall back to default dimensions for new actions that don't have their own
     // This ensures web-originated actions keep their CSS pixel dimensions,
@@ -113,6 +149,34 @@ const convertToApiAction = (
     sourceWidth: action.sourceWidth ?? defaultSourceWidth,
     sourceHeight: action.sourceHeight ?? defaultSourceHeight,
   },
+});
+
+/**
+ * Reverse of convertToApiAction: a wire CanvasAction → local SerializedAction,
+ * carrying the stable identity (id/createdAt/seq/originDeviceId) so a server- or
+ * merge-sourced action keeps the SAME id for dedup. Snapshot is skipped by
+ * callers; clear/region/stroke/fill/sticker map through.
+ */
+const apiToSerialized = (action: CanvasAction): SerializedAction => ({
+  id: action.id,
+  createdAt: action.timestamp,
+  seq: action.data?.seq,
+  originDeviceId: action.data?.originDeviceId,
+  type: action.type as SerializedAction["type"],
+  pathSvg: action.data?.path,
+  color: action.data?.color || action.data?.fillColor || "",
+  brushType: action.data?.brushType as BrushType | undefined,
+  strokeWidth: action.data?.brushSize,
+  fillX: action.data?.x,
+  fillY: action.data?.y,
+  sticker: action.data?.stickerId,
+  stickerX: action.data?.position?.x,
+  stickerY: action.data?.position?.y,
+  stickerSize: action.data?.scale,
+  mode: action.data?.mode,
+  variant: action.data?.variant as PaletteVariant | undefined,
+  sourceWidth: action.data?.sourceWidth,
+  sourceHeight: action.data?.sourceHeight,
 });
 
 /**
@@ -132,6 +196,7 @@ export const syncCanvasToServer = async (
   canvasHeight?: number,
   previewDataUrl?: string,
   snapshotDataUrl?: string,
+  attempt: number = 0,
 ): Promise<{ success: boolean; version?: number; error?: string }> => {
   console.log(
     `[CANVAS_SYNC] Syncing to server - Image: ${imageId}, Actions: ${actions.length}, Dimensions: ${canvasWidth}x${canvasHeight}`,
@@ -149,9 +214,9 @@ export const syncCanvasToServer = async (
       `[CANVAS_SYNC] Has preview: ${!!previewDataUrl}, preview size: ${previewDataUrl?.length || 0} chars`,
     );
 
-    // Convert to API format (stroke actions only)
-    const apiActions = actions.map((action, idx) =>
-      convertToApiAction(action, idx, canvasWidth, canvasHeight),
+    // Convert to API format (stable ids carried through, no Date.now()).
+    const apiActions = actions.map((action) =>
+      convertToApiAction(action, canvasWidth, canvasHeight),
     );
 
     const response = await fetch(`${apiUrl}/canvas/progress`, {
@@ -197,39 +262,60 @@ export const syncCanvasToServer = async (
           "No error message",
       );
 
-      // Handle version conflict - retry with the correct version
+      // Version conflict → APPEND-MERGE (not blind last-write-wins). The 409
+      // body hands us the server's current actions; union with ours by stable
+      // id, persist the merged set locally + rehydrate the store, then re-POST
+      // the merged set at the server version.
       if (response.status === 409 && errorData.currentVersion !== undefined) {
         console.log(
-          `[CANVAS_SYNC] Version conflict detected. Server version: ${errorData.currentVersion}, Our version: ${version}`,
+          `[CANVAS_SYNC] Version conflict. Server: ${errorData.currentVersion}, Our: ${version}. Merging…`,
         );
-        console.log(`[CANVAS_SYNC] Retrying with correct version...`);
 
-        // Update local storage with server version and retry once
+        const serverActions = (errorData.actions ?? []) as CanvasAction[];
+        const merged = mergeCanvasActions(
+          apiActions as CanvasAction[],
+          serverActions,
+        );
+        const mergedSerialized = merged.map(apiToSerialized);
+
+        // Persist merged actions + server version to MMKV BEFORE returning so a
+        // later autosave/pending-sync carries the union, not our device-only set
+        // (which would clobber the just-merged server work). Then rehydrate the
+        // in-memory store so the next autosave serializes the union.
         const key = `${STORAGE_PREFIX}${imageId}`;
         try {
           const stored = canvasStorage.getString(key);
-          if (stored) {
-            const data = JSON.parse(stored);
-            data.version = errorData.currentVersion;
-            canvasStorage.set(key, JSON.stringify(data));
-            console.log(
-              `[CANVAS_SYNC] Updated local version to ${errorData.currentVersion}`,
-            );
-          }
+          const data = stored
+            ? JSON.parse(stored)
+            : { imageId, savedAt: Date.now() };
+          data.version = errorData.currentVersion;
+          data.actions = mergedSerialized;
+          canvasStorage.set(key, JSON.stringify(data));
         } catch (e) {
-          console.error(`[CANVAS_SYNC] Failed to update local version:`, e);
+          console.error(`[CANVAS_SYNC] Failed to persist merged state:`, e);
+        }
+        _onMergedActions?.(imageId, deserializeActions(mergedSerialized));
+
+        if (attempt >= MAX_MERGE_RETRIES) {
+          console.warn(
+            `[CANVAS_SYNC] Merge retries exhausted; merged state kept locally + marked pending.`,
+          );
+          await markPendingSync(imageId);
+          return { success: false, error: "merge-retry-exhausted" };
         }
 
-        // Retry the sync with the correct version (pass through dimensions +
-        // preview + snapshot)
+        // Re-POST the MERGED actions at the server version. Drop the local
+        // snapshot — the server's snapshot matches the server action set the
+        // merge built on; shipping a pre-merge raster would diverge.
         return syncCanvasToServer(
           imageId,
-          actions,
+          mergedSerialized,
           errorData.currentVersion,
           canvasWidth,
           canvasHeight,
           previewDataUrl,
-          snapshotDataUrl,
+          undefined,
+          attempt + 1,
         );
       }
 
@@ -321,34 +407,14 @@ export const loadCanvasFromServer = async (
       `[CANVAS_SYNC] Loaded from server - Actions: ${data.actions?.length}, Version: ${data.version}, Dimensions: ${data.canvasWidth}x${data.canvasHeight}`,
     );
 
-    // Convert API actions back to local format (skip snapshot actions)
-    // CRITICAL: Preserve per-action sourceWidth/sourceHeight for cross-platform sync
-    // This ensures actions from web (CSS pixels ~880) keep their dimensions
-    // even when loaded on mobile (SVG viewBox ~1024)
+    // Convert API actions back to local format via the shared reverse mapping
+    // (carries the stable id/createdAt/seq/originDeviceId for the append-merge,
+    // and preserves per-action sourceWidth/sourceHeight for cross-platform
+    // coordinate scaling). Snapshot actions are skipped (top-level field).
     const localActions: SerializedAction[] =
-      data.actions
-        ?.filter((action: any) => action.type !== "snapshot") // Skip legacy snapshot actions
-        .map((action: any) => ({
-          type: action.type,
-          pathSvg: action.data?.path,
-          color: action.data?.color || action.data?.fillColor || "",
-          brushType: action.data?.brushType,
-          strokeWidth: action.data?.brushSize,
-          fillX: action.data?.x,
-          fillY: action.data?.y,
-          sticker: action.data?.stickerId,
-          stickerX: action.data?.position?.x,
-          stickerY: action.data?.position?.y,
-          stickerSize: action.data?.scale,
-          // region fields (Magic Brush / Auto Color)
-          mode: action.data?.mode,
-          variant: action.data?.variant,
-          // Preserve per-action source dimensions from server
-          // This is critical for cross-platform sync - web actions have different
-          // coordinate space than mobile actions
-          sourceWidth: action.data?.sourceWidth,
-          sourceHeight: action.data?.sourceHeight,
-        })) || [];
+      (data.actions as CanvasAction[] | undefined)
+        ?.filter((action) => (action.type as string) !== "snapshot")
+        .map(apiToSerialized) || [];
 
     return {
       actions: localActions,
@@ -464,11 +530,26 @@ const deserializePath = (svgString: string): SkPath | null => {
  */
 const serializeActions = (actions: DrawingAction[]): SerializedAction[] => {
   return actions.map((action): SerializedAction => {
+    // Stable identity, carried verbatim onto every SerializedAction.
+    const identity = {
+      id: action.id,
+      createdAt: action.createdAt,
+      seq: action.seq,
+      originDeviceId: action.originDeviceId,
+    };
+
     // Magic Brush / Auto Color → the cross-platform `region` action (web
     // reconstructs it from the same region store). magic-reveal carries the
-    // brush path; magic-auto carries no geometry.
-    if (action.type === "magic-reveal" || action.type === "magic-auto") {
+    // brush path; magic-auto carries no geometry. Legacy magic-fill is also a
+    // whole-page Auto Color → fold to region/auto so its TERMINAL semantics are
+    // honoured by the merge (otherwise prior strokes wouldn't collapse under it).
+    if (
+      action.type === "magic-reveal" ||
+      action.type === "magic-auto" ||
+      action.type === "magic-fill"
+    ) {
       return {
+        ...identity,
         type: "region",
         mode: action.type === "magic-reveal" ? "reveal" : "auto",
         variant: action.variant,
@@ -481,6 +562,7 @@ const serializeActions = (actions: DrawingAction[]): SerializedAction[] => {
     }
 
     return {
+      ...identity,
       type: action.type,
       pathSvg: action.path ? serializePath(action.path) : undefined,
       color: action.color,
@@ -512,16 +594,31 @@ const serializeActions = (actions: DrawingAction[]): SerializedAction[] => {
  * Deserializes stored actions back to DrawingAction[]
  * Preserves sourceWidth/sourceHeight for cross-platform coordinate scaling
  */
-const deserializeActions = (
+export const deserializeActions = (
   serialized: SerializedAction[],
 ): DrawingAction[] => {
   return serialized
     .map((action) => {
       const path = action.pathSvg ? deserializePath(action.pathSvg) : undefined;
 
+      // Carry the stable identity back onto every DrawingAction so a reloaded
+      // action keeps the SAME id/createdAt/seq for the append-merge dedup +
+      // ordering (addAction preserves these rather than re-stamping).
+      const identity = {
+        id: action.id,
+        createdAt: action.createdAt,
+        seq: action.seq,
+        originDeviceId: action.originDeviceId,
+      };
+
       // Skip actions with invalid paths
       if (action.type === "stroke" && action.pathSvg && !path) {
         return null;
+      }
+
+      // clear → a clear DrawingAction (replay blanks the canvas).
+      if (action.type === "clear") {
+        return { ...identity, type: "clear", color: "" } as DrawingAction;
       }
 
       // region → the in-memory magic-reveal / magic-auto action types.
@@ -529,6 +626,7 @@ const deserializeActions = (
         if (action.mode === "reveal") {
           if (action.pathSvg && !path) return null; // bad path → drop
           return {
+            ...identity,
             type: "magic-reveal",
             path: path || undefined,
             color: action.color || "#REGIONSTORE",
@@ -539,6 +637,7 @@ const deserializeActions = (
           } as DrawingAction;
         }
         return {
+          ...identity,
           type: "magic-auto",
           color: action.color || "#REGIONSTORE",
           variant: action.variant,
@@ -548,6 +647,7 @@ const deserializeActions = (
       }
 
       return {
+        ...identity,
         type: action.type,
         path: path || undefined,
         color: action.color,
@@ -690,10 +790,15 @@ export const saveCanvasState = async (
           console.log(
             `[CANVAS_PERSIST] Server sync completed - Version: ${result.version}`,
           );
-          // Update local storage with new server version
+          // Update ONLY the version field by re-reading stored data — a 409
+          // append-merge during sync may have already written the merged action
+          // union to this key; writing back the stale in-memory `data` (still
+          // our device-only actions) would clobber that merge. Re-read first.
           try {
-            data.version = result.version;
-            canvasStorage.set(key, JSON.stringify(data));
+            const latest = canvasStorage.getString(key);
+            const latestData = latest ? JSON.parse(latest) : data;
+            latestData.version = result.version;
+            canvasStorage.set(key, JSON.stringify(latestData));
             console.log(
               `[CANVAS_PERSIST] Updated local version to: ${result.version}`,
             );
@@ -767,19 +872,63 @@ export const loadCanvasState = async (
         `[CANVAS_PERSIST] Found server data - Actions: ${serverData.actions.length}, snapshot: ${!!serverData.snapshotUrl}, Source dimensions: ${serverData.canvasWidth}x${serverData.canvasHeight}`,
       );
 
-      // Deserialize actions for rendering
-      const actions = deserializeActions(serverData.actions);
-
-      // Also update local storage with server data
       const key = `${STORAGE_PREFIX}${imageId}`;
+
+      // LOAD-RECONCILE: if local has un-synced edits (a pending marker, or local
+      // action-ids the server doesn't have), MERGE rather than blindly adopt
+      // server data — else opening the page after editing offline would erase
+      // those edits before they ever sync. (Mirror of the web load path.)
+      let effectiveSerialized = serverData.actions;
+      try {
+        const storedLocal = canvasStorage.getString(key);
+        const hasPending =
+          canvasStorage.getString(`${SYNC_PENDING_PREFIX}${imageId}`) != null;
+        const localData = storedLocal
+          ? (JSON.parse(storedLocal) as SavedCanvasData)
+          : null;
+        const localActions = localData?.actions ?? [];
+        const serverIds = new Set(
+          serverData.actions.map((a) => a.id).filter(Boolean),
+        );
+        const localHasUnsynced =
+          localActions.length > 0 &&
+          (hasPending ||
+            localActions.some((a) => a.id && !serverIds.has(a.id)));
+
+        if (localHasUnsynced) {
+          console.log(
+            `[CANVAS_PERSIST] Local has un-synced actions — reconciling (merge) on load`,
+          );
+          const merged = mergeCanvasActions(
+            localActions.map((a) =>
+              convertToApiAction(a),
+            ) as unknown as CanvasAction[],
+            serverData.actions.map((a) =>
+              convertToApiAction(a),
+            ) as unknown as CanvasAction[],
+          );
+          effectiveSerialized = merged.map(apiToSerialized);
+          await markPendingSync(imageId); // re-POST the union
+        }
+      } catch (e) {
+        console.error(`[CANVAS_PERSIST] Load-reconcile failed:`, e);
+        effectiveSerialized = serverData.actions;
+      }
+
+      // Deserialize actions for rendering
+      const actions = deserializeActions(effectiveSerialized);
+
+      // Update local storage with the effective (server or merged) data
       const data: SavedCanvasData = {
         imageId,
-        actions: serverData.actions,
+        actions: effectiveSerialized,
         savedAt: Date.now(),
         version: serverData.version,
       };
       canvasStorage.set(key, JSON.stringify(data));
-      console.log(`[CANVAS_PERSIST] Updated local storage with server data`);
+      console.log(
+        `[CANVAS_PERSIST] Updated local storage with reconciled data`,
+      );
 
       return {
         actions,

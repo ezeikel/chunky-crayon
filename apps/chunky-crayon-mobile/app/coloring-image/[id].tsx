@@ -49,6 +49,7 @@ import {
 } from "@/utils/canvasPersistence";
 import { useResponsiveLayout } from "@/hooks/useResponsiveLayout";
 import { useCanvasStore } from "@/stores/canvasStore";
+import type { DrawingAction } from "@/stores/canvasStore";
 import { useArtworkStore, genArtworkId } from "@/stores/artworkStore";
 import { writeArtworkPng } from "@/lib/artwork/files";
 import { useUserContext } from "@/contexts/UserContext";
@@ -88,6 +89,7 @@ const ColoringImage = () => {
     setTool,
     setBrushType,
     captureCanvas,
+    addAction,
   } = useCanvasStore();
 
   // Active profile to stamp on locally-saved artwork (null = logged-out bucket).
@@ -117,11 +119,16 @@ const ColoringImage = () => {
     reset();
     setTool("brush");
     setBrushType("crayon");
-    // Clear local MMKV + delete the server progress row so Start Over doesn't
-    // resurrect on next load or sync back to the web/other device.
+    // Record a `clear` terminal action (web parity): a reset that syncs as a
+    // terminal so a stale offline peer's strokes collapse under it during a
+    // merge, instead of the union resurrecting them. addAction stamps its
+    // id/createdAt/seq/originDeviceId.
+    addAction({ type: "clear", color: "" } as DrawingAction);
+    // Also delete the local MMKV + server progress row for an immediate
+    // same-account reset; the clear terminal handles cross-device durability.
     void deleteCanvasState(id as string);
     notifySuccess();
-  }, [reset, setTool, setBrushType, id]);
+  }, [reset, setTool, setBrushType, addAction, id]);
 
   // ── Per-action sheet handlers ──────────────────────────────────────────
   // Each rail tile opens its own ActionSheet; the sheet's green ✓ fires the

@@ -75,7 +75,9 @@ import {
   saveCanvasState,
   loadCanvasState,
   debugCanvasStorage,
+  setMergedActionsHandler,
 } from "@/utils/canvasPersistence";
+import { primeDeviceId } from "@/stores/canvasStore";
 import {
   generateGlitterParticles,
   createSparklePath,
@@ -224,6 +226,7 @@ const ImageCanvas = ({
     imageId,
     isMuted,
     addAction,
+    setHistory,
     undo,
     redo,
     setColor,
@@ -558,6 +561,19 @@ const ImageCanvas = ({
       isCancelled = true;
     };
   }, [coloringImage.id, reset, setImageId, addAction, imageId]);
+
+  // Prime the cached device id (async SecureStore read) so actions stamped
+  // synchronously in addAction carry the real originDeviceId, and register the
+  // 409 append-merge rehydrate: when the sync layer merges this image, replace
+  // the store history with the merged union so the next autosave persists it.
+  useEffect(() => {
+    void primeDeviceId();
+    setMergedActionsHandler((mergedImageId, mergedActions) => {
+      if (mergedImageId === coloringImage.id) {
+        setHistory(mergedActions);
+      }
+    });
+  }, [coloringImage.id, setHistory]);
 
   // Save immediately when screen loses focus (user navigates away)
   useFocusEffect(
