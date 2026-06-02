@@ -285,6 +285,18 @@ const ImageCanvas = ({
 
   const runProgressMeasure = useCallback(() => {
     if (measuringRef.current) return;
+    // A canvas with no renderable PAINT actions is 0% by definition — short-
+    // circuit before the pixel sample. `clear` (Start Over) is a terminal that
+    // paints nothing, so a history of only clears still reads blank: otherwise
+    // the snapshot of the blank line-art raster samples a few anti-aliased
+    // outline pixels and the bar sticks at ~1% after Start Over instead of
+    // snapping to empty (web shows no bar at 0; mobile shows an empty pill).
+    const { history: h, historyIndex: hi } = useCanvasStore.getState();
+    const hasPaint = getVisibleActions(h, hi).some((a) => a.type !== "clear");
+    if (!hasPaint) {
+      useCanvasStore.getState().setProgress(0);
+      return;
+    }
     const snap = safeMakeSnapshot(); // null mid-rotation / 0-dim → skip
     if (!snap) return;
     measuringRef.current = true;
