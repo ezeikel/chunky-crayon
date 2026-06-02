@@ -228,6 +228,8 @@ export type ImageCanvasHandle = {
    * @returns WebP data URL of the thumbnail or null if canvas not available
    */
   generatePreviewThumbnail: () => string | null;
+  /** Full-fidelity 1024² PNG of the composite — the cross-device restore snapshot */
+  generateSnapshotDataUrl: () => string | null;
   /** Get the pre-coloured canvas (for Auto Color to draw in one shot) */
   getPreColoredCanvas: () => HTMLCanvasElement | null;
 };
@@ -266,6 +268,15 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
     const preColoredCanvasRef = useRef<HTMLCanvasElement | null>(null);
     // Temp canvas for per-dab compositing scratch space
     const tempDabCanvasRef = useRef<HTMLCanvasElement | null>(null);
+    // Indirection so replayAction (declared above buildPreColoredForVariant)
+    // can call it without a use-before-declaration / TDZ issue. Assigned just
+    // after buildPreColoredForVariant is defined.
+    const buildPreColoredForVariantRef = useRef<
+      | ((
+          variant: import("./types").PaletteVariant,
+        ) => HTMLCanvasElement | null)
+      | null
+    >(null);
 
     const {
       selectedColor,
@@ -606,6 +617,45 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
       return thumbCanvas.toDataURL("image/webp", 0.92);
     }, [getCompositeCanvas]);
 
+    // Full-fidelity 1024² PNG of the composite (line art + user drawing, magic
+    // included since magic composites into the drawing layer). This is the
+    // cross-device RESTORE snapshot (vs generatePreviewThumbnail's lossy feed
+    // WebP). PNG keeps region colours crisp. Returns null if not ready.
+    const generateSnapshotDataUrl = useCallback((): string | null => {
+      const compositeCanvas = getCompositeCanvas();
+      if (!compositeCanvas) return null;
+
+      const size = 1024;
+      const out = document.createElement("canvas");
+      out.width = size;
+      out.height = size;
+      const ctx = out.getContext("2d");
+      if (!ctx) return null;
+
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = "high";
+      ctx.fillStyle = "#FFFFFF";
+      ctx.fillRect(0, 0, size, size);
+
+      const sw = compositeCanvas.width;
+      const sh = compositeCanvas.height;
+      const scale = Math.min(size / sw, size / sh);
+      const dw = sw * scale;
+      const dh = sh * scale;
+      ctx.drawImage(
+        compositeCanvas,
+        0,
+        0,
+        sw,
+        sh,
+        (size - dw) / 2,
+        (size - dh) / 2,
+        dw,
+        dh,
+      );
+      return out.toDataURL("image/png");
+    }, [getCompositeCanvas]);
+
     // Get pre-computed dilated boundary ImageData for batch fills.
     // Avoids recomputing dilation for every fill in auto-color.
     const getDilatedBoundary = useCallback((): ImageData | null => {
@@ -829,9 +879,33 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
               return false;
             }
 
-            // Get brush radius from strokeWidth, scaled if needed
+            // Get brush radius from strokeWidth, scaled if needed.
+            // Use the GEOMETRIC MEAN of scaleX/scaleY so the rule matches
+            // mobile (which must use the same) — Math.max vs Math.min on the
+            // two platforms made a stroke change width on every round-trip.
             const radius =
-              ((action.strokeWidth || 10) * Math.max(scaleX, scaleY)) / 2;
+              ((action.strokeWidth || 10) *
+                Math.sqrt(Math.max(scaleX, 0) * Math.max(scaleY, 0))) /
+              2;
+
+            // Eraser strokes (brushType "eraser") punch through via
+            // destination-out, mirroring the live eraser — NOT a black stroke.
+            const isEraserStroke = action.brushType === "eraser";
+
+            const offScreenCtx =
+              offScreenCanvasRef.current?.getContext("2d") ?? null;
+
+            // For an eraser stroke, switch both contexts to destination-out so
+            // the stroke removes pixels (matching the live eraser) instead of
+            // painting a black line.
+            if (isEraserStroke) {
+              drawingCtx.save();
+              drawingCtx.globalCompositeOperation = "destination-out";
+              if (offScreenCtx) {
+                offScreenCtx.save();
+                offScreenCtx.globalCompositeOperation = "destination-out";
+              }
+            }
 
             // Draw each segment of the stroke
             for (let i = 1; i < points.length; i++) {
@@ -858,22 +932,23 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
               });
 
               // Update offscreen canvas
-              if (offScreenCanvasRef.current) {
-                const offScreenCtx =
-                  offScreenCanvasRef.current.getContext("2d");
-                if (offScreenCtx) {
-                  drawTexturedStroke({
-                    ctx: offScreenCtx,
-                    x: scaledX,
-                    y: scaledY,
-                    lastX: scaledLastX,
-                    lastY: scaledLastY,
-                    color: action.color || "#000000",
-                    radius: radius * currentDpr,
-                    brushType: action.brushType || "marker",
-                  });
-                }
+              if (offScreenCtx) {
+                drawTexturedStroke({
+                  ctx: offScreenCtx,
+                  x: scaledX,
+                  y: scaledY,
+                  lastX: scaledLastX,
+                  lastY: scaledLastY,
+                  color: action.color || "#000000",
+                  radius: radius * currentDpr,
+                  brushType: action.brushType || "marker",
+                });
               }
+            }
+
+            if (isEraserStroke) {
+              drawingCtx.restore();
+              if (offScreenCtx) offScreenCtx.restore();
             }
             return true;
           }
@@ -900,7 +975,9 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
             const scaledX = action.x * scaleX * currentDpr;
             const scaledY = action.y * scaleY * currentDpr;
             const scaledSize =
-              (action.size || 48) * Math.max(scaleX, scaleY) * currentDpr;
+              (action.size || 48) *
+              Math.sqrt(Math.max(scaleX, 0) * Math.max(scaleY, 0)) *
+              currentDpr;
 
             // Sanity check for extreme coordinates
             if (
@@ -935,11 +1012,85 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
             return true;
           }
 
+          case "region": {
+            // Magic Brush / Auto Color replay. Requires the region store; if
+            // it isn't ready (legacy page on this device) return false so the
+            // caller falls back to the snapshot.
+            if (!regionStore?.isReady) return false;
+            const pre = buildPreColoredForVariantRef.current?.(action.variant);
+            if (!pre) return false;
+
+            if (action.mode === "auto") {
+              // One-shot: draw the whole pre-coloured layer (raw pixels).
+              drawingCtx.save();
+              drawingCtx.setTransform(1, 0, 0, 1, 0, 0);
+              drawingCtx.drawImage(pre, 0, 0);
+              drawingCtx.restore();
+              if (offScreenCanvasRef.current) {
+                const offCtx = offScreenCanvasRef.current.getContext("2d");
+                offCtx?.drawImage(pre, 0, 0);
+              }
+              return true;
+            }
+
+            // mode "reveal": mask the pre-coloured layer to the brush path via
+            // source-in dabs (same compositing as the live brush).
+            const points = action.pathSvg ? parseSvgPath(action.pathSvg) : [];
+            if (points.length < 1) return false;
+            const tempCanvas =
+              tempDabCanvasRef.current ?? document.createElement("canvas");
+            tempCanvas.width = drawingCanvas.width;
+            tempCanvas.height = drawingCanvas.height;
+            const tempCtx = tempCanvas.getContext("2d");
+            if (!tempCtx) return false;
+
+            const revealRadius =
+              ((action.brushSize || 20) *
+                Math.sqrt(Math.max(scaleX, 0) * Math.max(scaleY, 0))) /
+              2;
+            for (let i = 1; i < points.length; i++) {
+              const a = points[i - 1];
+              const b = points[i];
+              tempCtx.clearRect(0, 0, tempCanvas.width, tempCanvas.height);
+              tempCtx.save();
+              tempCtx.scale(currentDpr, currentDpr);
+              drawTexturedStroke({
+                ctx: tempCtx,
+                x: b.x * scaleX,
+                y: b.y * scaleY,
+                lastX: a.x * scaleX,
+                lastY: a.y * scaleY,
+                color: "#FFFFFF",
+                radius: revealRadius,
+                brushType: "marker",
+              });
+              tempCtx.restore();
+              tempCtx.globalCompositeOperation = "source-in";
+              tempCtx.drawImage(pre, 0, 0);
+              tempCtx.globalCompositeOperation = "source-over";
+
+              drawingCtx.save();
+              drawingCtx.setTransform(1, 0, 0, 1, 0, 0);
+              drawingCtx.drawImage(tempCanvas, 0, 0);
+              drawingCtx.restore();
+              if (offScreenCanvasRef.current) {
+                const offCtx = offScreenCanvasRef.current.getContext("2d");
+                offCtx?.drawImage(tempCanvas, 0, 0);
+              }
+            }
+            return true;
+          }
+
           case "clear": {
             // Clear the canvas
             clearCanvas();
             return true;
           }
+
+          // snapshot is restored by the orchestration layer (restoreFromImage),
+          // not replayed here — it's a flattened raster, not a vector action.
+          case "snapshot":
+            return false;
 
           default:
             console.warn(
@@ -948,7 +1099,7 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
             return false;
         }
       },
-      [fillRegionAtPoint, clearCanvas],
+      [fillRegionAtPoint, clearCanvas, regionStore],
     );
 
     // Expose methods to parent via ref
@@ -967,6 +1118,7 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
         replayAction,
         forceRepaint,
         generatePreviewThumbnail,
+        generateSnapshotDataUrl,
         getPreColoredCanvas: () => preColoredCanvasRef.current,
       }),
       [
@@ -982,6 +1134,7 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
         replayAction,
         forceRepaint,
         generatePreviewThumbnail,
+        generateSnapshotDataUrl,
       ],
     );
 
@@ -1091,82 +1244,98 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
     // resize handler — otherwise the pre-coloured canvas would stay locked
     // to the initial-mount dimensions and Magic Brush dabs would land in
     // the wrong region after a resize.
+    // Build a pre-coloured canvas for ANY palette variant, at the drawing
+    // canvas's current resolution. Returns a fresh canvas (the caller decides
+    // whether to cache it). Used by buildPreColouredCanvas (active variant, for
+    // the live brush) and by region-action replay (the action's stored variant,
+    // so undo/redo across a variant switch keeps history's colours).
+    const buildPreColoredForVariant = useCallback(
+      (variant: import("./types").PaletteVariant): HTMLCanvasElement | null => {
+        if (!regionStore?.isReady) return null;
+        const drawingCanvas = drawingCanvasRef.current;
+        if (!drawingCanvas) return null;
+
+        const canvasW = drawingCanvas.width;
+        const canvasH = drawingCanvas.height;
+        const regionW = regionStore.width;
+        const regionH = regionStore.height;
+
+        const pcCanvas = document.createElement("canvas");
+        pcCanvas.width = canvasW;
+        pcCanvas.height = canvasH;
+        const pcCtx = pcCanvas.getContext("2d");
+        if (!pcCtx) return null;
+
+        const colorCache = new Map<
+          number,
+          { r: number; g: number; b: number } | null
+        >();
+        const getRgb = (rid: number) => {
+          if (colorCache.has(rid)) return colorCache.get(rid)!;
+          const hex = regionStore.getColorForRegion(rid, variant);
+          if (!hex) {
+            colorCache.set(rid, null);
+            return null;
+          }
+          const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+          const rgb = m
+            ? {
+                r: parseInt(m[1], 16),
+                g: parseInt(m[2], 16),
+                b: parseInt(m[3], 16),
+              }
+            : null;
+          colorCache.set(rid, rgb);
+          return rgb;
+        };
+
+        const imageData = pcCtx.createImageData(canvasW, canvasH);
+        const data = imageData.data;
+        for (let cy = 0; cy < canvasH; cy++) {
+          const ry = Math.floor((cy / canvasH) * regionH);
+          for (let cx = 0; cx < canvasW; cx++) {
+            const rx = Math.floor((cx / canvasW) * regionW);
+            const rid = regionStore.getRegionIdAt(rx, ry);
+            if (rid === 0) continue;
+            const rgb = getRgb(rid);
+            if (!rgb) continue;
+            const i = (cy * canvasW + cx) * 4;
+            data[i] = rgb.r;
+            data[i + 1] = rgb.g;
+            data[i + 2] = rgb.b;
+            data[i + 3] = 255;
+          }
+        }
+        pcCtx.putImageData(imageData, 0, 0);
+        return pcCanvas;
+      },
+      [regionStore],
+    );
+    // Keep the ref pointed at the latest builder so replayAction (declared
+    // earlier) can call it.
+    buildPreColoredForVariantRef.current = buildPreColoredForVariant;
+
+    // Build the active-variant pre-coloured canvas into preColoredCanvasRef +
+    // size the temp dab canvas. This is what the live Magic Brush uses.
     const buildPreColouredCanvas = useCallback(() => {
       if (!regionStore?.isReady) return;
       const drawingCanvas = drawingCanvasRef.current;
       if (!drawingCanvas) return;
 
-      const canvasW = drawingCanvas.width;
-      const canvasH = drawingCanvas.height;
-      const regionW = regionStore.width;
-      const regionH = regionStore.height;
-
-      if (!preColoredCanvasRef.current) {
-        preColoredCanvasRef.current = document.createElement("canvas");
-      }
-      const pcCanvas = preColoredCanvasRef.current;
-      pcCanvas.width = canvasW;
-      pcCanvas.height = canvasH;
-      const pcCtx = pcCanvas.getContext("2d");
-      if (!pcCtx) return;
-
-      const colorCache = new Map<
-        number,
-        { r: number; g: number; b: number } | null
-      >();
-      const getRgb = (rid: number) => {
-        if (colorCache.has(rid)) return colorCache.get(rid)!;
-        const hex = regionStore.getColorForRegion(rid, paletteVariant);
-        if (!hex) {
-          colorCache.set(rid, null);
-          return null;
-        }
-        const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-        const rgb = m
-          ? {
-              r: parseInt(m[1], 16),
-              g: parseInt(m[2], 16),
-              b: parseInt(m[3], 16),
-            }
-          : null;
-        colorCache.set(rid, rgb);
-        return rgb;
-      };
-
-      // Paint every pixel with its region's colour. ~50-100ms for a
-      // 1024×1024 canvas at DPR 2 = 2048×2048. Main thread is fine for
-      // now — can be moved to BUILD_PRECOLORED worker if jank reported.
-      const imageData = pcCtx.createImageData(canvasW, canvasH);
-      const data = imageData.data;
-
-      for (let cy = 0; cy < canvasH; cy++) {
-        const ry = Math.floor((cy / canvasH) * regionH);
-        for (let cx = 0; cx < canvasW; cx++) {
-          const rx = Math.floor((cx / canvasW) * regionW);
-          const rid = regionStore.getRegionIdAt(rx, ry);
-          if (rid === 0) continue;
-          const rgb = getRgb(rid);
-          if (!rgb) continue;
-          const i = (cy * canvasW + cx) * 4;
-          data[i] = rgb.r;
-          data[i + 1] = rgb.g;
-          data[i + 2] = rgb.b;
-          data[i + 3] = 255;
-        }
-      }
-
-      pcCtx.putImageData(imageData, 0, 0);
+      const pcCanvas = buildPreColoredForVariant(paletteVariant);
+      if (!pcCanvas) return;
+      preColoredCanvasRef.current = pcCanvas;
 
       if (!tempDabCanvasRef.current) {
         tempDabCanvasRef.current = document.createElement("canvas");
       }
-      tempDabCanvasRef.current.width = canvasW;
-      tempDabCanvasRef.current.height = canvasH;
+      tempDabCanvasRef.current.width = drawingCanvas.width;
+      tempDabCanvasRef.current.height = drawingCanvas.height;
 
       console.log(
-        `[ImageCanvas] Pre-coloured canvas built: ${canvasW}×${canvasH} for palette "${paletteVariant}"`,
+        `[ImageCanvas] Pre-coloured canvas built for palette "${paletteVariant}"`,
       );
-    }, [regionStore, paletteVariant]);
+    }, [regionStore, paletteVariant, buildPreColoredForVariant]);
 
     // Trigger the build on regionStore/palette/dpr changes. Resize-driven
     // rebuilds are handled inside the resize handler instead so they can
@@ -1819,8 +1988,9 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
 
         // Add fill action for server sync (normalize coordinates for cross-platform sync)
         const normalizedFillPoint = normalizePointsForSync([canvasCoords])[0];
-        // Include source dimensions for cross-platform scaling
-        const container = containerRef.current;
+        // Source dims = the ratio-correct drawing canvas (not the container —
+        // see the stroke commit note; container height over-tall → Y drift).
+        const fillDc = drawingCanvasRef.current;
         addDrawingAction({
           type: "fill",
           x: normalizedFillPoint.x,
@@ -1829,8 +1999,9 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
           fillType: selectedPattern === "solid" ? "solid" : "pattern",
           patternType: selectedPattern,
           timestamp: Date.now(),
-          sourceWidth: container?.clientWidth,
-          sourceHeight: container?.clientHeight,
+          sourceWidth: fillDc?.clientWidth ?? containerRef.current?.clientWidth,
+          sourceHeight:
+            fillDc?.clientHeight ?? containerRef.current?.clientHeight,
         });
 
         // Play fill sound + haptic
@@ -1905,8 +2076,8 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
 
       // Add sticker action for server sync (normalize coordinates for cross-platform sync)
       const normalizedStickerPoint = normalizePointsForSync([{ x, y }])[0];
-      // Include source dimensions for cross-platform scaling
-      const stickerContainer = containerRef.current;
+      // Source dims = the ratio-correct drawing canvas (see stroke commit note).
+      const stickerDc = drawingCanvasRef.current;
       addDrawingAction({
         type: "sticker",
         sticker: selectedSticker.emoji,
@@ -1914,8 +2085,10 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
         y: normalizedStickerPoint.y,
         size: stickerSize,
         timestamp: Date.now(),
-        sourceWidth: stickerContainer?.clientWidth,
-        sourceHeight: stickerContainer?.clientHeight,
+        sourceWidth:
+          stickerDc?.clientWidth ?? containerRef.current?.clientWidth,
+        sourceHeight:
+          stickerDc?.clientHeight ?? containerRef.current?.clientHeight,
       });
 
       // Play pop sound + haptic for sticker placement
@@ -2217,18 +2390,44 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
       ) {
         const stroke = currentStrokeRef.current;
         const normalizedPoints = normalizePointsForSync(stroke.points);
-        const pointerContainer = containerRef.current;
-        addDrawingAction({
-          type: "stroke",
-          path: normalizedPoints,
-          pathSvg: pointsToSvgPath(normalizedPoints),
-          color: stroke.color,
-          brushType: stroke.brushType,
-          strokeWidth: stroke.strokeWidth,
-          timestamp: Date.now(),
-          sourceWidth: pointerContainer?.clientWidth,
-          sourceHeight: pointerContainer?.clientHeight,
-        });
+        // Coordinate basis = the ratio-correct DRAWING canvas, not the
+        // container. The container can be taller than the letterboxed canvas
+        // (canvasHeight = clientWidth / imgRatio), so using container height
+        // makes every recorded Y too tall → strokes land high when replayed on
+        // mobile's square viewBox. The drawing canvas client dims are the true
+        // authoring space.
+        const dc = drawingCanvasRef.current;
+        const sourceWidth =
+          dc?.clientWidth ?? containerRef.current?.clientWidth;
+        const sourceHeight =
+          dc?.clientHeight ?? containerRef.current?.clientHeight;
+
+        if (stroke.color === "#REGION_STORE") {
+          // Magic Brush reveal → a region action (colour re-derived per region
+          // at replay; we store the stroke path + the variant it was drawn in).
+          addDrawingAction({
+            type: "region",
+            mode: "reveal",
+            variant: paletteVariant,
+            pathSvg: pointsToSvgPath(normalizedPoints),
+            brushSize: stroke.strokeWidth,
+            timestamp: Date.now(),
+            sourceWidth,
+            sourceHeight,
+          });
+        } else {
+          addDrawingAction({
+            type: "stroke",
+            path: normalizedPoints,
+            pathSvg: pointsToSvgPath(normalizedPoints),
+            color: stroke.color,
+            brushType: stroke.brushType,
+            strokeWidth: stroke.strokeWidth,
+            timestamp: Date.now(),
+            sourceWidth,
+            sourceHeight,
+          });
+        }
         currentStrokeRef.current = null;
       }
 
