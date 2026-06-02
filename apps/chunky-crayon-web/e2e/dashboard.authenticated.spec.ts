@@ -40,8 +40,17 @@ test.describe('Authenticated surfaces', () => {
   }) => {
     await gotoStable(page, '/');
     await expect(page).not.toHaveURL(/sign-in|login|auth/i);
-    // Stable hook on the prompt textarea (TextInput.tsx).
-    await expect(page.getByTestId('create-prompt')).toBeVisible();
+    // The create form's input-mode selector (role=tablist) is the always-
+    // present, ungated proof the form rendered. The default "Build" (Scene)
+    // mode is open; Type/Talk/Photo are parental-gated, so we assert the
+    // selector + Build tab rather than the gated Type prompt box.
+    const modeSelector = page.getByRole('tablist', {
+      name: /input mode selection/i,
+    });
+    await expect(modeSelector).toBeVisible();
+    await expect(
+      modeSelector.getByRole('tab', { name: /build/i }),
+    ).toBeVisible();
   });
 
   test('gallery is reachable', async ({ page }) => {

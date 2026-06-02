@@ -23,9 +23,19 @@ test.describe('Home page (unauthenticated)', () => {
 
   test('shows the create form to guests', async ({ page }) => {
     await page.goto('/');
-    // Guests can start a creation (subject to the free-tries limit) — the
-    // prompt box must be on the homepage, not gated behind auth.
-    await expect(page.getByTestId('create-prompt')).toBeVisible();
+    // The create form must be on the homepage for guests, not gated behind
+    // auth. The default mode is "Build" (Scene); Type/Talk/Photo are
+    // parental-gated, so the always-present, ungated proof the form is here is
+    // the input-mode selector (role=tablist) with its default "Build" tab.
+    // (The Type-mode prompt box `create-prompt` lives behind the parental
+    // gate — exercised by the create-flow specs, not this guest smoke.)
+    const modeSelector = page.getByRole('tablist', {
+      name: /input mode selection/i,
+    });
+    await expect(modeSelector).toBeVisible();
+    await expect(
+      modeSelector.getByRole('tab', { name: /build/i }),
+    ).toBeVisible();
   });
 
   test('pricing page is reachable', async ({ page }) => {

@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
 
 /**
  * THE crucial path: a logged-in user can reach the create form, type a
@@ -15,11 +15,40 @@ import { test, expect } from '@playwright/test';
  * paid e2e on every push.
  */
 
+/**
+ * The Type prompt box (`create-prompt`) is NOT the default surface — the
+ * create form opens in "Build" (Scene) mode, and Type/Talk/Photo are
+ * parental-gated. Switching to Type opens a parental gate: a simple
+ * "a + b = ?" with three answer buttons. Read the sum, click the right
+ * answer, then the Type panel (with `create-prompt`) renders. This mirrors a
+ * real grown-up unlocking the Type mode.
+ */
+async function switchToTextMode(page: Page): Promise<void> {
+  const tablist = page.getByRole('tablist', { name: /input mode selection/i });
+  await tablist.getByRole('tab', { name: /type/i }).click();
+
+  // Parental gate opens in a dialog: solve "a + b = ?" by clicking the
+  // matching answer button. Scope everything to the dialog so a bare number
+  // elsewhere on the page can't be mistaken for an answer button.
+  const dialog = page.getByRole('dialog');
+  const sum = dialog.getByText(/\d+\s*\+\s*\d+\s*=\s*\?/);
+  await expect(sum).toBeVisible();
+  const text = (await sum.textContent()) ?? '';
+  const m = text.match(/(\d+)\s*\+\s*(\d+)/);
+  if (!m) throw new Error(`Could not parse parental-gate sum from "${text}"`);
+  const answer = Number(m[1]) + Number(m[2]);
+  // Exact-match the answer text so "5" doesn't match "15".
+  await dialog.getByRole('button', { name: new RegExp(`^${answer}$`) }).click();
+
+  await expect(page.getByTestId('create-prompt')).toBeVisible();
+}
+
 test.describe('Create flow (authenticated)', () => {
   test('prompt box is present, editable, and the create CTA enables', async ({
     page,
   }) => {
     await page.goto('/');
+    await switchToTextMode(page);
 
     const prompt = page.getByTestId('create-prompt');
     await expect(prompt).toBeVisible();
@@ -38,6 +67,7 @@ test.describe('Create flow (authenticated)', () => {
     page,
   }) => {
     await page.goto('/');
+    await switchToTextMode(page);
     await page.getByTestId('create-prompt').fill('a rocket ship');
 
     // Arm the assertion BEFORE clicking, then cancel the request so we
