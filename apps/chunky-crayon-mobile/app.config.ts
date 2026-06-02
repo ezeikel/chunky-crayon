@@ -22,33 +22,21 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     ios: {
       supportsTablet: true,
       // Full-screen only (no iPad split-view / Slide-Over). This disables iPad
-      // MULTITASKING, which is a PRECONDITION for honoring the orientation
-      // whitelist (with multitasking on, iPadOS ignores the orientation list
-      // and treats the app as freely resizable). It does NOT by itself enable
-      // rotation — the UIApplicationSceneManifest below is what makes iOS give
-      // the app a real UIWindowScene whose geometry tracks rotation. Also
-      // desirable for an immersive ages-3-8 app: no accidental drag-out.
+      // MULTITASKING so iPadOS honors the orientation whitelist instead of
+      // treating the app as freely resizable. Also desirable for an immersive
+      // ages-3-8 app: no accidental drag-out.
+      //
+      // DO NOT add a UIApplicationSceneManifest here. The Expo SDK 56
+      // AppDelegate.swift uses the classic non-scene UIWindow lifecycle
+      // (creates `window` in didFinishLaunchingWithOptions and attaches the RN
+      // root via startReactNative(...in: window)). Declaring a scene manifest
+      // without a matching UISceneDelegate switches iOS to scene-based window
+      // management, orphaning the AppDelegate's window — the RN root never gets
+      // a visible window and the app boots to a BLACK SCREEN on every device.
       requireFullScreen: true,
       bundleIdentifier: "com.chewybytes.chunkycrayon.app",
       infoPlist: {
         ITSAppUsesNonExemptEncryption: false,
-        // Adopt the scene-based UIApplication lifecycle. Without a scene
-        // manifest the app runs the legacy non-scene UIWindow lifecycle, and
-        // on iPad (iOS 13+) iOS does NOT honor the LandscapeLeft/Right entries
-        // in UISupportedInterfaceOrientations — it only flips the portrait
-        // pair, so rotating to landscape just tips the portrait UI sideways
-        // (the bug). A single full-screen window scene + requireFullScreen
-        // makes iOS honor all four orientations and fire a real
-        // Dimensions/useWindowDimensions change so the layout reflows to its
-        // tablet-landscape tier.
-        UIApplicationSceneManifest: {
-          UIApplicationSupportsMultipleScenes: false,
-          UISceneConfigurations: {
-            UIWindowSceneSessionRoleApplication: [
-              { UISceneConfigurationName: "Default Configuration" },
-            ],
-          },
-        },
         CFBundleURLTypes: [
           {
             CFBundleURLSchemes: [
