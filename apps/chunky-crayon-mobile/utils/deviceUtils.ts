@@ -1,5 +1,5 @@
-import { Dimensions, Platform, ScaledSize } from "react-native";
-import { useState, useEffect } from "react";
+import { Dimensions, Platform, useWindowDimensions } from "react-native";
+import { useMemo } from "react";
 
 /**
  * Device detection and layout utilities for responsive tablet/phone experiences
@@ -180,26 +180,19 @@ export const getCurrentDeviceInfo = (): DeviceInfo => {
 };
 
 /**
- * React hook for reactive device info that updates on orientation changes
+ * React hook for reactive device info that updates on orientation changes.
+ *
+ * Uses RN's `useWindowDimensions()` — the official reactive primitive — rather
+ * than a manual `Dimensions.addEventListener('change')` subscription. The
+ * manual subscription did not reliably fire on iPad rotation, so the layout
+ * stayed in `tablet-portrait` after rotating to landscape (the whole portrait
+ * composition just rotated 90°, leaving the canvas cut off below the screen
+ * with no way to scroll to the pages underneath). `useWindowDimensions` is
+ * purpose-built to re-render on every window-size/orientation change.
  */
 export const useDeviceInfo = (): DeviceInfo => {
-  const [deviceInfo, setDeviceInfo] = useState<DeviceInfo>(() =>
-    getCurrentDeviceInfo(),
-  );
-
-  useEffect(() => {
-    const handleChange = ({ window }: { window: ScaledSize }) => {
-      setDeviceInfo(getDeviceInfo(window.width, window.height));
-    };
-
-    const subscription = Dimensions.addEventListener("change", handleChange);
-
-    return () => {
-      subscription?.remove();
-    };
-  }, []);
-
-  return deviceInfo;
+  const { width, height } = useWindowDimensions();
+  return useMemo(() => getDeviceInfo(width, height), [width, height]);
 };
 
 /**

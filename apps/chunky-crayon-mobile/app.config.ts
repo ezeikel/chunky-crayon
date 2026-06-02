@@ -21,18 +21,34 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     userInterfaceStyle: "light",
     ios: {
       supportsTablet: true,
-      // Full-screen only (no iPad split-view / Slide-Over). This is what makes
-      // a physical iPad ROTATION deliver a real window-size change to RN
-      // (firing Dimensions "change"), so the responsive layout re-flows
-      // portrait↔landscape. Without it (UIRequiresFullScreen=false, the Expo
-      // default), iOS rotates the rendered surface as a bitmap and the layout
-      // never recomputes — the portrait UI just appears tipped sideways.
-      // Desirable anyway for an immersive ages-3-8 coloring app: no accidental
-      // drag-out, no mid-session window resizes.
+      // Full-screen only (no iPad split-view / Slide-Over). This disables iPad
+      // MULTITASKING, which is a PRECONDITION for honoring the orientation
+      // whitelist (with multitasking on, iPadOS ignores the orientation list
+      // and treats the app as freely resizable). It does NOT by itself enable
+      // rotation — the UIApplicationSceneManifest below is what makes iOS give
+      // the app a real UIWindowScene whose geometry tracks rotation. Also
+      // desirable for an immersive ages-3-8 app: no accidental drag-out.
       requireFullScreen: true,
       bundleIdentifier: "com.chewybytes.chunkycrayon.app",
       infoPlist: {
         ITSAppUsesNonExemptEncryption: false,
+        // Adopt the scene-based UIApplication lifecycle. Without a scene
+        // manifest the app runs the legacy non-scene UIWindow lifecycle, and
+        // on iPad (iOS 13+) iOS does NOT honor the LandscapeLeft/Right entries
+        // in UISupportedInterfaceOrientations — it only flips the portrait
+        // pair, so rotating to landscape just tips the portrait UI sideways
+        // (the bug). A single full-screen window scene + requireFullScreen
+        // makes iOS honor all four orientations and fire a real
+        // Dimensions/useWindowDimensions change so the layout reflows to its
+        // tablet-landscape tier.
+        UIApplicationSceneManifest: {
+          UIApplicationSupportsMultipleScenes: false,
+          UISceneConfigurations: {
+            UIWindowSceneSessionRoleApplication: [
+              { UISceneConfigurationName: "Default Configuration" },
+            ],
+          },
+        },
         CFBundleURLTypes: [
           {
             CFBundleURLSchemes: [

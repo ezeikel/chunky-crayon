@@ -156,6 +156,32 @@ const ImageCanvas = ({
     return { canvasWidth: legacyCanvasSize, canvasHeight: legacyCanvasSize };
   }, [canvasArea, svgDimensions, legacyCanvasSize]);
 
+  // Latest canvas dims, readable from debounced/async closures (autosave fires
+  // in a setTimeout, focus-save on blur) without re-subscribing them.
+  const canvasDimsRef = useRef({ width: canvasWidth, height: canvasHeight });
+  canvasDimsRef.current = { width: canvasWidth, height: canvasHeight };
+
+  // Guarded Skia snapshot. `makeImageSnapshot()` builds an offscreen Metal
+  // texture sized to the canvas; if the canvas is mid-layout (e.g. during an
+  // orientation change the column momentarily measures 0/NaN) Metal's
+  // MTLTextureDescriptor validation ABORTS the process (SIGABRT) — NOT a JS
+  // throw, so the surrounding try/catch can't save us. So we refuse to snapshot
+  // unless both dimensions are finite and >= 1. Returns null when unsafe; all
+  // callers already handle a null image.
+  const safeMakeSnapshot = useCallback(() => {
+    const { width, height } = canvasDimsRef.current;
+    if (
+      !canvasRef.current ||
+      !Number.isFinite(width) ||
+      !Number.isFinite(height) ||
+      width < 1 ||
+      height < 1
+    ) {
+      return null;
+    }
+    return canvasRef.current.makeImageSnapshot();
+  }, []);
+
   const isInitializedRef = useRef(false);
 
   // Apple Pencil pressure smoothing — applied at commit time over the per-point
@@ -313,8 +339,7 @@ const ImageCanvas = ({
   // Register capture function for sharing/saving
   useEffect(() => {
     const captureCanvas = () => {
-      if (!canvasRef.current) return null;
-      const image = canvasRef.current.makeImageSnapshot();
+      const image = safeMakeSnapshot();
       if (!image) return null;
       const base64 = image.encodeToBase64();
       return `data:image/png;base64,${base64}`;
@@ -325,7 +350,7 @@ const ImageCanvas = ({
     return () => {
       setCaptureCanvas(null);
     };
-  }, [setCaptureCanvas]);
+  }, [setCaptureCanvas, safeMakeSnapshot]);
 
   // Initialize canvas with saved state when image changes
   // This handles both first mount AND navigation between different images
@@ -620,15 +645,13 @@ const ImageCanvas = ({
           let previewDataUrl: string | undefined;
           let snapshotDataUrl: string | undefined;
           try {
-            if (canvasRef.current) {
-              const image = canvasRef.current.makeImageSnapshot();
-              if (image) {
-                previewDataUrl = `data:image/jpeg;base64,${image.encodeToBase64(ImageFormat.JPEG, 80)}`;
-                snapshotDataUrl = `data:image/png;base64,${image.encodeToBase64()}`;
-                console.log(
-                  `[CANVAS_FOCUS] preview ${previewDataUrl.length}, snapshot ${snapshotDataUrl.length} chars`,
-                );
-              }
+            const image = safeMakeSnapshot();
+            if (image) {
+              previewDataUrl = `data:image/jpeg;base64,${image.encodeToBase64(ImageFormat.JPEG, 80)}`;
+              snapshotDataUrl = `data:image/png;base64,${image.encodeToBase64()}`;
+              console.log(
+                `[CANVAS_FOCUS] preview ${previewDataUrl.length}, snapshot ${snapshotDataUrl.length} chars`,
+              );
             }
           } catch (e) {
             console.log(
@@ -691,15 +714,13 @@ const ImageCanvas = ({
         let previewDataUrl: string | undefined;
         let snapshotDataUrl: string | undefined;
         try {
-          if (canvasRef.current) {
-            const image = canvasRef.current.makeImageSnapshot();
-            if (image) {
-              previewDataUrl = `data:image/jpeg;base64,${image.encodeToBase64(ImageFormat.JPEG, 80)}`;
-              snapshotDataUrl = `data:image/png;base64,${image.encodeToBase64()}`;
-              console.log(
-                `[AUTO_SAVE] preview ${previewDataUrl.length}, snapshot ${snapshotDataUrl.length} chars`,
-              );
-            }
+          const image = safeMakeSnapshot();
+          if (image) {
+            previewDataUrl = `data:image/jpeg;base64,${image.encodeToBase64(ImageFormat.JPEG, 80)}`;
+            snapshotDataUrl = `data:image/png;base64,${image.encodeToBase64()}`;
+            console.log(
+              `[AUTO_SAVE] preview ${previewDataUrl.length}, snapshot ${snapshotDataUrl.length} chars`,
+            );
           }
         } catch (e) {
           console.log(
