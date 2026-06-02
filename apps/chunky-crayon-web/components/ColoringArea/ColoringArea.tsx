@@ -45,6 +45,7 @@ import {
   saveColoringProgress,
   loadColoringProgress,
   clearColoringProgress,
+  setMergedActionsHandler,
 } from '@one-colored-pixel/coloring-ui';
 import { generateRegionFillPoints } from '@/app/actions/generate-color-map';
 import { generateColoredReference } from '@/app/actions/generate-colored-reference';
@@ -1319,6 +1320,18 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
         void paintedSnapshot; // (kept for clarity; no extra branch needed)
       }
     }, [coloringImage.id, setDrawingActions, paintServerSnapshot]);
+
+    // After a 409 append-merge, the storage layer hands back the merged action
+    // union for this image; rehydrate the in-memory record so future autosaves
+    // serialize the union (not this device's set) — otherwise the next save
+    // would clobber the just-merged server work.
+    useEffect(() => {
+      setMergedActionsHandler((mergedImageId, mergedActions) => {
+        if (mergedImageId === coloringImage.id) {
+          setDrawingActions(mergedActions);
+        }
+      });
+    }, [coloringImage.id, setDrawingActions]);
 
     // Handle region revealed by magic brush
     const handleRegionRevealed = useCallback(

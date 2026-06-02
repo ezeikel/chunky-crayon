@@ -5,8 +5,20 @@
  */
 
 import type { SerializableCanvasAction } from "./canvasActions";
-import { serializableToApiAction } from "./canvasActions";
+import {
+  serializableToApiAction,
+  apiActionToSerializable,
+} from "./canvasActions";
 import { idbSet, idbGet, idbDelete } from "./idbStorage";
+import {
+  mergeCanvasActions,
+  type CanvasAction,
+} from "@one-colored-pixel/db/types";
+
+// On a 409 the merged array is re-POSTed; cap the merge/retry loop so a third
+// concurrent writer can't ping-pong it forever. After the cap we keep the
+// merged result locally + mark pending (never blind-clobber).
+const MAX_MERGE_RETRIES = 2;
 // Preview cache invalidation — apps can provide their own implementation
 let _invalidatePreviewCache: ((id: string) => void) | null = null;
 
@@ -16,6 +28,20 @@ export function setPreviewCacheInvalidator(fn: (id: string) => void) {
 
 function invalidatePreviewCache(id: string) {
   _invalidatePreviewCache?.(id);
+}
+
+// After a 409 append-merge, the storage layer needs to push the merged action
+// set back into the live in-memory canvas so future autosaves serialize the
+// union (not the device-only set). The app (ColoringArea) registers a callback
+// that calls setDrawingActions with the merged actions for the matching image.
+let _onMergedActions:
+  | ((coloringImageId: string, actions: SerializableCanvasAction[]) => void)
+  | null = null;
+
+export function setMergedActionsHandler(
+  fn: (coloringImageId: string, actions: SerializableCanvasAction[]) => void,
+) {
+  _onMergedActions = fn;
 }
 
 const STORAGE_KEY_PREFIX = "coloring-progress-";
@@ -47,16 +73,15 @@ const syncToServer = async (
   canvasHeight?: number,
   previewDataUrl?: string,
   snapshotDataUrl?: string,
+  attempt: number = 0,
 ): Promise<{ success: boolean; version?: number; previewUrl?: string }> => {
   try {
     console.log(
       `[CANVAS_SYNC_WEB] Syncing to server - Image: ${coloringImageId}, Actions: ${actions.length}, Version: ${version}, Dimensions: ${canvasWidth}x${canvasHeight}`,
     );
 
-    // Convert serializable actions to API format
-    const apiActions = actions.map((action, index) =>
-      serializableToApiAction(action, index),
-    );
+    // Convert serializable actions to API format (stable ids carried through)
+    const apiActions = actions.map((action) => serializableToApiAction(action));
 
     const response = await fetch("/api/canvas/progress", {
       method: "POST",
@@ -86,38 +111,63 @@ const syncToServer = async (
         errorData,
       );
 
-      // Handle version conflict - retry with correct version
+      // Handle version conflict — APPEND-MERGE (not blind last-write-wins).
+      // The 409 body hands us the server's current actions; union them with
+      // ours by stable id, then re-POST the merged set at the server version.
       if (response.status === 409 && errorData.currentVersion !== undefined) {
         console.log(
-          `[CANVAS_SYNC_WEB] Version conflict. Server: ${errorData.currentVersion}, Ours: ${version}`,
+          `[CANVAS_SYNC_WEB] Version conflict. Server: ${errorData.currentVersion}, Ours: ${version}. Merging…`,
         );
-        console.log(`[CANVAS_SYNC_WEB] Retrying with correct version...`);
 
-        // Update local storage with server version
+        const serverActions = (errorData.actions ?? []) as CanvasAction[];
+        const merged = mergeCanvasActions(
+          apiActions as CanvasAction[],
+          serverActions,
+        );
+        const mergedSerializable = merged
+          .map((a) => apiActionToSerializable(a))
+          .filter((a): a is SerializableCanvasAction => a !== null);
+
+        // Persist the merged actions + server version locally BEFORE returning,
+        // so the next autosave/load carries the union — not our device-only set
+        // (otherwise the next save would clobber the just-merged server work).
         try {
           const stored = localStorage.getItem(getStorageKey(coloringImageId));
           if (stored) {
             const data = JSON.parse(stored) as SavedColoringData;
             data.version = errorData.currentVersion;
+            data.actions = mergedSerializable;
             localStorage.setItem(
               getStorageKey(coloringImageId),
               JSON.stringify(data),
             );
           }
         } catch (e) {
-          console.error(`[CANVAS_SYNC_WEB] Failed to update local version:`, e);
+          console.error(`[CANVAS_SYNC_WEB] Failed to persist merged state:`, e);
+        }
+        // Rehydrate the in-memory canvas so future autosaves serialize the union.
+        _onMergedActions?.(coloringImageId, mergedSerializable);
+
+        if (attempt >= MAX_MERGE_RETRIES) {
+          console.warn(
+            `[CANVAS_SYNC_WEB] Merge retries exhausted; merged state kept locally + marked pending.`,
+          );
+          markPendingSync(coloringImageId);
+          return { success: false };
         }
 
-        // Retry with the correct version (pass through dimensions + preview +
-        // snapshot)
+        // Re-POST the MERGED actions at the server version. Drop our local
+        // snapshot — the server's snapshot matches the server action set the
+        // merge built on; shipping a pre-merge raster would diverge from actions.
         return syncToServer(
           coloringImageId,
-          actions,
+          mergedSerializable,
           errorData.currentVersion,
           canvasWidth,
           canvasHeight,
           previewDataUrl,
-          snapshotDataUrl,
+          undefined,
+          attempt + 1,
         );
       }
 
@@ -338,95 +388,20 @@ const loadFromServer = async (
       `[CANVAS_SYNC_WEB] Processing ${data.actions?.length || 0} raw actions from server`,
     );
 
+    // Map each wire action to its serializable form via the shared converter,
+    // which carries the stable id + seq + originDeviceId through (required for
+    // the append-merge dedup/ordering) and handles every type including clear.
+    // Snapshot actions are skipped (they're a top-level field, not an action).
     for (let i = 0; i < (data.actions?.length || 0); i++) {
       const action = data.actions[i];
-      console.log(
-        `[CANVAS_SYNC_WEB] Action ${i}: type=${action.type}, hasData=${!!action.data}, hasPath=${!!action.data?.path}`,
-      );
-
-      // Log full structure of first action for debugging cross-platform sync
-      if (i === 0) {
-        console.log(
-          `[CANVAS_SYNC_WEB] First action full structure:`,
-          JSON.stringify(action, null, 2).substring(0, 500),
-        );
-      }
-
-      // Skip snapshot actions - we no longer use them
-      if (action.type === "snapshot") {
-        console.log(`[CANVAS_SYNC_WEB] Skipping legacy snapshot action`);
-        continue;
-      }
-
-      if (action.type === "stroke" && action.data?.path) {
-        const strokeAction = {
-          type: "stroke" as const,
-          path: [], // Path points would need to be parsed from SVG
-          pathSvg: action.data.path,
-          color: action.data.color || "#000000",
-          brushType: action.data.brushType || "marker",
-          strokeWidth: action.data.brushSize || 10,
-          timestamp: action.timestamp || Date.now(),
-          // CRITICAL: Preserve per-action source dimensions for cross-platform sync
-          // Each action may have different source dimensions (web CSS pixels vs mobile SVG viewBox)
-          sourceWidth: action.data.sourceWidth as number | undefined,
-          sourceHeight: action.data.sourceHeight as number | undefined,
-        };
-        console.log(
-          `[CANVAS_SYNC_WEB] Created stroke action: color=${strokeAction.color}, brushType=${strokeAction.brushType}, pathLength=${strokeAction.pathSvg?.length || 0}, sourceWidth=${strokeAction.sourceWidth}`,
-        );
-        drawingActions.push(strokeAction);
-      } else if (action.type === "fill") {
-        drawingActions.push({
-          type: "fill",
-          x: action.data?.x || 0,
-          y: action.data?.y || 0,
-          color: action.data?.fillColor || action.data?.color || "#000000",
-          timestamp: action.timestamp || Date.now(),
-          // Preserve per-action source dimensions
-          sourceWidth: action.data?.sourceWidth as number | undefined,
-          sourceHeight: action.data?.sourceHeight as number | undefined,
-        });
-        console.log(
-          `[CANVAS_SYNC_WEB] Created fill action at (${action.data?.x}, ${action.data?.y}), sourceWidth=${action.data?.sourceWidth}`,
-        );
-      } else if (action.type === "sticker") {
-        const position = action.data?.position || { x: 0, y: 0 };
-        drawingActions.push({
-          type: "sticker",
-          sticker: action.data?.stickerId || "",
-          x: position.x,
-          y: position.y,
-          size: action.data?.scale || 48,
-          timestamp: action.timestamp || Date.now(),
-          // Preserve per-action source dimensions
-          sourceWidth: action.data?.sourceWidth as number | undefined,
-          sourceHeight: action.data?.sourceHeight as number | undefined,
-        });
-        console.log(
-          `[CANVAS_SYNC_WEB] Created sticker action: ${action.data?.stickerId}, sourceWidth=${action.data?.sourceWidth}`,
-        );
-      } else if (action.type === "region") {
-        // Magic Brush / Auto Color — replayed against the region store.
-        drawingActions.push({
-          type: "region",
-          mode: action.data?.mode === "reveal" ? "reveal" : "auto",
-          variant: action.data?.variant || "realistic",
-          pathSvg: action.data?.path as string | undefined,
-          brushSize: action.data?.brushSize as number | undefined,
-          timestamp: action.timestamp || Date.now(),
-          sourceWidth: action.data?.sourceWidth as number | undefined,
-          sourceHeight: action.data?.sourceHeight as number | undefined,
-        });
-        console.log(
-          `[CANVAS_SYNC_WEB] Created region action: mode=${action.data?.mode}, variant=${action.data?.variant}`,
-        );
-      } else {
-        console.warn(
-          `[CANVAS_SYNC_WEB] Unknown or invalid action at index ${i}:`,
-          JSON.stringify(action).substring(0, 200),
-        );
-      }
+      if (action.type === "snapshot") continue;
+      const serializable = apiActionToSerializable({
+        id: action.id,
+        type: action.type,
+        timestamp: action.timestamp || Date.now(),
+        data: action.data,
+      });
+      if (serializable) drawingActions.push(serializable);
     }
 
     console.log(
@@ -498,44 +473,68 @@ export const loadColoringProgress = async (
         `[CANVAS_SYNC_WEB] Using server data - ${serverData.actions.length} actions, version ${serverData.version}, snapshot=${!!serverData.snapshotUrl}`,
       );
 
-      // Update local storage with server version for conflict resolution
-      // This ensures future saves use the correct version number
+      // LOAD-RECONCILE: if local has un-synced edits (a pending-sync marker, or
+      // local action-ids the server doesn't have), MERGE rather than blindly
+      // overwrite — otherwise opening the page on this device after editing it
+      // offline would erase those edits before they ever sync. This is the
+      // second blind-LWW path (the first is the 409 handler).
+      let effectiveActions = serverData.actions;
       try {
         const existingLocal = localStorage.getItem(
           getStorageKey(coloringImageId),
         );
-        if (existingLocal) {
-          const localData = JSON.parse(existingLocal) as SavedColoringData;
-          localData.version = serverData.version;
-          localData.actions = serverData.actions;
-          localStorage.setItem(
-            getStorageKey(coloringImageId),
-            JSON.stringify(localData),
-          );
-        } else {
-          // No local data exists - create entry with server version
-          // This is critical for first-time loads from another device
-          const newLocalData: SavedColoringData = {
-            imageDataUrl: "", // No snapshot yet
-            savedAt: Date.now(),
-            coloringImageId,
-            version: serverData.version,
-            actions: serverData.actions,
-          };
-          localStorage.setItem(
-            getStorageKey(coloringImageId),
-            JSON.stringify(newLocalData),
-          );
+        const hasPending =
+          localStorage.getItem(`${SYNC_PENDING_PREFIX}${coloringImageId}`) !==
+          null;
+        const localParsed = existingLocal
+          ? (JSON.parse(existingLocal) as SavedColoringData)
+          : null;
+        const localActions = localParsed?.actions ?? [];
+        const serverIds = new Set(
+          serverData.actions.map((a) => a.id).filter(Boolean),
+        );
+        const localHasUnsynced =
+          localActions.length > 0 &&
+          (hasPending ||
+            localActions.some((a) => a.id && !serverIds.has(a.id)));
+
+        if (localHasUnsynced) {
           console.log(
-            `[CANVAS_SYNC_WEB] Created local entry with server version: ${serverData.version}`,
+            `[CANVAS_SYNC_WEB] Local has un-synced actions — reconciling (merge) on load`,
           );
+          const merged = mergeCanvasActions(
+            localActions.map((a) =>
+              serializableToApiAction(a),
+            ) as CanvasAction[],
+            serverData.actions.map((a) =>
+              serializableToApiAction(a),
+            ) as CanvasAction[],
+          );
+          effectiveActions = merged
+            .map((a) => apiActionToSerializable(a))
+            .filter((a): a is SerializableCanvasAction => a !== null);
+          // keep it pending so the merged union re-POSTs
+          markPendingSync(coloringImageId);
         }
+
+        const base: SavedColoringData = localParsed ?? {
+          imageDataUrl: "",
+          savedAt: Date.now(),
+          coloringImageId,
+        };
+        base.version = serverData.version;
+        base.actions = effectiveActions;
+        localStorage.setItem(
+          getStorageKey(coloringImageId),
+          JSON.stringify(base),
+        );
       } catch {
-        // Ignore local storage errors
+        // Ignore local storage errors — fall back to raw server actions
+        effectiveActions = serverData.actions;
       }
 
       const result: LoadProgressResult = {
-        actions: serverData.actions,
+        actions: effectiveActions,
         version: serverData.version,
         source: "server" as const,
         sourceWidth: serverData.sourceWidth,

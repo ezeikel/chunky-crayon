@@ -38,6 +38,7 @@ import {
   saveColoringProgress,
   loadColoringProgress,
   clearColoringProgress,
+  setMergedActionsHandler,
 } from "@one-colored-pixel/coloring-ui";
 import {
   ActionButtonSizeProvider,
@@ -941,6 +942,16 @@ const ColoringArea = forwardRef<ColoringAreaHandle, ColoringAreaProps>(
           );
         }
       }
+    }, [coloringImage.id, setDrawingActions]);
+
+    // After a 409 append-merge, rehydrate the in-memory record with the merged
+    // union so future autosaves don't clobber the just-merged server work.
+    useEffect(() => {
+      setMergedActionsHandler((mergedImageId, mergedActions) => {
+        if (mergedImageId === coloringImage.id) {
+          setDrawingActions(mergedActions);
+        }
+      });
     }, [coloringImage.id, setDrawingActions]);
 
     // Handle region revealed by magic brush

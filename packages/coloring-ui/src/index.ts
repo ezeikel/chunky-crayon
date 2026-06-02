@@ -39,16 +39,28 @@ export {
   type ColoringVariant,
 } from "./context";
 
-// Canvas action types
+// Canvas action types + converters + stable-id helpers. Exported so the web
+// apps re-export them from here instead of keeping a drift-prone local copy
+// (the old app-local types/canvasActions.ts had gone stale — missing region).
 export {
   pointsToSvgPath,
+  serializableToApiAction,
+  apiActionToSerializable,
+  makeActionId,
+  nextActionSeq,
+  getWebDeviceId,
   type SerializableCanvasAction,
+  type StrokePoint,
+  type ActionIdentity,
 } from "./canvasActions";
 
 // Utilities
 export { default as cn } from "./cn";
 export { trackEvent } from "./analytics-client";
-export { setPreviewCacheInvalidator } from "./coloringStorage";
+export {
+  setPreviewCacheInvalidator,
+  setMergedActionsHandler,
+} from "./coloringStorage";
 export { proxyR2Url, setR2Host, setR2Hosts } from "./proxyR2Url";
 
 // Haptics

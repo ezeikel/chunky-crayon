@@ -18,6 +18,7 @@ import type {
   Sticker,
 } from "./types";
 import type { SerializableCanvasAction } from "./canvasActions";
+import { makeActionId, nextActionSeq, getWebDeviceId } from "./canvasActions";
 import type { PaletteVariant } from "./types";
 
 /** Controls which feature set is exposed in the UI */
@@ -352,14 +353,34 @@ export const ColoringContextProvider = ({
     setRedoStack([]);
   }, []);
 
-  // Serializable drawing action functions (for server sync)
+  // Serializable drawing action functions (for server sync). Every action is
+  // stamped HERE — the single funnel — with a stable cross-device identity:
+  // id (UUID, the merge dedup key), seq (per-session creation counter, the
+  // ordering tiebreak for same-ms actions), originDeviceId (so the merge's
+  // terminal-collapse only eats same-device earlier actions). Stamped once at
+  // append; never re-derived at serialize time.
   const addDrawingAction = useCallback((action: SerializableCanvasAction) => {
-    setDrawingActions((prev) => [...prev, action]);
+    const stamped = {
+      ...action,
+      id: action.id ?? makeActionId(),
+      seq: action.seq ?? nextActionSeq(),
+      originDeviceId: action.originDeviceId ?? getWebDeviceId(),
+    } as SerializableCanvasAction;
+    setDrawingActions((prev) => [...prev, stamped]);
     setHasUnsavedChanges(true);
   }, []);
 
+  // Start Over emits a real `clear` terminal action (not just an empty array)
+  // so a reset durably collapses a stale offline peer's strokes during a merge.
   const clearDrawingActions = useCallback(() => {
-    setDrawingActions([]);
+    const clearAction: SerializableCanvasAction = {
+      type: "clear",
+      timestamp: Date.now(),
+      id: makeActionId(),
+      seq: nextActionSeq(),
+      originDeviceId: getWebDeviceId(),
+    };
+    setDrawingActions([clearAction]);
   }, []);
 
   // Zoom/Pan functions

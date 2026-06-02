@@ -174,16 +174,44 @@ export async function POST(request: NextRequest) {
     });
 
     if (existingProgress) {
+      const storedActions =
+        existingProgress.actions as unknown as CanvasAction[];
+
       // Handle version conflict
       if (existingProgress.version > version) {
         return NextResponse.json(
           {
             error: "Version conflict",
             currentVersion: existingProgress.version,
-            actions: existingProgress.actions as unknown as CanvasAction[],
+            actions: storedActions,
           },
           { status: 409 },
         );
+      }
+
+      // Equal-version divergence guard: two devices that each advanced from a
+      // shared base offline can hold the SAME version, so the strict-greater
+      // check above wouldn't fire and the second write would clobber the first.
+      // If the stored set contains action-ids the incoming write doesn't carry,
+      // the client diverged — force a 409 so it append-merges instead. A clean
+      // linear advance (incoming ⊇ stored) passes through.
+      if (existingProgress.version === version) {
+        const incomingIds = new Set(
+          (actions as CanvasAction[]).map((a) => a.id).filter(Boolean),
+        );
+        const storedHasUnseen = storedActions.some(
+          (a) => a.id && !incomingIds.has(a.id),
+        );
+        if (storedHasUnseen) {
+          return NextResponse.json(
+            {
+              error: "Version conflict",
+              currentVersion: existingProgress.version,
+              actions: storedActions,
+            },
+            { status: 409 },
+          );
+        }
       }
 
       let newPreviewUrl: string | null = null;

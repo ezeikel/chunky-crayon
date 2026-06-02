@@ -4,6 +4,44 @@
  */
 
 import type { BrushType, FillPattern, PaletteVariant } from "./types";
+import { makeActionId } from "@one-colored-pixel/db/types";
+
+export { makeActionId };
+
+/**
+ * Stable per-browser device id for originDeviceId — generated once and
+ * persisted in localStorage. The append-merge uses it to decide whether a
+ * terminal (Auto Color / Start Over) may truncate an earlier action: only if
+ * they share an origin device (or the earlier action is clearly older than the
+ * skew window). SSR-safe: returns "" when there is no window/localStorage.
+ */
+const WEB_DEVICE_ID_KEY = "chunky_crayon_web_device_id";
+let cachedWebDeviceId: string | undefined;
+export function getWebDeviceId(): string {
+  if (cachedWebDeviceId !== undefined) return cachedWebDeviceId;
+  if (typeof window === "undefined" || !window.localStorage) {
+    cachedWebDeviceId = "";
+    return cachedWebDeviceId;
+  }
+  try {
+    let id = window.localStorage.getItem(WEB_DEVICE_ID_KEY);
+    if (!id) {
+      id = makeActionId();
+      window.localStorage.setItem(WEB_DEVICE_ID_KEY, id);
+    }
+    cachedWebDeviceId = id;
+  } catch {
+    cachedWebDeviceId = "";
+  }
+  return cachedWebDeviceId;
+}
+
+// Per-session monotonic creation counter for `seq` (secondary ordering key).
+let webSeqCounter = 0;
+export function nextActionSeq(): number {
+  webSeqCounter += 1;
+  return webSeqCounter;
+}
 
 /**
  * A single point in a stroke path
@@ -27,6 +65,26 @@ export type ActionSourceDimensions = {
 };
 
 /**
+ * Stable cross-device identity for an action, stamped ONCE at creation (in the
+ * coloring context's addDrawingAction) and preserved through serialize → sync →
+ * the append-merge. Optional on the serializable type because legacy rows
+ * loaded from before Stage 4 lack them; mergeCanvasActions/ensureId normalize
+ * those. New actions always carry all three.
+ *  - id: a UUID v4 (makeActionId). The dedup key in the merge.
+ *  - seq: per-session monotonic creation counter — secondary ordering key so
+ *    two same-millisecond actions (e.g. an Auto Color and a stroke right after)
+ *    order by true creation order, not by the random id.
+ *  - originDeviceId: stable per-browser id — the merge only lets a terminal
+ *    truncate an earlier action of the SAME device (or one clearly older than
+ *    the skew window), so cross-device near-simultaneous strokes aren't eaten.
+ */
+export type ActionIdentity = {
+  id?: string;
+  seq?: number;
+  originDeviceId?: string;
+};
+
+/**
  * Serializable stroke action - compatible with mobile format
  */
 export type SerializableStrokeAction = {
@@ -37,7 +95,8 @@ export type SerializableStrokeAction = {
   brushType: BrushType;
   strokeWidth: number;
   timestamp: number;
-} & ActionSourceDimensions;
+} & ActionSourceDimensions &
+  ActionIdentity;
 
 /**
  * Serializable fill action - compatible with mobile format
@@ -50,7 +109,8 @@ export type SerializableFillAction = {
   fillType?: "solid" | "pattern";
   patternType?: FillPattern;
   timestamp: number;
-} & ActionSourceDimensions;
+} & ActionSourceDimensions &
+  ActionIdentity;
 
 /**
  * Serializable sticker action - compatible with mobile format
@@ -62,15 +122,18 @@ export type SerializableStickerAction = {
   y: number;
   size: number;
   timestamp: number;
-} & ActionSourceDimensions;
+} & ActionSourceDimensions &
+  ActionIdentity;
 
 /**
- * Serializable clear action
+ * Serializable clear action. A real cross-device terminal: emitted by Start
+ * Over (clearDrawingActions) so a reset durably collapses a stale offline
+ * peer's strokes during a merge instead of the union resurrecting them.
  */
 export type SerializableClearAction = {
   type: "clear";
   timestamp: number;
-};
+} & ActionIdentity;
 
 /**
  * Snapshot action for cross-platform fallback
@@ -79,7 +142,7 @@ export type SerializableSnapshotAction = {
   type: "snapshot";
   imageDataUrl: string;
   timestamp: number;
-};
+} & ActionIdentity;
 
 /**
  * Serializable region action — Magic Brush ("reveal") / Auto Color ("auto").
@@ -95,7 +158,8 @@ export type SerializableRegionAction = {
   pathSvg?: string; // reveal only — the brush stroke
   brushSize?: number; // reveal only
   timestamp: number;
-} & ActionSourceDimensions;
+} & ActionSourceDimensions &
+  ActionIdentity;
 
 /**
  * Union of all serializable action types
@@ -135,15 +199,24 @@ export function pointsToSvgPath(points: StrokePoint[]): string {
  * Convert API action format to serializable format
  */
 export function apiActionToSerializable(apiAction: {
+  id?: string;
   type: string;
   timestamp: number;
   data?: Record<string, unknown>;
 }): SerializableCanvasAction | null {
-  const { type, timestamp, data } = apiAction;
+  const { id, type, timestamp, data } = apiAction;
 
   // Extract source dimensions for cross-platform scaling
   const sourceWidth = data?.sourceWidth as number | undefined;
   const sourceHeight = data?.sourceHeight as number | undefined;
+
+  // Carry the stable identity back so a round-tripped action keeps the SAME id
+  // (dedup) + seq/originDeviceId (ordering + skew guard) across save/load.
+  const identity: ActionIdentity = {
+    id,
+    seq: data?.seq as number | undefined,
+    originDeviceId: data?.originDeviceId as string | undefined,
+  };
 
   switch (type) {
     case "stroke":
@@ -157,6 +230,7 @@ export function apiActionToSerializable(apiAction: {
         timestamp,
         sourceWidth,
         sourceHeight,
+        ...identity,
       };
 
     case "fill":
@@ -171,6 +245,7 @@ export function apiActionToSerializable(apiAction: {
         timestamp,
         sourceWidth,
         sourceHeight,
+        ...identity,
       };
 
     case "sticker":
@@ -184,12 +259,14 @@ export function apiActionToSerializable(apiAction: {
         timestamp,
         sourceWidth,
         sourceHeight,
+        ...identity,
       };
 
     case "clear":
       return {
         type: "clear",
         timestamp,
+        ...identity,
       };
 
     case "snapshot":
@@ -209,6 +286,7 @@ export function apiActionToSerializable(apiAction: {
         timestamp,
         sourceWidth,
         sourceHeight,
+        ...identity,
       };
 
     default:
@@ -220,16 +298,23 @@ export function apiActionToSerializable(apiAction: {
 /**
  * Convert serializable action to API format
  */
-export function serializableToApiAction(
-  action: SerializableCanvasAction,
-  index: number,
-): {
+export function serializableToApiAction(action: SerializableCanvasAction): {
   id: string;
   type: string;
   timestamp: number;
   data: Record<string, unknown>;
 } {
-  const id = `action-${action.timestamp}-${index}`;
+  // Stable id stamped at creation (addDrawingAction). Fall back to a fresh id
+  // only if somehow absent (e.g. a legacy in-memory action) — NEVER derive from
+  // array position, which re-rolls on reorder and breaks dedup.
+  const id = ("id" in action && action.id) || makeActionId();
+
+  // Stable cross-device identity carried into data.* (ordering + skew guard).
+  const identity: Record<string, unknown> = {};
+  if ("seq" in action && action.seq !== undefined) identity.seq = action.seq;
+  if ("originDeviceId" in action && action.originDeviceId) {
+    identity.originDeviceId = action.originDeviceId;
+  }
 
   // Extract source dimensions for cross-platform scaling (if available)
   const sourceDimensions: Record<string, unknown> = {};
@@ -252,6 +337,7 @@ export function serializableToApiAction(
           brushType: action.brushType,
           brushSize: action.strokeWidth,
           ...sourceDimensions,
+          ...identity,
         },
       };
 
@@ -268,6 +354,7 @@ export function serializableToApiAction(
           fillType: action.fillType,
           patternType: action.patternType,
           ...sourceDimensions,
+          ...identity,
         },
       };
 
@@ -281,6 +368,7 @@ export function serializableToApiAction(
           position: { x: action.x, y: action.y },
           scale: action.size,
           ...sourceDimensions,
+          ...identity,
         },
       };
 
@@ -289,7 +377,7 @@ export function serializableToApiAction(
         id,
         type: "clear",
         timestamp: action.timestamp,
-        data: {},
+        data: { ...identity },
       };
 
     case "snapshot":
@@ -313,6 +401,7 @@ export function serializableToApiAction(
           ...(action.pathSvg && { path: action.pathSvg }),
           ...(action.brushSize && { brushSize: action.brushSize }),
           ...sourceDimensions,
+          ...identity,
         },
       };
   }
