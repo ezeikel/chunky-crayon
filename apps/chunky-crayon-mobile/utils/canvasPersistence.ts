@@ -9,6 +9,7 @@ import type {
   FillType,
   PatternType,
 } from "@/stores/canvasStore";
+import type { PaletteVariant } from "@/types";
 
 const STORAGE_PREFIX = "chunky_crayon_canvas_";
 const METADATA_KEY = `${STORAGE_PREFIX}metadata`;
@@ -25,7 +26,7 @@ const getApiUrl = () => {
 };
 
 type SerializedAction = {
-  type: "stroke" | "fill" | "sticker" | "magic-fill";
+  type: "stroke" | "fill" | "sticker" | "magic-fill" | "region";
   pathSvg?: string; // Serialized path as SVG
   color: string;
   brushType?: BrushType;
@@ -42,8 +43,13 @@ type SerializedAction = {
   stickerX?: number;
   stickerY?: number;
   stickerSize?: number;
-  // For magic-fill actions
+  // For magic-fill actions (LEGACY)
   magicFills?: Array<{ x: number; y: number; color: string }>;
+  // For region actions (Magic Brush 'reveal' / Auto Color 'auto') — colour is
+  // re-derived per region from the region store at replay; 'reveal' carries the
+  // brush path (pathSvg) + width (strokeWidth).
+  mode?: "reveal" | "auto";
+  variant?: PaletteVariant;
   // Cross-platform source dimensions - each action stores where it was recorded
   // so actions from web (CSS pixels) and mobile (SVG viewBox) can coexist
   sourceWidth?: number;
@@ -78,7 +84,10 @@ const convertToApiAction = (
   defaultSourceHeight?: number,
 ) => ({
   id: `action-${Date.now()}-${index}`,
-  type: action.type as "stroke" | "fill" | "sticker" | "erase",
+  // Wire type union is stroke|fill|sticker|region. The eraser is already a
+  // stroke with brushType 'eraser' (no 'erase' type). Legacy 'magic-fill' is
+  // passed through verbatim; web drops unknown types on load (harmless).
+  type: action.type as "stroke" | "fill" | "sticker" | "region",
   timestamp: Date.now(),
   data: {
     path: action.pathSvg,
@@ -94,6 +103,9 @@ const convertToApiAction = (
         ? { x: action.stickerX, y: action.stickerY || 0 }
         : undefined,
     scale: action.stickerSize,
+    // region fields (Magic Brush / Auto Color)
+    mode: action.mode,
+    variant: action.variant,
     // CRITICAL: Use per-action source dimensions if available (preserves original coordinate space)
     // Only fall back to default dimensions for new actions that don't have their own
     // This ensures web-originated actions keep their CSS pixel dimensions,
@@ -119,6 +131,7 @@ export const syncCanvasToServer = async (
   canvasWidth?: number,
   canvasHeight?: number,
   previewDataUrl?: string,
+  snapshotDataUrl?: string,
 ): Promise<{ success: boolean; version?: number; error?: string }> => {
   console.log(
     `[CANVAS_SYNC] Syncing to server - Image: ${imageId}, Actions: ${actions.length}, Dimensions: ${canvasWidth}x${canvasHeight}`,
@@ -147,6 +160,8 @@ export const syncCanvasToServer = async (
         "Content-Type": "application/json",
         ...authHeader,
       },
+      // profileId omitted — the server resolves the active profile from the
+      // mobile token. Snapshot = the cross-device restore raster.
       body: JSON.stringify({
         coloringImageId: imageId,
         actions: apiActions,
@@ -154,6 +169,9 @@ export const syncCanvasToServer = async (
         canvasWidth,
         canvasHeight,
         previewDataUrl,
+        snapshotDataUrl,
+        snapshotWidth: snapshotDataUrl ? (canvasWidth ?? 1024) : undefined,
+        snapshotHeight: snapshotDataUrl ? (canvasHeight ?? 1024) : undefined,
       }),
     });
 
@@ -202,7 +220,8 @@ export const syncCanvasToServer = async (
           console.error(`[CANVAS_SYNC] Failed to update local version:`, e);
         }
 
-        // Retry the sync with the correct version (pass through dimensions and preview)
+        // Retry the sync with the correct version (pass through dimensions +
+        // preview + snapshot)
         return syncCanvasToServer(
           imageId,
           actions,
@@ -210,6 +229,7 @@ export const syncCanvasToServer = async (
           canvasWidth,
           canvasHeight,
           previewDataUrl,
+          snapshotDataUrl,
         );
       }
 
@@ -261,6 +281,7 @@ export const loadCanvasFromServer = async (
   version: number;
   canvasWidth?: number;
   canvasHeight?: number;
+  snapshotUrl?: string;
   notFound?: boolean;
 } | null> => {
   console.log(`[CANVAS_SYNC] Loading from server - Image: ${imageId}`);
@@ -319,6 +340,9 @@ export const loadCanvasFromServer = async (
           stickerX: action.data?.position?.x,
           stickerY: action.data?.position?.y,
           stickerSize: action.data?.scale,
+          // region fields (Magic Brush / Auto Color)
+          mode: action.data?.mode,
+          variant: action.data?.variant,
           // Preserve per-action source dimensions from server
           // This is critical for cross-platform sync - web actions have different
           // coordinate space than mobile actions
@@ -331,6 +355,7 @@ export const loadCanvasFromServer = async (
       version: data.version,
       canvasWidth: data.canvasWidth,
       canvasHeight: data.canvasHeight,
+      snapshotUrl: data.snapshotUrl,
     };
   } catch (error) {
     console.error(`[CANVAS_SYNC] Network error loading progress:`, error);
@@ -438,25 +463,24 @@ const deserializePath = (svgString: string): SkPath | null => {
  * Preserves sourceWidth/sourceHeight for cross-platform coordinate scaling
  */
 const serializeActions = (actions: DrawingAction[]): SerializedAction[] => {
-  return actions
-    .filter(
-      // Region-store magic actions are NOT in the cross-platform
-      // SerializableCanvasAction schema (web has no replayable region action —
-      // it persists a magic-coloured page as a snapshot). Serializing them
-      // would produce mobile-only actions web can't replay, breaking
-      // cross-device restore. They stay render-only / session-undo; persisting
-      // a magic-coloured page across devices is the snapshot-sync work.
-      (
-        action,
-      ): action is DrawingAction & {
-        type: "stroke" | "fill" | "sticker" | "magic-fill";
-      } =>
-        action.type === "stroke" ||
-        action.type === "fill" ||
-        action.type === "sticker" ||
-        action.type === "magic-fill",
-    )
-    .map((action) => ({
+  return actions.map((action): SerializedAction => {
+    // Magic Brush / Auto Color → the cross-platform `region` action (web
+    // reconstructs it from the same region store). magic-reveal carries the
+    // brush path; magic-auto carries no geometry.
+    if (action.type === "magic-reveal" || action.type === "magic-auto") {
+      return {
+        type: "region",
+        mode: action.type === "magic-reveal" ? "reveal" : "auto",
+        variant: action.variant,
+        pathSvg: action.path ? serializePath(action.path) : undefined,
+        strokeWidth: action.strokeWidth,
+        color: action.color,
+        sourceWidth: action.sourceWidth,
+        sourceHeight: action.sourceHeight,
+      };
+    }
+
+    return {
       type: action.type,
       pathSvg: action.path ? serializePath(action.path) : undefined,
       color: action.color,
@@ -474,13 +498,14 @@ const serializeActions = (actions: DrawingAction[]): SerializedAction[] => {
       stickerX: action.stickerX,
       stickerY: action.stickerY,
       stickerSize: action.stickerSize,
-      // Magic-fill fields
+      // Magic-fill (legacy) fields
       magicFills: action.magicFills,
       // Cross-platform source dimensions - preserve so actions from different
       // platforms keep their original coordinate space
       sourceWidth: action.sourceWidth,
       sourceHeight: action.sourceHeight,
-    }));
+    };
+  });
 };
 
 /**
@@ -497,6 +522,29 @@ const deserializeActions = (
       // Skip actions with invalid paths
       if (action.type === "stroke" && action.pathSvg && !path) {
         return null;
+      }
+
+      // region → the in-memory magic-reveal / magic-auto action types.
+      if (action.type === "region") {
+        if (action.mode === "reveal") {
+          if (action.pathSvg && !path) return null; // bad path → drop
+          return {
+            type: "magic-reveal",
+            path: path || undefined,
+            color: action.color || "#REGIONSTORE",
+            variant: action.variant,
+            strokeWidth: action.strokeWidth,
+            sourceWidth: action.sourceWidth,
+            sourceHeight: action.sourceHeight,
+          } as DrawingAction;
+        }
+        return {
+          type: "magic-auto",
+          color: action.color || "#REGIONSTORE",
+          variant: action.variant,
+          sourceWidth: action.sourceWidth,
+          sourceHeight: action.sourceHeight,
+        } as DrawingAction;
       }
 
       return {
@@ -542,6 +590,7 @@ export const saveCanvasState = async (
   canvasWidth?: number,
   canvasHeight?: number,
   previewDataUrl?: string,
+  snapshotDataUrl?: string,
 ): Promise<boolean> => {
   console.log(
     `[CANVAS_PERSIST] SAVE START - Image: ${imageId}, Actions: ${actions.length}, Dimensions: ${canvasWidth}x${canvasHeight}`,
@@ -553,8 +602,10 @@ export const saveCanvasState = async (
     return false;
   }
 
-  if (!actions || actions.length === 0) {
-    console.warn(`[CANVAS_PERSIST] SAVE SKIPPED - No actions to save`);
+  // Save if there are actions OR a snapshot to persist (a legacy/reference page
+  // may have only a snapshot).
+  if ((!actions || actions.length === 0) && !snapshotDataUrl) {
+    console.warn(`[CANVAS_PERSIST] SAVE SKIPPED - Nothing to save`);
     return false;
   }
 
@@ -632,6 +683,7 @@ export const saveCanvasState = async (
       canvasWidth,
       canvasHeight,
       previewDataUrl,
+      snapshotDataUrl,
     )
       .then(async (result) => {
         if (result.success && result.version !== undefined) {
