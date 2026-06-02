@@ -11,6 +11,13 @@ import type {
 
 // Preview update throttle: 5 seconds minimum between updates
 const PREVIEW_UPDATE_THROTTLE_MS = 5 * 1000;
+// Snapshot (restore raster) is larger — throttle harder.
+const SNAPSHOT_UPDATE_THROTTLE_MS = 20 * 1000;
+
+// Habitat (adults) has no multi-child profiles, so canvas progress is always
+// profile-null. The CanvasProgress unique key is per-profile
+// ([userId, profileId, coloringImageId]); CH always passes profileId = null.
+const CH_PROFILE_ID = null;
 
 /**
  * Upload preview image to blob storage
@@ -69,6 +76,46 @@ function shouldUpdatePreview(lastUpdatedAt: Date | null): boolean {
   return elapsed >= PREVIEW_UPDATE_THROTTLE_MS;
 }
 
+function shouldUpdateSnapshot(lastUpdatedAt: Date | null): boolean {
+  if (!lastUpdatedAt) return true;
+  const elapsed = Date.now() - lastUpdatedAt.getTime();
+  return elapsed >= SNAPSHOT_UPDATE_THROTTLE_MS;
+}
+
+/**
+ * Upload the full-fidelity restore snapshot to blob storage.
+ */
+async function uploadSnapshotImage(
+  userId: string,
+  coloringImageId: string,
+  snapshotDataUrl: string,
+): Promise<string | null> {
+  try {
+    const base64Match = snapshotDataUrl.match(
+      /^data:image\/(\w+);base64,(.+)$/,
+    );
+    if (!base64Match) {
+      console.error("[Canvas API] Invalid snapshot data URL format");
+      return null;
+    }
+    const [, format, base64Data] = base64Match;
+    const imageBuffer = Buffer.from(base64Data, "base64");
+    if (imageBuffer.length > 2 * 1024 * 1024) {
+      console.warn("[Canvas API] Snapshot large:", imageBuffer.length);
+    }
+    const timestamp = Date.now();
+    const fileName = `uploads/canvas-snapshots/${userId}/no-profile/${coloringImageId}/${timestamp}.${format === "webp" ? "webp" : "png"}`;
+    const { url } = await put(fileName, imageBuffer, {
+      access: "public",
+      contentType: format === "webp" ? "image/webp" : "image/png",
+    });
+    return url;
+  } catch (error) {
+    console.error("[Canvas API] Error uploading snapshot:", error);
+    return null;
+  }
+}
+
 /**
  * Get the authenticated user ID from NextAuth session.
  * Habitat is web-only so no mobile JWT support needed.
@@ -95,6 +142,9 @@ export async function POST(request: NextRequest) {
       canvasWidth,
       canvasHeight,
       previewDataUrl,
+      snapshotDataUrl,
+      snapshotWidth,
+      snapshotHeight,
     } = body;
 
     if (!coloringImageId || !actions || version === undefined) {
@@ -117,14 +167,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if progress exists
-    const existingProgress = await db.canvasProgress.findUnique({
-      where: {
-        userId_coloringImageId: {
-          userId,
-          coloringImageId,
-        },
-      },
+    // Per-profile key (CH is always profile-null). findFirst handles the null
+    // in the compound unique cleanly.
+    const existingProgress = await db.canvasProgress.findFirst({
+      where: { userId, profileId: CH_PROFILE_ID, coloringImageId },
     });
 
     if (existingProgress) {
@@ -140,32 +186,38 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      // Handle preview upload with throttling
       let newPreviewUrl: string | null = null;
-      const shouldUploadPreview =
+      if (
         previewDataUrl &&
-        shouldUpdatePreview(existingProgress.previewUpdatedAt);
-
-      if (shouldUploadPreview) {
+        shouldUpdatePreview(existingProgress.previewUpdatedAt)
+      ) {
         newPreviewUrl = await uploadPreviewImage(
           userId,
           coloringImageId,
           previewDataUrl,
         );
-
         if (newPreviewUrl && existingProgress.previewUrl) {
           await deletePreviewImage(existingProgress.previewUrl);
         }
       }
 
-      // Update existing progress
+      let newSnapshotUrl: string | null = null;
+      if (
+        snapshotDataUrl &&
+        shouldUpdateSnapshot(existingProgress.snapshotUpdatedAt)
+      ) {
+        newSnapshotUrl = await uploadSnapshotImage(
+          userId,
+          coloringImageId,
+          snapshotDataUrl,
+        );
+        if (newSnapshotUrl && existingProgress.snapshotUrl) {
+          await deletePreviewImage(existingProgress.snapshotUrl);
+        }
+      }
+
       const updated = await db.canvasProgress.update({
-        where: {
-          userId_coloringImageId: {
-            userId,
-            coloringImageId,
-          },
-        },
+        where: { id: existingProgress.id },
         data: {
           actions: actions as any,
           version: version + 1,
@@ -175,6 +227,12 @@ export async function POST(request: NextRequest) {
             previewUrl: newPreviewUrl,
             previewUpdatedAt: new Date(),
           }),
+          ...(newSnapshotUrl && {
+            snapshotUrl: newSnapshotUrl,
+            snapshotWidth: snapshotWidth ?? null,
+            snapshotHeight: snapshotHeight ?? null,
+            snapshotUpdatedAt: new Date(),
+          }),
         },
       });
 
@@ -183,9 +241,9 @@ export async function POST(request: NextRequest) {
         version: updated.version,
         lastUpdated: updated.updatedAt.toISOString(),
         previewUrl: updated.previewUrl,
+        snapshotUrl: updated.snapshotUrl,
       });
     } else {
-      // Upload preview for new progress if provided
       let previewUrl: string | null = null;
       if (previewDataUrl) {
         previewUrl = await uploadPreviewImage(
@@ -194,11 +252,19 @@ export async function POST(request: NextRequest) {
           previewDataUrl,
         );
       }
+      let snapshotUrl: string | null = null;
+      if (snapshotDataUrl) {
+        snapshotUrl = await uploadSnapshotImage(
+          userId,
+          coloringImageId,
+          snapshotDataUrl,
+        );
+      }
 
-      // Create new progress
       const created = await db.canvasProgress.create({
         data: {
           userId,
+          profileId: CH_PROFILE_ID,
           coloringImageId,
           actions: actions as any,
           version: 1,
@@ -206,6 +272,10 @@ export async function POST(request: NextRequest) {
           canvasHeight: canvasHeight || null,
           previewUrl,
           previewUpdatedAt: previewUrl ? new Date() : null,
+          snapshotUrl,
+          snapshotWidth: snapshotUrl ? (snapshotWidth ?? null) : null,
+          snapshotHeight: snapshotUrl ? (snapshotHeight ?? null) : null,
+          snapshotUpdatedAt: snapshotUrl ? new Date() : null,
         },
       });
 
@@ -214,6 +284,7 @@ export async function POST(request: NextRequest) {
         version: created.version,
         lastUpdated: created.createdAt.toISOString(),
         previewUrl: created.previewUrl,
+        snapshotUrl: created.snapshotUrl,
       });
     }
   } catch (error) {
@@ -248,13 +319,8 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const progress = await db.canvasProgress.findUnique({
-      where: {
-        userId_coloringImageId: {
-          userId,
-          coloringImageId: imageId,
-        },
-      },
+    const progress = await db.canvasProgress.findFirst({
+      where: { userId, profileId: CH_PROFILE_ID, coloringImageId: imageId },
     });
 
     if (!progress) {
@@ -268,6 +334,11 @@ export async function GET(request: NextRequest) {
       ...(progress.canvasWidth && { canvasWidth: progress.canvasWidth }),
       ...(progress.canvasHeight && { canvasHeight: progress.canvasHeight }),
       ...(progress.previewUrl && { previewUrl: progress.previewUrl }),
+      ...(progress.snapshotUrl && { snapshotUrl: progress.snapshotUrl }),
+      ...(progress.snapshotWidth && { snapshotWidth: progress.snapshotWidth }),
+      ...(progress.snapshotHeight && {
+        snapshotHeight: progress.snapshotHeight,
+      }),
     };
 
     return NextResponse.json(response);
@@ -298,29 +369,20 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    // Fetch the progress to get the previewUrl for cleanup
-    const progress = await db.canvasProgress.findUnique({
-      where: {
-        userId_coloringImageId: {
-          userId,
-          coloringImageId: imageId,
-        },
-      },
-      select: { previewUrl: true },
+    // Fetch first to get blob URLs for cleanup + the row id to delete.
+    const progress = await db.canvasProgress.findFirst({
+      where: { userId, profileId: CH_PROFILE_ID, coloringImageId: imageId },
+      select: { id: true, previewUrl: true, snapshotUrl: true },
     });
 
-    if (progress?.previewUrl) {
-      await deletePreviewImage(progress.previewUrl);
+    if (!progress) {
+      return NextResponse.json({ success: true });
     }
 
-    await db.canvasProgress.delete({
-      where: {
-        userId_coloringImageId: {
-          userId,
-          coloringImageId: imageId,
-        },
-      },
-    });
+    if (progress.previewUrl) await deletePreviewImage(progress.previewUrl);
+    if (progress.snapshotUrl) await deletePreviewImage(progress.snapshotUrl);
+
+    await db.canvasProgress.delete({ where: { id: progress.id } });
 
     return NextResponse.json({ success: true });
   } catch (error) {
