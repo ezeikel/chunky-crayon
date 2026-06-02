@@ -819,7 +819,12 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
   },
   canvasCardLandscape: {
-    width: "100%",
+    // Hug the (letterboxed) canvas and center within the column rather than
+    // span full width — so a height-bound square sits centered, not pinned to
+    // the left with dead space beside it. maxWidth keeps it from exceeding the
+    // column on a wide image. alignSelf centers it horizontally; the parent
+    // (canvasFillFixed) centers it vertically.
+    alignSelf: "center",
     maxWidth: "100%",
     overflow: "hidden",
     backgroundColor: "rgba(255, 255, 255, 0.95)",

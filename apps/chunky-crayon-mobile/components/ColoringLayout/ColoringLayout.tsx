@@ -208,15 +208,21 @@ const styles = StyleSheet.create({
     alignItems: "stretch",
   },
   // Fixed (landscape) tier: claim the leftover column height so onLayout
-  // measures the real visible area, and clip a too-tall canvas rather than let
-  // it spill past the bottom edge. (Scrollable/portrait keeps plain canvasFill.)
+  // measures the real visible area, and CENTER the (letterboxed) canvas within
+  // it so the slack from height-fitting a square into a wide column is balanced
+  // top/bottom + left/right instead of pinned top-left. (Scrollable/portrait
+  // keeps plain canvasFill.)
   canvasFillFixed: {
     flex: 1,
     overflow: "hidden",
+    justifyContent: "center",
+    alignItems: "center",
   },
   middleCanvas: {
     flex: 1,
     overflow: "hidden",
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
 
