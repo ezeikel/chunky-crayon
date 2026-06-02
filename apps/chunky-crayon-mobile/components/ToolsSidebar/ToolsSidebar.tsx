@@ -19,7 +19,9 @@ import {
   ZoomInIcon,
   ZoomOutIcon,
   ExpandIcon,
+  HomeIcon,
 } from "@/components/coloring/StrokeIcons";
+import { useFocusMode } from "@/components/FocusMode/FocusModeProvider";
 import {
   COLORING_REGULAR_TOOLS,
   COLORING_MAGIC_TOOLS,
@@ -87,6 +89,7 @@ const ToolsSidebar = ({
   scrollable = false,
 }: ToolsSidebarProps) => {
   const insets = useSafeAreaInsets();
+  const { isFocusMode, toggleFocus } = useFocusMode();
 
   const {
     selectedTool,
@@ -262,8 +265,12 @@ const ToolsSidebar = ({
 
           <View style={styles.divider} />
 
-          {/* Zoom — stroke magnifier glyphs, borderless. Zoom out / in /
-              fullscreen (faExpand, persistent — web's third zoom button). */}
+          {/* Zoom — stroke glyphs, borderless. Web's ZoomControls row:
+              zoom out / in / home (reset-to-fit) / fullscreen (focus mode).
+              The home + fullscreen buttons are DISTINCT — home returns to the
+              whole picture, fullscreen toggles focus mode (hides all chrome).
+              Previously these were conflated into one expand button wired to
+              reset-zoom, so focus mode had no entry on iPad. */}
           <View style={[styles.controlRowCentered, { gap, width: gridWidth }]}>
             <Pressable
               onPress={() => {
@@ -305,8 +312,8 @@ const ToolsSidebar = ({
                 }
               />
             </Pressable>
-            {/* Fullscreen / fit-view — persistent third zoom button (web's
-                expand button). Resets the canvas to fit. */}
+            {/* Home — reset zoom/pan back to the whole picture (web's
+                HomeIcon reset-view). */}
             <Pressable
               onPress={() => {
                 tapLight();
@@ -316,7 +323,24 @@ const ToolsSidebar = ({
                 styles.controlButtonBorderless,
                 { width: controlSize, height: controlSize },
               ]}
-              accessibilityLabel="Fit to screen"
+              accessibilityLabel="See whole picture"
+            >
+              <HomeIcon size={22} color={COLORS.textSecondary} />
+            </Pressable>
+            {/* Fullscreen — toggles focus mode (hides all chrome, full-bleed
+                canvas). Web's trailing expand button; the floating X exits. */}
+            <Pressable
+              onPress={() => {
+                tapLight();
+                toggleFocus();
+              }}
+              style={[
+                styles.controlButtonBorderless,
+                { width: controlSize, height: controlSize },
+              ]}
+              accessibilityLabel={
+                isFocusMode ? "Exit focus mode" : "Enter focus mode"
+              }
             >
               <ExpandIcon size={22} color={COLORS.textSecondary} />
             </Pressable>

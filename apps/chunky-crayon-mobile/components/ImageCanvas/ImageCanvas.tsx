@@ -108,6 +108,7 @@ import {
   DEFAULT_SIMPLIFICATION_TOLERANCE,
 } from "@/utils/pathSimplification";
 import MagicColorHint from "@/components/MagicColorHint";
+import { useFocusMode } from "@/components/FocusMode/FocusModeProvider";
 import { perfect } from "@/styles";
 import {
   tapHeavy,
@@ -168,6 +169,13 @@ const ImageCanvas = ({
   const canvasDimsRef = useRef({ width: canvasWidth, height: canvasHeight });
   canvasDimsRef.current = { width: canvasWidth, height: canvasHeight };
 
+  // Focus mode hides all chrome and full-bleeds the canvas — a layout change
+  // that resizes the native RNSkView surface WITHOUT changing window dims, so it
+  // must re-arm the snapshot settle gate below (otherwise a queued progress
+  // measure snapshots the 0-dim mid-transition surface → native Metal SIGABRT,
+  // the same class of crash as rotation).
+  const { isFocusMode } = useFocusMode();
+
   // Rotation-settle gate for snapshots. `makeImageSnapshot()` builds an
   // offscreen Metal texture from the NATIVE RNSkView backing surface — NOT from
   // our JS-computed canvasWidth/Height. During an orientation change UIKit
@@ -185,6 +193,9 @@ const ImageCanvas = ({
   useEffect(() => {
     // screenWidth/screenHeight come from useWindowDimensions and flip the
     // instant orientation changes — before the native surface re-lays-out.
+    // isFocusMode is the same kind of event: entering/exiting focus resizes the
+    // canvas surface full-bleed without a window-dim change, and a snapshot
+    // during that transition aborts the process — so gate on it too.
     layoutSettledRef.current = false;
     if (settleTimerRef.current) clearTimeout(settleTimerRef.current);
     settleTimerRef.current = setTimeout(() => {
@@ -193,7 +204,7 @@ const ImageCanvas = ({
     return () => {
       if (settleTimerRef.current) clearTimeout(settleTimerRef.current);
     };
-  }, [screenWidth, screenHeight]);
+  }, [screenWidth, screenHeight, isFocusMode]);
 
   // Guarded Skia snapshot. Refuses to snapshot unless (a) the logical canvas
   // dimensions are finite and >= 1 AND (b) the layout has settled since the

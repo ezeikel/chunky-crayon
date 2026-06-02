@@ -396,28 +396,47 @@ const ColoringImage = () => {
                between them by what fits. Hidden chrome in focus mode →
                render just the canvas full-bleed. */
             isFocusMode ? (
-              /* Focus mode: full-bleed canvas, no header/title/rails — the most
-                 room, so the tight-fit concern doesn't apply here. Deflate by
-                 the card padding for consistency with the other tiers. */
-              <View style={styles.canvasCenter}>
-                <View style={styles.canvasCardLandscape}>
-                  <ImageCanvas
-                    coloringImage={coloringImage}
-                    setScroll={setScroll}
-                    canvasArea={{
-                      width: Math.max(
-                        1,
-                        canvasArea.width - CANVAS_CARD_PADDING * 2,
-                      ),
-                      height: Math.max(
-                        1,
-                        canvasArea.height - CANVAS_CARD_PADDING * 2,
-                      ),
-                    }}
-                    layoutMode={layoutMode}
-                  />
-                </View>
-              </View>
+              /* Focus mode: KEEP the rails (palette + tools), just drop the
+                 header above and the "More Coloring Pages" strip below so the
+                 canvas gets the full window height — maximum colouring space
+                 without losing the sidebars (web parity: focus mode hides
+                 chrome, not the toolbars). Render ColoringLayout directly in
+                 the flex:1 mainContent (no ScrollView wrapper) so its row
+                 fills the whole screen; the canvas measure-fits that taller
+                 box. No scroll = no More-pages — that's the point of focus.
+                 The full-screen relayout is gated by the Skia snapshot
+                 settle-gate (ImageCanvas re-arms on isFocusMode change). */
+              <ColoringLayout
+                width={deviceInfo.screenWidth}
+                height={deviceInfo.screenHeight}
+                onZoomIn={handleZoomIn}
+                onZoomOut={handleZoomOut}
+                onResetZoom={handleResetZoom}
+                zoom={scale}
+                onStartOver={handleStartOver}
+                onPrint={() => setShowPrintSheet(true)}
+                onSave={() => setShowSaveSheet(true)}
+                onMyArtwork={() => setShowMyArtworkSheet(true)}
+                renderCanvas={(area) => (
+                  <View style={styles.canvasCardLandscape}>
+                    <ImageCanvas
+                      coloringImage={coloringImage}
+                      setScroll={setScroll}
+                      canvasArea={{
+                        width: Math.max(
+                          1,
+                          area.width - CANVAS_CARD_PADDING * 2,
+                        ),
+                        height: Math.max(
+                          1,
+                          area.height - CANVAS_CARD_PADDING * 2,
+                        ),
+                      }}
+                      layoutMode={layoutMode}
+                    />
+                  </View>
+                )}
+              />
             ) : isThreeColumnPortrait ? (
               /* Portrait three-column: scroll the rails+canvas as one block,
                  then a "More Coloring Pages" grid fills the dead space below.

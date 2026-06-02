@@ -22,7 +22,9 @@ import {
   ZoomInIcon,
   ZoomOutIcon,
   ExpandIcon,
+  HomeIcon,
 } from "@/components/coloring/StrokeIcons";
+import { useFocusMode } from "@/components/FocusMode/FocusModeProvider";
 import {
   COLORING_REGULAR_TOOLS,
   COLORING_MAGIC_TOOLS,
@@ -75,6 +77,7 @@ const ColoringToolbar = ({
   const insets = useSafeAreaInsets();
   const { touchTargetSize } = useResponsiveLayout();
   const tile = touchTargetSize.medium;
+  const { isFocusMode, toggleFocus } = useFocusMode();
 
   const {
     selectedTool,
@@ -287,6 +290,7 @@ const ColoringToolbar = ({
               color={zoom >= maxZoom ? COLORS.textMuted : COLORS.textSecondary}
             />
           </Pressable>
+          {/* Home — reset zoom/pan to the whole picture (web's HomeIcon). */}
           <Pressable
             onPress={() => {
               tapLight();
@@ -296,7 +300,25 @@ const ColoringToolbar = ({
               styles.controlButtonBorderless,
               { width: tile, height: tile },
             ]}
-            accessibilityLabel="Fit to screen"
+            accessibilityLabel="See whole picture"
+          >
+            <HomeIcon size={22} color={COLORS.textSecondary} />
+          </Pressable>
+          {/* Fullscreen — toggles focus mode (web's expand button). Distinct
+              from home; previously the expand icon was wired to reset-zoom, so
+              focus mode had no entry on iPad landscape. */}
+          <Pressable
+            onPress={() => {
+              tapLight();
+              toggleFocus();
+            }}
+            style={[
+              styles.controlButtonBorderless,
+              { width: tile, height: tile },
+            ]}
+            accessibilityLabel={
+              isFocusMode ? "Exit focus mode" : "Enter focus mode"
+            }
           >
             <ExpandIcon size={22} color={COLORS.textSecondary} />
           </Pressable>
