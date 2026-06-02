@@ -65,8 +65,17 @@ jobs:
 
   # Gate e2e on the seed DB secret existing. Without it the job is skipped
   # (the run stays green) rather than a confusing red — until a
-  # PLAYWRIGHT_DATABASE_URL secret (a throwaway Neon branch forked from
-  # dev) exists, e2e simply doesn't run.
+  # PLAYWRIGHT_DATABASE_URL secret exists, e2e simply doesn't run.
+  #
+  # PLAYWRIGHT_DATABASE_URL points at a PERSISTENT, CI-owned Neon branch
+  # (`ci-e2e`), NOT a throwaway. It is forked from dev ONCE at creation, then
+  # lives forever: the "Apply migrations to the Playwright DB" step in the e2e
+  # job below runs `prisma migrate deploy` every run, so its SCHEMA auto-tracks
+  # main's committed migration history (same history dev + prod follow). Its
+  # CONTENT is only the e2e test seed (seed-test-user.ts is idempotent —
+  # upserts — so it's safe to re-run). Do NOT re-fork it per run (that would
+  # drag in dev's real data and cost a branch-create each run); do NOT point it
+  # at dev or prod.
   e2e-precheck:
     name: e2e precheck
     runs-on: ubuntu-latest
@@ -153,6 +162,20 @@ jobs:
       # ~30s of tsc, vs the ~2min full prod build we're avoiding.
       - name: Build workspace packages (deps of the web app)
         run: pnpm exec turbo run build --filter=@one-colored-pixel/chunky-crayon-web^...
+
+      # Bring the Playwright Neon branch up to the current schema BEFORE seeding.
+      # Without this the branch drifts behind main as migrations land (it was
+      # forked from dev at some past point), and the seed fails with a Prisma
+      # P2022 ColumnNotFound for any column added since the fork (e.g. the
+      # profiles avatarId / colo-evolution columns). `migrate deploy` applies
+      # the committed migration history, so the e2e DB self-heals every run and
+      # tracks main automatically. Uses the job-level DATABASE_URL
+      # (= PLAYWRIGHT_DATABASE_URL).
+      - name: Apply migrations to the Playwright DB
+        env:
+          DATABASE_URL: ${{ secrets.PLAYWRIGHT_DATABASE_URL }}
+        working-directory: ./packages/db
+        run: pnpm exec prisma migrate deploy
 
       - name: Seed Playwright test user
         working-directory: ./apps/chunky-crayon-web
