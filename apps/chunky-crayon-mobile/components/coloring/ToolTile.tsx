@@ -143,6 +143,12 @@ const ToolTile = ({
       <View
         style={[
           styles.tileBase,
+          // Regular tiles have no absolutely-positioned fill to clip (only the
+          // magic tile's gradient needs that), so DON'T clip here — faFillDrip
+          // (the Fill tool) has a wide viewBox with a drip in the bottom-right
+          // corner that otherwise gets cut by the rounded-corner overflow.
+          // Matches web, whose regular tool tiles aren't overflow-hidden.
+          styles.tileVisible,
           selected ? styles.selected : styles.unselected,
         ]}
       >
@@ -167,6 +173,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     overflow: "hidden",
+  },
+  // Regular-tile override: don't clip, so a wide glyph (faFillDrip) isn't cut
+  // at the rounded corner. The selected tile's bg/border come from
+  // styles.selected/unselected, which paint inside the radius regardless.
+  tileVisible: {
+    overflow: "visible",
   },
   fill: {
     position: "absolute",
