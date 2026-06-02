@@ -28,7 +28,6 @@ import {
   TextAlign,
   Fill,
   ImageFormat,
-  BlendMode,
   notifyChange,
 } from "@shopify/react-native-skia";
 import {
@@ -48,7 +47,10 @@ import {
   GridColorCell,
   GridColorMap,
   FillPointsData,
+  type PaletteVariant,
 } from "@/types";
+import { useRegionStore } from "@/hooks/useRegionStore";
+import { usePreColoredImage } from "@/hooks/usePreColoredImage";
 import {
   useCanvasStore,
   DrawingAction,
@@ -176,7 +178,14 @@ const ImageCanvas = ({
     y: number;
   } | null>(null);
 
-  // Parse fillPointsJson (preferred) and colorMapJson (fallback) once
+  // Region store (modern Magic Brush / Auto Color). Loads + decodes the
+  // pixel→region map; usePreColoredImage builds the per-variant SkImage that
+  // the reveal/auto layers paint with. Falls back to legacy fillPoints/colorMap
+  // below when no region data is present.
+  const regionStore = useRegionStore(coloringImage);
+
+  // Parse fillPointsJson (preferred) and colorMapJson (fallback) once — LEGACY
+  // fallback for images created before the region-store pipeline.
   const fillPoints = useMemo(() => {
     return parseFillPoints(coloringImage.fillPointsJson);
   }, [coloringImage.fillPointsJson]);
@@ -196,6 +205,7 @@ const ImageCanvas = ({
     selectedSticker,
     stickerSize,
     magicMode,
+    paletteVariant,
     rainbowHue,
     history,
     historyIndex,
@@ -222,16 +232,21 @@ const ImageCanvas = ({
   // Feature flags
   const { texturedBrushes, pathSimplification } = useFeatureStore();
 
-  // Magic tools (auto-color / magic brush) need pre-computed colour data —
-  // fill points (preferred) or the legacy grid colour map. The backend
-  // writes these async after image creation, so until one is present the
-  // toolbars disable + spin the magic buttons. Same condition the magic
-  // tap handler guards on (hasFillPoints || hasColorMap).
+  // Pre-coloured SkImage for the active palette variant (Magic Brush reveal +
+  // Auto Color). forVariant lets committed reveals/autos render with the exact
+  // variant they were made under. Built off the region store.
+  const preColored = usePreColoredImage(regionStore, paletteVariant);
+
+  // Magic tools enable as soon as EITHER the region store is ready OR legacy
+  // colour data exists. Region store is the modern path; fillPoints/colorMap
+  // the fallback for un-backfilled images. Until one is present the toolbars
+  // disable + spin the magic buttons (loading={!magicReady}).
   useEffect(() => {
+    const hasRegionStore = regionStore.state.isReady;
     const hasFillPoints = !!fillPoints && fillPoints.points.length > 0;
     const hasColorMap = !!colorMap && isValidColorMap(colorMap);
-    setMagicReady(hasFillPoints || hasColorMap);
-  }, [fillPoints, colorMap, setMagicReady]);
+    setMagicReady(hasRegionStore || hasFillPoints || hasColorMap);
+  }, [regionStore.state.isReady, fillPoints, colorMap, setMagicReady]);
 
   // Sync haptics enabled state with mute setting
   useEffect(() => {
@@ -779,6 +794,31 @@ const ImageCanvas = ({
         rebuilt.lineTo(xs[i], ys[i]);
       }
 
+      // Magic Brush drag → commit a region-store reveal (the whole stroke as
+      // one magic-reveal action = one SrcIn layer, not one per dab). Colour is
+      // re-derived per region from the pre-coloured image at render time; we
+      // just store the path + the variant it was drawn under. Skip all the
+      // brush/pressure/rainbow logic below.
+      if (liveSelectedTool === "magic") {
+        const { paletteVariant: liveVariant } = useCanvasStore.getState();
+        addAction({
+          type: "magic-reveal",
+          path: rebuilt,
+          color: "#REGIONSTORE",
+          variant: liveVariant,
+          strokeWidth: getPressureAdjustedWidth(
+            liveBrushSize,
+            "marker",
+            DEFAULT_PRESSURE,
+          ),
+          sourceWidth: svgDimensions.width,
+          sourceHeight: svgDimensions.height,
+          liveStrokeId: ++liveStrokeIdRef.current,
+        });
+        pendingLiveStrokeIdRef.current = liveStrokeIdRef.current;
+        return;
+      }
+
       const isErasing = liveSelectedTool === "eraser";
       const effectiveBrushType: BrushType = isErasing
         ? "eraser"
@@ -934,7 +974,48 @@ const ImageCanvas = ({
     (x: number, y: number) => {
       if (selectedTool !== "magic") return;
 
-      // Check if any color data is available (prefer fill points over grid)
+      const coords = touchToSvgCoords(x, y);
+      if (!coords || !svgDimensions) return;
+
+      // ── Region store path (preferred) ───────────────────────────────────
+      // Auto Color = paint the whole pre-coloured layer in one shot (a single
+      // magic-auto action). Magic Brush tap (suggest mode) = a dot reveal; the
+      // drag path is handled in the pan gesture. Both re-derive colour per
+      // region from the pre-coloured image at render time.
+      if (regionStore.state.isReady && preColored.current) {
+        tapMedium();
+        if (magicMode === "auto") {
+          notifySuccess();
+          addAction({
+            type: "magic-auto",
+            color: "#REGIONSTORE",
+            variant: paletteVariant,
+            sourceWidth: svgDimensions.width,
+            sourceHeight: svgDimensions.height,
+          });
+        } else {
+          // Magic Brush dot at the tap point.
+          const dot = Skia.Path.Make();
+          dot.moveTo(coords.x, coords.y);
+          dot.lineTo(coords.x, coords.y);
+          addAction({
+            type: "magic-reveal",
+            path: dot,
+            color: "#REGIONSTORE",
+            variant: paletteVariant,
+            strokeWidth: getPressureAdjustedWidth(
+              brushSize,
+              "marker",
+              DEFAULT_PRESSURE,
+            ),
+            sourceWidth: svgDimensions.width,
+            sourceHeight: svgDimensions.height,
+          });
+        }
+        return;
+      }
+
+      // ── Legacy fallback (fillPoints / colorMap) ─────────────────────────
       const hasFillPoints = fillPoints && fillPoints.points.length > 0;
       const hasColorMap = colorMap && isValidColorMap(colorMap);
 
@@ -942,9 +1023,6 @@ const ImageCanvas = ({
         console.warn("No color data available for magic tool");
         return;
       }
-
-      const coords = touchToSvgCoords(x, y);
-      if (!coords || !svgDimensions) return;
 
       tapMedium();
 
@@ -1015,6 +1093,10 @@ const ImageCanvas = ({
       svgDimensions,
       touchToSvgCoords,
       addAction,
+      regionStore.state.isReady,
+      preColored,
+      paletteVariant,
+      brushSize,
     ],
   );
 
@@ -1036,8 +1118,16 @@ const ImageCanvas = ({
   // Pan gesture for drawing or panning
   // Note: event.force and event.pointerType provide Apple Pencil pressure data
   // brush AND eraser both draw a path (the eraser commits a stroke with
-  // brushType "eraser", rendered with a dstOut blend). Anything else pans.
-  const isDrawingTool = selectedTool === "brush" || selectedTool === "eraser";
+  // brushType "eraser", rendered with a dstOut blend). Magic Brush (magic tool
+  // in suggest mode, with the region store ready) also drags a path — it
+  // commits a magic-reveal instead of a stroke. Anything else pans.
+  const isMagicBrush =
+    selectedTool === "magic" &&
+    magicMode === "suggest" &&
+    regionStore.state.isReady &&
+    !!preColored.current;
+  const isDrawingTool =
+    selectedTool === "brush" || selectedTool === "eraser" || isMagicBrush;
   const panGesture = Gesture.Pan()
     // Keep tracking when the finger strays outside the canvas mid-stroke. The
     // default cancels the gesture the moment the touch leaves the view bounds,
@@ -1554,6 +1644,62 @@ const ImageCanvas = ({
       });
   }, [visibleActions, brushSize, texturedBrushes]);
 
+  // Render committed region-store magic actions (Magic Brush reveals +
+  // Auto Color). magic-auto draws the whole pre-coloured image; magic-reveal
+  // reveals the pre-coloured image only along the stroke via SrcIn (the white
+  // stroke is the mask, the image supplies the per-region colour). Each looks
+  // up the pre-coloured image for the variant the action was committed under,
+  // so undo/redo across a palette switch keeps history's colours.
+  const renderReveals = useMemo(() => {
+    if (!svgDimensions) return null;
+    return visibleActions
+      .filter((a) => a.type === "magic-auto" || a.type === "magic-reveal")
+      .map((action, index) => {
+        const image = preColored.forVariant(
+          (action.variant as PaletteVariant) ?? "realistic",
+        );
+        if (!image) return null;
+
+        if (action.type === "magic-auto") {
+          return (
+            <SkiaImage
+              key={`magic-auto-${index}`}
+              image={image}
+              x={0}
+              y={0}
+              width={svgDimensions.width}
+              height={svgDimensions.height}
+              fit="fill"
+            />
+          );
+        }
+
+        // magic-reveal — mask the pre-coloured image to the stroke.
+        if (!action.path) return null;
+        return (
+          <Group key={`magic-reveal-${index}`} layer={<Paint />}>
+            <Path
+              path={action.path}
+              color="white"
+              style="stroke"
+              strokeWidth={action.strokeWidth ?? brushSize}
+              strokeCap="round"
+              strokeJoin="round"
+            />
+            <SkiaImage
+              image={image}
+              x={0}
+              y={0}
+              width={svgDimensions.width}
+              height={svgDimensions.height}
+              fit="fill"
+              blendMode="srcIn"
+            />
+          </Group>
+        );
+      });
+  }, [visibleActions, preColored, svgDimensions, brushSize]);
+
   if (!svgDimensions) {
     return null;
   }
@@ -1626,6 +1772,10 @@ const ImageCanvas = ({
                     svg={svg}
                   />
                 )}
+                {/* Region-store magic (Auto Color + Magic Brush reveals) —
+                    above the base/fill, below strokes & stickers so brush work
+                    sits on top and the eraser punches through both. */}
+                {renderReveals}
                 {/* Rendered paths */}
                 {renderPaths}
                 {/* Rendered stickers */}
@@ -1639,7 +1789,30 @@ const ImageCanvas = ({
                     never blank for a frame (no flash). The path geometry updates
                     on the UI thread via the shared value with no per-point
                     re-render. */}
-                {selectedTool === "eraser" ? (
+                {isMagicBrush && preColored.current ? (
+                  // Live Magic Brush reveal — same SrcIn mask as the committed
+                  // reveal: the white live stroke is the mask, the pre-coloured
+                  // image supplies the per-region colour.
+                  <Group layer={<Paint />}>
+                    <Path
+                      path={livePath}
+                      color="white"
+                      style="stroke"
+                      strokeWidth={currentStrokeWidth}
+                      strokeCap="round"
+                      strokeJoin="round"
+                    />
+                    <SkiaImage
+                      image={preColored.current}
+                      x={0}
+                      y={0}
+                      width={svgDimensions.width}
+                      height={svgDimensions.height}
+                      fit="fill"
+                      blendMode="srcIn"
+                    />
+                  </Group>
+                ) : selectedTool === "eraser" ? (
                   // Live eraser preview — dstOut so it erases as you drag.
                   <Path
                     path={livePath}
