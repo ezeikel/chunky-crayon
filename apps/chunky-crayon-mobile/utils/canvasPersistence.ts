@@ -31,6 +31,16 @@ const MAX_MERGE_RETRIES = 2;
 const _syncInFlight = new Set<string>();
 const _syncWanted = new Set<string>();
 
+// Read-only probe of the in-flight set. The autosave's deferred raster save
+// (see ImageCanvas Phase 2) skips capturing a snapshot while a sync is already
+// in flight for this image: the coalescing follow-up (see syncCanvasToServer)
+// re-sends the IN-FLIGHT call's closure URLs, so a second raster-bearing call
+// would be swallowed and the snapshot silently dropped. Skipping lets the next
+// settled autosave cycle capture it instead — within the staleness tolerance
+// for the (convenience-only) raster artifact.
+export const isSyncInFlight = (imageId: string): boolean =>
+  _syncInFlight.has(imageId);
+
 // After a 409 append-merge, the merged action set must be pushed back into the
 // live in-memory canvas store so the next autosave serializes the union (not
 // this device's set). The canvas screen registers a handler that replaces the

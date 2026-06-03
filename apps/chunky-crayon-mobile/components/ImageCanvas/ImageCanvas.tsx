@@ -13,6 +13,7 @@ import {
   useWindowDimensions,
   StyleSheet,
   Image as RNImage,
+  InteractionManager,
 } from "react-native";
 import { useFocusEffect } from "expo-router";
 import {
@@ -93,6 +94,7 @@ import {
   debugCanvasStorage,
   setMergedActionsHandler,
   unionLocalWithMerged,
+  isSyncInFlight,
 } from "@/utils/canvasPersistence";
 import { primeDeviceId } from "@/stores/canvasStore";
 import {
@@ -408,39 +410,57 @@ const ImageCanvas = ({
     // the snapshot of the blank line-art raster samples a few anti-aliased
     // outline pixels and the bar sticks at ~1% after Start Over instead of
     // snapping to empty (web shows no bar at 0; mobile shows an empty pill).
+    // This cheap store read stays synchronous so 0% snaps instantly.
     const { history: h, historyIndex: hi } = useCanvasStore.getState();
     const hasPaint = getVisibleActions(h, hi).some((a) => a.type !== "clear");
     if (!hasPaint) {
       useCanvasStore.getState().setProgress(0);
       return;
     }
-    const snap = safeMakeSnapshot(); // null mid-rotation / 0-dim → skip
-    if (!snap) return;
-    measuringRef.current = true;
-    try {
-      const w = snap.width();
-      const h = snap.height();
-      if (w < 1 || h < 1) return;
-      const cached = getPaintableMask(w, h);
-      if (!cached || cached.paintable <= 0) {
-        if (cached) useCanvasStore.getState().setProgress(0);
-        return;
+    // Defer the snapshot + pixel readback (the hundreds-of-ms synchronous Skia
+    // work) off the commit tick. This is the MORE FREQUENT of the two snapshot
+    // callers — it fires ~250ms after EVERY committed stroke (autosave is 1s and
+    // resets on rapid drawing), so its synchronous makeImageSnapshot + readRGBA
+    // colliding with the next stroke's commit → deferred-clear handoff is the
+    // leading cause of the residual ~1-frame stroke blink. runAfterInteractions
+    // does NOT wait for gestures/animations in this stack (gesture-handler +
+    // reanimated register no RN interaction handles) — it fires on the next
+    // drained-JS-queue tick (like setTimeout 0). That is sufficient: it makes
+    // the snapshot its OWN JS task, never on the handoff tick.
+    if (progressTaskRef.current) progressTaskRef.current.cancel();
+    progressTaskRef.current = InteractionManager.runAfterInteractions(() => {
+      progressTaskRef.current = null;
+      if (measuringRef.current) return;
+      const snap = safeMakeSnapshot(); // null mid-rotation / 0-dim → skip
+      if (!snap) return;
+      measuringRef.current = true;
+      try {
+        const w = snap.width();
+        const sh = snap.height();
+        if (w < 1 || sh < 1) return;
+        const cached = getPaintableMask(w, sh);
+        if (!cached || cached.paintable <= 0) {
+          if (cached) useCanvasStore.getState().setProgress(0);
+          return;
+        }
+        const composite = readRGBA(snap);
+        if (!composite) return;
+        const painted = countPainted(
+          composite,
+          cached.mask,
+          w,
+          sh,
+          PROGRESS_STRIDE,
+        );
+        useCanvasStore
+          .getState()
+          .setProgress(
+            progressPercent({ painted, paintable: cached.paintable }),
+          );
+      } finally {
+        measuringRef.current = false;
       }
-      const composite = readRGBA(snap);
-      if (!composite) return;
-      const painted = countPainted(
-        composite,
-        cached.mask,
-        w,
-        h,
-        PROGRESS_STRIDE,
-      );
-      useCanvasStore
-        .getState()
-        .setProgress(progressPercent({ painted, paintable: cached.paintable }));
-    } finally {
-      measuringRef.current = false;
-    }
+    });
   }, [safeMakeSnapshot, getPaintableMask, readRGBA]);
 
   const isInitializedRef = useRef(false);
@@ -588,6 +608,19 @@ const ImageCanvas = ({
   // Auto-save timer
   const autoSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // Deferred-snapshot task handles. The autosave raster (Phase 2) and the
+  // progress measure both do a SYNCHRONOUS Skia snapshot + pixel readback —
+  // hundreds of ms on the JS thread. Run inside InteractionManager.runAfter-
+  // Interactions so they land on their OWN drained-queue JS task, never on the
+  // same tick as a stroke's commit → deferred-clear handoff (which must coalesce
+  // empty-live + paint-committed into one Skia frame). A snapshot on that tick
+  // splits the handoff across a frame boundary → the rare ~1-frame stroke blink.
+  // Tracked so they can be cancelled on cleanup / image change (preserves the
+  // iPad-rotate 0-dim SIGABRT guard — a stale task must not snapshot a torn-down
+  // or mid-rotation surface).
+  const snapshotTaskRef = useRef<{ cancel: () => void } | null>(null);
+  const progressTaskRef = useRef<{ cancel: () => void } | null>(null);
+
   // Track which image ID we've initialized for (prevents re-init and detects changes)
   const initializedForImageIdRef = useRef<string | null>(null);
 
@@ -639,6 +672,18 @@ const ImageCanvas = ({
         `[CANVAS_INIT] Starting initialization for image: ${currentImageId}`,
       );
       isInitializedRef.current = false;
+
+      // Cancel any deferred snapshot/progress task left over from the previous
+      // image so its safeMakeSnapshot/encode can't run against the new image's
+      // canvas (belt-and-suspenders alongside the effect-cleanup cancels).
+      if (snapshotTaskRef.current) {
+        snapshotTaskRef.current.cancel();
+        snapshotTaskRef.current = null;
+      }
+      if (progressTaskRef.current) {
+        progressTaskRef.current.cancel();
+        progressTaskRef.current = null;
+      }
 
       // Debug storage to see what's actually saved
       await debugCanvasStorage();
@@ -999,47 +1044,86 @@ const ImageCanvas = ({
           `[AUTO_SAVE] Saving ${actionsToSave.length} actions with SVG dimensions: ${saveWidth}x${saveHeight}`,
         );
 
-        // Generate the feed preview (JPEG, small) AND the cross-device restore
-        // snapshot (PNG, full-fidelity — carries magic/legacy results the
-        // action list can't replay on another device) from one snapshot.
-        let previewDataUrl: string | undefined;
-        let snapshotDataUrl: string | undefined;
-        try {
-          const image = safeMakeSnapshot();
-          if (image) {
-            previewDataUrl = `data:image/jpeg;base64,${image.encodeToBase64(ImageFormat.JPEG, 80)}`;
-            snapshotDataUrl = `data:image/png;base64,${image.encodeToBase64()}`;
-            console.log(
-              `[AUTO_SAVE] preview ${previewDataUrl.length}, snapshot ${snapshotDataUrl.length} chars`,
-            );
-          }
-        } catch (e) {
-          console.log(
-            `[AUTO_SAVE] Could not capture preview/snapshot (canvas not ready)`,
-          );
-        }
-
-        saveCanvasState(
-          coloringImage.id,
-          actionsToSave,
-          saveWidth,
-          saveHeight,
-          previewDataUrl,
-          snapshotDataUrl,
-        )
+        // PHASE 1 — persist the action list IMMEDIATELY, with NO snapshot. The
+        // action list is the source of truth for replay; this is the prompt
+        // save. The expensive raster (a synchronous makeImageSnapshot + two
+        // encodeToBase64 passes) is split into Phase 2 below so it never blocks
+        // the JS thread on the same tick as a stroke's commit → deferred-clear
+        // handoff (the rare ~1-frame stroke blink).
+        saveCanvasState(coloringImage.id, actionsToSave, saveWidth, saveHeight)
           .then((success) => {
-            console.log(`[AUTO_SAVE] Save completed with result: ${success}`);
+            console.log(`[AUTO_SAVE] action-list save: ${success}`);
           })
           .catch((error) => {
-            console.error(`[AUTO_SAVE] Save failed with error:`, error);
+            console.error(`[AUTO_SAVE] action-list save failed:`, error);
           });
         currentState.setDirty(false);
+
+        // PHASE 2 — capture the raster (feed-preview JPEG + cross-device restore
+        // PNG) on its OWN drained-queue JS task, off the commit tick.
+        // runAfterInteractions does NOT wait for gestures/animations in this
+        // stack (gesture-handler + reanimated register no RN interaction
+        // handles); it fires on the next drained-JS-queue tick (like setTimeout
+        // 0). That is sufficient: the snapshot+encode becomes its own task and
+        // can never split the live→committed handoff across a frame. Continuous
+        // drawing reschedules this each cycle, so the raster only captures once
+        // the user pauses — within the few-hundred-ms staleness tolerance for a
+        // convenience artifact (the action list is already saved in Phase 1).
+        if (snapshotTaskRef.current) snapshotTaskRef.current.cancel();
+        snapshotTaskRef.current = InteractionManager.runAfterInteractions(
+          () => {
+            snapshotTaskRef.current = null;
+            const latest = useCanvasStore.getState();
+            const acts = latest.history;
+            if (acts.length === 0) return;
+            // Skip the raster while a sync is already in flight for this image:
+            // saveCanvasState's coalescing follow-up re-sends the IN-FLIGHT call's
+            // closure URLs (undefined, from the Phase-1 actions-only save), so a
+            // second raster-bearing call now would be swallowed and the snapshot
+            // silently dropped. The next settled autosave cycle captures it.
+            if (isSyncInFlight(coloringImage.id)) return;
+            let previewDataUrl: string | undefined;
+            let snapshotDataUrl: string | undefined;
+            try {
+              const image = safeMakeSnapshot();
+              if (image) {
+                previewDataUrl = `data:image/jpeg;base64,${image.encodeToBase64(ImageFormat.JPEG, 80)}`;
+                snapshotDataUrl = `data:image/png;base64,${image.encodeToBase64()}`;
+                console.log(
+                  `[AUTO_SAVE] raster preview ${previewDataUrl.length}, snapshot ${snapshotDataUrl.length} chars`,
+                );
+              }
+            } catch (e) {
+              // Canvas not ready (mid-rotation / torn down) — the action list is
+              // already saved; skip the raster this cycle.
+              console.log(
+                `[AUTO_SAVE] Could not capture preview/snapshot (canvas not ready)`,
+              );
+            }
+            if (previewDataUrl || snapshotDataUrl) {
+              saveCanvasState(
+                coloringImage.id,
+                acts,
+                saveWidth,
+                saveHeight,
+                previewDataUrl,
+                snapshotDataUrl,
+              ).catch(() => {});
+            }
+          },
+        );
       }
     }, 1000); // Save 1 second after last change (matching web)
 
     return () => {
       if (autoSaveTimerRef.current) {
         clearTimeout(autoSaveTimerRef.current);
+      }
+      // Cancel a pending deferred raster so a stale snapshot can't fire against
+      // a changed image / torn-down canvas (preserves the SIGABRT guard).
+      if (snapshotTaskRef.current) {
+        snapshotTaskRef.current.cancel();
+        snapshotTaskRef.current = null;
       }
     };
   }, [history, historyIndex, coloringImage.id, setDirty, svgDimensions]);
@@ -1060,6 +1144,12 @@ const ImageCanvas = ({
     progressTimerRef.current = scheduleGatedMeasure(runProgressMeasure, 250);
     return () => {
       if (progressTimerRef.current) clearTimeout(progressTimerRef.current);
+      // Cancel a pending deferred progress snapshot so it can't fire against a
+      // changed image / torn-down canvas (preserves the SIGABRT guard).
+      if (progressTaskRef.current) {
+        progressTaskRef.current.cancel();
+        progressTaskRef.current = null;
+      }
     };
   }, [
     history,
