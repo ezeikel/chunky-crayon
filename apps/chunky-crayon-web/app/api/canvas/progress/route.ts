@@ -237,14 +237,38 @@ export async function POST(request: NextRequest) {
       // shared base offline can hold the SAME version, so the strict-greater
       // check above wouldn't fire and the second write would clobber the first.
       // If the stored set contains action-ids the incoming write doesn't carry,
-      // the client diverged — force a 409 so it append-merges instead. A clean
-      // linear advance (incoming ⊇ stored) passes through.
+      // the client MAY have diverged — force a 409 so it append-merges instead.
+      //
+      // EXCEPTION (terminal collapse): the client's append-merge deliberately
+      // DROPS actions that a later terminal (Start Over `clear`, or whole-page
+      // Auto `region`) supersedes — see mergeCanvasActions terminal-collapse.
+      // So a legitimate terminal-collapsing re-POST is NOT a divergence even
+      // though it omits stored ids: those ids are superseded, not lost. Without
+      // this exception the guard 409s such a re-POST forever (the client keeps
+      // re-collapsing to the same deficient set), an infinite equal-version
+      // merge loop that churns the canvas (the first-open stroke flash). So:
+      // only treat a stored id as genuine divergence if it is NOT superseded by
+      // an incoming terminal — i.e. it is NEWER than every incoming terminal (or
+      // the incoming set carries no terminal at all). Anything at/older than an
+      // incoming terminal was intentionally collapsed and is fine to drop.
       if (existingProgress.version === version) {
+        const incomingActions = actions as CanvasAction[];
         const incomingIds = new Set(
-          (actions as CanvasAction[]).map((a) => a.id).filter(Boolean),
+          incomingActions.map((a) => a.id).filter(Boolean),
+        );
+        const isTerminal = (a: CanvasAction) =>
+          a.type === 'clear' ||
+          (a.type === 'region' && a.data?.mode === 'auto');
+        const newestIncomingTerminalTs = incomingActions.reduce(
+          (max, a) => (isTerminal(a) ? Math.max(max, a.timestamp ?? 0) : max),
+          -1,
         );
         const storedHasUnseen = storedActions.some(
-          (a) => a.id && !incomingIds.has(a.id),
+          (a) =>
+            a.id &&
+            !incomingIds.has(a.id) &&
+            // genuine divergence only if NOT superseded by an incoming terminal
+            (a.timestamp ?? 0) > newestIncomingTerminalTs,
         );
         if (storedHasUnseen) {
           return NextResponse.json(
