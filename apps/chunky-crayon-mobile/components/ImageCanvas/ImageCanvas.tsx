@@ -1284,122 +1284,62 @@ const ImageCanvas = ({
   const handleMagicTap = useCallback(
     (x: number, y: number) => {
       if (selectedTool !== "magic") return;
+      // Auto Color fires instantly on tool-select (applyAutoColor effect), not
+      // on tap — a canvas tap in auto mode is a no-op. Only Magic Brush
+      // (suggest) reveals where you touch.
+      if (magicMode === "auto") return;
 
       const coords = touchToSvgCoords(x, y);
       if (!coords || !svgDimensions) return;
 
-      // ── Region store path (preferred) ───────────────────────────────────
-      // Auto Color = paint the whole pre-coloured layer in one shot (a single
-      // magic-auto action). Magic Brush tap (suggest mode) = a dot reveal; the
-      // drag path is handled in the pan gesture. Both re-derive colour per
-      // region from the pre-coloured image at render time.
+      // Magic Brush (suggest) reveals where you touch — a dot at the tap point;
+      // the drag path is handled in the pan gesture. Colour is re-derived per
+      // region from the pre-coloured image at render time. (Auto Color is
+      // instant on tool-select and returns above.)
       if (regionStore.state.isReady && preColored.current) {
         tapMedium();
-        if (magicMode === "auto") {
-          notifySuccess();
-          addAction({
-            type: "magic-auto",
-            color: "#REGIONSTORE",
-            variant: paletteVariant,
-            sourceWidth: svgDimensions.width,
-            sourceHeight: svgDimensions.height,
-          });
-        } else {
-          // Magic Brush dot at the tap point.
-          const dot = Skia.Path.Make();
-          dot.moveTo(coords.x, coords.y);
-          dot.lineTo(coords.x, coords.y);
-          addAction({
-            type: "magic-reveal",
-            path: dot,
-            color: "#REGIONSTORE",
-            variant: paletteVariant,
-            strokeWidth: getPressureAdjustedWidth(
-              brushSize,
-              "marker",
-              DEFAULT_PRESSURE,
-            ),
-            sourceWidth: svgDimensions.width,
-            sourceHeight: svgDimensions.height,
-          });
-        }
+        const dot = Skia.Path.Make();
+        dot.moveTo(coords.x, coords.y);
+        dot.lineTo(coords.x, coords.y);
+        addAction({
+          type: "magic-reveal",
+          path: dot,
+          color: "#REGIONSTORE",
+          variant: paletteVariant,
+          strokeWidth: getPressureAdjustedWidth(
+            brushSize,
+            "marker",
+            DEFAULT_PRESSURE,
+          ),
+          sourceWidth: svgDimensions.width,
+          sourceHeight: svgDimensions.height,
+        });
         return;
       }
 
-      // ── Legacy fallback (fillPoints / colorMap) ─────────────────────────
-      const hasFillPoints = fillPoints && fillPoints.points.length > 0;
+      // ── Legacy fallback (colorMap suggestion hint) ──────────────────────
       const hasColorMap = colorMap && isValidColorMap(colorMap);
-
-      if (!hasFillPoints && !hasColorMap) {
+      if (!hasColorMap) {
         console.warn("No color data available for magic tool");
         return;
       }
 
       tapMedium();
-
-      if (magicMode === "suggest") {
-        // Show color suggestion for the tapped area (grid-based only for now)
-        if (hasColorMap) {
-          const suggestedCell = getSuggestedColor(
-            coords.x,
-            coords.y,
-            svgDimensions,
-            colorMap,
-          );
-
-          if (suggestedCell) {
-            setMagicHintCell(suggestedCell);
-            setMagicHintPosition({ x, y });
-          }
-        }
-      } else if (magicMode === "auto") {
-        notifySuccess();
-
-        const fills: Array<{ x: number; y: number; color: string }> = [];
-
-        if (hasFillPoints) {
-          // Use region-aware fill points with coordinate scaling
-          const scaleX = svgDimensions.width / fillPoints.sourceWidth;
-          const scaleY = svgDimensions.height / fillPoints.sourceHeight;
-
-          for (const point of fillPoints.points) {
-            fills.push({
-              x: point.x * scaleX,
-              y: point.y * scaleY,
-              color: point.color,
-            });
-          }
-        } else if (hasColorMap) {
-          // Fall back to grid-based cell center approach
-          const cellWidth = svgDimensions.width / 5;
-          const cellHeight = svgDimensions.height / 5;
-
-          colorMap.gridColors.forEach((cell) => {
-            const centerX = (cell.col - 0.5) * cellWidth;
-            const centerY = (cell.row - 0.5) * cellHeight;
-            fills.push({
-              x: centerX,
-              y: centerY,
-              color: cell.suggestedColor,
-            });
-          });
-        }
-
-        // Add a single magic-fill action that contains all fills
-        const action: DrawingAction = {
-          type: "magic-fill",
-          color: fills[0]?.color || "#FFFFFF",
-          magicFills: fills,
-          sourceWidth: svgDimensions?.width,
-          sourceHeight: svgDimensions?.height,
-        };
-        addAction(action);
+      // Show a colour suggestion for the tapped area (grid-based).
+      const suggestedCell = getSuggestedColor(
+        coords.x,
+        coords.y,
+        svgDimensions,
+        colorMap,
+      );
+      if (suggestedCell) {
+        setMagicHintCell(suggestedCell);
+        setMagicHintPosition({ x, y });
       }
     },
     [
       selectedTool,
       magicMode,
-      fillPoints,
       colorMap,
       svgDimensions,
       touchToSvgCoords,
@@ -1410,6 +1350,93 @@ const ImageCanvas = ({
       brushSize,
     ],
   );
+
+  // Auto Color fills the WHOLE picture — there's no spot to aim at, so it
+  // should fire the instant the tool is picked (web parity: ColoringArea fires
+  // handleRegionStoreAutoColor in a useEffect on activeTool === 'magic-auto').
+  // Requiring a canvas tap was confusing ("I pressed it, nothing happened").
+  // Magic Brush (suggest mode) stays tap/drag-driven — that one DOES aim.
+  const applyAutoColor = useCallback(() => {
+    if (!svgDimensions) return false;
+
+    // Region store path (preferred): one magic-auto action paints the whole
+    // pre-coloured layer; colour is re-derived per region at render time.
+    if (regionStore.state.isReady && preColored.current) {
+      notifySuccess();
+      addAction({
+        type: "magic-auto",
+        color: "#REGIONSTORE",
+        variant: paletteVariant,
+        sourceWidth: svgDimensions.width,
+        sourceHeight: svgDimensions.height,
+      });
+      return true;
+    }
+
+    // Legacy fallback (fillPoints / colorMap) — one magic-fill action with all
+    // the per-region fills.
+    const hasFillPoints = fillPoints && fillPoints.points.length > 0;
+    const hasColorMap = colorMap && isValidColorMap(colorMap);
+    if (!hasFillPoints && !hasColorMap) return false;
+
+    const fills: Array<{ x: number; y: number; color: string }> = [];
+    if (hasFillPoints) {
+      const scaleX = svgDimensions.width / fillPoints.sourceWidth;
+      const scaleY = svgDimensions.height / fillPoints.sourceHeight;
+      for (const point of fillPoints.points) {
+        fills.push({
+          x: point.x * scaleX,
+          y: point.y * scaleY,
+          color: point.color,
+        });
+      }
+    } else if (hasColorMap) {
+      const cellWidth = svgDimensions.width / 5;
+      const cellHeight = svgDimensions.height / 5;
+      colorMap.gridColors.forEach((cell) => {
+        fills.push({
+          x: (cell.col - 0.5) * cellWidth,
+          y: (cell.row - 0.5) * cellHeight,
+          color: cell.suggestedColor,
+        });
+      });
+    }
+    notifySuccess();
+    addAction({
+      type: "magic-fill",
+      color: fills[0]?.color || "#FFFFFF",
+      magicFills: fills,
+      sourceWidth: svgDimensions.width,
+      sourceHeight: svgDimensions.height,
+    });
+    return true;
+  }, [
+    svgDimensions,
+    regionStore.state.isReady,
+    preColored,
+    paletteVariant,
+    addAction,
+    fillPoints,
+    colorMap,
+  ]);
+
+  // Fire Auto Color instantly when the tool becomes active (web parity). Runs
+  // ONCE per activation: re-selecting Auto Color while still active won't
+  // re-fire; switching away and back will. applyAutoColor self-gates on data
+  // readiness (returns false until the region store / fill points load), so a
+  // not-yet-ready selection retries when readiness flips, then marks fired.
+  const autoColorFiredRef = useRef(false);
+  const isAutoColorActive = selectedTool === "magic" && magicMode === "auto";
+  useEffect(() => {
+    if (!isAutoColorActive) {
+      autoColorFiredRef.current = false;
+      return;
+    }
+    if (autoColorFiredRef.current) return;
+    if (!svgDimensions) return;
+    const applied = applyAutoColor();
+    if (applied) autoColorFiredRef.current = true;
+  }, [isAutoColorActive, svgDimensions, applyAutoColor]);
 
   // Dismiss magic hint
   const handleDismissMagicHint = useCallback(() => {
