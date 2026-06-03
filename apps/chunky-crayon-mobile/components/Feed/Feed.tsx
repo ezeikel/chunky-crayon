@@ -9,7 +9,7 @@ import {
   ListRenderItem,
 } from "react-native";
 import { Image } from "expo-image";
-import { SvgUri } from "react-native-svg";
+import SafeSvgUri from "@/components/SafeSvgUri/SafeSvgUri";
 import { useRouter } from "expo-router";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import {
@@ -67,7 +67,7 @@ const ColoringCard = memo(
           />
         ) : item.svgUrl ? (
           // Fall back to SVG outline
-          <SvgUri
+          <SafeSvgUri
             width="100%"
             height="100%"
             uri={item.svgUrl}
@@ -146,7 +146,7 @@ const InProgressCard = memo(
             transition={200}
           />
         ) : item.coloringImage.svgUrl ? (
-          <SvgUri
+          <SafeSvgUri
             width="100%"
             height="100%"
             uri={item.coloringImage.svgUrl}

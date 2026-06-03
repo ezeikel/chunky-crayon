@@ -1,6 +1,6 @@
 import { View, Text, Pressable, ScrollView, StyleSheet } from "react-native";
 import { Image } from "expo-image";
-import { SvgUri } from "react-native-svg";
+import SafeSvgUri from "@/components/SafeSvgUri/SafeSvgUri";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faArrowRight, faPalette } from "@fortawesome/pro-duotone-svg-icons";
 import { tapLight } from "@/utils/haptics";
@@ -118,7 +118,7 @@ const MyRecentCreationsView = ({
                   transition={200}
                 />
               ) : item.svgUrl ? (
-                <SvgUri
+                <SafeSvgUri
                   width="100%"
                   height="100%"
                   uri={item.svgUrl}

@@ -8,7 +8,7 @@ import {
   useWindowDimensions,
 } from "react-native";
 import { Image } from "expo-image";
-import { SvgUri } from "react-native-svg";
+import SafeSvgUri from "@/components/SafeSvgUri/SafeSvgUri";
 import { LinearGradient } from "expo-linear-gradient";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faHeart, faPalette } from "@fortawesome/pro-solid-svg-icons";
@@ -106,7 +106,7 @@ const MyArtworkScreen = () => {
                 />
               ) : item.coloringImage.svgUrl ? (
                 <View style={styles.artworkImage}>
-                  <SvgUri
+                  <SafeSvgUri
                     uri={item.coloringImage.svgUrl}
                     width="100%"
                     height="100%"

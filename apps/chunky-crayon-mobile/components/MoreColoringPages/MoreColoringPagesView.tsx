@@ -1,5 +1,5 @@
 import { View, Text, Pressable, StyleSheet } from "react-native";
-import { SvgUri } from "react-native-svg";
+import SafeSvgUri from "@/components/SafeSvgUri/SafeSvgUri";
 import { tapLight } from "@/utils/haptics";
 import { FONTS, COLORS } from "@/lib/design";
 
@@ -95,7 +95,7 @@ const MoreColoringPagesView = ({
             >
               <View style={styles.cardInner}>
                 {item.svgUrl ? (
-                  <SvgUri
+                  <SafeSvgUri
                     width="100%"
                     height="100%"
                     uri={item.svgUrl}

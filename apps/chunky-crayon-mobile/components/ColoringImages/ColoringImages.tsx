@@ -8,7 +8,7 @@ import {
   StyleSheet,
   ViewStyle,
 } from "react-native";
-import { SvgUri } from "react-native-svg";
+import SafeSvgUri from "@/components/SafeSvgUri/SafeSvgUri";
 import { Link } from "expo-router";
 import { FlashList } from "@shopify/flash-list";
 import useColoringImages from "@/hooks/api/useColoringImages";
@@ -32,7 +32,7 @@ const Square = memo(
       <Link href={path} asChild>
         <Pressable style={squareStyles.pressable}>
           <View style={squareStyles.container}>
-            <SvgUri
+            <SafeSvgUri
               width="100%"
               height="100%"
               uri={svgUri}
