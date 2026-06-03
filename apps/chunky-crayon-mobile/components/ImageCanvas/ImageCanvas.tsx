@@ -2073,11 +2073,62 @@ const ImageCanvas = ({
   // stroke is the mask, the image supplies the per-region colour). Each looks
   // up the pre-coloured image for the variant the action was committed under,
   // so undo/redo across a palette switch keeps history's colours.
+  // Committed region-store magic, SPLIT by variant so the active-variant
+  // reveals can share ONE saveLayer with the live preview (see the live-preview
+  // render below).
+  //
+  // Why the split: each reveal is a white stroke masking the pre-coloured image
+  // via SrcIn, wrapped in its own layer={<Paint/>} (a saveLayer). When a Magic
+  // Brush stroke commits, the live preview group (its own saveLayer) is swapped
+  // for the committed reveal group (another saveLayer) in one frame. SrcIn over
+  // SrcIn is non-idempotent at fractional edge coverage (2c - c² > c), so two
+  // independently-flattened saveLayers swapping in place make the antialiased
+  // stroke EDGE brighten for exactly one frame — the "flash". (Regular brush
+  // strokes don't flash: live + committed are bare sibling <Path>s in one
+  // layer, so the swap is an in-place body overwrite, not a layer flip.)
+  //
+  // Fix: collect the active-variant reveal MASKS (just the white <Path>s) and
+  // render them as siblings of the live mask inside ONE shared saveLayer with a
+  // single SrcIn pass (below). The commit then becomes an in-place
+  // re-rasterization of that one layer (committed mask appears, live mask
+  // empties) — pixel-identical edges across the transition, no layer swap.
+  // Other-variant reveals (undo/redo across a palette switch) and magic-auto
+  // keep their own per-node groups so history colours stay correct.
+  const activeRevealMaskPaths = useMemo(() => {
+    return visibleActions
+      .filter(
+        (a) =>
+          a.type === "magic-reveal" &&
+          !!a.path &&
+          ((a.variant as PaletteVariant) ?? "realistic") === paletteVariant,
+      )
+      .map((action, index) => (
+        <Path
+          key={`active-reveal-mask-${index}`}
+          path={action.path!}
+          color="white"
+          style="stroke"
+          strokeWidth={action.strokeWidth ?? brushSize}
+          strokeCap="round"
+          strokeJoin="round"
+        />
+      ));
+  }, [visibleActions, brushSize, paletteVariant]);
+
   const renderReveals = useMemo(() => {
     if (!svgDimensions) return null;
     return visibleActions
       .filter((a) => a.type === "magic-auto" || a.type === "magic-reveal")
       .map((action, index) => {
+        // Active-variant reveals are rendered in the shared live group below;
+        // skip them here so they aren't double-drawn in their own saveLayer.
+        if (
+          action.type === "magic-reveal" &&
+          ((action.variant as PaletteVariant) ?? "realistic") === paletteVariant
+        ) {
+          return null;
+        }
+
         const image = preColored.forVariant(
           (action.variant as PaletteVariant) ?? "realistic",
         );
@@ -2097,7 +2148,8 @@ const ImageCanvas = ({
           );
         }
 
-        // magic-reveal — mask the pre-coloured image to the stroke.
+        // Other-variant magic-reveal — mask the pre-coloured image to the
+        // stroke in its own layer (keeps the committed-under variant's colours).
         if (!action.path) return null;
         return (
           <Group key={`magic-reveal-${index}`} layer={<Paint />}>
@@ -2121,7 +2173,7 @@ const ImageCanvas = ({
           </Group>
         );
       });
-  }, [visibleActions, preColored, svgDimensions, brushSize]);
+  }, [visibleActions, preColored, svgDimensions, brushSize, paletteVariant]);
 
   if (!svgDimensions) {
     return null;
@@ -2213,8 +2265,45 @@ const ImageCanvas = ({
                 )}
                 {/* Region-store magic (Auto Color + Magic Brush reveals) —
                     above the base/fill, below strokes & stickers so brush work
-                    sits on top and the eraser punches through both. */}
+                    sits on top and the eraser punches through both.
+                    renderReveals now emits only magic-auto + OTHER-variant
+                    reveals; the ACTIVE-variant reveals + the live Magic Brush
+                    preview share the one saveLayer below (kept at THIS z-slot,
+                    below strokes/stickers, so brush work still sits on top). */}
                 {renderReveals}
+                {/* Active-variant magic reveals + live Magic Brush preview in
+                    ONE saveLayer (single SrcIn). Placed here (below strokes) so
+                    z-order is unchanged from when these reveals lived in
+                    renderReveals. Merging committed + live into one layer is
+                    what removes the one-frame edge flash on commit (see the
+                    activeRevealMaskPaths comment). The live mask is only present
+                    while Magic Brush is the active drawing tool; otherwise just
+                    the committed active masks render. */}
+                {(isMagicBrush || activeRevealMaskPaths.length > 0) &&
+                preColored.current ? (
+                  <Group layer={<Paint />}>
+                    {activeRevealMaskPaths}
+                    {isMagicBrush && (
+                      <Path
+                        path={livePath}
+                        color="white"
+                        style="stroke"
+                        strokeWidth={currentStrokeWidth}
+                        strokeCap="round"
+                        strokeJoin="round"
+                      />
+                    )}
+                    <SkiaImage
+                      image={preColored.current}
+                      x={0}
+                      y={0}
+                      width={svgDimensions.width}
+                      height={svgDimensions.height}
+                      fit="fill"
+                      blendMode="srcIn"
+                    />
+                  </Group>
+                ) : null}
                 {/* Rendered paths */}
                 {renderPaths}
                 {/* Rendered stickers */}
@@ -2228,30 +2317,11 @@ const ImageCanvas = ({
                     never blank for a frame (no flash). The path geometry updates
                     on the UI thread via the shared value with no per-point
                     re-render. */}
-                {isMagicBrush && preColored.current ? (
-                  // Live Magic Brush reveal — same SrcIn mask as the committed
-                  // reveal: the white live stroke is the mask, the pre-coloured
-                  // image supplies the per-region colour.
-                  <Group layer={<Paint />}>
-                    <Path
-                      path={livePath}
-                      color="white"
-                      style="stroke"
-                      strokeWidth={currentStrokeWidth}
-                      strokeCap="round"
-                      strokeJoin="round"
-                    />
-                    <SkiaImage
-                      image={preColored.current}
-                      x={0}
-                      y={0}
-                      width={svgDimensions.width}
-                      height={svgDimensions.height}
-                      fit="fill"
-                      blendMode="srcIn"
-                    />
-                  </Group>
-                ) : selectedTool === "eraser" ? (
+                {/* Magic Brush has NO live branch here — its live preview is
+                    merged into the shared active-reveal saveLayer above (below
+                    strokes) to avoid the commit-frame edge flash. So when Magic
+                    Brush is active this live slot draws nothing. */}
+                {isMagicBrush ? null : selectedTool === "eraser" ? (
                   // Live eraser preview — dstOut so it erases as you drag.
                   <Path
                     path={livePath}
