@@ -1,0 +1,116 @@
+diff --git a/apple/Utils/RNSVGPathParser.mm b/apple/Utils/RNSVGPathParser.mm
+index 74d7d7af61a29bf3efffd9c2dab05125f2eededf..3833d21e715f4d3be98f5f64c1b4d39e3a3d4a8c 100644
+--- a/apple/Utils/RNSVGPathParser.mm
++++ b/apple/Utils/RNSVGPathParser.mm
+@@ -55,7 +55,7 @@ - (CGPathRef)getPath
+ 
+     if (!has_prev_cmd && first_char != 'M' && first_char != 'm') {
+       // The first segment must be a MoveTo.
+-      RCTLogError(@"UnexpectedData: %@", s);
++      RCTLogWarn(@"RNSVG: unexpected path data, skipping"); // (chunkycrayon) no redbox
+       CGPathRelease(path);
+       return nil;
+     }
+@@ -70,7 +70,7 @@ - (CGPathRef)getPath
+     } else if ([self is_number_start:first_char] && has_prev_cmd) {
+       if (prev_cmd == 'Z' || prev_cmd == 'z') {
+         // ClosePath cannot be followed by a number.
+-        RCTLogError(@"UnexpectedData: %@", s);
++        RCTLogWarn(@"RNSVG: unexpected path data, skipping"); // (chunkycrayon) no redbox
+         CGPathRelease(path);
+         return nil;
+       }
+@@ -90,7 +90,7 @@ - (CGPathRef)getPath
+         cmd = prev_cmd;
+       }
+     } else {
+-      RCTLogError(@"UnexpectedData: %@", s);
++      RCTLogWarn(@"RNSVG: unexpected path data, skipping"); // (chunkycrayon) no redbox
+       CGPathRelease(path);
+       return nil;
+     }
+@@ -189,7 +189,7 @@ - (CGPathRef)getPath
+         break;
+       }
+       default: {
+-        RCTLogError(@"UnexpectedData: %@", s);
++        RCTLogWarn(@"RNSVG: unexpected path data, skipping"); // (chunkycrayon) no redbox
+         CGPathRelease(path);
+         return nil;
+       }
+@@ -554,7 +554,7 @@ - (bool)parse_flag
+       break;
+     }
+     default:
+-      RCTLogError(@"UnexpectedData: %@", s);
++      RCTLogWarn(@"RNSVG: unexpected flag data"); // (chunkycrayon) no redbox
+   }
+ 
+   return c == '1';
+@@ -562,8 +562,13 @@ - (bool)parse_flag
+ 
+ - (float)parse_list_number
+ {
++  // (chunkycrayon patch) Reaching end here is the normal terminator of a
++  // coordinate list (parse_list_number is called once more after the final
++  // number). Upstream RCTLogError → dev redbox flash over the canvas on the
++  // big single-path coloring SVGs. Return cleanly; parse_number also guards
++  // i == l now.
+   if (i == l) {
+-    RCTLogError(@"UnexpectedEnd: %@", s);
++    return 0;
+   }
+ 
+   float n = [self parse_number];
+@@ -578,8 +583,18 @@ - (float)parse_number
+   // Strip off leading whitespaces.
+   [self skip_spaces];
+ 
++  // (chunkycrayon patch) Reaching end-of-string here is the LEGITIMATE end of a
++  // coordinate list — parse_list_number calls parse_number once more after the
++  // final number and lands here with i == l. Upstream logs RCTLogError(
++  // "InvalidNumber") AND falls through to characterAtIndex:i (an out-of-bounds
++  // read at i == l), and in a dev build RCTLogError drives the React Native
++  // redbox. On the kids' coloring pages each line-art SVG is a SINGLE <path>
++  // with a 40K-115K-char d attribute, so this fires intermittently as the
++  // thumbnails mount and flashes a redbox over the canvas. Return cleanly
++  // instead — an empty/early number here is the normal terminator, not an
++  // error. (react-native-svg 15.15.4 has no upstream guard.)
+   if (i == l) {
+-    RCTLogError(@"InvalidNumber: %@", s);
++    return 0;
+   }
+ 
+   NSUInteger start = i;
+@@ -599,7 +614,8 @@ - (float)parse_number
+       c = [s characterAtIndex:i];
+     }
+   } else if (c != '.') {
+-    RCTLogError(@"InvalidNumber: %@", s);
++    // (chunkycrayon patch) warn, don't RCTLogError → no dev redbox flash.
++    RCTLogWarn(@"RNSVG parse_number: unexpected char in number");
+   }
+ 
+   // Consume fraction.
+@@ -624,7 +640,8 @@ - (float)parse_number
+       } else if (c >= '0' && c <= '9') {
+         [self skip_digits];
+       } else {
+-        RCTLogError(@"InvalidNumber: %@", s);
++        // (chunkycrayon patch) warn, don't RCTLogError → no dev redbox flash.
++        RCTLogWarn(@"RNSVG parse_number: malformed exponent");
+       }
+     }
+   }
+@@ -634,7 +651,10 @@ - (float)parse_number
+ 
+   // inf, nan, etc. are an error.
+   if (!isfinite(n)) {
+-    RCTLogError(@"InvalidNumber: %@", s);
++    // (chunkycrayon patch) warn + coerce to 0, don't RCTLogError → no dev
++    // redbox flash; a non-finite coordinate becomes a harmless 0.
++    RCTLogWarn(@"RNSVG parse_number: non-finite number coerced to 0");
++    return 0;
+   }
+ 
+   return n;
