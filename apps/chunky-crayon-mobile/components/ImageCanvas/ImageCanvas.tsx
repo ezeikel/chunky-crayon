@@ -8,12 +8,18 @@ import {
   useRef,
   useState,
 } from "react";
-import { View, useWindowDimensions, StyleSheet } from "react-native";
+import {
+  View,
+  useWindowDimensions,
+  StyleSheet,
+  Image as RNImage,
+} from "react-native";
 import { useFocusEffect } from "expo-router";
 import {
   Canvas,
   ImageSVG,
   Image as SkiaImage,
+  useImage,
   useCanvasRef,
   useSVG,
   fitbox,
@@ -60,6 +66,7 @@ import {
   getVisibleActions,
   type BrushType,
 } from "@/stores/canvasStore";
+import { getCanvasSticker, CANVAS_STICKER_IMAGES } from "@/lib/canvasStickers";
 import {
   createBrushPaint,
   createSimplePaint,
@@ -129,6 +136,54 @@ type ImageCanvasProps = {
   canvasArea?: { width: number; height: number };
   /** Current layout mode for responsive sizing */
   layoutMode?: LayoutMode;
+};
+
+/**
+ * One placed canvas sticker, drawn as its bundled transparent PNG. Hooks can't
+ * run inside the renderStickers .map, so each sticker is its own component
+ * that calls useImage. Resolves the bundled asset by catalog id; falls back to
+ * a Skia Paragraph emoji render for legacy emoji-only saves (no catalog id /
+ * unknown id). Centred on the tap point, sized by the action's stickerSize.
+ */
+const StickerActionImage = ({ action }: { action: DrawingAction }) => {
+  const catalogId = action.stickerCatalogId;
+  // Resolve the bundled asset to a URI string and let useImage load that.
+  // (useImage(<require number>) was unreliable for Skia; resolveAssetSource
+  // gives the packaged asset:// URI in a release binary and the Metro
+  // http://…/assets URI in dev — both of which useImage loads.)
+  const assetMod = catalogId ? CANVAS_STICKER_IMAGES[catalogId] : undefined;
+  const assetUri = assetMod
+    ? RNImage.resolveAssetSource(assetMod)?.uri
+    : undefined;
+  const skImage = useImage(assetUri ?? null);
+
+  const size = action.stickerSize || 40;
+  const x = (action.stickerX || 0) - size / 2;
+  const y = (action.stickerY || 0) - size / 2;
+
+  if (skImage) {
+    return (
+      <SkiaImage
+        image={skImage}
+        x={x}
+        y={y}
+        width={size}
+        height={size}
+        fit="contain"
+      />
+    );
+  }
+
+  // Fallback: legacy emoji glyph via Skia Paragraph (colour-emoji fallback).
+  const glyph = action.sticker;
+  if (!glyph) return null;
+  const para = Skia.ParagraphBuilder.Make({ textAlign: TextAlign.Center })
+    .pushStyle({ fontSize: size })
+    .addText(glyph)
+    .pop()
+    .build();
+  para.layout(size);
+  return <Paragraph paragraph={para} x={x} y={y} width={size} />;
 };
 
 const ImageCanvas = ({
@@ -1194,11 +1249,17 @@ const ImageCanvas = ({
       // Haptic feedback for sticker placement
       tapHeavy();
 
-      // Add sticker action
+      // `selectedSticker` is a catalog id; record the id + emoji fallback (the
+      // PNG itself resolves from the bundled registry at render time, web
+      // parity). stickerCatalogId/stickerImageUrl ride to the wire for
+      // cross-device replay.
+      const sticker = getCanvasSticker(selectedSticker);
       const action: DrawingAction = {
         type: "sticker",
         color: selectedColor, // Not used but required by type
-        sticker: selectedSticker,
+        sticker: sticker?.emoji ?? selectedSticker, // legacy fallback glyph
+        stickerCatalogId: selectedSticker,
+        stickerImageUrl: `/images/stickers/canvas/${selectedSticker}.png`,
         stickerX: coords.x,
         stickerY: coords.y,
         stickerSize: stickerSize,
@@ -1650,39 +1711,21 @@ const ImageCanvas = ({
     return getPressureAdjustedWidth(brushSize, brushType, DEFAULT_PRESSURE);
   }, [brushSize, brushType, selectedTool]);
 
-  // Render stickers via the Skia Paragraph API. The low-level Skia <Text>
-  // primitive uses a single default typeface with NO color-emoji fallback, so
-  // emoji rendered as little tofu/□ (or nothing) — that was the bug. The
-  // Paragraph API does platform emoji-font fallback (Apple Color Emoji on
-  // iOS) by default, so the sticker renders in full colour. Building a
-  // paragraph is imperative, so we do it per-sticker inside the memo.
+  // Render stickers as bundled transparent PNGs (web parity — the canvas
+  // tool stamps PNGs, not emoji). Each placed sticker resolves its catalog id
+  // to a bundled asset via StickerActionImage (which calls useImage). Legacy
+  // emoji-only saves (no stickerCatalogId) fall back to the Skia Paragraph
+  // emoji render inside that child.
   const renderStickers = useMemo(() => {
     return visibleActions
-      .filter((action) => action.type === "sticker" && action.sticker)
-      .map((action, index) => {
-        const size = action.stickerSize || 40;
-        // Lay the emoji out in a box `size` wide, centred on the tap point.
-        const para = Skia.ParagraphBuilder.Make({
-          textAlign: TextAlign.Center,
-        })
-          .pushStyle({ fontSize: size })
-          .addText(action.sticker || "")
-          .pop()
-          .build();
-        para.layout(size);
-        const x = (action.stickerX || 0) - size / 2;
-        const y = (action.stickerY || 0) - size / 2;
-
-        return (
-          <Paragraph
-            key={`sticker-${index}`}
-            paragraph={para}
-            x={x}
-            y={y}
-            width={size}
-          />
-        );
-      });
+      .filter(
+        (action) =>
+          action.type === "sticker" &&
+          (action.stickerCatalogId || action.sticker),
+      )
+      .map((action, index) => (
+        <StickerActionImage key={`sticker-${index}`} action={action} />
+      ));
   }, [visibleActions]);
 
   // Render drawing paths

@@ -52,100 +52,12 @@ export type PatternType =
   | "confetti";
 export type MagicMode = "suggest" | "auto"; // suggest = tap for color hint, auto = fill entire image
 
-// Kid-friendly emoji stickers organized by category
-export type StickerCategory =
-  | "animals"
-  | "nature"
-  | "food"
-  | "faces"
-  | "objects"
-  | "weather";
-export const STICKER_CATEGORIES: Record<StickerCategory, string[]> = {
-  animals: [
-    "🐶",
-    "🐱",
-    "🐰",
-    "🦊",
-    "🐻",
-    "🐼",
-    "🦁",
-    "🐯",
-    "🐮",
-    "🐷",
-    "🐸",
-    "🦋",
-  ],
-  nature: [
-    "🌸",
-    "🌺",
-    "🌻",
-    "🌷",
-    "🌹",
-    "🌼",
-    "🌿",
-    "🍀",
-    "🌳",
-    "🌴",
-    "🌵",
-    "🍄",
-  ],
-  food: [
-    "🍎",
-    "🍓",
-    "🍌",
-    "🍕",
-    "🍩",
-    "🍪",
-    "🧁",
-    "🍰",
-    "🍫",
-    "🍬",
-    "🍭",
-    "🍦",
-  ],
-  faces: [
-    "😊",
-    "😄",
-    "🥰",
-    "😎",
-    "🤩",
-    "😋",
-    "🤗",
-    "😺",
-    "🙈",
-    "👻",
-    "🤖",
-    "👽",
-  ],
-  objects: [
-    "⭐",
-    "🌟",
-    "💫",
-    "✨",
-    "💖",
-    "💝",
-    "🎈",
-    "🎀",
-    "🎁",
-    "🏆",
-    "👑",
-    "💎",
-  ],
-  weather: [
-    "☀️",
-    "🌈",
-    "⛅",
-    "🌙",
-    "⭐",
-    "❄️",
-    "💧",
-    "🌊",
-    "🔥",
-    "🌸",
-    "🍂",
-    "🌺",
-  ],
-};
+// Canvas sticker tool now uses the shared PNG catalog (lib/canvasStickers) —
+// `selectedSticker` holds a catalog ID (e.g. "star-classic"), not an emoji
+// glyph. StickerCategory + the per-category sticker lists come from there.
+import type { CanvasStickerCategory } from "@/lib/canvasStickers";
+
+export type StickerCategory = CanvasStickerCategory;
 
 export type DrawingAction = {
   // Stable cross-device identity, stamped ONCE at creation (in addAction) and
@@ -197,8 +109,12 @@ export type DrawingAction = {
   // For pattern fills
   fillType?: FillType;
   patternType?: PatternType;
-  // For sticker actions
+  // For sticker actions. `sticker` keeps the legacy emoji glyph (back-compat /
+  // fallback render); stickerCatalogId + stickerImageUrl carry the PNG sticker
+  // (the bundled transparent asset, web parity).
   sticker?: string;
+  stickerCatalogId?: string;
+  stickerImageUrl?: string;
   stickerX?: number;
   stickerY?: number;
   stickerSize?: number;
@@ -266,6 +182,7 @@ export type CanvasState = {
   selectedPattern: PatternType;
 
   // Sticker settings
+  /** Canvas sticker catalog id (lib/canvasStickers), NOT an emoji glyph. */
   selectedSticker: string;
   stickerCategory: StickerCategory;
   stickerSize: number;
@@ -370,8 +287,8 @@ const initialState: CanvasState = {
   brushSize: 10,
   fillType: "solid",
   selectedPattern: "dots",
-  selectedSticker: "🐶",
-  stickerCategory: "animals",
+  selectedSticker: "star-classic",
+  stickerCategory: "stars",
   stickerSize: 40,
   magicMode: "suggest",
   magicReady: true,

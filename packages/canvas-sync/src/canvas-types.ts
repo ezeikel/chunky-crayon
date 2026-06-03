@@ -70,7 +70,19 @@ export interface CanvasAction {
     fillColor?: string;
 
     // For stickers
+    // `stickerId` historically (and still, for back-compat) carries the EMOJI
+    // GLYPH of a placed sticker — pre-PNG-migration saved artwork has the glyph
+    // here, and the renderer falls back to drawing it as text when `imageUrl`
+    // is absent. New placements ALSO set `catalogId` (the stable
+    // CANVAS_STICKERS id) + `imageUrl` (the transparent PNG) so the renderer
+    // draws the image. Additive + opaque-JSON → no DB migration, old clients
+    // ignore the new fields. Do NOT repurpose `stickerId` — it would break
+    // every already-saved sticker.
     stickerId?: string;
+    /** Stable catalog id (CANVAS_STICKERS[].id) for PNG stickers. */
+    catalogId?: string;
+    /** Transparent PNG path/url for the sticker (absent on legacy emoji saves). */
+    imageUrl?: string;
     position?: { x: number; y: number };
     scale?: number;
     rotation?: number;

@@ -26,6 +26,7 @@ import {
 } from "@one-colored-pixel/canvas";
 import { haptics } from "./haptics";
 import { proxyR2Url } from "./proxyR2Url";
+import { getStickerImage, preloadStickerImages } from "./stickerImageCache";
 import {
   pointsToSvgPath,
   type SerializableCanvasAction,
@@ -354,6 +355,12 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
 
     // Brush sound debounce - stop sound after no movement for 150ms
     const brushSoundTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+    // Pre-decode the canvas-sticker PNGs once so placement + replay can draw
+    // them synchronously (the 2D replay loop can't await an image load).
+    useEffect(() => {
+      preloadStickerImages();
+    }, []);
 
     // Cleanup: ensure brush sound stops when isDrawing becomes false or component unmounts
     useEffect(() => {
@@ -990,24 +997,39 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
               return false;
             }
 
-            drawingCtx.save();
-            drawingCtx.font = `${scaledSize}px "Noto Color Emoji", "Apple Color Emoji", "Segoe UI Emoji", sans-serif`;
-            drawingCtx.textAlign = "center";
-            drawingCtx.textBaseline = "middle";
-            drawingCtx.fillText(action.sticker, scaledX, scaledY);
-            drawingCtx.restore();
+            // PNG sticker (action.imageUrl) drawn centered; legacy emoji
+            // (action.sticker) is the fallback when there's no image / it
+            // hasn't decoded yet.
+            const replayImg = getStickerImage(action.imageUrl);
+            // Skip entirely if there's neither an image nor an emoji glyph
+            // (malformed/empty action) — avoids a blank fillText("") no-op.
+            // Mirrors the mobile renderStickers filter.
+            if (!replayImg && !action.sticker) return true;
+            const drawReplaySticker = (ctx: CanvasRenderingContext2D) => {
+              ctx.save();
+              if (replayImg) {
+                ctx.drawImage(
+                  replayImg,
+                  scaledX - scaledSize / 2,
+                  scaledY - scaledSize / 2,
+                  scaledSize,
+                  scaledSize,
+                );
+              } else {
+                ctx.font = `${scaledSize}px "Noto Color Emoji", "Apple Color Emoji", "Segoe UI Emoji", sans-serif`;
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.fillText(action.sticker, scaledX, scaledY);
+              }
+              ctx.restore();
+            };
+
+            drawReplaySticker(drawingCtx);
 
             // Update offscreen canvas
             if (offScreenCanvasRef.current) {
               const offScreenCtx = offScreenCanvasRef.current.getContext("2d");
-              if (offScreenCtx) {
-                offScreenCtx.save();
-                offScreenCtx.font = `${scaledSize}px "Noto Color Emoji", "Apple Color Emoji", "Segoe UI Emoji", sans-serif`;
-                offScreenCtx.textAlign = "center";
-                offScreenCtx.textBaseline = "middle";
-                offScreenCtx.fillText(action.sticker, scaledX, scaledY);
-                offScreenCtx.restore();
-              }
+              if (offScreenCtx) drawReplaySticker(offScreenCtx);
             }
             return true;
           }
@@ -2038,31 +2060,35 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
       };
       const stickerSize = stickerSizes[brushSize] || 48;
 
-      // Save current context state
-      drawingCtx.save();
+      // Draw the sticker PNG (transparent, same-origin so the canvas stays
+      // untainted for save/snapshot) centered on the click point. Falls back
+      // to the legacy emoji glyph if the image hasn't decoded yet.
+      const stickerImg = getStickerImage(selectedSticker.imageUrl);
+      const drawSticker = (ctx: CanvasRenderingContext2D) => {
+        ctx.save();
+        if (stickerImg) {
+          ctx.drawImage(
+            stickerImg,
+            x - stickerSize / 2,
+            y - stickerSize / 2,
+            stickerSize,
+            stickerSize,
+          );
+        } else {
+          ctx.font = `${stickerSize}px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif`;
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText(selectedSticker.emoji, x, y);
+        }
+        ctx.restore();
+      };
 
-      // Set up text properties for emoji drawing
-      drawingCtx.font = `${stickerSize}px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif`;
-      drawingCtx.textAlign = "center";
-      drawingCtx.textBaseline = "middle";
-
-      // Draw the sticker emoji at the click position
-      drawingCtx.fillText(selectedSticker.emoji, x, y);
-
-      // Restore context state
-      drawingCtx.restore();
+      drawSticker(drawingCtx);
 
       // Update offscreen canvas with same sticker
       if (offScreenCanvasRef.current) {
         const offScreenCtx = offScreenCanvasRef.current.getContext("2d");
-        if (offScreenCtx) {
-          offScreenCtx.save();
-          offScreenCtx.font = `${stickerSize}px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif`;
-          offScreenCtx.textAlign = "center";
-          offScreenCtx.textBaseline = "middle";
-          offScreenCtx.fillText(selectedSticker.emoji, x, y);
-          offScreenCtx.restore();
-        }
+        if (offScreenCtx) drawSticker(offScreenCtx);
       }
 
       // Push to history for undo
@@ -2080,7 +2106,11 @@ const ImageCanvas = forwardRef<ImageCanvasHandle, ImageCanvasProps>(
       const stickerDc = drawingCanvasRef.current;
       addDrawingAction({
         type: "sticker",
+        // Legacy emoji kept for back-compat/fallback; catalogId + imageUrl
+        // drive the PNG render on replay + cross-device.
         sticker: selectedSticker.emoji,
+        catalogId: selectedSticker.id,
+        imageUrl: selectedSticker.imageUrl,
         x: normalizedStickerPoint.x,
         y: normalizedStickerPoint.y,
         size: stickerSize,

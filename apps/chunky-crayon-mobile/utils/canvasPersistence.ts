@@ -81,8 +81,11 @@ type SerializedAction = {
   targetColor?: string;
   fillType?: FillType;
   patternType?: PatternType;
-  // For sticker actions
+  // For sticker actions. `sticker` = legacy emoji glyph (back-compat/fallback);
+  // stickerCatalogId + stickerImageUrl carry the PNG sticker.
   sticker?: string;
+  stickerCatalogId?: string;
+  stickerImageUrl?: string;
   stickerX?: number;
   stickerY?: number;
   stickerSize?: number;
@@ -145,6 +148,8 @@ const convertToApiAction = (
     y: action.fillY,
     fillColor: action.color,
     stickerId: action.sticker,
+    catalogId: action.stickerCatalogId,
+    imageUrl: action.stickerImageUrl,
     position:
       action.stickerX !== undefined
         ? { x: action.stickerX, y: action.stickerY || 0 }
@@ -190,6 +195,8 @@ const apiToSerialized = (action: CanvasAction): SerializedAction => ({
   fillX: action.data?.x,
   fillY: action.data?.y,
   sticker: action.data?.stickerId,
+  stickerCatalogId: action.data?.catalogId,
+  stickerImageUrl: action.data?.imageUrl,
   stickerX: action.data?.position?.x,
   stickerY: action.data?.position?.y,
   stickerSize: action.data?.scale,
@@ -667,6 +674,8 @@ const serializeActions = (actions: DrawingAction[]): SerializedAction[] => {
       patternType: action.patternType,
       // Sticker fields
       sticker: action.sticker,
+      stickerCatalogId: action.stickerCatalogId,
+      stickerImageUrl: action.stickerImageUrl,
       stickerX: action.stickerX,
       stickerY: action.stickerY,
       stickerSize: action.stickerSize,
@@ -754,6 +763,8 @@ export const deserializeActions = (
         patternType: action.patternType,
         // Sticker fields
         sticker: action.sticker,
+        stickerCatalogId: action.stickerCatalogId,
+        stickerImageUrl: action.stickerImageUrl,
         stickerX: action.stickerX,
         stickerY: action.stickerY,
         stickerSize: action.stickerSize,

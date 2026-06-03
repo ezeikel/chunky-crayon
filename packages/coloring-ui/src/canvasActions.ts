@@ -123,7 +123,12 @@ export type SerializableFillAction = {
  */
 export type SerializableStickerAction = {
   type: "sticker";
+  /** Legacy emoji glyph (still carried for back-compat / fallback render). */
   sticker: string;
+  /** Stable catalog id (CANVAS_STICKERS[].id) for PNG stickers. */
+  catalogId?: string;
+  /** Transparent PNG path for PNG stickers (absent on legacy emoji saves). */
+  imageUrl?: string;
   x: number;
   y: number;
   size: number;
@@ -261,6 +266,8 @@ export function apiActionToSerializable(apiAction: {
       return {
         type: "sticker",
         sticker: (data?.stickerId as string) || "",
+        catalogId: data?.catalogId as string | undefined,
+        imageUrl: data?.imageUrl as string | undefined,
         x: position?.x || 0,
         y: position?.y || 0,
         size: (data?.scale as number) || 50,
@@ -380,7 +387,11 @@ export function serializableToApiAction(action: SerializableCanvasAction): {
         type: "sticker",
         timestamp: action.timestamp,
         data: {
+          // stickerId keeps the legacy emoji glyph for back-compat; catalogId
+          // + imageUrl carry the PNG sticker (additive — old clients ignore).
           stickerId: action.sticker,
+          ...(action.catalogId ? { catalogId: action.catalogId } : {}),
+          ...(action.imageUrl ? { imageUrl: action.imageUrl } : {}),
           position: { x: action.x, y: action.y },
           scale: action.size,
           ...sourceDimensions,

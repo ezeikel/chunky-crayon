@@ -18,6 +18,7 @@ import ToolTile from "@/components/coloring/ToolTile";
 import BrushSizeRow from "@/components/coloring/BrushSizeRow";
 import PaletteVariantPills from "@/components/coloring/PaletteVariantPills";
 import ColorSwatchGrid from "@/components/coloring/ColorSwatchGrid";
+import StickerPickerGrid from "@/components/coloring/StickerPickerGrid";
 import { UndoIcon, RedoIcon } from "@/components/coloring/StrokeIcons";
 import {
   COLORING_REGULAR_TOOLS,
@@ -91,6 +92,12 @@ const ToolbarContent = () => {
   const isMagicToolActive =
     selectedTool === "magic" &&
     (magicMode === "suggest" || magicMode === "auto");
+
+  // With the Sticker tool active, the phone sheet picks the STICKER (what you
+  // place) instead of a colour — swap the palette pills + swatches for the
+  // sticker picker, matching the iPad rail. Without this, a kid on phone could
+  // select the Sticker tool but had no way to choose WHICH sticker.
+  const isStickerToolActive = selectedTool === "sticker";
 
   const handleToolSelect = useCallback(
     (config: ColoringToolConfig) => {
@@ -176,30 +183,41 @@ const ToolbarContent = () => {
         </View>
       </View>
 
-      {/* Palette-variant pills (4 across) */}
-      <View style={styles.section}>
-        <PaletteVariantPills
-          selected={paletteVariant}
-          onSelect={setPaletteVariant}
-          columns={4}
-        />
-      </View>
+      {isStickerToolActive ? (
+        /* Sticker tool: pick WHICH sticker (replaces palette + swatches).
+           Wider cells + labelled category pills since the phone sheet has
+           room. */
+        <View style={styles.section}>
+          <StickerPickerGrid cellSize={60} columns={5} showLabels />
+        </View>
+      ) : (
+        <>
+          {/* Palette-variant pills (4 across) */}
+          <View style={styles.section}>
+            <PaletteVariantPills
+              selected={paletteVariant}
+              onSelect={setPaletteVariant}
+              columns={4}
+            />
+          </View>
 
-      {/* Swatch grid for the active variant — dims for magic tools. */}
-      <View
-        style={[styles.section, { opacity: isMagicToolActive ? 0.4 : 1 }]}
-        pointerEvents={isMagicToolActive ? "none" : "auto"}
-      >
-        <ColorSwatchGrid
-          variant={paletteVariant}
-          selectedColor={isMagicToolActive ? "" : selectedColor}
-          onSelect={(color) => {
-            selectionChanged();
-            setColor(color);
-          }}
-          columns={8}
-        />
-      </View>
+          {/* Swatch grid for the active variant — dims for magic tools. */}
+          <View
+            style={[styles.section, { opacity: isMagicToolActive ? 0.4 : 1 }]}
+            pointerEvents={isMagicToolActive ? "none" : "auto"}
+          >
+            <ColorSwatchGrid
+              variant={paletteVariant}
+              selectedColor={isMagicToolActive ? "" : selectedColor}
+              onSelect={(color) => {
+                selectionChanged();
+                setColor(color);
+              }}
+              columns={8}
+            />
+          </View>
+        </>
+      )}
 
       {/* Brush sizes — own row, left-aligned. Tiles are the SAME size as the
           tool-grid cards (web: brush tiles match the tool tiles), so they read

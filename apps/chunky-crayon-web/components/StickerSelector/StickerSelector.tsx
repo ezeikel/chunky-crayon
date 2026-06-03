@@ -1,17 +1,23 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTimes, faCheck } from '@fortawesome/pro-solid-svg-icons';
+import { faCheck, faHandPointer } from '@fortawesome/pro-duotone-svg-icons';
 import {
   CANVAS_STICKERS,
   STICKER_CATEGORIES,
   Sticker,
   StickerCategory,
 } from '@/constants';
-import { useColoringContext } from '@one-colored-pixel/coloring-ui';
-import { useSound } from '@one-colored-pixel/coloring-ui';
-import Portal from '@/components/Portal';
+import {
+  useColoringContext,
+  useSound,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@one-colored-pixel/coloring-ui';
 import cn from '@/utils/cn';
 
 type StickerSelectorProps = {
@@ -45,108 +51,89 @@ const StickerSelector = ({ isOpen, onClose }: StickerSelectorProps) => {
     playSound('tap');
   };
 
-  if (!isOpen) return null;
-
   return (
-    <Portal>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-        {/* Backdrop */}
-        <div
-          className="absolute inset-0 bg-black/40 backdrop-blur-sm"
-          onClick={onClose}
-          aria-hidden="true"
-        />
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      {/* Built on the shared Dialog primitive (same as ParentalGateModal /
+          StickerDetailModal): cream 2px border, rounded-coloring-card, soft
+          shadow, zoom+fade entrance, and the circular faXmark close button —
+          no more hand-rolled flat card. */}
+      <DialogContent className="max-w-md gap-5">
+        <DialogHeader>
+          <DialogTitle>Choose a Sticker</DialogTitle>
+        </DialogHeader>
 
-        {/* Modal Content */}
-        <div className="relative z-10 w-full max-w-sm bg-white rounded-2xl shadow-xl overflow-hidden">
-          {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b border-paper-cream-dark">
-            <h3 className="font-tondo font-bold text-lg text-text-primary">
-              Choose a Sticker
-            </h3>
+        {/* Category tabs — orange selected state (brand accent, matching the
+            other modals) instead of the old purple. */}
+        <div className="flex gap-1.5 overflow-x-auto scrollbar-hide -mx-1 px-1 pb-1">
+          {categories.map(([category, config]) => (
             <button
+              key={category}
               type="button"
-              onClick={onClose}
-              className="p-2 text-text-secondary hover:text-text-primary transition-colors"
-              aria-label="Close"
+              onClick={() => handleCategoryChange(category)}
+              className={cn(
+                'flex items-center gap-1.5 px-3 py-2 rounded-full whitespace-nowrap transition-all',
+                'font-coloring-body text-sm',
+                activeCategory === category
+                  ? 'bg-coloring-accent text-white font-bold shadow-sm'
+                  : 'bg-coloring-surface text-coloring-text-secondary hover:bg-coloring-surface-dark',
+              )}
             >
-              <FontAwesomeIcon icon={faTimes} />
+              <span className="text-base">{config.icon}</span>
+              <span>{config.name}</span>
             </button>
-          </div>
-
-          {/* Category Tabs */}
-          <div className="flex gap-1 p-2 bg-paper-cream overflow-x-auto scrollbar-hide">
-            {categories.map(([category, config]) => (
-              <button
-                key={category}
-                type="button"
-                onClick={() => handleCategoryChange(category)}
-                className={cn(
-                  'flex items-center gap-1.5 px-3 py-2 rounded-lg whitespace-nowrap transition-all',
-                  activeCategory === category
-                    ? 'bg-crayon-purple text-white font-medium'
-                    : 'bg-white text-text-secondary hover:bg-paper-cream-dark',
-                )}
-              >
-                <span className="text-lg">{config.icon}</span>
-                <span className="text-sm">{config.name}</span>
-              </button>
-            ))}
-          </div>
-
-          {/* Sticker Grid */}
-          <div className="grid grid-cols-5 gap-2 p-4 max-h-64 overflow-y-auto">
-            {filteredStickers.map((sticker) => {
-              const isSelected = selectedSticker?.id === sticker.id;
-
-              return (
-                <button
-                  key={sticker.id}
-                  type="button"
-                  onClick={() => handleStickerSelect(sticker)}
-                  className={cn(
-                    'relative flex items-center justify-center aspect-square rounded-xl text-3xl transition-all hover:scale-110 active:scale-95',
-                    isSelected
-                      ? 'bg-crayon-purple/20 ring-2 ring-crayon-purple'
-                      : 'bg-paper-cream hover:bg-paper-cream-dark',
-                  )}
-                  title={sticker.name}
-                  aria-label={sticker.name}
-                >
-                  {sticker.emoji}
-                  {isSelected && (
-                    <div className="absolute -top-1 -right-1 w-4 h-4 bg-crayon-purple rounded-full flex items-center justify-center">
-                      <FontAwesomeIcon
-                        icon={faCheck}
-                        className="text-white text-[8px]"
-                      />
-                    </div>
-                  )}
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Selected sticker preview */}
-          {selectedSticker && (
-            <div className="flex items-center justify-center gap-2 p-3 bg-paper-cream border-t border-paper-cream-dark">
-              <span className="text-sm text-text-secondary">Selected:</span>
-              <span className="text-2xl">{selectedSticker.emoji}</span>
-              <span className="text-sm font-medium text-text-primary">
-                {selectedSticker.name}
-              </span>
-            </div>
-          )}
-
-          {/* Help text */}
-          <div className="p-3 bg-gradient-to-r from-crayon-purple/5 to-crayon-pink/5 border-t border-paper-cream-dark">
-            <p className="text-xs text-text-muted text-center">
-              Tap on the canvas to place your sticker
-            </p>
-          </div>
+          ))}
         </div>
-      </div>
-    </Portal>
+
+        {/* Sticker grid — real transparent PNGs (web parity with the canvas
+            tool), not emoji glyphs. Inner scroll keeps tabs + help pinned. */}
+        <div className="grid grid-cols-4 gap-2.5 max-h-72 overflow-y-auto -mx-1 px-1">
+          {filteredStickers.map((sticker) => {
+            const isSelected = selectedSticker?.id === sticker.id;
+
+            return (
+              <button
+                key={sticker.id}
+                type="button"
+                onClick={() => handleStickerSelect(sticker)}
+                className={cn(
+                  'relative flex items-center justify-center aspect-square rounded-2xl p-2 transition-all hover:scale-105 active:scale-95',
+                  isSelected
+                    ? 'bg-coloring-accent/10 ring-2 ring-coloring-accent'
+                    : 'bg-coloring-surface hover:bg-coloring-surface-dark',
+                )}
+                title={sticker.name}
+                aria-label={sticker.name}
+              >
+                <Image
+                  src={sticker.imageUrl}
+                  alt={sticker.name}
+                  width={64}
+                  height={64}
+                  className="h-full w-full object-contain"
+                />
+                {isSelected && (
+                  <div className="absolute -top-1.5 -right-1.5 flex size-5 items-center justify-center rounded-full bg-coloring-accent">
+                    <FontAwesomeIcon
+                      icon={faCheck}
+                      className="text-[10px] text-white"
+                    />
+                  </div>
+                )}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Two-step hint — the thing kids miss: picking ≠ placing. */}
+        <div className="flex items-center justify-center gap-2 font-coloring-body text-sm font-bold text-coloring-text-secondary">
+          <FontAwesomeIcon
+            icon={faHandPointer}
+            className="text-coloring-accent"
+          />
+          <span>Now tap your picture to place it!</span>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 };
 

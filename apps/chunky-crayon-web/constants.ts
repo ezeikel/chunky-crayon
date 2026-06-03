@@ -160,89 +160,15 @@ export type ColoringTool =
   | 'magic-reveal'
   | 'magic-auto';
 
-// Sticker configuration for canvas decorations
-export type StickerCategory =
-  | 'shapes'
-  | 'emojis'
-  | 'stars'
-  | 'hearts'
-  | 'nature'
-  | 'fun';
-
-export type Sticker = {
-  id: string;
-  name: string;
-  category: StickerCategory;
-  emoji: string; // Emoji representation for the sticker
-};
-
-// Available stickers for canvas decoration
-export const CANVAS_STICKERS: Sticker[] = [
-  // Stars category
-  { id: 'star-yellow', name: 'Yellow Star', category: 'stars', emoji: '⭐' },
-  { id: 'star-sparkle', name: 'Sparkle Star', category: 'stars', emoji: '✨' },
-  { id: 'star-glow', name: 'Glowing Star', category: 'stars', emoji: '🌟' },
-  {
-    id: 'star-shooting',
-    name: 'Shooting Star',
-    category: 'stars',
-    emoji: '💫',
-  },
-
-  // Hearts category
-  { id: 'heart-red', name: 'Red Heart', category: 'hearts', emoji: '❤️' },
-  { id: 'heart-pink', name: 'Pink Heart', category: 'hearts', emoji: '💕' },
-  {
-    id: 'heart-sparkle',
-    name: 'Sparkle Heart',
-    category: 'hearts',
-    emoji: '💖',
-  },
-  {
-    id: 'heart-rainbow',
-    name: 'Rainbow Heart',
-    category: 'hearts',
-    emoji: '🩷',
-  },
-
-  // Shapes category
-  { id: 'circle', name: 'Circle', category: 'shapes', emoji: '🔵' },
-  { id: 'square', name: 'Square', category: 'shapes', emoji: '🟦' },
-  { id: 'triangle', name: 'Triangle', category: 'shapes', emoji: '🔺' },
-  { id: 'diamond', name: 'Diamond', category: 'shapes', emoji: '💎' },
-
-  // Nature category
-  { id: 'flower', name: 'Flower', category: 'nature', emoji: '🌸' },
-  { id: 'sun', name: 'Sun', category: 'nature', emoji: '☀️' },
-  { id: 'rainbow', name: 'Rainbow', category: 'nature', emoji: '🌈' },
-  { id: 'cloud', name: 'Cloud', category: 'nature', emoji: '☁️' },
-  { id: 'butterfly', name: 'Butterfly', category: 'nature', emoji: '🦋' },
-  { id: 'leaf', name: 'Leaf', category: 'nature', emoji: '🍃' },
-
-  // Emojis category
-  { id: 'smile', name: 'Smile', category: 'emojis', emoji: '😊' },
-  { id: 'love', name: 'Love Eyes', category: 'emojis', emoji: '😍' },
-  { id: 'cool', name: 'Cool', category: 'emojis', emoji: '😎' },
-  { id: 'wink', name: 'Wink', category: 'emojis', emoji: '😉' },
-
-  // Fun category
-  { id: 'crown', name: 'Crown', category: 'fun', emoji: '👑' },
-  { id: 'unicorn', name: 'Unicorn', category: 'fun', emoji: '🦄' },
-  { id: 'rocket', name: 'Rocket', category: 'fun', emoji: '🚀' },
-  { id: 'balloon', name: 'Balloon', category: 'fun', emoji: '🎈' },
-  { id: 'gift', name: 'Gift', category: 'fun', emoji: '🎁' },
-  { id: 'cake', name: 'Cake', category: 'fun', emoji: '🎂' },
-];
-
-// Group stickers by category for UI
-export const STICKER_CATEGORIES = {
-  stars: { name: 'Stars', icon: '⭐' },
-  hearts: { name: 'Hearts', icon: '❤️' },
-  shapes: { name: 'Shapes', icon: '🔷' },
-  nature: { name: 'Nature', icon: '🌸' },
-  emojis: { name: 'Emojis', icon: '😊' },
-  fun: { name: 'Fun', icon: '🎉' },
-} as const;
+// Canvas-sticker config now lives in the shared package as the SINGLE source
+// of truth (the 36-sticker transparent-PNG catalog), consumed by both web and
+// mobile. Re-exported here so existing `@/constants` importers (StickerSelector)
+// keep working without churn. See packages/coloring-ui/src/types.ts.
+export type { Sticker, StickerCategory } from '@one-colored-pixel/coloring-ui';
+export {
+  CANVAS_STICKERS,
+  STICKER_CATEGORIES,
+} from '@one-colored-pixel/coloring-ui';
 
 // Fill pattern types for the fill tool
 export type FillPattern =

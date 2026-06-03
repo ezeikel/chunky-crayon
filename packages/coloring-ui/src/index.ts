@@ -159,6 +159,13 @@ export {
   type SceneSelection,
 } from "./SceneBuilder";
 
+// Canvas-sticker PNG cache (web drawImage of transparent sticker PNGs)
+export {
+  preloadStickerImages,
+  getStickerImage,
+  getStickerById,
+} from "./stickerImageCache";
+
 // Async fill (Web Worker)
 export { asyncFloodFill, terminateFillWorker } from "./asyncFill";
 
