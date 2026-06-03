@@ -1224,12 +1224,19 @@ const ImageCanvas = ({
         averagePressure =
           pressurePoints.reduce((a, b) => a + b, 0) / pressurePoints.length;
       }
+      // Commit at the SAME width the live preview showed so the stroke doesn't
+      // snap-resize on release ("flash again and settle"). The preview is a
+      // constant DEFAULT_PRESSURE width (it can't vary per-point on the single
+      // UI-thread path), so a touch stroke must commit at DEFAULT_PRESSURE to
+      // match. Stylus (Apple Pencil) strokes still commit at the measured
+      // average pressure — pressure variation is the point of a stylus, and the
+      // preview is an accepted approximation there.
       const strokeWidth = isErasing
         ? liveBrushSize * 2
         : getPressureAdjustedWidth(
             liveBrushSize,
             liveBrushType,
-            averagePressure,
+            isStylus ? averagePressure : DEFAULT_PRESSURE,
           );
 
       const textureSeed = Math.random() * 1000;
@@ -1785,8 +1792,18 @@ const ImageCanvas = ({
   useLayoutEffect(() => {
     const pending = pendingLiveStrokeIdRef.current;
     if (pending == null) return;
+    // Match BOTH committed types by identity: a Magic Brush drag commits a
+    // "magic-reveal" (not a "stroke"), so a stroke-only guard never matched it
+    // and left the live magic preview drawn forever — stacked on top of the
+    // committed reveal (a second SrcIn pass = the reveal "growing"/intensifying
+    // the instant you lift). liveStrokeId is monotonic and never serialized
+    // (reloaded actions can't spuriously match), so keying on it across both
+    // types is safe. handleMagicTap's reveal sets no liveStrokeId / parks no
+    // pending id, so a single-tap reveal is correctly unaffected.
     const committed = visibleActions.some(
-      (a) => a.type === "stroke" && a.liveStrokeId === pending,
+      (a) =>
+        (a.type === "stroke" || a.type === "magic-reveal") &&
+        a.liveStrokeId === pending,
     );
     if (!committed) return;
     pendingLiveStrokeIdRef.current = null;
@@ -1803,9 +1820,24 @@ const ImageCanvas = ({
   // preview uses a stable default-pressure width (the exact pressure-adjusted
   // width is applied when the stroke is committed in commitStroke). Recomputes
   // only when the tool/size/brush changes, not per touch point.
+  //
+  // The live width MUST equal the committed width for the same gesture, or the
+  // stroke visibly snaps to a different size the instant you lift (the "flash
+  // again and settle" / "magic stroke grows" report). Two alignment points:
+  //   - Magic Brush commits with the "marker" multiplier (commitStroke), NOT
+  //     the active brushType — so preview here with "marker" too, else the
+  //     preview is the active brush's width and jumps to marker's on commit.
+  //   - Touch (non-stylus) regular strokes commit at DEFAULT_PRESSURE width
+  //     (see commitStroke), so the default-pressure preview already matches;
+  //     stylus strokes commit at the measured average pressure, which the
+  //     constant-width preview can only approximate (per-point width can't be
+  //     applied to the single UI-thread live path).
   const currentStrokeWidth = useMemo(() => {
     // Eraser uses a flat radius*2 (web parity), ignoring pressure.
     if (selectedTool === "eraser") return brushSize * 2;
+    if (selectedTool === "magic") {
+      return getPressureAdjustedWidth(brushSize, "marker", DEFAULT_PRESSURE);
+    }
     return getPressureAdjustedWidth(brushSize, brushType, DEFAULT_PRESSURE);
   }, [brushSize, brushType, selectedTool]);
 
