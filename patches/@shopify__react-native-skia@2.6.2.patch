@@ -1,0 +1,28 @@
+diff --git a/android/README.md b/android/README.md
+deleted file mode 100644
+index ac2fbda377ad1213c02f090138f48054e5660547..0000000000000000000000000000000000000000
+diff --git a/apple/MetalContext.h b/apple/MetalContext.h
+index 3fd4e908ca6baf5fd23c443edc2ac6b756eb28aa..df8c8e61240a97b1f3d4244b0cb737cec725e8f2 100644
+--- a/apple/MetalContext.h
++++ b/apple/MetalContext.h
+@@ -47,6 +47,17 @@ public:
+ 
+   sk_sp<SkSurface> MakeOffscreen(int width, int height,
+                                  bool useP3ColorSpace = false) {
++    // Guard against a 0/negative-dimension offscreen surface. Metal's
++    // newTextureWithDescriptor ABORTS the whole process (SIGABRT) on a 0-dim
++    // texture descriptor, which is uncatchable from JS. This happens when
++    // makeImageSnapshot runs while the native view is mid-relayout (e.g. an
++    // iPad orientation change briefly reports a 0x0 backing surface). Returning
++    // nullptr converts that uncatchable native abort into the already-handled
++    // "Could not create image from current surface" JS path. (chunkycrayon
++    // patch — react-native-skia 2.6.2 has no such guard upstream.)
++    if (width < 1 || height < 1) {
++      return nullptr;
++    }
+     auto device = _device;
+     auto ctx = new OffscreenRenderContext(device, _directContext, _commandQueue,
+                                           width, height);
+diff --git a/cpp/skia/include/private/base/README.md b/cpp/skia/include/private/base/README.md
+deleted file mode 100644
+index 7f4f17b228c2b8e664b462983d66f735c6383fe7..0000000000000000000000000000000000000000

@@ -38,6 +38,7 @@ import {
   AlphaType,
   notifyChange,
   type SkImage,
+  type SkSize,
 } from "@shopify/react-native-skia";
 import {
   Gesture,
@@ -47,6 +48,7 @@ import {
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
+  useAnimatedReaction,
   withSpring,
   runOnJS,
 } from "react-native-reanimated";
@@ -115,7 +117,6 @@ import {
   DEFAULT_SIMPLIFICATION_TOLERANCE,
 } from "@/utils/pathSimplification";
 import MagicColorHint from "@/components/MagicColorHint";
-import { useFocusMode } from "@/components/FocusMode/FocusModeProvider";
 import { perfect } from "@/styles";
 import {
   tapHeavy,
@@ -224,61 +225,103 @@ const ImageCanvas = ({
   const canvasDimsRef = useRef({ width: canvasWidth, height: canvasHeight });
   canvasDimsRef.current = { width: canvasWidth, height: canvasHeight };
 
-  // Focus mode hides all chrome and full-bleeds the canvas — a layout change
-  // that resizes the native RNSkView surface WITHOUT changing window dims, so it
-  // must re-arm the snapshot settle gate below (otherwise a queued progress
-  // measure snapshots the 0-dim mid-transition surface → native Metal SIGABRT,
-  // the same class of crash as rotation).
-  const { isFocusMode } = useFocusMode();
+  // Snapshot safety gate. `makeImageSnapshot()` builds an offscreen Metal
+  // texture from the NATIVE RNSkView backing surface — NOT from our JS-computed
+  // canvasWidth/Height. During an orientation change UIKit re-lays-out that
+  // surface and for a few frames it is 0-sized, even though our logical dims
+  // never drop below 1. A 0-dim Metal texture historically ABORTED the process
+  // (uncatchable native SIGABRT). TWO layers now prevent that:
+  //   1. Native patch (patches/@shopify__react-native-skia): MetalContext::
+  //      MakeOffscreen returns nullptr on <1 dims, so a 0-dim snapshot becomes a
+  //      handled JS "couldn't create image" instead of an abort. This is the
+  //      real backstop — no timing assumptions.
+  //   2. This JS gate (below): avoids even ATTEMPTING a snapshot when the real
+  //      native surface isn't at its final size. It reads the actual surface
+  //      size from Skia's <Canvas onSize> (the same dimension Metal allocates
+  //      from), not a guessed timer — so the decision is principled, not a
+  //      "probably settled by now" delay.
 
-  // Rotation-settle gate for snapshots. `makeImageSnapshot()` builds an
-  // offscreen Metal texture from the NATIVE RNSkView backing surface — NOT from
-  // our JS-computed canvasWidth/Height. During an orientation change UIKit
-  // re-lays-out that native surface, and for a few frames it can be 0-sized
-  // even though our logical canvasWidth/Height never drop below 1. Snapshotting
-  // in that window fails MTLTextureDescriptor validation and ABORTS the process
-  // (SIGABRT) — a native abort, NOT a JS throw, so try/catch cannot save us
-  // (this is exactly how the iPad rotation crash slipped past the old
-  // dimension-only guard). A JS dimension check can't see the native surface
-  // state, so instead we treat any window-dimension change (rotation / iPad
-  // resize) as "layout in flight" and refuse to snapshot until it settles.
-  const SNAPSHOT_SETTLE_MS = 350;
-  const layoutSettledRef = useRef(true);
-  const settleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  useEffect(() => {
-    // screenWidth/screenHeight come from useWindowDimensions and flip the
-    // instant orientation changes — before the native surface re-lays-out.
-    // isFocusMode is the same kind of event: entering/exiting focus resizes the
-    // canvas surface full-bleed without a window-dim change, and a snapshot
-    // during that transition aborts the process — so gate on it too.
-    layoutSettledRef.current = false;
-    if (settleTimerRef.current) clearTimeout(settleTimerRef.current);
-    settleTimerRef.current = setTimeout(() => {
-      layoutSettledRef.current = true;
-    }, SNAPSHOT_SETTLE_MS);
-    return () => {
-      if (settleTimerRef.current) clearTimeout(settleTimerRef.current);
-    };
-  }, [screenWidth, screenHeight, isFocusMode]);
+  // Sub-pixel slack between Skia's measured surface size (points) and our
+  // JS-computed canvas dims.
+  const LAYOUT_MATCH_TOLERANCE = 1.5;
 
-  // Guarded Skia snapshot. Refuses to snapshot unless (a) the logical canvas
-  // dimensions are finite and >= 1 AND (b) the layout has settled since the
-  // last rotation/resize (see the gate above). Returns null when unsafe; all
-  // callers already handle a null image.
+  // Real native-surface size, fed by Skia's <Canvas onSize> (a Reanimated frame
+  // loop measuring the actual backing view). This is the SAME dimension
+  // makeImageSnapshot allocates its offscreen Metal texture from — and the one
+  // that transiently goes 0 mid-rotation. (RN onLayout is deprecated/ignored on
+  // Fabric for Skia <Canvas>, so onSize is the only reliable native-size signal;
+  // our JS canvasWidth/Height never see the transient 0-dim surface.)
+  const canvasSize = useSharedValue<SkSize>({ width: 0, height: 0 });
+  const measuredBoxRef = useRef<{ width: number; height: number } | null>(null);
+
+  // Layout generation, bumped whenever the measured surface size changes (i.e.
+  // a resize is in flight). Timer-scheduled measures capture it at schedule time
+  // and skip if it changed by fire time — so a progress/autosave timer queued
+  // just before a rotation never fires a wasted snapshot into the mid-relayout
+  // surface. (Purely an optimization now that the native patch makes the 0-dim
+  // case safe; no arbitrary settle delay.)
+  const layoutGenRef = useRef(0);
+
+  // Mirror the native onSize (UI thread) into a JS ref + bump the generation on
+  // any change. No debounce timer — the gate reads the live measured size and
+  // compares it to the expected dims, which is the actual readiness signal.
+  const onCanvasSizeChange = useCallback((width: number, height: number) => {
+    const prev = measuredBoxRef.current;
+    const changed =
+      !prev ||
+      Math.abs(prev.width - width) > 0.5 ||
+      Math.abs(prev.height - height) > 0.5;
+    measuredBoxRef.current = { width, height };
+    if (changed) layoutGenRef.current += 1;
+  }, []);
+
+  useAnimatedReaction(
+    () => canvasSize.value,
+    (size) => {
+      runOnJS(onCanvasSizeChange)(size.width, size.height);
+    },
+  );
+
+  // Guarded Skia snapshot. Refuses unless the REAL measured native surface is
+  // non-zero AND ≈ the expected JS dims (i.e. the surface has actually settled
+  // at its final size — not mid-rotation). makeImageSnapshot allocates the
+  // offscreen Metal texture from that native size, so this is the precise
+  // readiness check, with no timing guesswork. The native patch is the hard
+  // backstop if a snapshot still slips through; this just avoids the wasted
+  // attempt. Returns null when unsafe; all callers already handle a null image.
   const safeMakeSnapshot = useCallback(() => {
-    const { width, height } = canvasDimsRef.current;
+    const { width, height } = canvasDimsRef.current; // expected (JS-computed)
+    const measured = measuredBoxRef.current; // real native surface size
     if (
       !canvasRef.current ||
-      !layoutSettledRef.current ||
+      !measured ||
       !Number.isFinite(width) ||
       !Number.isFinite(height) ||
       width < 1 ||
-      height < 1
+      height < 1 ||
+      measured.width < 1 ||
+      measured.height < 1 ||
+      Math.abs(measured.width - width) > LAYOUT_MATCH_TOLERANCE ||
+      Math.abs(measured.height - height) > LAYOUT_MATCH_TOLERANCE
     ) {
       return null;
     }
     return canvasRef.current.makeImageSnapshot();
   }, []);
+
+  // Snapshot scheduled by a debounce timer. Captures the layout generation now;
+  // if a resize happens before the timer fires, the generation changes and we
+  // skip the wasted snapshot (the next commit re-measures once stable).
+  const scheduleGatedMeasure = useCallback(
+    (fn: () => void, delayMs: number) => {
+      const genAtSchedule = layoutGenRef.current;
+      return setTimeout(() => {
+        if (layoutGenRef.current !== genAtSchedule) return; // resized since → skip
+        fn();
+      }, delayMs);
+    },
+    [],
+  );
 
   // ── Coloring-progress measure (the mobile analogue of web measureProgress) ──
   // Reads the composite canvas pixels vs a cached line-art mask and feeds the
@@ -294,6 +337,13 @@ const ImageCanvas = ({
   } | null>(null);
   const measuringRef = useRef(false);
   const progressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Initial-restore progress measure (fired once per init). Was a bare
+  // uncancelled setTimeout(…, 300) — the orphan that survived navigation/re-init
+  // and fired mid-rotation onto a 0-dim surface (the SIGABRT). Now tracked,
+  // generation-gated, cleaned up, and ≥ the settle window.
+  const initMeasureTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
 
   // Read an SkImage's pixels as RGBA_8888 (R,G,B,A bytes) — web-identical layout.
   const readRGBA = useCallback((img: SkImage): Uint8Array | null => {
@@ -787,8 +837,17 @@ const ImageCanvas = ({
       // Initial progress measure once restore completes. Required for the
       // cross-device snapshot-restore path (paints a base layer but adds no
       // history actions, so the history-keyed effect alone wouldn't fire).
-      // Delay a tick so the restored layers have rendered into the surface.
-      setTimeout(runProgressMeasure, 300);
+      // Short delay so the restored layers have painted; the safeMakeSnapshot
+      // gate (real measured surface size) handles readiness, and it's
+      // generation-gated + cleaned up so a rotation right after page entry just
+      // skips it (was a bare uncancelled setTimeout(…, 300) — the orphan that
+      // fired mid-rotation and crashed).
+      if (initMeasureTimerRef.current)
+        clearTimeout(initMeasureTimerRef.current);
+      initMeasureTimerRef.current = scheduleGatedMeasure(
+        runProgressMeasure,
+        400,
+      );
     };
 
     initializeCanvas();
@@ -799,6 +858,8 @@ const ImageCanvas = ({
         `[CANVAS_INIT] Cleanup - cancelling effect for image ${currentImageId}`,
       );
       isCancelled = true;
+      if (initMeasureTimerRef.current)
+        clearTimeout(initMeasureTimerRef.current);
     };
   }, [coloringImage.id, reset, setImageId, addAction, imageId]);
 
@@ -975,11 +1036,21 @@ const ImageCanvas = ({
   useEffect(() => {
     if (!isInitializedRef.current) return;
     if (progressTimerRef.current) clearTimeout(progressTimerRef.current);
-    progressTimerRef.current = setTimeout(runProgressMeasure, 250);
+    // Keep the 250ms responsiveness for the progress bar in steady state, but
+    // generation-gate it: if a rotation/resize lands between schedule and fire,
+    // the measured-box gate would already refuse the snapshot — this skips the
+    // wasted call (and the next commit re-measures once stable).
+    progressTimerRef.current = scheduleGatedMeasure(runProgressMeasure, 250);
     return () => {
       if (progressTimerRef.current) clearTimeout(progressTimerRef.current);
     };
-  }, [history, historyIndex, svgDimensions, runProgressMeasure]);
+  }, [
+    history,
+    historyIndex,
+    svgDimensions,
+    runProgressMeasure,
+    scheduleGatedMeasure,
+  ]);
 
   const src = svgDimensions
     ? rect(0, 0, svgDimensions.width, svgDimensions.height)
@@ -2042,6 +2113,7 @@ const ImageCanvas = ({
           {svg ? (
             <Canvas
               ref={canvasRef}
+              onSize={canvasSize}
               style={{
                 height: canvasHeight,
                 width: canvasWidth,
