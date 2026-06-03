@@ -1753,19 +1753,31 @@ const ImageCanvas = ({
   // mutate the store (setScale / resetTransform), while the on-screen
   // transform is driven by the shared values — so without this the buttons
   // moved the % label but never the canvas. Gestures already write BOTH the
-  // shared value and the store to the same number, so the equality guards
-  // make this a no-op after a pinch/double-tap (no feedback loop); it only
-  // fires when the store diverges from the shared value, i.e. a button press.
+  // shared value and the store to the same number, so the guards make this a
+  // no-op after a pinch/double-tap; it should only fire on a button press.
+  //
+  // The guard MUST use an EPSILON, not strict `!==`. A gesture/spring leaves
+  // gestureScale.value a hair off the store value (springs don't land exactly
+  // on target; pan/pinch round-trip through JS state isn't bit-identical), so
+  // a strict `!==` stays true indefinitely. Then ANY unrelated re-render —
+  // notably the autosave's setDirty(false) ~1s after a stroke — re-runs this
+  // effect and re-springs the transform from that residual sub-pixel delta,
+  // making the whole canvas zoom/pan a touch and snap back: the "stroke
+  // shimmers ~1s after I lift" bug. Only a real button press moves these by a
+  // meaningful amount, so an epsilon ignores the float noise while still
+  // catching button-driven changes.
+  const SCALE_EPS = 0.001;
+  const TRANSLATE_EPS = 0.5;
   useEffect(() => {
-    if (gestureScale.value !== scale) {
+    if (Math.abs(gestureScale.value - scale) > SCALE_EPS) {
       gestureScale.value = withSpring(scale);
       savedScale.value = scale;
     }
-    if (gestureTranslateX.value !== translateX) {
+    if (Math.abs(gestureTranslateX.value - translateX) > TRANSLATE_EPS) {
       gestureTranslateX.value = withSpring(translateX);
       savedTranslateX.value = translateX;
     }
-    if (gestureTranslateY.value !== translateY) {
+    if (Math.abs(gestureTranslateY.value - translateY) > TRANSLATE_EPS) {
       gestureTranslateY.value = withSpring(translateY);
       savedTranslateY.value = translateY;
     }
