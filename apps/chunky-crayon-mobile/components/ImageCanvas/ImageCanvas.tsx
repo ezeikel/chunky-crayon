@@ -93,6 +93,7 @@ import {
   loadCanvasState,
   debugCanvasStorage,
   setMergedActionsHandler,
+  clearMergedActionsHandler,
   unionLocalWithMerged,
   isSyncInFlight,
 } from "@/utils/canvasPersistence";
@@ -178,7 +179,16 @@ const StickerActionImage = ({ action }: { action: DrawingAction }) => {
     );
   }
 
-  // Fallback: legacy emoji glyph via Skia Paragraph (colour-emoji fallback).
+  // PNG sticker (has a catalog id) still decoding: render NOTHING until the
+  // image is ready. Do NOT fall through to the emoji glyph — a PNG sticker
+  // carries action.sticker as a LEGACY fallback glyph too, so falling through
+  // flashed the emoji for the frames before useImage resolved, then swapped to
+  // the PNG (the "shows an old emoji then rotates" flash). The decode is fast;
+  // a blank frame or two is invisible, an emoji→PNG swap is not.
+  if (catalogId) return null;
+
+  // Fallback: genuinely legacy emoji-only save (no catalog id) → Skia Paragraph
+  // colour-emoji render.
   const glyph = action.sticker;
   if (!glyph) return null;
   const para = Skia.ParagraphBuilder.Make({ textAlign: TextAlign.Center })
@@ -915,27 +925,53 @@ const ImageCanvas = ({
   // the store history with the merged union so the next autosave persists it.
   useEffect(() => {
     void primeDeviceId();
-    setMergedActionsHandler((mergedImageId, mergedActions) => {
-      if (mergedImageId === coloringImage.id) {
-        // Re-merge the incoming set against the LIVE store history, not a blind
-        // replace. The 409 merge was built from a POST-time snapshot, so a
-        // stroke drawn during the ~1s round-trip is absent from it; a blind
-        // setHistory(merged) would drop that in-flight stroke permanently (the
-        // "stroke vanishes a beat after release and doesn't come back" bug).
-        // unionLocalWithMerged keeps local-only actions (live store wins) while
-        // still absorbing the server's merged work. Idempotent + id-deduped, so
-        // it's a no-op when nothing was drawn mid-flight.
-        const liveHistory = useCanvasStore.getState().history;
-        setHistory(
-          unionLocalWithMerged(
-            liveHistory,
-            mergedActions,
-            svgDimensions?.width,
-            svgDimensions?.height,
-          ),
-        );
-      }
+    // Per-image handler (keyed by id in the Map), so a 409 merge for THIS image
+    // reconciles this screen even when another coloring-image screen is mounted
+    // underneath. The old single-slot handler needed an inner id-guard and let
+    // the last-mounted screen win; the Map keys by id, so no guard is needed.
+    setMergedActionsHandler(coloringImage.id, (mergedActions) => {
+      // Only the ACTIVE image should rehydrate the shared store — a merge for a
+      // backgrounded image must not setHistory over the foreground canvas.
+      if (useCanvasStore.getState().imageId !== coloringImage.id) return;
+      // Re-merge the incoming set against the LIVE store history, not a blind
+      // replace. The 409 merge was built from a POST-time snapshot, so a stroke
+      // drawn during the ~1s round-trip is absent from it; a blind
+      // setHistory(merged) would drop that in-flight stroke permanently (the
+      // "stroke vanishes a beat after release and doesn't come back" bug).
+      // unionLocalWithMerged keeps local-only actions (live store wins) while
+      // still absorbing the server's merged work. Idempotent + id-deduped, so
+      // it's a no-op when nothing was drawn mid-flight.
+      const liveHistory = useCanvasStore.getState().history;
+      const unioned = unionLocalWithMerged(
+        liveHistory,
+        mergedActions,
+        svgDimensions?.width,
+        svgDimensions?.height,
+      );
+      // CRITICAL: only setHistory when the union ACTUALLY differs from current
+      // history. setHistory installs a NEW array reference, which re-arms the
+      // autosave effect (deps [history, historyIndex]) → another sync → another
+      // 409 (the server +1s every accepted write) → another merge → back here.
+      // Because the autosave fires TWO writes per cycle (action-list + raster),
+      // they leapfrog the version forever: a content-IDENTICAL merge would still
+      // setHistory a fresh ref and keep that loop spinning (version climbs with
+      // no new strokes — the stroke flash + bouncing progress). Comparing by
+      // stable id + undo state, skip the setHistory when nothing changed so the
+      // loop terminates once the action set is stable.
+      const sameSet =
+        unioned.length === liveHistory.length &&
+        unioned.every((a, i) => {
+          const b = liveHistory[i];
+          return (
+            !!b &&
+            a.id === b.id &&
+            (a.undone ?? false) === (b.undone ?? false) &&
+            (a.undoneSeq ?? 0) === (b.undoneSeq ?? 0)
+          );
+        });
+      if (!sameSet) setHistory(unioned);
     });
+    return () => clearMergedActionsHandler(coloringImage.id);
   }, [coloringImage.id, setHistory, svgDimensions]);
 
   // Save immediately when screen loses focus (user navigates away)
@@ -1029,6 +1065,17 @@ const ImageCanvas = ({
     }
 
     autoSaveTimerRef.current = setTimeout(() => {
+      // ACTIVE-IMAGE GATE. coloring-image/[id] is a native-stack route opened
+      // via router.push, so navigating from image A to image B leaves A's
+      // ImageCanvas MOUNTED underneath — its autosave effect stays subscribed to
+      // the ONE global canvas store. Without this guard A's effect fires, reads
+      // useCanvasStore.getState().history (the shared store, now holding B's
+      // actions) and saves it under A's id — two screens hammering the sync
+      // endpoint under two ids, racing the version into an endless 409 storm.
+      // The store's `imageId` is owned by whichever screen last initialized
+      // (the active/foreground one), so only that screen autosaves. No
+      // navigation hook needed (useIsFocused isn't a resolvable dep here).
+      if (useCanvasStore.getState().imageId !== coloringImage.id) return;
       // Get the latest state from the store directly. Save the FULL history (not
       // the visible prefix) so UNDO TOMBSTONES — which live at/after the cursor
       // — reach the server and make the undo durable across reload/devices. The
@@ -1074,6 +1121,9 @@ const ImageCanvas = ({
           () => {
             snapshotTaskRef.current = null;
             const latest = useCanvasStore.getState();
+            // Re-check the active-image gate: the foreground image may have
+            // changed between the 1s timer firing and this deferred task running.
+            if (latest.imageId !== coloringImage.id) return;
             const acts = latest.history;
             if (acts.length === 0) return;
             // Skip the raster while a sync is already in flight for this image:
@@ -1439,6 +1489,15 @@ const ImageCanvas = ({
       // parity). stickerCatalogId/stickerImageUrl ride to the wire for
       // cross-device replay.
       const sticker = getCanvasSticker(selectedSticker);
+      // The stored stickerSize (20-100 slider) is in CANVAS-pixel terms, like
+      // web's 32/48/64. But placement records the sticker in SVG viewBox space
+      // (coords come from touchToSvgCoords, ~1024-wide), where a raw 40 is ~4%
+      // of the width — tiny. Scale the slider value into SVG space by the same
+      // factor that maps a canvas pixel to an SVG unit, so a sticker lands at
+      // the SAME visual proportion as web (~9% of width at the default).
+      const svgW = svgDimensions?.width ?? 1024;
+      const sizeScale = svgW / Math.max(1, canvasWidth);
+      const svgStickerSize = stickerSize * sizeScale;
       const action: DrawingAction = {
         type: "sticker",
         color: selectedColor, // Not used but required by type
@@ -1447,7 +1506,7 @@ const ImageCanvas = ({
         stickerImageUrl: `/images/stickers/canvas/${selectedSticker}.png`,
         stickerX: coords.x,
         stickerY: coords.y,
-        stickerSize: stickerSize,
+        stickerSize: svgStickerSize,
         // Store source dimensions for cross-platform sync
         sourceWidth: svgDimensions?.width,
         sourceHeight: svgDimensions?.height,
@@ -1462,6 +1521,7 @@ const ImageCanvas = ({
       touchToSvgCoords,
       addAction,
       svgDimensions,
+      canvasWidth,
     ],
   );
 
@@ -1725,9 +1785,20 @@ const ImageCanvas = ({
         liveForces.value = [...liveForces.value, force];
         notifyChange(livePath);
       } else {
-        // Pan mode
-        gestureTranslateX.value = savedTranslateX.value + event.translationX;
-        gestureTranslateY.value = savedTranslateY.value + event.translationY;
+        // Pan mode — ONLY when zoomed in (scale > 1). At scale 1 the image fills
+        // its frame and must stay fixed (was freely draggable off-centre). When
+        // zoomed, clamp the translation so the scaled image can't be dragged past
+        // its own edges: the content overflows the frame by (scale-1)*dim, split
+        // half each side, so the max offset per axis is (scale-1)*dim/2.
+        const s = gestureScale.value;
+        if (s > 1) {
+          const maxX = ((s - 1) * canvasWidth) / 2;
+          const maxY = ((s - 1) * canvasHeight) / 2;
+          const nextX = savedTranslateX.value + event.translationX;
+          const nextY = savedTranslateY.value + event.translationY;
+          gestureTranslateX.value = Math.max(-maxX, Math.min(maxX, nextX));
+          gestureTranslateY.value = Math.max(-maxY, Math.min(maxY, nextY));
+        }
       }
     })
     .onEnd((event) => {
@@ -1777,6 +1848,27 @@ const ImageCanvas = ({
     .onEnd(() => {
       savedScale.value = gestureScale.value;
       runOnJS(setScale)(gestureScale.value);
+      // Re-clamp the pan after a zoom change. Zooming OUT shrinks the allowed
+      // offset, so an existing translation can now exceed the bound and leave
+      // the image off-centre; at scale <= 1 it must snap fully back to centre.
+      const s = gestureScale.value;
+      if (s <= 1) {
+        gestureTranslateX.value = withSpring(0);
+        gestureTranslateY.value = withSpring(0);
+        savedTranslateX.value = 0;
+        savedTranslateY.value = 0;
+        runOnJS(setTranslate)(0, 0);
+      } else {
+        const maxX = ((s - 1) * canvasWidth) / 2;
+        const maxY = ((s - 1) * canvasHeight) / 2;
+        const cx = Math.max(-maxX, Math.min(maxX, gestureTranslateX.value));
+        const cy = Math.max(-maxY, Math.min(maxY, gestureTranslateY.value));
+        gestureTranslateX.value = cx;
+        gestureTranslateY.value = cy;
+        savedTranslateX.value = cx;
+        savedTranslateY.value = cy;
+        runOnJS(setTranslate)(cx, cy);
+      }
       runOnJS(setScroll)(true);
     });
 

@@ -43,15 +43,24 @@ export const isSyncInFlight = (imageId: string): boolean =>
 
 // After a 409 append-merge, the merged action set must be pushed back into the
 // live in-memory canvas store so the next autosave serializes the union (not
-// this device's set). The canvas screen registers a handler that replaces the
-// store history for the matching image.
-let _onMergedActions:
-  | ((imageId: string, actions: DrawingAction[]) => void)
-  | null = null;
+// this device's set). Each mounted canvas screen registers a handler KEYED BY
+// IMAGE ID. This is a Map (not a single slot) because coloring-image/[id] is a
+// native-stack route: pushing image B leaves image A's ImageCanvas mounted, so
+// BOTH register handlers concurrently. A single global slot let the last-mounted
+// screen (B) overwrite A's — so a 409 merge for A was dropped (A never
+// reconciled → A re-POSTed the same version → infinite 409), while a merge for B
+// churned setHistory on the shared store. Keying by id reconciles each image
+// against its own handler. Handlers are removed on unmount via
+// clearMergedActionsHandler.
+const _mergedHandlers = new Map<string, (actions: DrawingAction[]) => void>();
 export const setMergedActionsHandler = (
-  fn: (imageId: string, actions: DrawingAction[]) => void,
+  imageId: string,
+  fn: (actions: DrawingAction[]) => void,
 ): void => {
-  _onMergedActions = fn;
+  _mergedHandlers.set(imageId, fn);
+};
+export const clearMergedActionsHandler = (imageId: string): void => {
+  _mergedHandlers.delete(imageId);
 };
 
 /**
@@ -433,7 +442,7 @@ const doSyncCanvasToServer = async (
         } catch (e) {
           console.error(`[CANVAS_SYNC] Failed to persist merged state:`, e);
         }
-        _onMergedActions?.(imageId, deserializeActions(mergedSerialized));
+        _mergedHandlers.get(imageId)?.(deserializeActions(mergedSerialized));
 
         if (attempt >= MAX_MERGE_RETRIES) {
           console.warn(
@@ -472,6 +481,36 @@ const doSyncCanvasToServer = async (
 
     const data = await response.json();
     console.log(`[CANVAS_SYNC] Sync successful - Version: ${data.version}`);
+
+    // Write the new server version back to MMKV SYNCHRONOUSLY, here, BEFORE this
+    // function returns (and therefore before `syncCanvasToServer`'s finally runs
+    // `_syncInFlight.delete`). The version writeback used to live in the caller's
+    // deferred `.then` (saveCanvasState), which is scheduled AFTER the in-flight
+    // flag is cleared — opening a window where the flag says "no sync running"
+    // but MMKV still holds the STALE pre-sync version. The two autosave phases
+    // (action-list + raster) hit that window: Phase 2 reads the stale version,
+    // sees no in-flight sync to coalesce against, and POSTs at the old version →
+    // guaranteed 409 → merge → +1 → leapfrog loop (the bouncing progress + the
+    // stroke flash). Writing the version here closes the window: by the time the
+    // in-flight flag clears, MMKV already holds the fresh version, so Phase 2
+    // either coalesces or POSTs at the correct version. Re-read first so a
+    // concurrent 409-merge writeback to this key isn't clobbered.
+    if (typeof data.version === "number") {
+      const key = `${STORAGE_PREFIX}${imageId}`;
+      try {
+        const latest = canvasStorage.getString(key);
+        if (latest) {
+          const latestData = JSON.parse(latest);
+          latestData.version = data.version;
+          canvasStorage.set(key, JSON.stringify(latestData));
+          console.log(
+            `[CANVAS_SYNC] Wrote server version ${data.version} back to MMKV`,
+          );
+        }
+      } catch (e) {
+        console.error(`[CANVAS_SYNC] Failed to write version back:`, e);
+      }
+    }
 
     // Clear pending sync marker
     await clearPendingSync(imageId);
@@ -871,14 +910,18 @@ export const saveCanvasState = async (
   try {
     const key = `${STORAGE_PREFIX}${imageId}`;
 
-    // Read existing version from local storage (may have been set by server sync)
+    // Read existing version + actions from local storage (may have been set by
+    // server sync). Capture the stored actions string for the no-change dedup
+    // below.
     let currentVersion = CURRENT_VERSION;
+    let storedActionsStr: string | null = null;
     try {
       const existingData = canvasStorage.getString(key);
       if (existingData) {
         const parsed = JSON.parse(existingData) as SavedCanvasData;
         // Use the stored version (which reflects server version after sync)
         currentVersion = parsed.version || CURRENT_VERSION;
+        storedActionsStr = JSON.stringify(parsed.actions ?? []);
         console.log(
           `[CANVAS_PERSIST] Using existing version: ${currentVersion}`,
         );
@@ -887,9 +930,34 @@ export const saveCanvasState = async (
       // Ignore parse errors, use default version
     }
 
+    const serializedActions = serializeActions(actions);
+
+    // NO-CHANGE DEDUP — the autosave fires saveCanvasState TWICE per cycle
+    // (Phase 1 action-list + Phase 2 raster), and each 409-merge writes the
+    // result back; without this, two writers re-POST the SAME action set at a
+    // stale version, each bumping the server version, leapfrogging into an
+    // ENDLESS 409→merge→200→409 loop (version climbs forever with no new
+    // strokes). Each loop iteration's setHistory/version-writeback churns the
+    // canvas → the stroke flash + the progress bar bouncing. If the action set
+    // is byte-identical to what's already stored AND there's no new raster to
+    // upload, this save is a pure no-op: skip the MMKV write AND the server
+    // sync entirely. (A raster-bearing Phase-2 call still proceeds so the
+    // preview/snapshot upload happens once.)
+    if (
+      !previewDataUrl &&
+      !snapshotDataUrl &&
+      storedActionsStr !== null &&
+      JSON.stringify(serializedActions) === storedActionsStr
+    ) {
+      console.log(
+        `[CANVAS_PERSIST] SAVE SKIPPED - action set unchanged, no raster (dedup)`,
+      );
+      return true;
+    }
+
     const data: SavedCanvasData = {
       imageId,
-      actions: serializeActions(actions),
+      actions: serializedActions,
       savedAt: Date.now(),
       version: currentVersion,
     };
@@ -934,29 +1002,16 @@ export const saveCanvasState = async (
       previewDataUrl,
       snapshotDataUrl,
     )
-      .then(async (result) => {
+      .then((result) => {
+        // The fresh server version is written back to MMKV SYNCHRONOUSLY inside
+        // doSyncCanvasToServer (before the in-flight flag clears) — see the note
+        // there. This .then only logs; doing the writeback here (in a deferred
+        // microtask, after the in-flight guard released) is what created the
+        // stale-version race that fed the 409 leapfrog loop.
         if (result.success && result.version !== undefined) {
           console.log(
             `[CANVAS_PERSIST] Server sync completed - Version: ${result.version}`,
           );
-          // Update ONLY the version field by re-reading stored data — a 409
-          // append-merge during sync may have already written the merged action
-          // union to this key; writing back the stale in-memory `data` (still
-          // our device-only actions) would clobber that merge. Re-read first.
-          try {
-            const latest = canvasStorage.getString(key);
-            const latestData = latest ? JSON.parse(latest) : data;
-            latestData.version = result.version;
-            canvasStorage.set(key, JSON.stringify(latestData));
-            console.log(
-              `[CANVAS_PERSIST] Updated local version to: ${result.version}`,
-            );
-          } catch (updateError) {
-            console.error(
-              `[CANVAS_PERSIST] Failed to update local version:`,
-              updateError,
-            );
-          }
         } else {
           console.log(
             `[CANVAS_PERSIST] Server sync failed: ${result.error} (will retry later)`,
