@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import { Image } from "expo-image";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faStar, faLock, faCheck } from "@fortawesome/pro-solid-svg-icons";
 import AppHeader from "@/components/AppHeader";
@@ -17,6 +18,7 @@ import StickerDetailSheet, {
 import useHeaderData from "@/hooks/useHeaderData";
 import { useStickers, useMarkStickersAsViewed } from "@/hooks/api";
 import { useT } from "@/lib/i18n/useT";
+import { STICKER_IMAGES } from "@/lib/stickers";
 
 type StickerCategory = {
   id: string;
@@ -40,35 +42,9 @@ type StickerItemProps = {
   onPress: () => void;
 };
 
-// Map sticker IDs to emojis for display (until we have real sticker images)
-const STICKER_EMOJIS: Record<string, string> = {
-  "first-steps": "🎨",
-  "getting-started": "✨",
-  "high-five": "🖐️",
-  "perfect-ten": "🏆",
-  "super-artist": "🦸",
-  "master-creator": "👑",
-  "century-club": "💯",
-  "animal-friend": "🐱",
-  "fantasy-dreamer": "🧙",
-  "space-explorer": "🚀",
-  "nature-lover": "🌸",
-  "vehicle-driver": "🚗",
-  "dino-hunter": "🦖",
-  "ocean-diver": "🐠",
-  "food-lover": "🍕",
-  "sports-star": "⚽",
-  "holiday-spirit": "🎉",
-  "animal-master": "🦁",
-  "fantasy-master": "🔮",
-  "space-master": "🌟",
-  "category-explorer": "🗺️",
-  "world-traveler": "🌍",
-};
-
 const StickerItem = ({ sticker, onPress }: StickerItemProps) => {
   const t = useT("mobile.stickers");
-  const emoji = STICKER_EMOJIS[sticker.id] || "⭐";
+  const image = STICKER_IMAGES[sticker.id];
 
   return (
     <Pressable
@@ -79,8 +55,20 @@ const StickerItem = ({ sticker, onPress }: StickerItemProps) => {
       ]}
       onPress={onPress}
     >
-      <View style={styles.stickerEmoji}>
-        <Text style={styles.stickerEmojiText}>{emoji}</Text>
+      <View style={styles.stickerArt}>
+        {/* Real bundled sticker PNG (web parity: web's StickerCard renders
+            sticker.imageUrl). Locked = dimmed, matching web's grayscale/
+            opacity treatment (RN Image has no CSS grayscale, so dim via
+            opacity on the locked tile + this lower opacity). */}
+        <Image
+          source={image}
+          style={[
+            styles.stickerImage,
+            !sticker.isUnlocked && styles.stickerImageLocked,
+          ]}
+          contentFit="contain"
+          transition={150}
+        />
         {!sticker.isUnlocked && (
           <View style={styles.lockOverlay}>
             <FontAwesomeIcon icon={faLock} size={16} color="#9CA3AF" />
@@ -150,7 +138,6 @@ const StickersScreen = () => {
     setSelectedSticker({
       id: sticker.id,
       name: sticker.name,
-      emoji: STICKER_EMOJIS[sticker.id] ?? "⭐",
       rarity: sticker.rarity,
       isUnlocked: sticker.isUnlocked,
       unlockedAt: sticker.unlockedAt,
@@ -309,14 +296,21 @@ const styles = StyleSheet.create({
   stickerItemPressed: {
     transform: [{ scale: 0.95 }],
   },
-  stickerEmoji: {
+  stickerArt: {
     width: 56,
     height: 56,
     alignItems: "center",
     justifyContent: "center",
   },
-  stickerEmojiText: {
-    fontSize: 40,
+  stickerImage: {
+    width: "100%",
+    height: "100%",
+  },
+  stickerImageLocked: {
+    // RN <Image> has no CSS grayscale; the tile already dims to 0.5 via
+    // stickerItemLocked, and this drops the art further so locked stickers
+    // read as "not yet earned" like web's grayscale+opacity treatment.
+    opacity: 0.4,
   },
   lockOverlay: {
     position: "absolute",

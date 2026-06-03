@@ -20,9 +20,14 @@ import Animated, {
   SlideOutDown,
 } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
+import { Image } from "expo-image";
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import { faSparkles, faStar } from "@fortawesome/pro-duotone-svg-icons";
 import ColoAvatar from "@/components/ColoAvatar";
 import type { ColoStage, EvolutionResult } from "@/lib/colo";
 import { COLO_STAGES, getAccessory } from "@/lib/colo";
+import { COLO_ACCESSORY_IMAGES } from "@/lib/colo/colo-images";
+import { COLORS } from "@/lib/design";
 
 type ColoEvolutionCelebrationProps = {
   /** Evolution result from server action */
@@ -41,20 +46,6 @@ const EVOLUTION_MESSAGES: Record<ColoStage, string[]> = {
   4: ["Colo is so happy!", "You're a coloring superstar!"],
   5: ["Incredible! Artist Colo!", "You're a true artist now!"],
   6: ["AMAZING! Master Colo!", "You've mastered coloring!"],
-};
-
-// Accessory emojis for display
-const ACCESSORY_EMOJIS: Record<string, string> = {
-  "astronaut-helmet": "🪖",
-  crown: "👑",
-  "rainbow-scarf": "🧣",
-  "party-hat": "🎉",
-  "artist-beret": "🎨",
-  "wizard-hat": "🧙",
-  "dino-spikes": "🦖",
-  "flower-crown": "🌸",
-  "superhero-cape": "🦸",
-  "sparkle-glasses": "✨",
 };
 
 const AnimatedTouchableOpacity =
@@ -156,23 +147,37 @@ const ColoEvolutionCelebration = ({
                       <ColoAvatar stage={newStage} size="xl" />
                     </Animated.View>
 
-                    {/* Sparkle effects */}
+                    {/* Sparkle burst — FontAwesome duotone to match web's
+                        ColoEvolutionCelebration (faSparkles/faStar in
+                        yellow/orange/pink), not emoji glyphs. */}
                     <Animated.View
                       className="absolute inset-0 items-center justify-center"
                       style={sparkleAnimatedStyle}
                     >
-                      <Text className="absolute -top-4 left-4 text-3xl">
-                        ✨
-                      </Text>
-                      <Text className="absolute -top-2 right-4 text-3xl">
-                        🌟
-                      </Text>
-                      <Text className="absolute -bottom-4 left-8 text-3xl">
-                        ⭐
-                      </Text>
-                      <Text className="absolute -bottom-2 right-8 text-3xl">
-                        ✨
-                      </Text>
+                      <FontAwesomeIcon
+                        icon={faSparkles}
+                        size={28}
+                        color={COLORS.yellow}
+                        style={styles.sparkleTopLeft}
+                      />
+                      <FontAwesomeIcon
+                        icon={faStar}
+                        size={28}
+                        color={COLORS.crayonOrange}
+                        style={styles.sparkleTopRight}
+                      />
+                      <FontAwesomeIcon
+                        icon={faStar}
+                        size={28}
+                        color={COLORS.yellow}
+                        style={styles.sparkleBottomLeft}
+                      />
+                      <FontAwesomeIcon
+                        icon={faSparkles}
+                        size={28}
+                        color={COLORS.coral}
+                        style={styles.sparkleBottomRight}
+                      />
                     </Animated.View>
                   </View>
 
@@ -212,11 +217,16 @@ const ColoEvolutionCelebration = ({
 
                     return (
                       <View key={accessoryId} className="items-center">
-                        {/* Accessory icon */}
-                        <View className="w-16 h-16 rounded-full bg-[#E46444] items-center justify-center mb-2">
-                          <Text className="text-2xl">
-                            {ACCESSORY_EMOJIS[accessoryId] || "🎁"}
-                          </Text>
+                        {/* Accessory icon — bundled PNG illustration (web
+                            parity: web renders accessory.imagePath via
+                            next/image), not an emoji. */}
+                        <View className="w-16 h-16 rounded-full bg-[#E46444] items-center justify-center mb-2 overflow-hidden">
+                          <Image
+                            source={COLO_ACCESSORY_IMAGES[accessoryId]}
+                            style={styles.accessoryImage}
+                            contentFit="contain"
+                            transition={200}
+                          />
                         </View>
                         <Text style={styles.accessoryName}>
                           {accessory.name}
@@ -299,6 +309,35 @@ const styles = StyleSheet.create({
     color: "#FFF",
     fontSize: 18,
     fontFamily: "TondoTrial-Bold",
+  },
+  // Accessory PNG inside the 64px (w-16/h-16) circle. p-1.5 padding mirrors
+  // web's object-contain p-1.5; the parent View clips with overflow-hidden.
+  accessoryImage: {
+    width: "100%",
+    height: "100%",
+    padding: 6,
+  },
+  // Sparkle-burst positions around the avatar (mirror web's absolute
+  // -top-4 left-1/4 etc.). Absolute within the inset-0 sparkle layer.
+  sparkleTopLeft: {
+    position: "absolute",
+    top: -16,
+    left: "25%",
+  },
+  sparkleTopRight: {
+    position: "absolute",
+    top: -8,
+    right: "25%",
+  },
+  sparkleBottomLeft: {
+    position: "absolute",
+    bottom: -16,
+    left: "33%",
+  },
+  sparkleBottomRight: {
+    position: "absolute",
+    bottom: -8,
+    right: "33%",
   },
 });
 

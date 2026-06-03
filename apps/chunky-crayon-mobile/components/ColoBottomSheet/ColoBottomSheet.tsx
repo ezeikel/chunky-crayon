@@ -1,11 +1,13 @@
 import { useCallback } from "react";
 import { View, Text, StyleSheet } from "react-native";
+import { Image } from "expo-image";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ModalBottomSheet } from "@swmansion/react-native-bottom-sheet";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faSparkles, faTrophy } from "@fortawesome/pro-solid-svg-icons";
 import ColoAvatar from "@/components/ColoAvatar";
 import { getAccessory } from "@/lib/colo";
+import { COLO_ACCESSORY_IMAGES } from "@/lib/colo/colo-images";
 import type { ColoState } from "@/lib/colo";
 import { FONTS, COLORS } from "@/lib/design";
 
@@ -125,11 +127,15 @@ const ColoBottomSheet = ({
                       style={styles.accessoryChip}
                       accessibilityLabel={accessory.name}
                     >
-                      {/* The accessory imagePath is a string ID that
-                        callers map to a bundled asset. For now render
-                        as an emoji-like text fallback since the
-                        accessory sprites aren't bundled on mobile yet. */}
-                      <Text style={styles.accessoryEmoji}>✨</Text>
+                      {/* Real bundled accessory PNG (web parity), resolved by
+                          id via COLO_ACCESSORY_IMAGES — replaces the old ✨
+                          emoji placeholder. */}
+                      <Image
+                        source={COLO_ACCESSORY_IMAGES[accessoryId]}
+                        style={styles.accessoryImage}
+                        contentFit="contain"
+                        transition={150}
+                      />
                     </View>
                   );
                 })}
@@ -225,8 +231,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  accessoryEmoji: {
-    fontSize: 18,
+  accessoryImage: {
+    width: "100%",
+    height: "100%",
+    padding: 4,
   },
   accessoryOverflow: {
     backgroundColor: COLORS.borderLight,

@@ -17,6 +17,8 @@ import {
   faTrophy,
   faChevronRight,
   faUserAstronaut,
+  faPalette,
+  faStar,
 } from "@fortawesome/pro-duotone-svg-icons";
 import Animated, {
   useSharedValue,
@@ -35,6 +37,7 @@ import ParentalGate from "@/components/ParentalGate";
 import { useColoContext } from "@/contexts";
 import useHeaderData from "@/hooks/useHeaderData";
 import { useT } from "@/lib/i18n/useT";
+import { COLORS } from "@/lib/design";
 
 const padding = 20;
 
@@ -118,19 +121,36 @@ const HomeScreen = () => {
               />
             </View>
 
-            {/* Colo encouragement message */}
+            {/* Colo encouragement message. Trailing FontAwesome duotone icon
+                (faPalette / faStar) replaces the old 🎨 / 🌟 emoji — FA over
+                emoji in UI copy. Centered row so the icon sits inline after
+                the text. */}
             {!coloLoading && coloState.progressToNext && (
-              <Text style={styles.encouragement}>
-                {coloState.stageName} wants to grow! Save{" "}
-                {coloState.progressToNext.required -
-                  coloState.progressToNext.current}{" "}
-                more artworks to evolve! 🎨
-              </Text>
+              <View style={styles.encouragementRow}>
+                <Text style={styles.encouragement}>
+                  {coloState.stageName} wants to grow! Save{" "}
+                  {coloState.progressToNext.required -
+                    coloState.progressToNext.current}{" "}
+                  more artworks to evolve!
+                </Text>
+                <FontAwesomeIcon
+                  icon={faPalette}
+                  size={14}
+                  color={COLORS.crayonOrange}
+                />
+              </View>
             )}
             {!coloLoading && !coloState.progressToNext && (
-              <Text style={styles.encouragement}>
-                Your {coloState.stageName} is so proud of you! 🌟
-              </Text>
+              <View style={styles.encouragementRow}>
+                <Text style={styles.encouragement}>
+                  Your {coloState.stageName} is so proud of you!
+                </Text>
+                <FontAwesomeIcon
+                  icon={faStar}
+                  size={14}
+                  color={COLORS.yellow}
+                />
+              </View>
             )}
           </View>
 
@@ -354,13 +374,21 @@ const styles = StyleSheet.create({
     fontFamily: "TondoTrial-Bold",
     flexShrink: 1,
   },
+  encouragementRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    flexWrap: "wrap",
+    gap: 6,
+    paddingHorizontal: 24,
+    marginTop: 4,
+  },
   encouragement: {
     fontSize: 14,
     color: "#6B7280",
     textAlign: "center",
-    paddingHorizontal: 24,
-    marginTop: 4,
     fontFamily: "TondoTrial-Regular",
+    flexShrink: 1,
   },
   card: {
     backgroundColor: "#FFFFFF",

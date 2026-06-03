@@ -1,5 +1,6 @@
 import { useCallback } from "react";
 import { View, Text, StyleSheet } from "react-native";
+import { Image } from "expo-image";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ModalBottomSheet } from "@swmansion/react-native-bottom-sheet";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
@@ -10,6 +11,7 @@ import {
 } from "@fortawesome/pro-duotone-svg-icons";
 import { useT } from "@/lib/i18n/useT";
 import { COLORS, CRAYON, FONTS } from "@/lib/design";
+import { STICKER_IMAGES } from "@/lib/stickers";
 
 /**
  * Sticker detail bottom sheet — mobile port of web's StickerDetailModal.
@@ -18,16 +20,15 @@ import { COLORS, CRAYON, FONTS } from "@/lib/design";
  * slides up with the big sticker, its rarity stars, and either the unlock
  * celebration (unlocked) or how-to-unlock hint (locked).
  *
- * Mobile uses emoji placeholders (the sticker-image pipeline isn't wired
- * yet), so the "big sticker" is the emoji at large size, dimmed when
- * locked. Rarity renders as 1-4 filled stars, matching web (kids count
- * stars, they don't read "rare").
+ * The big sticker is the real bundled PNG (resolved by id via
+ * STICKER_IMAGES), dimmed when locked — web parity with StickerDetailModal,
+ * which renders sticker.imageUrl. Rarity renders as 1-4 filled stars,
+ * matching web (kids count stars, they don't read "rare").
  */
 
 export type StickerDetail = {
   id: string;
   name: string;
-  emoji: string;
   rarity: string;
   isUnlocked: boolean;
   unlockedAt: string | null;
@@ -85,21 +86,23 @@ const StickerDetailSheet = ({
                 {isUnlocked ? sticker.name : t("lockedTitle")}
               </Text>
 
-              {/* Big sticker — full emoji unlocked, dimmed + lock badge locked */}
+              {/* Big sticker — real bundled PNG (web parity), dimmed + lock
+                  badge when locked. */}
               <View
                 style={[
                   styles.bigTile,
                   isUnlocked ? styles.bigTileUnlocked : styles.bigTileLocked,
                 ]}
               >
-                <Text
+                <Image
+                  source={STICKER_IMAGES[sticker.id]}
                   style={[
-                    styles.bigEmoji,
-                    !isUnlocked && styles.bigEmojiLocked,
+                    styles.bigImage,
+                    !isUnlocked && styles.bigImageLocked,
                   ]}
-                >
-                  {sticker.emoji}
-                </Text>
+                  contentFit="contain"
+                  transition={200}
+                />
                 {!isUnlocked && (
                   <View style={styles.lockBadge}>
                     <FontAwesomeIcon
@@ -226,10 +229,11 @@ const styles = StyleSheet.create({
   bigTileLocked: {
     backgroundColor: "#F3F4F6",
   },
-  bigEmoji: {
-    fontSize: 72,
+  bigImage: {
+    width: 104,
+    height: 104,
   },
-  bigEmojiLocked: {
+  bigImageLocked: {
     opacity: 0.3,
   },
   lockBadge: {

@@ -12,6 +12,14 @@ import Animated, {
 import { LinearGradient } from "expo-linear-gradient";
 import Svg, { Circle } from "react-native-svg";
 import * as Haptics from "expo-haptics";
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
+import {
+  faHeart,
+  faStar,
+  faSparkles,
+  faEgg,
+} from "@fortawesome/pro-duotone-svg-icons";
 import type { ColoStage, ColoState } from "@/lib/colo";
 import { COLO_STAGES } from "@/lib/colo";
 import { COLO_STAGE_IMAGES } from "@/lib/colo/colo-images";
@@ -81,11 +89,19 @@ const EMOJI_SIZES: Record<AvatarSize, number> = {
   xl: 20,
 };
 
-// Particle emojis for reactions
-const PARTICLE_EMOJIS: Record<ParticleType, string> = {
-  heart: "❤️",
-  star: "⭐",
-  sparkle: "✨",
+// Particle icons + colors for tap reactions — FontAwesome duotone to match
+// web's ColoAvatar PARTICLE_ICONS/PARTICLE_COLORS exactly (no emoji glyphs).
+// heart = crayon-pink, star/sparkle = crayon-yellow (mobile design tokens).
+const PARTICLE_ICONS: Record<ParticleType, IconDefinition> = {
+  heart: faHeart,
+  star: faStar,
+  sparkle: faSparkles,
+};
+
+const PARTICLE_COLORS: Record<ParticleType, string> = {
+  heart: COLORS.coral, // = crayon-pink (#E68991)
+  star: COLORS.yellow, // = crayon-yellow (#FAC342)
+  sparkle: COLORS.yellow,
 };
 
 const getRandomParticleType = (): ParticleType => {
@@ -204,12 +220,10 @@ const ColoAvatar = ({
     return `${filled} ${circumference}`;
   }, [progressPercentage, ringRadius]);
 
-  // Get stage emoji
-  const getStageEmoji = () => {
-    if (stage <= 2) return "🥚";
-    if (stage <= 4) return "🐣";
-    return "🌟";
-  };
+  // Stage indicator icon for the gradient placeholder (shown only if the
+  // bundled stage PNG fails to load). FontAwesome to match web exactly:
+  // egg for the early stages, star once grown (web uses faEgg/faStar, white).
+  const stageIcon: IconDefinition = stage <= 4 ? faEgg : faStar;
 
   return (
     <View
@@ -228,9 +242,11 @@ const ColoAvatar = ({
             particleAnimatedStyle,
           ]}
         >
-          <Text style={styles.particleEmoji}>
-            {PARTICLE_EMOJIS[particle.type]}
-          </Text>
+          <FontAwesomeIcon
+            icon={PARTICLE_ICONS[particle.type]}
+            size={18}
+            color={PARTICLE_COLORS[particle.type]}
+          />
         </Animated.View>
       ))}
 
@@ -263,10 +279,12 @@ const ColoAvatar = ({
               >
                 {stage}
               </Text>
-              {/* Stage emoji */}
-              <Text style={{ fontSize: EMOJI_SIZES[size] }}>
-                {getStageEmoji()}
-              </Text>
+              {/* Stage icon (FA, white) — egg early, star once grown. */}
+              <FontAwesomeIcon
+                icon={stageIcon}
+                size={EMOJI_SIZES[size]}
+                color="#FFFFFF"
+              />
             </LinearGradient>
           ) : (
             /* Real bundled Colo illustration for this stage. */
@@ -327,9 +345,6 @@ const styles = StyleSheet.create({
   particle: {
     position: "absolute",
     zIndex: 20,
-  },
-  particleEmoji: {
-    fontSize: 18,
   },
   touchable: {
     borderRadius: RADIUS.full,

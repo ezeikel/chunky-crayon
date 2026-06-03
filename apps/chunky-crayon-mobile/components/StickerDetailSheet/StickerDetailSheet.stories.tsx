@@ -50,7 +50,6 @@ export const UnlockedCommon: Story = {
       sticker={{
         id: "first-steps",
         name: "First Steps",
-        emoji: "🎨",
         rarity: "common",
         isUnlocked: true,
         unlockedAt: "2026-05-20T10:00:00.000Z",
@@ -67,7 +66,6 @@ export const UnlockedLegendary: Story = {
       sticker={{
         id: "master-creator",
         name: "Master Creator",
-        emoji: "👑",
         rarity: "legendary",
         isUnlocked: true,
         unlockedAt: "2026-05-25T14:30:00.000Z",
@@ -84,7 +82,6 @@ export const Locked: Story = {
       sticker={{
         id: "century-club",
         name: "Century Club",
-        emoji: "💯",
         rarity: "rare",
         isUnlocked: false,
         unlockedAt: null,

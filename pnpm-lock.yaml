@@ -178,6 +178,9 @@ importers:
       '@fortawesome/free-solid-svg-icons':
         specifier: ^6.7.1
         version: 6.7.2
+      '@fortawesome/pro-duotone-svg-icons':
+        specifier: ^6.7.1
+        version: 6.7.2
       '@fortawesome/pro-light-svg-icons':
         specifier: ^6.7.1
         version: 6.7.2
