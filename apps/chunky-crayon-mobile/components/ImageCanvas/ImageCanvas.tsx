@@ -92,6 +92,7 @@ import {
   loadCanvasState,
   debugCanvasStorage,
   setMergedActionsHandler,
+  unionLocalWithMerged,
 } from "@/utils/canvasPersistence";
 import { primeDeviceId } from "@/stores/canvasStore";
 import {
@@ -871,10 +872,26 @@ const ImageCanvas = ({
     void primeDeviceId();
     setMergedActionsHandler((mergedImageId, mergedActions) => {
       if (mergedImageId === coloringImage.id) {
-        setHistory(mergedActions);
+        // Re-merge the incoming set against the LIVE store history, not a blind
+        // replace. The 409 merge was built from a POST-time snapshot, so a
+        // stroke drawn during the ~1s round-trip is absent from it; a blind
+        // setHistory(merged) would drop that in-flight stroke permanently (the
+        // "stroke vanishes a beat after release and doesn't come back" bug).
+        // unionLocalWithMerged keeps local-only actions (live store wins) while
+        // still absorbing the server's merged work. Idempotent + id-deduped, so
+        // it's a no-op when nothing was drawn mid-flight.
+        const liveHistory = useCanvasStore.getState().history;
+        setHistory(
+          unionLocalWithMerged(
+            liveHistory,
+            mergedActions,
+            svgDimensions?.width,
+            svgDimensions?.height,
+          ),
+        );
       }
     });
-  }, [coloringImage.id, setHistory]);
+  }, [coloringImage.id, setHistory, svgDimensions]);
 
   // Save immediately when screen loses focus (user navigates away)
   useFocusEffect(

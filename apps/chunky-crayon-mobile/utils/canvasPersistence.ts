@@ -44,6 +44,42 @@ export const setMergedActionsHandler = (
   _onMergedActions = fn;
 };
 
+/**
+ * Union a freshly-merged action set with the CURRENT live store history.
+ *
+ * Why this exists: the 409 append-merge runs `mergeCanvasActions(apiActions,
+ * serverActions)` where `apiActions` is a SNAPSHOT of history taken when the
+ * autosave POST started. The POST round-trip (network + 409 + re-merge) takes
+ * ~1s, and a user can draw ANOTHER stroke in that window. That new stroke is in
+ * the live store but in NEITHER apiActions NOR serverActions, so the merge can't
+ * see it — and the old handler did a blind `setHistory(merged)`, which DROPPED
+ * the in-flight stroke (the "stroke disappears a beat after I lift, and doesn't
+ * come back" bug). The live store is the authority for actions the round-trip
+ * couldn't have observed, so we re-merge the incoming set against it (local wins
+ * on field-level divergence; tombstones resolve monotonically) before applying.
+ * `mergeCanvasActions` is idempotent + dedups by stable id, so re-merging an
+ * action that IS in both is a no-op.
+ */
+export const unionLocalWithMerged = (
+  liveHistory: DrawingAction[],
+  merged: DrawingAction[],
+  defaultSourceWidth?: number,
+  defaultSourceHeight?: number,
+): DrawingAction[] => {
+  const toApi = (actions: DrawingAction[]): CanvasAction[] =>
+    serializeActions(actions).map(
+      (a) =>
+        convertToApiAction(
+          a,
+          defaultSourceWidth,
+          defaultSourceHeight,
+        ) as CanvasAction,
+    );
+  // local = live store (wins on divergence), remote = the merged set.
+  const reMerged = mergeCanvasActions(toApi(liveHistory), toApi(merged));
+  return deserializeActions(reMerged.map(apiToSerialized));
+};
+
 const STORAGE_PREFIX = "chunky_crayon_canvas_";
 const METADATA_KEY = `${STORAGE_PREFIX}metadata`;
 const SYNC_PENDING_PREFIX = "chunky_crayon_sync_pending_";
