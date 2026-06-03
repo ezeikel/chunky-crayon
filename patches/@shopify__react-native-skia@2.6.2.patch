@@ -23,6 +23,43 @@ index 3fd4e908ca6baf5fd23c443edc2ac6b756eb28aa..df8c8e61240a97b1f3d4244b0cb737ce
      auto device = _device;
      auto ctx = new OffscreenRenderContext(device, _directContext, _commandQueue,
                                            width, height);
+diff --git a/cpp/rnskia/RNSkView.h b/cpp/rnskia/RNSkView.h
+index 5181c713c7415a48544b95fbb826c56a81bc0787..09825ac077b6a248ecd81493b752cff24bfe3cc7 100644
+--- a/cpp/rnskia/RNSkView.h
++++ b/cpp/rnskia/RNSkView.h
+@@ -84,6 +84,13 @@ public:
+    Returns a snapshot of the current surface/canvas
+    */
+   sk_sp<SkImage> makeSnapshot(SkRect *bounds) {
++    // (chunkycrayon patch) Same null-surface guard as renderToCanvas: a 0-dim /
++    // torn-down offscreen surface makes _surface null (MetalContext patch), and
++    // _surface->makeImageSnapshot() would SIGSEGV. Return null; callers treat a
++    // null image as "couldn't snapshot" and skip cleanly.
++    if (_surface == nullptr) {
++      return nullptr;
++    }
+     sk_sp<SkImage> image;
+     if (bounds != nullptr) {
+       SkIRect b =
+@@ -117,6 +124,18 @@ public:
+    Render to a canvas
+    */
+   bool renderToCanvas(const std::function<void(SkCanvas *)> &cb) override {
++    // (chunkycrayon patch) Guard a null offscreen surface. makeOffscreenSurface
++    // (→ MetalContext::MakeOffscreen, patched) returns nullptr when the backing
++    // surface is 0-dim / mid-relayout / torn down — e.g. a deferred autosave or
++    // progress snapshot firing from a setTimeout after the canvas began tearing
++    // down on navigation. Without this check _surface->getCanvas() dereferences
++    // null and SIGSEGVs on the JS thread (SkSurface::getCanvas, far=0x28). The
++    // MetalContext patch fixed the 0-dim SIGABRT but moved the null one frame
++    // here; this closes it. The caller (RNSkView::makeImageSnapshot) already
++    // handles a failed render as "couldn't create image".
++    if (_surface == nullptr) {
++      return false;
++    }
+     cb(_surface->getCanvas());
+     return true;
+   };
 diff --git a/cpp/skia/include/private/base/README.md b/cpp/skia/include/private/base/README.md
 deleted file mode 100644
 index 7f4f17b228c2b8e664b462983d66f735c6383fe7..0000000000000000000000000000000000000000
