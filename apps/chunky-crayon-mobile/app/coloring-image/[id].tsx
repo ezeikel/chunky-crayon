@@ -97,6 +97,7 @@ const ColoringImage = () => {
     setBrushType,
     captureCanvas,
     addAction,
+    setImageId,
   } = useCanvasStore();
 
   // Active profile to stamp on locally-saved artwork (null = logged-out bucket).
@@ -124,6 +125,15 @@ const ColoringImage = () => {
   const confirmStartOver = useCallback(() => {
     tapHeavy();
     reset();
+    // Restore the image identity IMMEDIATELY: reset() spreads initialState,
+    // which sets imageId back to null. The ImageCanvas init effect subscribes to
+    // store imageId AND has it in its dep array, so leaving it null re-fires the
+    // effect (real→null), which re-runs the full new-image load branch and
+    // re-restores the actions we're trying to clear (the magic-reveal flash on
+    // Start Over). Setting it back to the real id before anything else means the
+    // dep never actually changes value, so the effect doesn't re-fire — and the
+    // `clear` terminal below stamps under the correct imageId, not null.
+    setImageId(id as string);
     setTool("brush");
     setBrushType("crayon");
     // Record a `clear` terminal action (web parity): a reset that syncs as a
@@ -135,7 +145,7 @@ const ColoringImage = () => {
     // same-account reset; the clear terminal handles cross-device durability.
     void deleteCanvasState(id as string);
     notifySuccess();
-  }, [reset, setTool, setBrushType, addAction, id]);
+  }, [reset, setImageId, setTool, setBrushType, addAction, id]);
 
   // ── Per-action sheet handlers ──────────────────────────────────────────
   // Each rail tile opens its own ActionSheet; the sheet's green ✓ fires the

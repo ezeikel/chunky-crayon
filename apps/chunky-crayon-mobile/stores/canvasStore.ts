@@ -250,6 +250,13 @@ type CanvasActions = {
   // History actions
   addAction: (action: DrawingAction) => void;
   setHistory: (history: DrawingAction[]) => void;
+  // Atomically install a full restored action set in ONE store commit (one
+  // re-render, one Skia repaint). Used by the canvas load path instead of N
+  // sequential addAction() calls — those each fire a separate set() → separate
+  // paint, so an N-action page visibly rebuilds region-by-region from blank on
+  // every open (the "first-open flash"). Stamps any action missing stable
+  // identity, exactly like addAction, so restored actions keep their ids.
+  restoreHistory: (actions: DrawingAction[]) => void;
   undo: () => void;
   redo: () => void;
   clearHistory: () => void;
@@ -426,6 +433,31 @@ export const useCanvasStore = create<CanvasState & CanvasActions>(
     // the next autosave serializes the merged union, not this device's set).
     setHistory: (history) =>
       set({ history, historyIndex: history.length - 1, isDirty: false }),
+
+    // Atomic restore for the canvas load path. Stamps each action's stable
+    // identity the same way addAction does (preserving any already present —
+    // restored actions carry their saved ids), then commits the whole set in a
+    // SINGLE set(). This replaces the old `savedActions.forEach(addAction)`
+    // restore in ImageCanvas, which fired one set()/paint per action and made
+    // the page rebuild visibly from blank on every open (the first-open flash).
+    // isDirty stays false: a freshly-restored canvas isn't a pending edit.
+    restoreHistory: (actions) => {
+      const stamped = actions.map((action) => ({
+        ...action,
+        id: action.id ?? makeActionId(),
+        createdAt: action.createdAt ?? Date.now(),
+        seq: action.seq ?? nextActionSeq(),
+        originDeviceId: action.originDeviceId ?? cachedDeviceId,
+      }));
+      console.log(
+        `[CANVAS_STORE] RESTORE_HISTORY - ${stamped.length} actions in one commit`,
+      );
+      set({
+        history: stamped,
+        historyIndex: stamped.length - 1,
+        isDirty: false,
+      });
+    },
 
     clearHistory: () => set({ history: [], historyIndex: -1 }),
 

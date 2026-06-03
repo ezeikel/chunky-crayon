@@ -544,6 +544,7 @@ const ImageCanvas = ({
     isMuted,
     addAction,
     setHistory,
+    restoreHistory,
     undo,
     redo,
     setColor,
@@ -842,17 +843,19 @@ const ImageCanvas = ({
         reset();
         setImageId(currentImageId);
 
-        // Restore saved actions if they exist
+        // Restore saved actions if they exist — in ONE atomic commit. The old
+        // path called addAction per action, and each addAction is its own
+        // store set() → its own re-render → its own Skia repaint. So an
+        // N-action page painted itself blank (after reset) and then rebuilt
+        // region-by-region across N frames — the visible "first-open flash" the
+        // user reported on every coloring-page open. restoreHistory installs
+        // the whole set in a single commit: one paint, the artwork appears at
+        // once. (restoreHistory stamps identity exactly like addAction.)
         if (savedActions.length > 0) {
           console.log(
-            `[CANVAS_INIT] Restoring ${savedActions.length} actions to store...`,
+            `[CANVAS_INIT] Restoring ${savedActions.length} actions in one commit...`,
           );
-          savedActions.forEach((action, idx) => {
-            console.log(
-              `[CANVAS_INIT] Adding action ${idx + 1}/${savedActions.length}, type: ${action.type}`,
-            );
-            addAction(action);
-          });
+          restoreHistory(savedActions);
           console.log(`[CANVAS_INIT] All actions restored`);
         } else {
           console.log(`[CANVAS_INIT] No saved actions to restore`);
@@ -917,7 +920,7 @@ const ImageCanvas = ({
       if (initMeasureTimerRef.current)
         clearTimeout(initMeasureTimerRef.current);
     };
-  }, [coloringImage.id, reset, setImageId, addAction, imageId]);
+  }, [coloringImage.id, reset, setImageId, restoreHistory, imageId]);
 
   // Prime the cached device id (async SecureStore read) so actions stamped
   // synchronously in addAction carry the real originDeviceId, and register the
