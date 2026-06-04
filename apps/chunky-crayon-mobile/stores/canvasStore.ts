@@ -296,7 +296,10 @@ const initialState: CanvasState = {
   selectedPattern: "dots",
   selectedSticker: "star-classic",
   stickerCategory: "stars",
-  stickerSize: 40,
+  // Default placed-sticker size (canvas-px terms; mapped to SVG space at
+  // placement). Bumped 40→80 (~2x) — at 40 stickers read tiny against the
+  // artwork and are fiddly for ages 3-8. Clamp max widened to match (see below).
+  stickerSize: 80,
   magicMode: "suggest",
   magicReady: true,
   rainbowHue: 0,
@@ -336,7 +339,8 @@ export const useCanvasStore = create<CanvasState & CanvasActions>(
     setSticker: (sticker) => set({ selectedSticker: sticker }),
     setStickerCategory: (category) => set({ stickerCategory: category }),
     setStickerSize: (size) =>
-      set({ stickerSize: Math.max(20, Math.min(100, size)) }),
+      // Max widened 100→150 so kids can size stickers up further (default is 80).
+      set({ stickerSize: Math.max(20, Math.min(150, size)) }),
     setMagicMode: (mode) => set({ magicMode: mode }),
     setMagicReady: (ready) => set({ magicReady: ready }),
     advanceRainbowHue: (amount = 30) =>
