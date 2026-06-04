@@ -489,47 +489,55 @@ const ColoringImage = () => {
                between them by what fits. Hidden chrome in focus mode →
                render just the canvas full-bleed. */
             isFocusMode ? (
-              /* Focus mode: KEEP the rails (palette + tools), just drop the
-                 header above and the "More Coloring Pages" strip below so the
-                 canvas gets the full window height — maximum colouring space
-                 without losing the sidebars (web parity: focus mode hides
-                 chrome, not the toolbars). Render ColoringLayout directly in
-                 the flex:1 mainContent (no ScrollView wrapper) so its row
-                 fills the whole screen; the canvas measure-fits that taller
-                 box. No scroll = no More-pages — that's the point of focus.
-                 The full-screen relayout is gated by the Skia snapshot
-                 settle-gate (ImageCanvas re-arms on isFocusMode change). */
-              <ColoringLayout
-                width={deviceInfo.screenWidth}
-                height={deviceInfo.screenHeight}
-                onZoomIn={handleZoomIn}
-                onZoomOut={handleZoomOut}
-                onResetZoom={handleResetZoom}
-                zoom={scale}
-                onStartOver={handleStartOver}
-                onPrint={() => setShowPrintSheet(true)}
-                onSave={() => setShowSaveSheet(true)}
-                onMyArtwork={() => setShowMyArtworkSheet(true)}
-                renderCanvas={(area) => (
-                  <View style={styles.canvasCardLandscape}>
-                    <ImageCanvas
-                      coloringImage={coloringImage}
-                      setScroll={setScroll}
-                      canvasArea={{
-                        width: Math.max(
-                          1,
-                          area.width - CANVAS_CARD_PADDING * 2,
-                        ),
-                        height: Math.max(
-                          1,
-                          area.height - CANVAS_CARD_PADDING * 2,
-                        ),
-                      }}
-                      layoutMode={layoutMode}
-                    />
-                  </View>
-                )}
-              />
+              /* Focus mode (iPad/landscape): the EXACT same three-column
+                 ColoringLayout as the non-focus landscape path — same width/height
+                 so the canvas measure-fits identically — just rendered straight in
+                 the flex:1 mainContent with NO ScrollView, NO header above, NO
+                 "More Coloring Pages" below. So the colouring area is unchanged;
+                 focus only strips the surrounding chrome (web parity: hides chrome,
+                 not the toolbars). The exit X is the global FocusModeFloatingExit,
+                 absolutely positioned (modal vibe) and offset to clear the right
+                 rail — NOT a layout header row (that stole space + pushed the
+                 canvas down).
+                 Wrapped in a flex:1 column View so ColoringLayout gets a
+                 FULL-HEIGHT bounded box (mirrors the non-focus path's
+                 landscapeColoringBlock) — without it, ColoringLayout sits bare in
+                 the flexDirection:row mainContent and its canvas measure-fit
+                 collapsed/dropped to the bottom. */
+              <View style={styles.focusColumn}>
+                <ColoringLayout
+                  width={deviceInfo.screenWidth}
+                  height={deviceInfo.screenHeight}
+                  hideTopBar
+                  onZoomIn={handleZoomIn}
+                  onZoomOut={handleZoomOut}
+                  onResetZoom={handleResetZoom}
+                  zoom={scale}
+                  onStartOver={handleStartOver}
+                  onPrint={() => setShowPrintSheet(true)}
+                  onSave={() => setShowSaveSheet(true)}
+                  onMyArtwork={() => setShowMyArtworkSheet(true)}
+                  renderCanvas={(area) => (
+                    <View style={styles.canvasCardLandscape}>
+                      <ImageCanvas
+                        coloringImage={coloringImage}
+                        setScroll={setScroll}
+                        canvasArea={{
+                          width: Math.max(
+                            1,
+                            area.width - CANVAS_CARD_PADDING * 2,
+                          ),
+                          height: Math.max(
+                            1,
+                            area.height - CANVAS_CARD_PADDING * 2,
+                          ),
+                        }}
+                        layoutMode={layoutMode}
+                      />
+                    </View>
+                  )}
+                />
+              </View>
             ) : isThreeColumnPortrait ? (
               /* Portrait three-column: scroll the rails+canvas as one block,
                  then a "More Coloring Pages" grid fills the dead space below.
@@ -799,7 +807,11 @@ const ColoringImage = () => {
             props. */}
         {!isLandscapeLayout && <MobileColoringToolbar />}
 
-        {/* Floating exit X — only renders while focus mode is active. */}
+        {/* Floating exit X — modal-style, pinned to the true top-right SCREEN
+            corner (only renders in focus mode). Offsetting it left by the rail
+            width put it on top of the progress/sound bar (CanvasTopBar) instead;
+            the rail's top-right corner is empty (zoom controls sit lower), so a
+            plain corner X is clean on both iPad and phone. */}
         <FocusModeFloatingExit />
       </LinearGradient>
     </View>
@@ -884,6 +896,17 @@ const styles = StyleSheet.create({
   mainContent: {
     flex: 1,
     flexDirection: "row",
+  },
+  // iPad/landscape focus mode: a flex:1 column wrapper so the three-column
+  // ColoringLayout gets a full-height bounded box (mirrors the non-focus
+  // landscapeColoringBlock). paddingTop reserves a band at the top for the
+  // absolutely-positioned exit X (FocusModeFloatingExit, ~44px at top≈16-24) so
+  // the X sits in clear space ABOVE the three columns — never over the right rail
+  // or the progress/sound bar. The columns (rails + canvas) start below it.
+  focusColumn: {
+    flex: 1,
+    flexDirection: "column",
+    paddingTop: 72,
   },
   middleColumn: {
     flex: 1,

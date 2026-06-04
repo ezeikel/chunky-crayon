@@ -35,6 +35,14 @@ type ColoringLayoutProps = {
    * fixed-screen `flex:1` behaviour for landscape / middle / phone / stories.
    */
   scrollable?: boolean;
+  /**
+   * Hide the per-column CanvasTopBar (progress bar + sound/music). Used by iPad
+   * focus mode to drop that top strip so the canvas + rails fill the window —
+   * matching iPhone focus (which uses a different layout with no CanvasTopBar).
+   * The progress bar is a passive completion indicator; sound/music can be set
+   * before entering focus. Default false keeps the bar everywhere else.
+   */
+  hideTopBar?: boolean;
 };
 
 /**
@@ -63,6 +71,7 @@ const ColoringLayout = ({
   onSave,
   onMyArtwork,
   scrollable = false,
+  hideTopBar = false,
 }: ColoringLayoutProps) => {
   const tier = getColoringTier(width, height);
 
@@ -101,7 +110,7 @@ const ColoringLayout = ({
         {/* Center column: progress bar + sound/music ABOVE the canvas
             (web's per-column placement), then the dominant canvas. */}
         <View style={styles.canvasCenter}>
-          <CanvasTopBar />
+          {!hideTopBar && <CanvasTopBar />}
           <View
             style={[styles.canvasFill, !scrollable && styles.canvasFillFixed]}
             onLayout={scrollable ? undefined : onFillLayout}
@@ -147,7 +156,7 @@ const ColoringLayout = ({
   // rendering nothing until measured so the 0-fallback never paints oversized.
   return (
     <View style={styles.column}>
-      <CanvasTopBar />
+      {!hideTopBar && <CanvasTopBar />}
       <ColoringToolbar
         onZoomIn={onZoomIn}
         onZoomOut={onZoomOut}
@@ -208,14 +217,17 @@ const styles = StyleSheet.create({
     alignItems: "stretch",
   },
   // Fixed (landscape) tier: claim the leftover column height so onLayout
-  // measures the real visible area, and CENTER the (letterboxed) canvas within
-  // it so the slack from height-fitting a square into a wide column is balanced
-  // top/bottom + left/right instead of pinned top-left. (Scrollable/portrait
-  // keeps plain canvasFill.)
+  // measures the real visible area. TOP-align the canvas (flex-start) so it sits
+  // directly under the progress/sound bar instead of floating centered with a big
+  // gap above — that gap was the "canvas pushed down" in focus mode, where the
+  // slot is full-window-height (taller than the non-focus measured viewport) so a
+  // width-bound square centered in it had huge top/bottom slack. (Horizontal stays
+  // centered so a height-bound square isn't pinned left.) Scrollable/portrait
+  // keeps plain canvasFill.
   canvasFillFixed: {
     flex: 1,
     overflow: "hidden",
-    justifyContent: "center",
+    justifyContent: "flex-start",
     alignItems: "center",
   },
   middleCanvas: {

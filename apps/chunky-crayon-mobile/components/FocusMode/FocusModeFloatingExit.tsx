@@ -19,7 +19,19 @@ import { tapLight } from "@/utils/haptics";
 
 const SIZE = 44;
 
-const FocusModeFloatingExit = () => {
+type FocusModeFloatingExitProps = {
+  /**
+   * Extra right offset (px) so the X clears a sidebar that stays visible in
+   * focus mode. On iPad/landscape the tools rail stays, so pass its width →
+   * the X sits at the top-right of the CANVAS area, clear of the rail. On phone
+   * the rail is gone (0) and it pins to the screen corner.
+   */
+  rightInset?: number;
+};
+
+const FocusModeFloatingExit = ({
+  rightInset = 0,
+}: FocusModeFloatingExitProps) => {
   const { isFocusMode, exitFocus } = useFocusMode();
   const insets = useSafeAreaInsets();
 
@@ -35,7 +47,7 @@ const FocusModeFloatingExit = () => {
         styles.button,
         {
           top: Math.max(insets.top, 16),
-          right: Math.max(insets.right, 16),
+          right: Math.max(insets.right, 16) + rightInset,
         },
         pressed && styles.pressed,
       ]}
