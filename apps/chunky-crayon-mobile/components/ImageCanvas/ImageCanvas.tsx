@@ -3039,8 +3039,11 @@ const ImageCanvas = ({
                     surface AND the fill image (both earlier siblings in this
                     layer). These brushes move to the surface in v2. */}
                 {renderPaths}
-                {/* Rendered stickers */}
-                {renderStickers}
+                {/* Stickers are NOT here anymore — they render in their own group
+                    ABOVE the SVG outline (below the </Canvas>), so a placed sticker
+                    sits on top of the line art (web parity, natural stamp). That
+                    also puts them OUTSIDE this erasable layer, so the eraser no
+                    longer rubs stickers out (delete via undo, not the eraser). */}
                 {/* Live drawing path — built on the UI thread (livePath shared
                     value), styled by the active tool/brush. Always mounted; an
                     empty Skia path draws nothing ("no live stroke"). On finger-up
@@ -3061,6 +3064,12 @@ const ImageCanvas = ({
                   svg={svg}
                 />
               </Group>
+              {/* Stickers — TOP-MOST, above the line art, so a placed sticker
+                  sits on top of everything (web parity). Sized in SVG units
+                  (StickerActionImage reads action.stickerX/Y/Size in SVG space),
+                  so this group shares the same fitbox transform. Outside the
+                  erasable group → not removable by the eraser (by design). */}
+              <Group transform={transform}>{renderStickers}</Group>
             </Canvas>
           ) : null}
         </Animated.View>
