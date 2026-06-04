@@ -29,8 +29,12 @@ import {
   SkPath,
   Skia,
   Path,
+  Picture,
   Paint,
   BlurMask,
+  BlendMode,
+  BlurStyle,
+  createPicture,
   Paragraph,
   TextAlign,
   Fill,
@@ -40,6 +44,10 @@ import {
   notifyChange,
   type SkImage,
   type SkSize,
+  type SkSurface,
+  type SkPaint,
+  type SkPicture,
+  type SkCanvas,
 } from "@shopify/react-native-skia";
 import {
   Gesture,
@@ -97,6 +105,7 @@ import {
   unionLocalWithMerged,
   isSyncInFlight,
 } from "@/utils/canvasPersistence";
+import { queryClient } from "@/providers";
 import { primeDeviceId } from "@/stores/canvasStore";
 import {
   generateGlitterParticles,
@@ -132,6 +141,101 @@ import {
 import type { LayoutMode } from "@/utils/deviceUtils";
 import { getOptimalCanvasDimensions } from "@/hooks/useResponsiveLayout";
 import { useFillLayer } from "@/hooks/useFillLayer";
+
+// ── Committed strokes as a shared-value SkPicture ────────────────────────────
+// All ADDITIVE brushes are baked into a SharedValue<SkPicture> rendered via
+// <Picture>. Committing happens in the onFinalize WORKLET (UI thread) so it
+// triggers exactly ONE Skia redraw — web's "pointerup redraws nothing" model.
+// See docs/mobile/canvas-immediate-mode.md.
+//
+// v2 baked set = crayon/marker/pencil/paintbrush/rainbow/glow/neon — every brush
+// whose paint is color + alpha + optional blur MaskFilter (all worklet-safe).
+// EXCLUDED (still React <Path> nodes): "eraser" (dstOut must cut the FILL image
+// beneath, which only works as a node sibling in the erasable saveLayer, not in
+// the strokes picture); "glitter" (sparkle particle sub-paths via JS utils, not
+// trivially worklet-safe). Textured crayon/pencil need the texturedBrushes flag,
+// which is OFF by default, so the textured branch is dead here. Keep
+// BAKED_BRUSH_TYPES in sync with the renderPaths filter below.
+//
+// TODO(eraser flash): the eraser still commits via React → still flashes on its
+// own commit (the v2 known limitation). The full fix is to bake the FILL layer
+// into this picture as its base so the eraser can bake on top with dstOut cutting
+// both strokes AND fill in one layer (v3). Deferred — it couples this picture to
+// the async flood-fill layer and adds risk to the load-bearing fill/magic/eraser
+// path. See docs/mobile/canvas-immediate-mode.md (Status/scope) for the full
+// rationale: the problem, what failed, why we landed on the shared-value picture,
+// and why the eraser is the one brush left out.
+const STROKE_BAKE_LOG = true; // [FLASH_DIAG] trace commit/re-bake while fixing.
+
+const BAKED_BRUSH_TYPES = new Set<BrushType>([
+  "crayon",
+  "marker",
+  "pencil",
+  "paintbrush",
+  "rainbow",
+  "glow",
+  "neon",
+]);
+const isBakedStroke = (action: DrawingAction): boolean =>
+  // Textured crayon/pencil render via a shader paint that isn't worklet-safe;
+  // when the flag is on, fall back to a React node so they still draw. (Flag is
+  // OFF by default, so this is normally a no-op.)
+  action.type === "stroke" &&
+  !!action.path &&
+  BAKED_BRUSH_TYPES.has((action.brushType as BrushType) ?? "crayon");
+
+// Per-brush paint params, matched to the declarative renderPaths inline paints
+// EXACTLY (NOT createBrushPaint — different blend modes). blurSigma 0 = no blur.
+// blurStyle is the BlurStyle enum (Normal/Outer). Used by the worklet commit (via
+// commitStyle) AND the JS rebuild.
+const bakedBrushParams = (
+  brushType: BrushType | undefined,
+): { alpha: number; blurSigma: number; blurStyle: BlurStyle } => {
+  "worklet";
+  switch (brushType) {
+    case "marker":
+      return { alpha: 0.75, blurSigma: 0, blurStyle: BlurStyle.Normal };
+    case "glow":
+      return { alpha: 0.7, blurSigma: 8, blurStyle: BlurStyle.Normal };
+    case "neon":
+      return { alpha: 1, blurSigma: 12, blurStyle: BlurStyle.Outer };
+    case "paintbrush":
+      return { alpha: 0.5, blurSigma: 3, blurStyle: BlurStyle.Normal };
+    // pencil + rainbow render at full alpha in renderPaths' default branch.
+    case "pencil":
+    case "rainbow":
+      return { alpha: 1, blurSigma: 0, blurStyle: BlurStyle.Normal };
+    default: // crayon (and fallback)
+      return { alpha: 0.85, blurSigma: 0, blurStyle: BlurStyle.Normal };
+  }
+};
+
+// WORKLET-SAFE: draw one baked stroke into a Skia canvas. Used by BOTH the commit
+// worklet (UI thread) and the JS-side rebuild-from-actions. Only synchronous Skia
+// primitives (Paint/Color/MaskFilter/drawPath) → safe on either runtime.
+const drawBakedStroke = (
+  canvas: SkCanvas,
+  path: SkPath,
+  color: string,
+  width: number,
+  alpha: number,
+  blurSigma: number,
+  blurStyle: BlurStyle,
+): void => {
+  "worklet";
+  const paint = Skia.Paint();
+  paint.setAntiAlias(true);
+  paint.setStyle(1); // stroke
+  paint.setStrokeWidth(width);
+  paint.setStrokeCap(1); // round
+  paint.setStrokeJoin(1); // round
+  paint.setColor(Skia.Color(color));
+  paint.setAlphaf(alpha);
+  if (blurSigma > 0) {
+    paint.setMaskFilter(Skia.MaskFilter.MakeBlur(blurStyle, blurSigma, true));
+  }
+  canvas.drawPath(path, paint);
+};
 
 type ImageCanvasProps = {
   coloringImage: ColoringImage;
@@ -413,6 +517,7 @@ const ImageCanvas = ({
   );
 
   const runProgressMeasure = useCallback(() => {
+    if (DIAG_DISABLE_PROGRESS_SNAPSHOT) return; // TEMP flash-bisect
     if (measuringRef.current) return;
     // A canvas with no renderable PAINT actions is 0% by definition — short-
     // circuit before the pixel sample. `clear` (Start Over) is a terminal that
@@ -479,15 +584,14 @@ const ImageCanvas = ({
   // forces captured on the UI thread during the stroke.
   const pressureSmootherRef = useRef(new PressureSmoother(3));
 
-  // Live-stroke commit handoff (fixes the draw→vanish→reappear flash). Each
-  // brush/eraser stroke gets a monotonic id when it commits; the live preview
-  // is cleared only once the committed <Path> carrying that exact id appears in
-  // the render (see the useLayoutEffect below). Identity — not history.length —
-  // because addAction truncates the redo tail and MAX_HISTORY shift() pins the
-  // length, so a length-keyed clear would silently stop firing and leave the
-  // live path permanently double-drawn over the committed one.
+  // Monotonic per-stroke id (render-only, never serialized). The live→committed
+  // FROZEN HANDOFF that used to consume this — frozenStrokeId/frozenVisible/
+  // committedLivePath + the swap useLayoutEffect — is GONE. Committed strokes now
+  // bake into a retained offscreen surface (crayon/marker) or render as a
+  // renderPaths node (other brushes), and the re-bake useLayoutEffect clears the
+  // live path in the SAME React commit the surface/node gains the stroke — one
+  // redraw, no frozen copy, no swap, no 3-redraw burst (the flash root cause).
   const liveStrokeIdRef = useRef(0);
-  const pendingLiveStrokeIdRef = useRef<number | null>(null);
 
   // Magic color hint state
   const [magicHintCell, setMagicHintCell] = useState<GridColorCell | null>(
@@ -599,6 +703,74 @@ const ImageCanvas = ({
   // <Path> requires a non-null path, and an empty one is the "no live stroke"
   // state.
   const livePath = useSharedValue<SkPath>(Skia.Path.Make());
+
+  // ── Committed crayon/marker strokes as a SHARED-VALUE SkPicture ────────────
+  // The committed baked strokes live in a SharedValue<SkPicture>, rendered via
+  // <Picture picture={committedPicture}/> — read on the UI thread exactly like
+  // the live <Path path={livePath}/>. THE POINT: committing a stroke happens in
+  // the onFinalize WORKLET (UI thread) — it builds a new picture (old picture +
+  // the just-finished stroke) and assigns it + clears livePath in ONE worklet
+  // tick → ONE notifyChange → ONE Skia redraw. addAction still runs (via runOnJS)
+  // for undo/persistence but feeds NOTHING in the Canvas tree for baked brushes,
+  // so the React commit triggers no canvas redraw. This is web's "pointerup
+  // redraws nothing" — the only thing that kills the multi-redraw burst (the
+  // previous React-state surface still bursted: addAction render + setState +
+  // livePath notify = 3 redraws raced by rn-skia).
+  const committedPicture = useSharedValue<SkPicture>(createPicture(() => {}));
+  // Paint params for the active baked brush, mirrored into a shared value so the
+  // commit worklet can build the stroke paint WITHOUT reading React state (a
+  // worklet can't touch the store). Updated by an effect on tool/color/size.
+  // crayon/marker touch strokes commit at the live preview width + no rainbow, so
+  // these values equal the committed appearance.
+  const commitStyle = useSharedValue<{
+    color: string;
+    width: number;
+    alpha: number;
+    blurSigma: number;
+    blurStyle: BlurStyle;
+    baked: boolean;
+  }>({
+    color: "#000000",
+    width: 1,
+    alpha: 1,
+    blurSigma: 0,
+    blurStyle: BlurStyle.Normal,
+    baked: false,
+  });
+
+  // ── TEMP flash-bisect toggles (revert before commit) ──────────────────────
+  // The flash is intermittent on random strokes (NOT post-clear-specific). The
+  // prime suspects are the async makeImageSnapshot() readbacks that fire near a
+  // commit and force a synchronous GPU flush of the on-screen surface (a textbook
+  // intermittent-flash cause). Flip these one at a time to bisect:
+  //   DIAG_DISABLE_PROGRESS_SNAPSHOT — the ~250ms-after-every-commit progress
+  //     measure snapshot (runProgressMeasure). MOST likely (fires on every stroke).
+  //   DIAG_DISABLE_AUTOSAVE_SNAPSHOT — the autosave Phase-2 raster snapshot.
+  //   DIAG_DISABLE_SERVER_SYNC — the mid-stroke server sync writeback.
+  // Set a flag true to turn that subsystem OFF (non-destructive — only the
+  // diagnostic artifact is skipped; the action-list autosave/replay is untouched).
+  // BISECT COMPLETE (all back to false = normal behavior restored):
+  //   R1 progress snapshot OFF → still flashed.
+  //   R2 BOTH snapshots OFF → still flashed → snapshots EXONERATED.
+  //   R3 + server sync OFF → STILL flashed → ALL async subsystems EXONERATED.
+  // Root cause = the freeze live→committed render handoff (the swap effect's
+  // frozen-copy drop racing the bare <Path>'s React paint). Fixed separately;
+  // these toggles are kept temporarily for re-bisect and removed before commit.
+  const DIAG_DISABLE_PROGRESS_SNAPSHOT = false;
+  const DIAG_DISABLE_AUTOSAVE_SNAPSHOT = false;
+  const DIAG_DISABLE_SERVER_SYNC = false;
+  // TEMP flash-bisect (round 4): remove the offscreen saveLayer (layer={<Paint/>})
+  // from the erasable Group. This isolates the ONE suspect the earlier bisect
+  // never tested — a non-atomic re-rasterization of that backing texture at the
+  // per-stroke commit, which (unlike the handoff) is below the JS layer and would
+  // explain an INTERMITTENT flash from an identical clean JS sequence. With the
+  // layer off, the eraser composites WRONG (dstOut needs the layer) — that's
+  // expected and throwaway; we only check whether the FLASH disappears for a
+  // NON-eraser brush. true = layer OFF (test); false = normal.
+  // REVERTED to false: device test proved the saveLayer is NOT the cause (blink
+  // persisted with it off), and off breaks the eraser. Restore normal compositing.
+  const DIAG_DISABLE_ERASABLE_SAVELAYER = false;
+
   // Touch→SVG transform constants captured at stroke start (stable mid-stroke,
   // since you can't pan/zoom while drawing): svgScale + centering offsets +
   // committed zoom/pan. Read inside the worklet to map screen → SVG coords.
@@ -1054,6 +1226,15 @@ const ImageCanvas = ({
         } else {
           console.log(`[CANVAS_FOCUS] No actions to save or not initialized`);
         }
+
+        // Refresh the "More Coloring Pages" / feed thumbnails ONCE on leave. This
+        // used to live in syncCanvasToServer (fired on every stroke), which
+        // invalidated ["feed"] per stroke → the route's feed strip re-rendered
+        // the whole screen each stroke (~110ms, the measured flash/jank). Doing
+        // it here means the preview is fresh when the user navigates back, with
+        // zero per-stroke cost. The focus-loss save above pushes the new preview
+        // to the server first, so the refetched feed picks up the latest thumb.
+        queryClient.invalidateQueries({ queryKey: ["feed"] });
       };
     }, [coloringImage.id, svgDimensions]),
   );
@@ -1100,13 +1281,22 @@ const ImageCanvas = ({
         // encodeToBase64 passes) is split into Phase 2 below so it never blocks
         // the JS thread on the same tick as a stroke's commit → deferred-clear
         // handoff (the rare ~1-frame stroke blink).
-        saveCanvasState(coloringImage.id, actionsToSave, saveWidth, saveHeight)
-          .then((success) => {
-            console.log(`[AUTO_SAVE] action-list save: ${success}`);
-          })
-          .catch((error) => {
-            console.error(`[AUTO_SAVE] action-list save failed:`, error);
-          });
+        if (!DIAG_DISABLE_SERVER_SYNC) {
+          saveCanvasState(
+            coloringImage.id,
+            actionsToSave,
+            saveWidth,
+            saveHeight,
+          )
+            .then((success) => {
+              console.log(`[AUTO_SAVE] action-list save: ${success}`);
+            })
+            .catch((error) => {
+              console.error(`[AUTO_SAVE] action-list save failed:`, error);
+            });
+        } else {
+          console.log(`[FLASH_DIAG] server sync + save SKIPPED (bisect)`);
+        }
         currentState.setDirty(false);
 
         // PHASE 2 — capture the raster (feed-preview JPEG + cross-device restore
@@ -1123,6 +1313,7 @@ const ImageCanvas = ({
         snapshotTaskRef.current = InteractionManager.runAfterInteractions(
           () => {
             snapshotTaskRef.current = null;
+            if (DIAG_DISABLE_AUTOSAVE_SNAPSHOT) return; // TEMP flash-bisect
             const latest = useCanvasStore.getState();
             // Re-check the active-image gate: the foreground image may have
             // changed between the 1s timer firing and this deferred task running.
@@ -1138,10 +1329,16 @@ const ImageCanvas = ({
             let previewDataUrl: string | undefined;
             let snapshotDataUrl: string | undefined;
             try {
+              console.log(
+                `[FLASH_DIAG] deferred raster makeImageSnapshot START @ ${Date.now()}`,
+              );
               const image = safeMakeSnapshot();
               if (image) {
                 previewDataUrl = `data:image/jpeg;base64,${image.encodeToBase64(ImageFormat.JPEG, 80)}`;
                 snapshotDataUrl = `data:image/png;base64,${image.encodeToBase64()}`;
+                console.log(
+                  `[FLASH_DIAG] deferred raster makeImageSnapshot DONE @ ${Date.now()}`,
+                );
                 console.log(
                   `[AUTO_SAVE] raster preview ${previewDataUrl.length}, snapshot ${snapshotDataUrl.length} chars`,
                 );
@@ -1279,11 +1476,9 @@ const ImageCanvas = ({
   const startStrokeHaptics = useCallback(() => {
     brushHaptics.start(brushType);
     setScroll(false);
-    // Re-arm: a fresh stroke just took over livePath, so any not-yet-fired
-    // deferred clear from the PREVIOUS stroke must not run against it (that
-    // would wipe this in-progress stroke). Dropping the pending id makes the
-    // stale clear a no-op; this stroke parks its own id when it commits.
-    pendingLiveStrokeIdRef.current = null;
+    // No frozen-handoff arming anymore — committing draws into the committed
+    // surface (or renderPaths node) and the re-bake effect clears livePath in the
+    // same commit. There is no stale frozen copy to drop at the next stroke start.
   }, [brushType, setScroll]);
 
   // Commit a finished stroke to the store. Receives the raw SVG-space points +
@@ -1311,14 +1506,12 @@ const ImageCanvas = ({
       } = useCanvasStore.getState();
 
       if (!svgDimensions || xs.length === 0) {
-        // Zero-length stroke (a brush/eraser tap with no drag). No action is
-        // committed, so the identity-based deferred clear below would never
-        // fire — clear the stray live dot here, directly, instead.
+        // Zero-length stroke (a brush/eraser tap with no drag). Nothing commits,
+        // so the re-bake effect won't fire to clear the live dot — clear it here.
         livePath.value = Skia.Path.Make();
         liveXs.value = [];
         liveYs.value = [];
         liveForces.value = [];
-        pendingLiveStrokeIdRef.current = null;
         notifyChange(livePath);
         return;
       }
@@ -1337,6 +1530,14 @@ const ImageCanvas = ({
       // brush/pressure/rainbow logic below.
       if (liveSelectedTool === "magic") {
         const { paletteVariant: liveVariant } = useCanvasStore.getState();
+        const magicLiveStrokeId = ++liveStrokeIdRef.current;
+        // Handoff COLLAPSED (v1): no frozen mask, no pending filter. The committed
+        // reveal renders directly in the SHARED SrcIn layer it already lives in
+        // (activeRevealMaskPaths), and the re-bake useLayoutEffect clears the live
+        // mask (livePath) on this same addAction commit. SrcIn region coverage is
+        // IDEMPOTENT, so a 1-frame live+committed overlap can't intensify/darken —
+        // magic has no 2a−a² flash class — so removing the frozen node + swap is
+        // safe and collapses the magic commit burst.
         addAction({
           type: "magic-reveal",
           path: rebuilt,
@@ -1349,9 +1550,8 @@ const ImageCanvas = ({
           ),
           sourceWidth: svgDimensions.width,
           sourceHeight: svgDimensions.height,
-          liveStrokeId: ++liveStrokeIdRef.current,
+          liveStrokeId: magicLiveStrokeId,
         });
-        pendingLiveStrokeIdRef.current = liveStrokeIdRef.current;
         return;
       }
 
@@ -1406,9 +1606,12 @@ const ImageCanvas = ({
           ? simplifyPath(rebuilt, DEFAULT_SIMPLIFICATION_TOLERANCE)
           : rebuilt;
 
-      // Stamp a monotonic id so the deferred clear (useLayoutEffect below) can
-      // wipe the live preview exactly when THIS committed stroke renders — not
-      // before (vanish gap) and not never (permanent double-draw).
+      // liveStrokeId kept for cross-device dedup hints (render-only, never
+      // serialized). The old freeze handoff that read it is gone: committing a
+      // BAKED stroke (crayon/marker) draws it into the committed surface via the
+      // re-bake useLayoutEffect, which also clears the live path in the SAME React
+      // commit — no frozen copy, no swap, single redraw. Non-baked brushes render
+      // their committed <Path> in renderPaths on the same commit the live clears.
       const liveStrokeId = ++liveStrokeIdRef.current;
       const action: DrawingAction = {
         type: "stroke",
@@ -1425,7 +1628,17 @@ const ImageCanvas = ({
         liveStrokeId,
       };
       addAction(action);
-      pendingLiveStrokeIdRef.current = liveStrokeId;
+
+      // Clear the live preview. Baked brushes (crayon/marker) already emptied
+      // livePath in the onFinalize worklet the same tick they drew into the
+      // picture — this is a harmless no-op for them. For NON-baked brushes
+      // (eraser/pencil/rainbow/glow/neon/glitter) the committed renderPaths <Path>
+      // appears on THIS addAction commit, so clearing livePath now hands off in
+      // the same React commit (acceptable for v1; they move to the surface in v2).
+      if (!isBakedStroke(action)) {
+        livePath.value = Skia.Path.Make();
+        notifyChange(livePath);
+      }
 
       if (liveBrushType === "rainbow") {
         advanceRainbowHue(30);
@@ -1437,6 +1650,7 @@ const ImageCanvas = ({
       advanceRainbowHue,
       svgDimensions,
       pathSimplification,
+      livePath,
     ],
   );
 
@@ -1492,12 +1706,12 @@ const ImageCanvas = ({
       // parity). stickerCatalogId/stickerImageUrl ride to the wire for
       // cross-device replay.
       const sticker = getCanvasSticker(selectedSticker);
-      // The stored stickerSize (20-100 slider) is in CANVAS-pixel terms, like
-      // web's 32/48/64. But placement records the sticker in SVG viewBox space
-      // (coords come from touchToSvgCoords, ~1024-wide), where a raw 40 is ~4%
-      // of the width — tiny. Scale the slider value into SVG space by the same
-      // factor that maps a canvas pixel to an SVG unit, so a sticker lands at
-      // the SAME visual proportion as web (~9% of width at the default).
+      // The stored stickerSize (20-150 slider, default 80) is in CANVAS-pixel
+      // terms, like web's 32/48/64. But placement records the sticker in SVG
+      // viewBox space (coords come from touchToSvgCoords, ~1024-wide), where a
+      // raw 80 is ~8% of the width. Scale the slider value into SVG space by the
+      // same factor that maps a canvas pixel to an SVG unit, so a sticker lands at
+      // the SAME visual proportion as web.
       const svgW = svgDimensions?.width ?? 1024;
       const sizeScale = svgW / Math.max(1, canvasWidth);
       const svgStickerSize = stickerSize * sizeScale;
@@ -1821,13 +2035,61 @@ const ImageCanvas = ({
       // Commit the drawing stroke on ANY termination — normal end OR cancel.
       // onFinalize always fires (unlike onEnd, which is skipped on cancel), so a
       // stroke is never left as a lingering uncommitted live path. commitStroke
-      // early-returns for an empty buffer (tap / never-activated), so this is a
-      // no-op when there's nothing to commit. The identity-keyed useLayoutEffect
-      // then clears the live preview once the committed <Path> has rendered.
+      // early-returns for an empty buffer (tap / never-activated).
       if (isDrawingTool && liveXs.value.length > 0) {
         const isStylus =
           (event as unknown as { pointerType?: string }).pointerType ===
           "stylus";
+
+        // ── BAKED brush (crayon/marker): commit ON THE UI THREAD, ZERO React
+        // redraw. Build a new picture = old committed picture + this stroke, swap
+        // it in, and empty livePath — ALL in this one worklet tick, so it's ONE
+        // notifyChange → ONE Skia redraw (web's "pointerup redraws nothing", the
+        // burst fix). addAction (runOnJS below) records for undo/persistence but
+        // feeds no Canvas node for baked brushes, so its React commit doesn't
+        // redraw the canvas. commitStyle mirrors the active crayon/marker paint.
+        const style = commitStyle.value;
+        if (style.baked) {
+          const finished = livePath.value;
+          const old = committedPicture.value;
+          const w = style.width;
+          const color = style.color;
+          const alpha = style.alpha;
+          const blurSigma = style.blurSigma;
+          const blurStyle = style.blurStyle;
+          committedPicture.value = createPicture((canvas) => {
+            "worklet";
+            canvas.drawPicture(old);
+            drawBakedStroke(
+              canvas,
+              finished,
+              color,
+              w,
+              alpha,
+              blurSigma,
+              blurStyle,
+            );
+          });
+          notifyChange(committedPicture);
+          // Empty the live path the SAME tick — the picture already shows the
+          // stroke, so no gap and no double-draw. Both writes batch into one
+          // reanimated mapper draw → one frame.
+          livePath.value = Skia.Path.Make();
+          notifyChange(livePath);
+          // [FLASH_DIAG] commit anchor (replaces the old "swap effect FIRED").
+          // Correlate the next [FLASH_NATIVE] redraw burst against this UI-thread
+          // commit: a clean fix shows ONE redraw after this, not the 3-redraw
+          // burst. console.log in a worklet routes to the JS console (reanimated).
+          if (STROKE_BAKE_LOG) {
+            console.log(
+              `[FLASH_DIAG] baked stroke committed (UI-thread picture swap) @ ${Date.now()}`,
+            );
+          }
+        }
+
+        // Persist / undo-history (and, for NON-baked brushes, the actual render
+        // node + livePath clear) on the JS thread. For baked brushes this only
+        // addActions — the visual is already done above.
         runOnJS(commitStroke)(
           liveXs.value,
           liveYs.value,
@@ -1983,49 +2245,134 @@ const ImageCanvas = ({
     return getVisibleActions(history, historyIndex);
   }, [history, historyIndex]);
 
-  // Clear the UI-thread live preview exactly once the committed stroke it stood
-  // in for has rendered — closing the draw→vanish→reappear flash. We gate on the
-  // stroke's IDENTITY (the liveStrokeId stamped in commitStroke), NOT on
-  // history.length: addAction truncates the redo tail (undo-then-draw can leave
-  // the length unchanged) and MAX_HISTORY's shift() pins the length once full,
-  // so a length-keyed clear would silently stop firing and leave the live path
-  // permanently double-drawn over the committed one (visible darkening for
-  // translucent crayon/marker/paintbrush). Reloaded/persisted actions never
-  // carry a liveStrokeId (it isn't serialized), so they can't trigger a
-  // spurious clear.
-  //
-  // CRUCIAL: this clear does NOT call notifyChange(livePath). This effect runs
-  // inside the SAME React commit that adds the committed <Path> to renderPaths;
-  // the <Canvas> subtree re-reads livePath as a prop during that commit, so
-  // emptying it here coalesces into the committed render's own repaint — the
-  // committed stroke appears and the live preview empties in ONE Skia frame.
-  // Calling notifyChange would instead force a SEPARATE, earlier repaint of the
-  // emptied live path (before renderPaths has painted), leaving the stroke blank
-  // for the frames until the committed paint lands — the draw→vanish→reappear
-  // flash. So: empty the shared values, let the committed render carry the paint.
+  // The ordered list of baked (crayon/marker) committed strokes the
+  // committedPicture currently represents — by stable action.id. The commit
+  // worklet appends one stroke to the picture WITHOUT touching React, so after a
+  // normal commit visibleActions grows by exactly one baked stroke at the end and
+  // the picture is already correct → the rebuild effect below SKIPS (no redraw,
+  // the whole point). Any OTHER change (undo, redo, clear, restore, 409-merge,
+  // reorder) needs a full rebuild.
+  const bakedIdsRef = useRef<string[]>([]);
+
+  // Rebuild committedPicture from scratch by replaying all visible baked strokes
+  // in order. Runs on the JS thread (createPicture works on either runtime). Used
+  // for undo/redo/clear/restore/merge — NOT the steady-draw commit hot path.
+  const rebuildCommittedPicture = useCallback(
+    (actions: DrawingAction[]) => {
+      const baked = actions.filter(isBakedStroke);
+      const pic = createPicture((canvas) => {
+        for (const a of baked) {
+          const width =
+            a.strokeWidth ||
+            brushSize *
+              getBrushMultiplier((a.brushType as BrushType) ?? "crayon");
+          const p = bakedBrushParams(a.brushType as BrushType);
+          drawBakedStroke(
+            canvas,
+            a.path!,
+            a.color,
+            width,
+            p.alpha,
+            p.blurSigma,
+            p.blurStyle,
+          );
+        }
+      });
+      committedPicture.value = pic;
+      notifyChange(committedPicture);
+      bakedIdsRef.current = baked.map((a) => a.id ?? "");
+      if (STROKE_BAKE_LOG) {
+        console.log(
+          `[FLASH_DIAG] rebuild committedPicture: ${baked.length} strokes @ ${Date.now()}`,
+        );
+      }
+    },
+    [brushSize, committedPicture],
+  );
+
+  // Reconcile committedPicture to visibleActions. SKIP when the change is exactly
+  // "one baked stroke appended" — the commit worklet already put it in the
+  // picture, so rebuilding would be a redundant redraw (the burst we are killing).
+  // Everything else (undo/redo/clear/restore/merge/non-baked change) rebuilds.
   useLayoutEffect(() => {
-    const pending = pendingLiveStrokeIdRef.current;
-    if (pending == null) return;
-    // Match BOTH committed types by identity: a Magic Brush drag commits a
-    // "magic-reveal" (not a "stroke"), so a stroke-only guard never matched it
-    // and left the live magic preview drawn forever — stacked on top of the
-    // committed reveal (a second SrcIn pass = the reveal "growing"/intensifying
-    // the instant you lift). liveStrokeId is monotonic and never serialized
-    // (reloaded actions can't spuriously match), so keying on it across both
-    // types is safe. handleMagicTap's reveal sets no liveStrokeId / parks no
-    // pending id, so a single-tap reveal is correctly unaffected.
-    const committed = visibleActions.some(
-      (a) =>
-        (a.type === "stroke" || a.type === "magic-reveal") &&
-        a.liveStrokeId === pending,
+    const baked = visibleActions.filter(isBakedStroke);
+    const prevIds = bakedIdsRef.current;
+    const ids = baked.map((a) => a.id ?? "");
+    const isAppendOfOne =
+      ids.length === prevIds.length + 1 &&
+      prevIds.every((id, i) => id === ids[i]);
+    if (isAppendOfOne) {
+      // Worklet already drew it; just record the new id set. No redraw.
+      bakedIdsRef.current = ids;
+      return;
+    }
+    rebuildCommittedPicture(visibleActions);
+  }, [visibleActions, rebuildCommittedPicture]);
+
+  // Remount key for the erasable content saveLayer Group (see its key= below).
+  // The erasable Group has layer={<Paint/>} → a Skia offscreen saveLayer texture.
+  // Its children (renderPaths, stickers, live preview) are bare nodes inside an
+  // ALWAYS-mounted Group with a stable identity. On Start Over the store truly
+  // clears (visibleActions → just [clear], renderPaths empties, React removes the
+  // <Path> nodes), but in rn-skia 2.6.2 under Fabric removing children from a
+  // never-remounted saveLayer Group does NOT re-rasterize its backing texture —
+  // the old crayon pixels keep compositing, so cleared strokes ghost on screen
+  // (magic reveals vanish correctly because they live in their OWN conditionally-
+  // unmounted saveLayer Groups). We remount the Group on each clear to free the
+  // stale texture.
+  //
+  // The key is the stable id of the LATEST `clear` action, NOT a content/empty
+  // binary. A binary key flipped TWICE per Start Over — once to "cleared" (frees
+  // texture, good), then back to "content" on the very first stroke after the
+  // clear — and that SECOND remount, landing mid-first-stroke, blanked the
+  // freshly-mounted layer for one frame = a flash on the first post-clear stroke.
+  // A clear-COUNT is also wrong: confirmStartOver does reset() (history→[], count
+  // 0) THEN addAction(clear) (count 1), so if the page already carried a clear
+  // the count nets back to its prior value → no remount → the ghost returns.
+  // Keying on the latest clear's id is robust: every Start Over stamps a FRESH
+  // clear id (addAction → makeActionId), so the key changes exactly once per
+  // Start Over (remount → texture freed), and drawing strokes afterward never
+  // changes the latest clear id → no further remount, no first-stroke flash. No
+  // clear yet (fresh page) → a constant sentinel, so the Group never remounts.
+  const clearGeneration = useMemo(() => {
+    let latestClearId = "none";
+    for (const a of visibleActions) {
+      if (a.type === "clear" && a.id) latestClearId = a.id;
+    }
+    console.log(
+      `[FLASH_DIAG] clearGeneration (Group key) = ${latestClearId} @ ${Date.now()} (actions: ${visibleActions.length})`,
     );
-    if (!committed) return;
-    pendingLiveStrokeIdRef.current = null;
+    return latestClearId;
+  }, [visibleActions]);
+
+  // The canvas is "empty" (only a clear, no drawable actions) — used to reset the
+  // live-stroke shared values on Start Over (see effect below). Distinct from the
+  // remount key: this can be true without forcing a remount.
+  const isCanvasEmpty = useMemo(
+    () => !visibleActions.some((a) => a.type !== "clear"),
+    [visibleActions],
+  );
+
+  // When the canvas goes empty (Start Over, or erasing the last stroke), empty
+  // the live-stroke shared values too. They're component-scoped (survive the
+  // erasable Group's remount), and `<Path path={livePath}>` re-subscribes after
+  // remount — so without this the LAST stroke's geometry, still parked in
+  // livePath, repaints as a stray line on the freshly-cleared canvas. The point
+  // buffers are reset for the same reason. Empty path = "no live stroke". (The
+  // committed surface is cleared by the re-bake effect, which sees the now-empty
+  // visible stroke set and bakes an empty surface.)
+  useEffect(() => {
+    if (!isCanvasEmpty) return;
     livePath.value = Skia.Path.Make();
     liveXs.value = [];
     liveYs.value = [];
     liveForces.value = [];
-  }, [visibleActions, livePath, liveXs, liveYs, liveForces]);
+  }, [isCanvasEmpty, livePath, liveXs, liveYs, liveForces]);
+
+  // (The frozen→committed swap useLayoutEffect was removed: the live→frozen→
+  // committed handoff is gone. Committing draws into the committed surface (or a
+  // renderPaths node) and the re-bake useLayoutEffect above clears livePath in
+  // the same commit — one redraw, no swap, no burst. See plan.)
 
   // Compute fill layer image (SVG + all fill/magic-fill actions baked in)
   const { fillLayerImage } = useFillLayer(svg, svgDimensions, visibleActions);
@@ -2055,6 +2402,127 @@ const ImageCanvas = ({
     return getPressureAdjustedWidth(brushSize, brushType, DEFAULT_PRESSURE);
   }, [brushSize, brushType, selectedTool]);
 
+  // Render the live preview <Path> for the current brush/tool from the live path
+  // shared value. The paint here should match the committed rendering (renderPaths
+  // for non-baked brushes; drawBakedStroke for baked crayon/marker) so the stroke
+  // doesn't visibly change the instant it commits. Magic Brush has no entry here
+  // (its preview is the white mask in the SrcIn group).
+  const renderLivePreviewPath = useCallback(
+    (pathValue: typeof livePath, key: string) => {
+      if (selectedTool === "eraser") {
+        return (
+          <Path
+            key={key}
+            path={pathValue}
+            color="black"
+            style="stroke"
+            strokeWidth={currentStrokeWidth}
+            strokeCap="round"
+            strokeJoin="round"
+            blendMode="dstOut"
+          />
+        );
+      }
+      if (brushType === "glow") {
+        return (
+          <Path
+            key={key}
+            path={pathValue}
+            color={selectedColor}
+            style="stroke"
+            strokeWidth={currentStrokeWidth}
+            strokeCap="round"
+            strokeJoin="round"
+            opacity={0.7}
+          >
+            <BlurMask blur={8} style="normal" />
+          </Path>
+        );
+      }
+      if (brushType === "neon") {
+        return (
+          <Path
+            key={key}
+            path={pathValue}
+            color={selectedColor}
+            style="stroke"
+            strokeWidth={currentStrokeWidth}
+            strokeCap="round"
+            strokeJoin="round"
+            opacity={1}
+          >
+            <BlurMask blur={12} style="outer" />
+          </Path>
+        );
+      }
+      if (brushType === "paintbrush") {
+        return (
+          <Path
+            key={key}
+            path={pathValue}
+            color={selectedColor}
+            style="stroke"
+            strokeWidth={currentStrokeWidth}
+            strokeCap="round"
+            strokeJoin="round"
+            opacity={0.5}
+          >
+            <BlurMask blur={3} style="normal" />
+          </Path>
+        );
+      }
+      return (
+        <Path
+          key={key}
+          path={pathValue}
+          color={
+            brushType === "rainbow"
+              ? getRainbowColor(rainbowHue)
+              : selectedColor
+          }
+          style="stroke"
+          strokeWidth={currentStrokeWidth}
+          strokeCap="round"
+          strokeJoin="round"
+          opacity={
+            brushType === "crayon" ? 0.85 : brushType === "marker" ? 0.75 : 1
+          }
+        />
+      );
+    },
+    [selectedTool, brushType, selectedColor, currentStrokeWidth, rainbowHue],
+  );
+
+  // Mirror the active baked-brush paint into commitStyle so the onFinalize WORKLET
+  // can build the committed stroke paint without reading React state. `baked` is
+  // true only when the active tool is the brush AND the brush is in
+  // BAKED_BRUSH_TYPES (crayon/marker/pencil/paintbrush/rainbow/glow/neon). For
+  // touch strokes the committed width = currentStrokeWidth (live preview width,
+  // DEFAULT_PRESSURE), so it equals the committed appearance; rainbow uses the
+  // live hue's colour. Eraser/glitter/magic set baked=false → the worklet skips
+  // the picture path and they commit via runOnJS(commitStroke) → renderPaths node.
+  useEffect(() => {
+    const isBakedActive =
+      selectedTool === "brush" && BAKED_BRUSH_TYPES.has(brushType as BrushType);
+    const params = bakedBrushParams(brushType);
+    commitStyle.value = {
+      color:
+        brushType === "rainbow" ? getRainbowColor(rainbowHue) : selectedColor,
+      width: currentStrokeWidth,
+      alpha: params.alpha,
+      blurSigma: params.blurSigma,
+      blurStyle: params.blurStyle,
+      baked: isBakedActive,
+    };
+  }, [
+    selectedTool,
+    brushType,
+    selectedColor,
+    currentStrokeWidth,
+    rainbowHue,
+    commitStyle,
+  ]);
+
   // Render stickers as bundled transparent PNGs (web parity — the canvas
   // tool stamps PNGs, not emoji). Each placed sticker resolves its catalog id
   // to a bundled asset via StickerActionImage (which calls useImage). Legacy
@@ -2068,15 +2536,37 @@ const ImageCanvas = ({
           (action.stickerCatalogId || action.sticker),
       )
       .map((action, index) => (
-        <StickerActionImage key={`sticker-${index}`} action={action} />
+        <StickerActionImage
+          key={action.id ?? `sticker-${index}`}
+          action={action}
+        />
       ));
   }, [visibleActions]);
 
-  // Render drawing paths
+  // Render drawing paths — ONLY the brushes NOT baked into committedPicture
+  // (eraser + pencil/rainbow/glow/neon/glitter in v1). Crayon + marker are baked
+  // (isBakedStroke) and drawn via the <Picture> above, so they're excluded here.
+  // No frozen/pending filter anymore: the live→committed handoff is gone — a baked
+  // stroke is appended to the picture in the onFinalize worklet (one redraw) and
+  // the live path clears the same tick. (Non-baked brushes still render as React
+  // <Path> nodes; their commit appears here on the addAction commit while the live
+  // path clears the same commit — acceptable for v1, they move to the picture in
+  // v2.)
   const renderPaths = useMemo(() => {
     return visibleActions
-      .filter((action) => action.type === "stroke" && action.path)
+      .filter(
+        (action) =>
+          action.type === "stroke" && action.path && !isBakedStroke(action),
+      )
       .map((action, index) => {
+        // STABLE key per committed stroke. Index keys (`path-${index}`) were the
+        // flash suspect: the swap filters/un-filters the pending stroke, shifting
+        // array indices, so rn-skia's persistent reconciler could reuse a <Path>
+        // Skia node for a DIFFERENT action (feeding it new geometry/paint) — an
+        // intermittent below-JS node-identity churn that presents the just-changed
+        // stroke a frame late. action.id is unique + stable across reorders, so the
+        // reconciler maps each <Path> node to the SAME stroke every commit.
+        const stableKey = action.id ?? `path-${index}`;
         const strokeWidth =
           action.strokeWidth ||
           brushSize * getBrushMultiplier(action.brushType || "crayon");
@@ -2109,7 +2599,7 @@ const ImageCanvas = ({
 
           return (
             <Path
-              key={`path-${index}`}
+              key={stableKey}
               path={action.path!}
               paint={paint}
               style="stroke"
@@ -2137,7 +2627,7 @@ const ImageCanvas = ({
 
           return (
             <Path
-              key={`path-${index}`}
+              key={stableKey}
               path={action.path!}
               paint={paint}
               style="stroke"
@@ -2155,7 +2645,7 @@ const ImageCanvas = ({
         if (action.brushType === "eraser") {
           return (
             <Path
-              key={`path-${index}`}
+              key={stableKey}
               path={action.path!}
               color="black"
               style="stroke"
@@ -2174,7 +2664,7 @@ const ImageCanvas = ({
         if (action.brushType === "paintbrush") {
           return (
             <Path
-              key={`path-${index}`}
+              key={stableKey}
               path={action.path!}
               color={action.color}
               style="stroke"
@@ -2191,7 +2681,7 @@ const ImageCanvas = ({
         // Glow and neon effects need blur
         if (action.brushType === "glow") {
           return (
-            <Group key={`path-${index}`}>
+            <Group key={stableKey}>
               <Path
                 path={action.path!}
                 color={action.color}
@@ -2209,7 +2699,7 @@ const ImageCanvas = ({
 
         if (action.brushType === "neon") {
           return (
-            <Group key={`path-${index}`}>
+            <Group key={stableKey}>
               <Path
                 path={action.path!}
                 color={action.color}
@@ -2233,7 +2723,7 @@ const ImageCanvas = ({
             0.12,
           );
           return (
-            <Group key={`path-${index}`}>
+            <Group key={stableKey}>
               {/* Base stroke with transparency */}
               <Path
                 path={action.path!}
@@ -2268,7 +2758,7 @@ const ImageCanvas = ({
 
         return (
           <Path
-            key={`path-${index}`}
+            key={stableKey}
             path={action.path!}
             color={action.color}
             style="stroke"
@@ -2309,6 +2799,10 @@ const ImageCanvas = ({
   // Other-variant reveals (undo/redo across a palette switch) and magic-auto
   // keep their own per-node groups so history colours stay correct.
   const activeRevealMaskPaths = useMemo(() => {
+    // No pending filter anymore (handoff collapsed). The committed reveal renders
+    // here the instant it lands in visibleActions; the re-bake effect clears the
+    // live mask (livePath) the same commit. SrcIn region coverage is idempotent,
+    // so a 1-frame live+committed overlap can't intensify — no flash.
     return visibleActions
       .filter(
         (a) =>
@@ -2318,7 +2812,7 @@ const ImageCanvas = ({
       )
       .map((action, index) => (
         <Path
-          key={`active-reveal-mask-${index}`}
+          key={action.id ?? `active-reveal-mask-${index}`}
           path={action.path!}
           color="white"
           style="stroke"
@@ -2334,6 +2828,9 @@ const ImageCanvas = ({
     return visibleActions
       .filter((a) => a.type === "magic-auto" || a.type === "magic-reveal")
       .map((action, index) => {
+        // Stable key (see renderPaths) — index keys churn Skia node identity when
+        // the action list reorders/filters.
+        const revealKey = action.id ?? `magic-${index}`;
         // Active-variant reveals are rendered in the shared live group below;
         // skip them here so they aren't double-drawn in their own saveLayer.
         if (
@@ -2351,7 +2848,7 @@ const ImageCanvas = ({
         if (action.type === "magic-auto") {
           return (
             <SkiaImage
-              key={`magic-auto-${index}`}
+              key={revealKey}
               image={image}
               x={0}
               y={0}
@@ -2366,7 +2863,7 @@ const ImageCanvas = ({
         // stroke in its own layer (keeps the committed-under variant's colours).
         if (!action.path) return null;
         return (
-          <Group key={`magic-reveal-${index}`} layer={<Paint />}>
+          <Group key={revealKey} layer={<Paint />}>
             <Path
               path={action.path}
               color="white"
@@ -2429,7 +2926,11 @@ const ImageCanvas = ({
                   (drawn in a separate group on top). The fill image is now
                   INSIDE the transform group so it shares the strokes'
                   coordinate space and the eraser affects both. */}
-              <Group layer={<Paint />} transform={transform}>
+              <Group
+                key={clearGeneration}
+                layer={DIAG_DISABLE_ERASABLE_SAVELAYER ? undefined : <Paint />}
+                transform={transform}
+              >
                 {/* Fill layer image (baked fills/magic-fills). This group is
                     in SVG (viewBox) coordinate space — `transform` does the
                     SVG→canvas fitbox scale — so children must be sized in SVG
@@ -2497,6 +2998,11 @@ const ImageCanvas = ({
                 preColored.current ? (
                   <Group layer={<Paint />}>
                     {activeRevealMaskPaths}
+                    {/* Live Magic Brush mask. No frozen-copy sibling anymore: the
+                        committed reveal renders in activeRevealMaskPaths the same
+                        commit this live mask clears (re-bake effect empties
+                        livePath). SrcIn coverage is idempotent so any 1-frame
+                        overlap is invisible — no frozen handoff needed. */}
                     {isMagicBrush && (
                       <Path
                         path={livePath}
@@ -2518,93 +3024,31 @@ const ImageCanvas = ({
                     />
                   </Group>
                 ) : null}
-                {/* Rendered paths */}
+                {/* Committed crayon/marker strokes — ONE shared-value SkPicture
+                    (web-style immediate mode) instead of per-stroke <Path> nodes.
+                    The onFinalize WORKLET appends each finished stroke to this
+                    picture on the UI thread (one redraw, no React commit) — the
+                    burst fix. Drawn in SVG coords so the parent transform scales
+                    it like the fill/SVG siblings. Inside the erasable layer so the
+                    eraser (a renderPaths dstOut node rendered AFTER it) cuts
+                    through this + the fill below. */}
+                <Picture picture={committedPicture} />
+                {/* Non-baked committed strokes (eraser + pencil/rainbow/glow/
+                    neon/glitter in v1) still render as React <Path> nodes, above
+                    the baked crayon/marker surface. Eraser dstOut here cuts the
+                    surface AND the fill image (both earlier siblings in this
+                    layer). These brushes move to the surface in v2. */}
                 {renderPaths}
                 {/* Rendered stickers */}
                 {renderStickers}
                 {/* Live drawing path — built on the UI thread (livePath shared
-                    value), styled by the active tool/brush (stable mid-stroke).
-                    Always mounted; an empty Skia path draws nothing (the "no
-                    live stroke" state). It stays drawn from finger-up until the
-                    committed <Path> for the stroke has rendered, then the
-                    deferred-clear effect resets it to empty — so the stroke is
-                    never blank for a frame (no flash). The path geometry updates
-                    on the UI thread via the shared value with no per-point
-                    re-render. */}
-                {/* Magic Brush has NO live branch here — its live preview is
-                    merged into the shared active-reveal saveLayer above (below
-                    strokes) to avoid the commit-frame edge flash. So when Magic
-                    Brush is active this live slot draws nothing. */}
-                {isMagicBrush ? null : selectedTool === "eraser" ? (
-                  // Live eraser preview — dstOut so it erases as you drag.
-                  <Path
-                    path={livePath}
-                    color="black"
-                    style="stroke"
-                    strokeWidth={currentStrokeWidth}
-                    strokeCap="round"
-                    strokeJoin="round"
-                    blendMode="dstOut"
-                  />
-                ) : brushType === "glow" ? (
-                  <Path
-                    path={livePath}
-                    color={selectedColor}
-                    style="stroke"
-                    strokeWidth={currentStrokeWidth}
-                    strokeCap="round"
-                    strokeJoin="round"
-                    opacity={0.7}
-                  >
-                    <BlurMask blur={8} style="normal" />
-                  </Path>
-                ) : brushType === "neon" ? (
-                  <Path
-                    path={livePath}
-                    color={selectedColor}
-                    style="stroke"
-                    strokeWidth={currentStrokeWidth}
-                    strokeCap="round"
-                    strokeJoin="round"
-                    opacity={1}
-                  >
-                    <BlurMask blur={12} style="outer" />
-                  </Path>
-                ) : brushType === "paintbrush" ? (
-                  // Live Paint preview — translucent + soft edge (matches the
-                  // committed paintbrush render).
-                  <Path
-                    path={livePath}
-                    color={selectedColor}
-                    style="stroke"
-                    strokeWidth={currentStrokeWidth}
-                    strokeCap="round"
-                    strokeJoin="round"
-                    opacity={0.5}
-                  >
-                    <BlurMask blur={3} style="normal" />
-                  </Path>
-                ) : (
-                  <Path
-                    path={livePath}
-                    color={
-                      brushType === "rainbow"
-                        ? getRainbowColor(rainbowHue)
-                        : selectedColor
-                    }
-                    style="stroke"
-                    strokeWidth={currentStrokeWidth}
-                    strokeCap="round"
-                    strokeJoin="round"
-                    opacity={
-                      brushType === "crayon"
-                        ? 0.85
-                        : brushType === "marker"
-                          ? 0.75
-                          : 1
-                    }
-                  />
-                )}
+                    value), styled by the active tool/brush. Always mounted; an
+                    empty Skia path draws nothing ("no live stroke"). On finger-up
+                    the committed surface gains the stroke and the re-bake effect
+                    empties livePath in the SAME React commit — no gap, no double.
+                    Magic Brush has no live branch here (its live mask is in the
+                    SrcIn group above). */}
+                {isMagicBrush ? null : renderLivePreviewPath(livePath, "live")}
               </Group>
               {/* SVG outline layer (on top) — OUTSIDE the erasable layer so
                   the eraser never removes the line art. */}

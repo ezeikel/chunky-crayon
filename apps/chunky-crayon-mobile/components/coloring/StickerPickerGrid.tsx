@@ -72,8 +72,11 @@ const StickerPickerGrid = ({
   columns = 3,
   showLabels = false,
 }: StickerPickerGridProps) => {
-  const { selectedSticker, stickerCategory, setSticker, setStickerCategory } =
-    useCanvasStore();
+  // Narrow selectors (was whole-store useCanvasStore() → re-rendered on every
+  // stroke). No history dep here.
+  const selectedSticker = useCanvasStore((s) => s.selectedSticker);
+  const stickerCategory = useCanvasStore((s) => s.stickerCategory);
+  const { setSticker, setStickerCategory } = useCanvasStore.getState();
 
   const stickers = getCanvasStickersByCategory(stickerCategory);
 

@@ -2,7 +2,6 @@ import { canvasStorage } from "@/lib/storage/mmkv";
 import { SkPath, Skia } from "@shopify/react-native-skia";
 import { Platform } from "react-native";
 import { getAuthHeader } from "@/lib/auth";
-import { queryClient } from "@/providers";
 import type {
   DrawingAction,
   BrushType,
@@ -515,8 +514,15 @@ const doSyncCanvasToServer = async (
     // Clear pending sync marker
     await clearPendingSync(imageId);
 
-    // Invalidate feed query so previews refresh when user navigates back
-    queryClient.invalidateQueries({ queryKey: ["feed"] });
+    // NOTE: feed invalidation is intentionally NOT done here. syncCanvasToServer
+    // runs on EVERY stroke (autosave), and invalidating ["feed"] marks the feed
+    // query stale → React Query notifies its subscriber (the coloring screen's
+    // "More Coloring Pages" strip, high in the route tree) → the WHOLE route +
+    // chrome re-render (~110ms dev / ~35ms prod JS block per stroke, measured via
+    // the React profiler — this was the canvas flash/jank). The feed thumbnail
+    // only needs to refresh when the user LEAVES the page, so the invalidation
+    // is done once in the screen's focus-loss handler (ImageCanvas useFocusEffect
+    // cleanup) instead of on every in-progress sync.
 
     return { success: true, version: data.version };
   } catch (error) {

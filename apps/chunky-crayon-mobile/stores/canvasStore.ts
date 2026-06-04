@@ -469,7 +469,20 @@ export const useCanvasStore = create<CanvasState & CanvasActions>(
     },
 
     // Zoom/Pan actions
-    setScale: (scale) => set({ scale: Math.max(0.5, Math.min(4, scale)) }),
+    setScale: (scale) => {
+      const clamped = Math.max(0.5, Math.min(4, scale));
+      // No-op when effectively unchanged. The pan/pinch gesture springs settle a
+      // hair off the committed value and run setScale on every gesture end
+      // (including plain draw strokes), which wrote a sub-pixel-different scale
+      // and fired every `scale` subscriber (the route's zoom-% readout), forcing
+      // a ~110ms whole-screen re-render PER STROKE (measured via the profiler).
+      // Ignoring sub-epsilon deltas keeps that subscription quiet on draw while
+      // still updating on a real zoom (button = ±20%, pinch = visible change).
+      // The 1% displayed zoom readout (whole-number %) can't show a <0.5% delta
+      // anyway, so this is visually lossless.
+      if (Math.abs(clamped - get().scale) < 0.005) return;
+      set({ scale: clamped });
+    },
 
     setTranslate: (x, y) => set({ translateX: x, translateY: y }),
 

@@ -1,4 +1,13 @@
-import { useState, useCallback, useEffect } from "react";
+import {
+  useState,
+  useCallback,
+  useEffect,
+  useContext,
+  createContext,
+  type Dispatch,
+  type SetStateAction,
+  type ReactNode,
+} from "react";
 import { Text, View, ScrollView, StyleSheet, Pressable } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
@@ -60,11 +69,73 @@ import {
   FocusModeFloatingExit,
 } from "@/components/FocusMode";
 
+// ── Draw-scroll arbitration, isolated from the route's render ────────────────
+// The canvas toggles page-scroll OFF while you draw (ImageCanvas calls
+// setScroll(false) on draw-start, true on draw-end) so a stroke doesn't scroll
+// the page. This used to be `useState` ON the route — so EVERY stroke flipped it
+// (false→true) and re-rendered the WHOLE ColoringImage route + chrome (~110ms
+// dev / ~35ms prod JS-thread block per stroke, measured + pinpointed via a
+// per-render diagnostic: the route's only per-stroke-changing input was
+// `scroll`). It was THE cause of the canvas flash/jank.
+//
+// Fix: own the `scroll` state in a PROVIDER that wraps the route, and split it
+// across TWO contexts. React Context has NO field-level subscription — ANY
+// component that calls useContext(C) re-renders when C's Provider value changes
+// identity, regardless of which field it destructures. So a single context
+// holding { scrollEnabled, setScroll } would STILL re-render the route on every
+// stroke (the route reads setScroll → subscribes to the whole value → the
+// scrollEnabled flip recreates the value → route re-renders). Measured: that was
+// exactly the residual flash — the profiler flagged "ColoringImage … context
+// changed", 109-134ms per stroke.
+//
+// Two contexts:
+//   • SetScrollContext — value is the stable setter, set ONCE, identity NEVER
+//     changes. Consuming it (the route) therefore NEVER re-renders.
+//   • ScrollEnabledContext — the reactive boolean; ONLY DrawScrollView consumes
+//     it, so a stroke re-renders just the cheap ScrollView wrapper, not the route.
+const SetScrollContext = createContext<Dispatch<SetStateAction<boolean>>>(
+  () => {},
+);
+const ScrollEnabledContext = createContext<boolean>(true);
+
+const DrawScrollProvider = ({ children }: { children: ReactNode }) => {
+  const [scrollEnabled, setScroll] = useState(true);
+  // setScroll is referentially stable (useState guarantee), so SetScrollContext's
+  // value never changes identity → its consumers (the route) never re-render.
+  return (
+    <SetScrollContext.Provider value={setScroll}>
+      <ScrollEnabledContext.Provider value={scrollEnabled}>
+        {children}
+      </ScrollEnabledContext.Provider>
+    </SetScrollContext.Provider>
+  );
+};
+
+// The route uses this — the setter context value is referentially stable for the
+// provider's lifetime, so reading it never re-renders the route on a scroll flip.
+const useSetScroll = () => useContext(SetScrollContext);
+
+// A ScrollView that reads the reactive scrollEnabled from its OWN context. This
+// (not the route) is the only thing that re-renders when a stroke toggles scroll.
+const DrawScrollView = ({
+  children,
+  ...props
+}: React.ComponentProps<typeof ScrollView>) => {
+  const scrollEnabled = useContext(ScrollEnabledContext);
+  return (
+    <ScrollView {...props} scrollEnabled={scrollEnabled}>
+      {children}
+    </ScrollView>
+  );
+};
+
 const ColoringImage = () => {
   const { id } = useLocalSearchParams();
   const router = useRouter();
   const { data, isLoading } = useColoringImage(id as string);
-  const [scroll, setScroll] = useState(true);
+  // scroll state lives in DrawScrollProvider (see above) so a stroke's
+  // setScroll toggle does NOT re-render this route. Read only the stable setter.
+  const setScroll = useSetScroll();
   const [showStartOverConfirm, setShowStartOverConfirm] = useState(false);
   // One sheet per rail action (web parity: Save / Print / My Artwork are
   // separate buttons, each its own bottom sheet — no combined menu).
@@ -87,18 +158,25 @@ const ColoringImage = () => {
   const { layoutMode, coloringTier, useCompactHeader, canvasArea, deviceInfo } =
     useResponsiveLayout();
 
-  // Get zoom state and actions from canvas store
+  // The route subscribes ONLY to `scale` (for the ColoringLayout zoom-% readout
+  // — `zoom={scale}`). It previously did `useCanvasStore()` (whole store) →
+  // re-rendered the entire route + chrome on every stroke (~110ms dev / ~35ms
+  // prod JS block, measured — the flash/jank). Narrowing to `scale` is correct
+  // PROVIDED `scale` only changes on a real zoom: the spurious per-stroke `scale`
+  // write from the pan gesture is suppressed at its source in ImageCanvas (a
+  // no-op guard when the value is unchanged), so a plain stroke no longer writes
+  // `scale` → this subscription no longer fires on draw. Actions are stable
+  // (read once via getState).
+  const scale = useCanvasStore((s) => s.scale);
   const {
-    scale,
     setScale,
     resetTransform,
     reset,
     setTool,
     setBrushType,
-    captureCanvas,
     addAction,
     setImageId,
-  } = useCanvasStore();
+  } = useCanvasStore.getState();
 
   // Active profile to stamp on locally-saved artwork (null = logged-out bucket).
   const { activeProfile } = useUserContext();
@@ -158,6 +236,10 @@ const ColoringImage = () => {
 
   // Save to Photos — capture the canvas, write a PNG, save to the library.
   const handleSaveToPhotos = useCallback(async () => {
+    // Read captureCanvas non-reactively (it's set by the canvas on mount). This
+    // avoids subscribing the route to it, keeping the route's only reactive
+    // store dep `scale` (see the selector note above).
+    const captureCanvas = useCanvasStore.getState().captureCanvas;
     if (!captureCanvas) {
       toast.error(SAVE_FAIL_MSG);
       return;
@@ -193,7 +275,7 @@ const ColoringImage = () => {
     } finally {
       setIsSaving(false);
     }
-  }, [captureCanvas, id]);
+  }, [id]);
 
   // Add to My Artwork — save into the kid's LOCAL-FIRST collection (MMKV store
   // + PNG on disk), NOT the photo library. Works offline / logged-out / with no
@@ -201,6 +283,7 @@ const ColoringImage = () => {
   // (handleSaveToPhotos) stays the explicit photo-library export — the two
   // buttons now do genuinely different jobs (collection vs. camera-roll export).
   const handleMyArtwork = useCallback(async () => {
+    const captureCanvas = useCanvasStore.getState().captureCanvas;
     if (!captureCanvas) {
       toast.error(SAVE_FAIL_MSG);
       return;
@@ -233,7 +316,7 @@ const ColoringImage = () => {
     } finally {
       setIsSaving(false);
     }
-  }, [captureCanvas, id, activeProfile?.id, data?.coloringImage?.title]);
+  }, [id, activeProfile?.id, data?.coloringImage?.title]);
 
   // Print — build a PDF (line art + QR) and open the system print/share sheet.
   const handlePrint = useCallback(async () => {
@@ -454,10 +537,9 @@ const ColoringImage = () => {
                  toggles it off mid-stroke so drawing doesn't scroll the page.
                  `scrollable` drops ColoringLayout's row flex:1 so it takes its
                  intrinsic height inside the (unbounded) scroll content. */
-              <ScrollView
+              <DrawScrollView
                 style={styles.scrollView}
                 contentContainerStyle={styles.threeColScrollContent}
-                scrollEnabled={scroll}
                 showsVerticalScrollIndicator={false}
               >
                 <ColoringLayout
@@ -500,7 +582,7 @@ const ColoringImage = () => {
                   currentId={coloringImage.id}
                   containerWidth={deviceInfo.screenWidth}
                 />
-              </ScrollView>
+              </DrawScrollView>
             ) : (
               /* Landscape three-column / middle. Like portrait, the coloring
                  block fills the FIRST screenful (canvas fully visible, no scroll
@@ -512,10 +594,9 @@ const ColoringImage = () => {
                  arbitration (ImageCanvas setScroll(false) on draw-start) — the
                  SAME proven pattern as the portrait + phone paths, no new
                  gesture conflict. */
-              <ScrollView
+              <DrawScrollView
                 style={styles.scrollView}
                 contentContainerStyle={styles.threeColScrollContent}
-                scrollEnabled={scroll}
                 showsVerticalScrollIndicator={false}
                 onLayout={(e) => {
                   const h = e.nativeEvent.layout.height;
@@ -572,15 +653,14 @@ const ColoringImage = () => {
                   currentId={coloringImage.id}
                   containerWidth={deviceInfo.screenWidth}
                 />
-              </ScrollView>
+              </DrawScrollView>
             )
           ) : (
             /* Phone layout - Canvas with bottom toolbar */
             <View style={styles.canvasWrapper}>
-              <ScrollView
+              <DrawScrollView
                 style={styles.scrollView}
                 contentContainerStyle={styles.scrollContent}
-                scrollEnabled={scroll}
                 showsVerticalScrollIndicator={false}
               >
                 <View style={styles.canvasContainer}>
@@ -654,7 +734,7 @@ const ColoringImage = () => {
                     </Pressable>
                   </View>
                 </View>
-              </ScrollView>
+              </DrawScrollView>
             </View>
           )}
         </View>
@@ -927,4 +1007,12 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ColoringImage;
+// Wrap the route in DrawScrollProvider so the per-stroke `scroll` toggle
+// re-renders only the provider + the ScrollView consumers, not the route body.
+const ColoringImageRoute = () => (
+  <DrawScrollProvider>
+    <ColoringImage />
+  </DrawScrollProvider>
+);
+
+export default ColoringImageRoute;

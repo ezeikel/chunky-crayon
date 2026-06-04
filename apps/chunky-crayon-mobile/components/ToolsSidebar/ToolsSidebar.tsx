@@ -91,13 +91,29 @@ const ToolsSidebar = ({
   const insets = useSafeAreaInsets();
   const { isFocusMode, toggleFocus } = useFocusMode();
 
+  // Narrow per-slice selectors instead of a whole-store subscription. The old
+  // `useCanvasStore()` re-rendered this rail on EVERY store change — including
+  // every stroke's addAction — which the profiler measured as the ~110ms
+  // whole-screen hot commit per stroke (the flash/jank). This rail renders only
+  // on these tool/brush/magic/color primitives + the undo/redo enabled state.
+  const selectedTool = useCanvasStore((s) => s.selectedTool);
+  const brushType = useCanvasStore((s) => s.brushType);
+  const brushSize = useCanvasStore((s) => s.brushSize);
+  const magicMode = useCanvasStore((s) => s.magicMode);
+  const magicReady = useCanvasStore((s) => s.magicReady);
+  const selectedColor = useCanvasStore((s) => s.selectedColor);
+  // Derived undo/redo enabled state — keeps the greyed/enabled visual live.
+  // canRedo depends on BOTH historyIndex AND history.length (addAction
+  // tombstones the redo tail + appends on draw-after-undo), so subscribing to
+  // historyIndex alone would miss the Redo button greying out — subscribe to the
+  // derived booleans directly (primitive → no useShallow needed).
+  const canUndoNow = useCanvasStore((s) => s.historyIndex >= 0);
+  const canRedoNow = useCanvasStore(
+    (s) => s.historyIndex < s.history.length - 1,
+  );
+  // Stable action/getter fns — identity never changes; no subscription. The
+  // canUndo()/canRedo() getters stay here for the live-at-tap handler guards.
   const {
-    selectedTool,
-    brushType,
-    brushSize,
-    magicMode,
-    magicReady,
-    selectedColor,
     setTool,
     setBrushType,
     setBrushSize,
@@ -106,7 +122,7 @@ const ToolsSidebar = ({
     redo,
     canUndo,
     canRedo,
-  } = useCanvasStore();
+  } = useCanvasStore.getState();
 
   const handleToolSelect = useCallback(
     (config: ColoringToolConfig) => {
@@ -233,32 +249,32 @@ const ToolsSidebar = ({
           <View style={[styles.controlRowCentered, { gap, width: gridWidth }]}>
             <Pressable
               onPress={handleUndo}
-              disabled={!canUndo()}
+              disabled={!canUndoNow}
               style={[
                 styles.controlButtonBorderless,
                 { width: controlSize, height: controlSize },
-                !canUndo() && styles.disabled,
+                !canUndoNow && styles.disabled,
               ]}
               accessibilityLabel="Undo"
             >
               <UndoIcon
                 size={24}
-                color={canUndo() ? COLORS.textPrimary : COLORS.textMuted}
+                color={canUndoNow ? COLORS.textPrimary : COLORS.textMuted}
               />
             </Pressable>
             <Pressable
               onPress={handleRedo}
-              disabled={!canRedo()}
+              disabled={!canRedoNow}
               style={[
                 styles.controlButtonBorderless,
                 { width: controlSize, height: controlSize },
-                !canRedo() && styles.disabled,
+                !canRedoNow && styles.disabled,
               ]}
               accessibilityLabel="Redo"
             >
               <RedoIcon
                 size={24}
-                color={canRedo() ? COLORS.textPrimary : COLORS.textMuted}
+                color={canRedoNow ? COLORS.textPrimary : COLORS.textMuted}
               />
             </Pressable>
           </View>

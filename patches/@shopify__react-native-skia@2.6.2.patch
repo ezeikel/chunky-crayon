@@ -63,3 +63,279 @@ index 5181c713c7415a48544b95fbb826c56a81bc0787..09825ac077b6a248ecd81493b752cff2
 diff --git a/cpp/skia/include/private/base/README.md b/cpp/skia/include/private/base/README.md
 deleted file mode 100644
 index 7f4f17b228c2b8e664b462983d66f735c6383fe7..0000000000000000000000000000000000000000
+diff --git a/lib/module/sksg/Container.native.js b/lib/module/sksg/Container.native.js
+index 1baab989477c80c4e35b10f958b97927e7cd8bd3..42b6a64af4c5bc471693c724705b022642bb29b6 100644
+--- a/lib/module/sksg/Container.native.js
++++ b/lib/module/sksg/Container.native.js
+@@ -13,7 +13,7 @@ import "../views/api";
+ const {
+   SkiaViewApi
+ } = globalThis;
+-const nativeDrawOnscreen = (nativeId, recorder, picture) => {
++const nativeDrawOnscreen = (nativeId, recorder, picture, flashDiag) => {
+   "worklet";
+ 
+   //const start = performance.now();
+@@ -21,7 +21,21 @@ const nativeDrawOnscreen = (nativeId, recorder, picture) => {
+   //const end = performance.now();
+   //console.log("Recording time: ", end - start);
+   SkiaViewApi.setJsiProperty(nativeId, "picture", picture);
++  // [FLASH_NATIVE] H1 below-JS present-timing instrumentation. flashDiag carries
++  // { drawId, src, buildPerf, buildDate, pathCount } captured on the JS thread in
++  // redraw(); here on the UI thread we stamp the present and compute the JS-build
++  // -> UI-present hop. Correlate drawId/buildDate against the JS-side
++  // [FLASH_DIAG] swap-effect log (which uses Date.now()).
++  if (flashDiag) {
++    const nowPerf = performance.now();
++    const hop = nowPerf - flashDiag.buildPerf;
++    console.log(
++      `[FLASH_NATIVE] present draw#${flashDiag.drawId} src=${flashDiag.src} paths=${flashDiag.pathCount} hop=${hop.toFixed(2)}ms uiPerf=${nowPerf.toFixed(2)} buildDate=${flashDiag.buildDate}`,
++    );
++  }
+ };
++// [FLASH_NATIVE] monotonic draw-id, JS-thread, one per redraw().
++let __flashDrawId = 0;
+ class NativeReanimatedContainer extends Container {
+   constructor(Skia, nativeId) {
+     super(Skia);
+@@ -45,19 +59,56 @@ class NativeReanimatedContainer extends Container {
+     visit(recorder, this.root);
+     const sharedValues = recorder.getSharedValues();
+     const sharedRecorder = recorder.getRecorder();
++    // [FLASH_NATIVE] capture the per-redraw fingerprint on the JS thread: a
++    // monotonic id, the build timestamps (perf for hop math, Date to correlate
++    // with [FLASH_DIAG]), and the path count recorded during visit() above. The
++    // path count is fixed at record time — mapper applyUpdates only mutates prop
++    // values, never node count — so it is the same for first-frame and mapper.
++    const __drawId = ++__flashDrawId;
++    const __buildPerf = performance.now();
++    const __buildDate = Date.now();
++    const __pathCount = recorder.getPathCount ? recorder.getPathCount() : -1;
++    console.log(
++      `[FLASH_NATIVE] redraw build draw#${__drawId} paths=${__pathCount} animated=${sharedValues.length} buildDate=${__buildDate}`,
++    );
++    const __firstFrameDiag = {
++      drawId: __drawId,
++      src: "first-frame",
++      buildPerf: __buildPerf,
++      buildDate: __buildDate,
++      pathCount: __pathCount,
++    };
++    const __mapperDiag = {
++      drawId: __drawId,
++      src: "mapper#1",
++      buildPerf: __buildPerf,
++      buildDate: __buildDate,
++      pathCount: __pathCount,
++    };
+     // Draw first frame
+     Rea.runOnUI(() => {
+       "worklet";
+ 
+-      nativeDrawOnscreen(nativeId, sharedRecorder, picture);
++      nativeDrawOnscreen(nativeId, sharedRecorder, picture, __firstFrameDiag);
+     })();
+     // Animate
+     if (sharedValues.length > 0) {
++      // [FLASH_NATIVE] only the FIRST mapper tick should log (subsequent ticks
++      // are steady-state animation, not the present we are chasing). A
++      // UI-thread shared flag, flipped once, keeps the log to one line.
++      const __mapperLogged = Rea.makeMutable
++        ? Rea.makeMutable(false)
++        : null;
+       this.mapperId = Rea.startMapper(() => {
+         "worklet";
+ 
+         sharedRecorder.applyUpdates(sharedValues);
+-        nativeDrawOnscreen(nativeId, sharedRecorder, picture);
++        let diag = null;
++        if (__mapperLogged && !__mapperLogged.value) {
++          __mapperLogged.value = true;
++          diag = __mapperDiag;
++        }
++        nativeDrawOnscreen(nativeId, sharedRecorder, picture, diag);
+       }, sharedValues);
+     }
+   }
+diff --git a/lib/module/sksg/Recorder/ReanimatedRecorder.js b/lib/module/sksg/Recorder/ReanimatedRecorder.js
+index 89d42ab571222bffa23b19ea36545935bf06bdcb..67d36aca8eed308e5aab02dbd1a5cf5466ca91b3 100644
+--- a/lib/module/sksg/Recorder/ReanimatedRecorder.js
++++ b/lib/module/sksg/Recorder/ReanimatedRecorder.js
+@@ -11,10 +11,17 @@ export class ReanimatedRecorder {
+   constructor(Skia) {
+     _defineProperty(this, "values", new Set());
+     _defineProperty(this, "recorder", void 0);
++    // [FLASH_NATIVE] per-recorder drawPath fingerprint (record-time, JS thread).
++    _defineProperty(this, "pathCount", 0);
+     this.recorder = Skia.Recorder();
+   }
++  // [FLASH_NATIVE] read by Container.native.js redraw() to fingerprint the scene.
++  getPathCount() {
++    return this.pathCount;
++  }
+   reset() {
+     this.values.clear();
++    this.pathCount = 0;
+     this.recorder.reset();
+   }
+   processAnimationValues(props) {
+@@ -130,6 +137,7 @@ export class ReanimatedRecorder {
+   }
+   drawPath(props) {
+     this.processAnimationValues(props);
++    this.pathCount += 1; // [FLASH_NATIVE] count nodes baked into this present.
+     this.recorder.drawPath(props);
+   }
+   drawRect(props) {
+diff --git a/src/sksg/Container.native.ts b/src/sksg/Container.native.ts
+index 08c16a9b2eca78a0e1c07b0c857fad6d74a77e7d..23d2bb08099b0392011d38e5d41168265c96665d 100644
+--- a/src/sksg/Container.native.ts
++++ b/src/sksg/Container.native.ts
+@@ -13,10 +13,21 @@ import "../views/api";
+ // create local reference for `strictGlobal` option in Worklets
+ const { SkiaViewApi } = globalThis;
+ 
++// [FLASH_NATIVE] H1 present-timing fingerprint captured on the JS thread in
++// redraw() and threaded into the worklet so the UI thread can stamp the present.
++interface FlashDiag {
++  drawId: number;
++  src: string;
++  buildPerf: number;
++  buildDate: number;
++  pathCount: number;
++}
++
+ const nativeDrawOnscreen = (
+   nativeId: number,
+   recorder: JsiRecorder,
+-  picture: SkPicture
++  picture: SkPicture,
++  flashDiag?: FlashDiag | null
+ ) => {
+   "worklet";
+ 
+@@ -25,8 +36,23 @@ const nativeDrawOnscreen = (
+   //const end = performance.now();
+   //console.log("Recording time: ", end - start);
+   SkiaViewApi.setJsiProperty(nativeId, "picture", picture);
++  // [FLASH_NATIVE] H1 below-JS present-timing instrumentation. flashDiag carries
++  // { drawId, src, buildPerf, buildDate, pathCount } captured on the JS thread in
++  // redraw(); here on the UI thread we stamp the present and compute the JS-build
++  // -> UI-present hop. Correlate drawId/buildDate against the JS-side
++  // [FLASH_DIAG] swap-effect log (which uses Date.now()).
++  if (flashDiag) {
++    const nowPerf = performance.now();
++    const hop = nowPerf - flashDiag.buildPerf;
++    console.log(
++      `[FLASH_NATIVE] present draw#${flashDiag.drawId} src=${flashDiag.src} paths=${flashDiag.pathCount} hop=${hop.toFixed(2)}ms uiPerf=${nowPerf.toFixed(2)} buildDate=${flashDiag.buildDate}`
++    );
++  }
+ };
+ 
++// [FLASH_NATIVE] monotonic draw-id, JS thread, one per redraw().
++let __flashDrawId = 0;
++
+ class NativeReanimatedContainer extends Container {
+   private mapperId: number | null = null;
+   private picture: SkPicture;
+@@ -51,17 +77,64 @@ class NativeReanimatedContainer extends Container {
+     visit(recorder, this.root);
+     const sharedValues = recorder.getSharedValues();
+     const sharedRecorder = recorder.getRecorder();
++    // [FLASH_NATIVE] capture the per-redraw fingerprint on the JS thread: a
++    // monotonic id, the build timestamps (perf for hop math, Date to correlate
++    // with [FLASH_DIAG]), and the path count recorded during visit() above. The
++    // path count is fixed at record time — mapper applyUpdates only mutates prop
++    // values, never node count — so it is the same for first-frame and mapper.
++    const __drawId = ++__flashDrawId;
++    const __buildPerf = performance.now();
++    const __buildDate = Date.now();
++    const __pathCount = (
++      recorder as unknown as { getPathCount?: () => number }
++    ).getPathCount
++      ? (recorder as unknown as { getPathCount: () => number }).getPathCount()
++      : -1;
++    console.log(
++      `[FLASH_NATIVE] redraw build draw#${__drawId} paths=${__pathCount} animated=${sharedValues.length} buildDate=${__buildDate}`
++    );
++    const __firstFrameDiag: FlashDiag = {
++      drawId: __drawId,
++      src: "first-frame",
++      buildPerf: __buildPerf,
++      buildDate: __buildDate,
++      pathCount: __pathCount,
++    };
++    const __mapperDiag: FlashDiag = {
++      drawId: __drawId,
++      src: "mapper#1",
++      buildPerf: __buildPerf,
++      buildDate: __buildDate,
++      pathCount: __pathCount,
++    };
+     // Draw first frame
+     Rea.runOnUI(() => {
+       "worklet";
+-      nativeDrawOnscreen(nativeId, sharedRecorder, picture);
++      nativeDrawOnscreen(nativeId, sharedRecorder, picture, __firstFrameDiag);
+     })();
+     // Animate
+     if (sharedValues.length > 0) {
++      // [FLASH_NATIVE] only the FIRST mapper tick should log (later ticks are
++      // steady-state animation, not the present we are chasing). A UI-thread
++      // mutable flag, flipped once, keeps the log to one line per redraw.
++      const __mapperLogged = (
++        Rea as unknown as { makeMutable?: (v: boolean) => { value: boolean } }
++      ).makeMutable
++        ? (
++            Rea as unknown as {
++              makeMutable: (v: boolean) => { value: boolean };
++            }
++          ).makeMutable(false)
++        : null;
+       this.mapperId = Rea.startMapper(() => {
+         "worklet";
+         sharedRecorder.applyUpdates(sharedValues);
+-        nativeDrawOnscreen(nativeId, sharedRecorder, picture);
++        let diag: FlashDiag | null = null;
++        if (__mapperLogged && !__mapperLogged.value) {
++          __mapperLogged.value = true;
++          diag = __mapperDiag;
++        }
++        nativeDrawOnscreen(nativeId, sharedRecorder, picture, diag);
+       }, sharedValues);
+     }
+   }
+diff --git a/src/sksg/Recorder/ReanimatedRecorder.ts b/src/sksg/Recorder/ReanimatedRecorder.ts
+index c18d5e272a799ad4dd93f8f0aed00a72b4c3c6a7..1b4fd01364ed9340b940476d0080b956394a52a9 100644
+--- a/src/sksg/Recorder/ReanimatedRecorder.ts
++++ b/src/sksg/Recorder/ReanimatedRecorder.ts
+@@ -40,13 +40,21 @@ import { isSharedValue } from "../utils";
+ export class ReanimatedRecorder implements BaseRecorder {
+   private values = new Set<SharedValue<unknown>>();
+   private recorder: JsiRecorder;
++  // [FLASH_NATIVE] per-recorder drawPath fingerprint (record-time, JS thread).
++  private pathCount = 0;
+ 
+   constructor(Skia: Skia) {
+     this.recorder = Skia.Recorder();
+   }
+ 
++  // [FLASH_NATIVE] read by Container.native.ts redraw() to fingerprint the scene.
++  getPathCount() {
++    return this.pathCount;
++  }
++
+   reset() {
+     this.values.clear();
++    this.pathCount = 0;
+     this.recorder.reset();
+   }
+ 
+@@ -211,6 +219,7 @@ export class ReanimatedRecorder implements BaseRecorder {
+ 
+   drawPath(props: AnimatedProps<PathProps>): void {
+     this.processAnimationValues(props);
++    this.pathCount += 1; // [FLASH_NATIVE] count nodes baked into this present.
+     this.recorder.drawPath(props);
+   }
+ 

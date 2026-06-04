@@ -27,14 +27,18 @@ type ColorPaletteSidebarProps = {
  */
 const ColorPaletteSidebar = ({ width }: ColorPaletteSidebarProps) => {
   const insets = useSafeAreaInsets();
-  const {
-    selectedColor,
-    setColor,
-    selectedTool,
-    magicMode,
-    paletteVariant,
-    setPaletteVariant,
-  } = useCanvasStore();
+  // Narrow per-slice selectors instead of a whole-store subscription. The old
+  // `useCanvasStore()` (no selector) re-rendered this rail on EVERY store change
+  // — including every stroke's addAction (history change) — which the profiler
+  // showed as a ~110ms whole-screen hot commit per stroke (the flash/jank). This
+  // rail only renders on these tool/color/magic/variant primitives; a stroke
+  // touches none of them, so it no longer re-renders on draw.
+  const selectedColor = useCanvasStore((s) => s.selectedColor);
+  const selectedTool = useCanvasStore((s) => s.selectedTool);
+  const magicMode = useCanvasStore((s) => s.magicMode);
+  const paletteVariant = useCanvasStore((s) => s.paletteVariant);
+  // Stable action fns — identity never changes; read once, no subscription.
+  const { setColor, setPaletteVariant } = useCanvasStore.getState();
 
   const isMagicToolActive =
     selectedTool === "magic" &&

@@ -42,7 +42,11 @@ const MagicColorHint = ({
 }: MagicColorHintProps) => {
   const opacity = useSharedValue(0);
   const scale = useSharedValue(0.8);
-  const { setColor, setTool } = useCanvasStore();
+  // Both are stable action fns, only called inside handleUseColor — read once,
+  // no subscription. This component renders on its props, never on store state,
+  // so the old whole-store useCanvasStore() was pure per-stroke re-render
+  // overhead (it's always mounted by ImageCanvas).
+  const { setColor, setTool } = useCanvasStore.getState();
 
   // Fade out + scale back, then call onDismiss when the fade settles.
   // Reanimated's withTiming completion callback runs on the UI thread,

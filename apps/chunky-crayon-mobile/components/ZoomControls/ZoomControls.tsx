@@ -40,8 +40,11 @@ type ZoomControlsProps = {
  * - Coral color scheme (#E46444)
  */
 const ZoomControls = ({ style, trailing }: ZoomControlsProps) => {
-  const { scale, setScale, resetTransform, selectedTool, setTool } =
-    useCanvasStore();
+  // Narrow selectors (was whole-store useCanvasStore() → re-rendered on every
+  // stroke). No history dep here.
+  const scale = useCanvasStore((s) => s.scale);
+  const selectedTool = useCanvasStore((s) => s.selectedTool);
+  const { setScale, resetTransform, setTool } = useCanvasStore.getState();
 
   // Remember the previous tool to switch back to when pan is deselected
   const previousToolRef = useRef<Tool>("brush");
