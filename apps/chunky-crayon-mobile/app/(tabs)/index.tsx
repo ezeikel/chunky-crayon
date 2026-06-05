@@ -82,7 +82,7 @@ const HomeScreen = () => {
         />
         <ScrollView
           style={{ flex: 1 }}
-          contentContainerStyle={{ paddingBottom: 100 }}
+          contentContainerStyle={{ paddingBottom: 128 }}
           showsVerticalScrollIndicator={false}
         >
           {/* Colo Avatar & Greeting */}

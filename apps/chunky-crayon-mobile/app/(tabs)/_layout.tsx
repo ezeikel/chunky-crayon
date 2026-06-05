@@ -156,7 +156,19 @@ export default function TabLayout() {
   return (
     <Tabs
       tabBar={(props) => <CustomTabBar {...props} />}
-      screenOptions={{ headerShown: false }}
+      screenOptions={{
+        headerShown: false,
+        // position:absolute → expo-router/react-navigation does NOT reserve
+        // tab-bar height in the scene, so each screen renders full-height behind
+        // the (absolutely-positioned, transparent) custom pill. transparent bg
+        // so the page's cream gradient shows around it (no white strip).
+        tabBarStyle: {
+          position: "absolute",
+          backgroundColor: "transparent",
+          borderTopWidth: 0,
+          elevation: 0,
+        },
+      }}
     >
       <Tabs.Screen name="index" />
       <Tabs.Screen name="gallery" />
@@ -170,11 +182,18 @@ const FAB_SIZE = 58;
 const CRADLE = FAB_SIZE + 12;
 
 const styles = StyleSheet.create({
-  // Transparent wrapper pinned to the bottom; holds the floating pill clear of
-  // the screen edges + home indicator. Tinted gradient page bg shows through.
+  // ABSOLUTELY positioned over the screen so the cream page background shows
+  // through around the pill (a non-absolute wrapper takes layout height and the
+  // tab region renders opaque/white — the "still a bar" look). Screens reserve
+  // bottom padding (TAB_BAR_CLEARANCE) so content isn't hidden behind the pill.
   barWrap: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
     paddingHorizontal: 16,
     paddingTop: 8,
+    backgroundColor: "transparent",
   },
   // The floating pill itself — rounded, white, soft shadow, no top border.
   bar: {

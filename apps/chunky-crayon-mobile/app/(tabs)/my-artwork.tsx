@@ -204,13 +204,13 @@ const MyArtworkScreen = () => {
 
 const styles = StyleSheet.create({
   scrollContent: {
-    paddingBottom: 100,
+    paddingBottom: 128,
   },
   emptyScrollContent: {
     flexGrow: 1,
     justifyContent: "center",
     alignItems: "center",
-    paddingBottom: 100,
+    paddingBottom: 128,
     paddingHorizontal: 24,
   },
   loadingContainer: {
