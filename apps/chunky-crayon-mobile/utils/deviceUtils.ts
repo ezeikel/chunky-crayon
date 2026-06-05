@@ -56,31 +56,45 @@ const THREE_COLUMN_RAIL_CHROME = 198 + 16 + 232 + 16; // 462
 const THREE_COLUMN_MIN_CANVAS = 538;
 const COLORING_TIER_THREE_COLUMN_MIN =
   THREE_COLUMN_RAIL_CHROME + THREE_COLUMN_MIN_CANVAS; // 1000
-// Minimum HEIGHT for a tools-above-canvas (middle) or rails (three-column)
-// layout to leave a usable canvas. Below this the toolbar/chrome eats the whole
-// viewport, so we drop to the phone bottom-sheet tier (collapsible → works in
-// short heights). This is what stops a wide-but-SHORT phone-landscape
-// (e.g. 852×393) from getting middle tools-on-top with a sliver of canvas: it's
-// classified by width like a tablet, but only ~393px tall. Every tablet —
-// even an iPad split-view — clears this (≥744 tall), so only phone-landscape
-// is affected.
+// Minimum HEIGHT for a tools-above-canvas (middle) layout to leave a usable
+// canvas. Below this, `middle` (toolbar-on-top) would starve the canvas, so a
+// short window goes to phone OR — if wide enough — to a HEIGHT-ADAPTIVE
+// three-column (rails resize their tiles to fit the short height). Every tablet
+// is ≥744 tall so this only affects phone-landscape.
 const COLORING_TIER_MIN_HEIGHT = 600;
+// iPhone-LANDSCAPE → three-column. The rails now resize-to-fit a short height,
+// so a wide-but-short window gets the full palette│canvas│tools layout instead
+// of the bottom sheet. Width gate is LOWER than the tall three-column bar (1000)
+// because iPhones-landscape are ~745–932 wide: rails chrome (462) + a usable
+// height-bound canvas. Targets: iPhone 17 Pro 932×430, others 852×393 / 745×430.
+const COLORING_TIER_LANDSCAPE_THREE_COLUMN_MIN = 740;
+// Hard floor below which even resized rails can't fit (blocks tiny split-views).
+// Below the shortest iPhone-landscape (~393) so all qualify; excludes ~320 ones.
+const COLORING_TIER_LANDSCAPE_MIN_HEIGHT = 380;
 
 /**
- * Pick the coloring layout tier. WIDTH decides three-column vs middle vs phone,
- * but a viewport too SHORT for an above-canvas toolbar is forced to the phone
- * bottom sheet regardless of width (height is optional for back-compat; when
- * omitted, the old width-only behaviour applies).
+ * Pick the coloring layout tier. WIDTH decides three-column vs middle vs phone.
+ * A wide-but-SHORT window (iPhone landscape) gets a height-adaptive three-column
+ * (rails resize to fit) instead of the bottom sheet. (height optional for
+ * back-compat; omitted → width-only.)
  */
 export const getColoringTier = (
   width: number,
   height?: number,
 ): ColoringTier => {
-  // Too short for tools-on-top / rails to leave a usable canvas → bottom sheet.
-  if (height !== undefined && height < COLORING_TIER_MIN_HEIGHT) return "phone";
-  // Three-column only if both rails + gaps + a comfortable canvas fit.
+  const tooShort = height !== undefined && height < COLORING_TIER_MIN_HEIGHT;
+  // iPhone-landscape: wide enough for rails + a real canvas, tall enough for the
+  // resized rails. Routed to three-column ahead of the phone fallback.
+  const isShortWide =
+    height !== undefined &&
+    tooShort &&
+    height >= COLORING_TIER_LANDSCAPE_MIN_HEIGHT &&
+    width >= COLORING_TIER_LANDSCAPE_THREE_COLUMN_MIN;
+  if (isShortWide) return "three-column";
+  // Too short for tools-on-top / rails (and not wide enough) → bottom sheet.
+  if (tooShort) return "phone";
+  // Tall window: width-only tiers (tablets, phone-portrait stays phone).
   if (width >= COLORING_TIER_THREE_COLUMN_MIN) return "three-column";
-  // Otherwise toolbar-on-top for anything wider than a phone.
   if (width >= COLORING_TIER_MIDDLE_MIN) return "middle";
   return "phone";
 };

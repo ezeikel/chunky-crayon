@@ -1,6 +1,5 @@
 import { useCallback } from "react";
 import { View, Text, Pressable, ScrollView, StyleSheet } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import {
   faArrowsRotate,
@@ -27,6 +26,7 @@ import {
   COLORING_MAGIC_TOOLS,
   type ColoringToolConfig,
 } from "@/lib/coloring/tools";
+import { getLandscapeRailFit } from "@/constants/Sizes";
 
 type ToolsSidebarProps = {
   /** Width of the sidebar */
@@ -57,6 +57,19 @@ type ToolsSidebarProps = {
    * scroll. Default false keeps the landscape behaviour.
    */
   scrollable?: boolean;
+  /**
+   * Height the rail must fit into (FIXED/landscape tier). When set + short, the
+   * tool/control/action tiles shrink to fit (via the shared getLandscapeRailFit),
+   * clamped to today's sizes as a CEIL (so a tall window = no-op, iPad unchanged).
+   * The inner ScrollView stays as a last-resort net. undefined → fixed sizes.
+   */
+  availableHeight?: number;
+  /**
+   * Safe-area inset on this column's screen edge (the notch / Dynamic Island in
+   * landscape). The card pads away from it so it sits flush to the inner usable
+   * edge while clearing the notch. Default 0 (iPad / no notch on this side).
+   */
+  edgeInset?: number;
 };
 
 /**
@@ -87,8 +100,9 @@ const ToolsSidebar = ({
   onSave,
   onMyArtwork,
   scrollable = false,
+  availableHeight,
+  edgeInset = 0,
 }: ToolsSidebarProps) => {
-  const insets = useSafeAreaInsets();
   const { isFocusMode, toggleFocus } = useFocusMode();
 
   // Narrow per-slice selectors instead of a whole-store subscription. The old
@@ -167,17 +181,30 @@ const ToolsSidebar = ({
     }
   };
 
-  // Web (measured): tool tiles 61px, controls 48px, actions 64px, 8px gap.
-  // We render the action tiles at the tool-tile size (61) so all three fit
-  // the shared 3-column grid width (a 64px action tile would overflow it and
-  // wrap Save onto its own row).
+  // Height-adaptive tile sizes come from the SHARED helper so the rail card
+  // width and the column-split width (getLandscapeSidebarWidths) agree exactly
+  // (no empty gutter, no starved canvas). On a tall window everything resolves
+  // to the iPad CEIL sizes (61 / 48). The inner ScrollView stays as a net.
+  const isShort = availableHeight !== undefined && availableHeight < 560;
+  const {
+    tileSize,
+    controlSize,
+    actionSize,
+    toolsContentWidth,
+    rightCardWidth,
+  } = getLandscapeRailFit(availableHeight);
   const gap = 8;
-  const tileSize = 61;
-  const controlSize = 48;
-  const actionSize = 61;
-  // The 3-tile grid width keeps every row (tools, magic, brush, undo/zoom,
-  // actions) aligned to the same left edge and content width.
-  const gridWidth = tileSize * 3 + gap * 2;
+  // Every row (tools, magic, brush, undo/zoom, actions) pins to this width so
+  // they share one left edge + content width. It is the SHARED content box from
+  // getLandscapeRailFit — the MAX of the 3-tile grid and the 4-button zoom row —
+  // so the zoom row no longer overflows/wraps inside a 3-tile-only basis.
+  const gridWidth = toolsContentWidth;
+  // On the SHORT (iPhone-landscape) path the content box is widened to fit the
+  // 4-button zoom row, so the narrower 3-tile rows would hug the left and leave
+  // a gap on the right. Center the normally-left-aligned grids so the whole rail
+  // reads symmetric. On iPad the box == the 3-tile grid, so centering is a
+  // no-op → web's left-aligned layout is unchanged.
+  const gridJustify = isShort ? ("center" as const) : ("flex-start" as const);
 
   // In scrollable (portrait) mode the rail is full content height with NO
   // inner scroll — a plain View — so every row renders and the outer page
@@ -193,13 +220,34 @@ const ToolsSidebar = ({
       };
 
   return (
-    <View style={[styles.outer, { width, paddingRight: insets.right + 8 }]}>
+    // paddingRight clears the notch (edgeInset) while keeping the card flush to
+    // the inner usable edge. The COLUMN width already reserves edgeInset, so we
+    // pad by max(8, edgeInset) — never less than the base 8pt gutter.
+    <View
+      style={[styles.outer, { width, paddingRight: Math.max(8, edgeInset) }]}
+    >
       {/* Floating tools rail (web's DesktopToolsSidebar) — content-height
           rounded card, 3-column LEFT-ALIGNED grid + control rows. */}
-      <View style={[styles.rail, scrollable && styles.railScrollable]}>
+      <View
+        style={[
+          styles.rail,
+          scrollable && styles.railScrollable,
+          // Hug content width on a short window so no empty space inside. Use the
+          // SHARED rightCardWidth (content box + padding + border) from
+          // getLandscapeRailFit — same value the column split reserves — so the
+          // inner content box == gridWidth exactly (no 4px border clip, no drift).
+          isShort ? { width: rightCardWidth } : null,
+        ]}
+      >
         <RailBody {...railBodyProps}>
-          {/* Regular tools — 3-column LEFT-ALIGNED grid (web). */}
-          <View style={[styles.toolGrid, { gap, width: gridWidth }]}>
+          {/* Regular tools — 3-column grid (left on iPad, centered when the
+              card is widened on iPhone-landscape). */}
+          <View
+            style={[
+              styles.toolGrid,
+              { gap, width: gridWidth, justifyContent: gridJustify },
+            ]}
+          >
             {COLORING_REGULAR_TOOLS.map((config) => (
               <ToolTile
                 key={config.id}
@@ -213,7 +261,12 @@ const ToolsSidebar = ({
           </View>
 
           {/* Magic tools — 2-up, gradient + sparkle. */}
-          <View style={[styles.toolGrid, { gap, width: gridWidth }]}>
+          <View
+            style={[
+              styles.toolGrid,
+              { gap, width: gridWidth, justifyContent: gridJustify },
+            ]}
+          >
             {COLORING_MAGIC_TOOLS.map((config) => (
               <ToolTile
                 key={config.id}
@@ -230,8 +283,13 @@ const ToolsSidebar = ({
 
           <View style={styles.divider} />
 
-          {/* Brush sizes (left-aligned row). */}
-          <View style={[styles.controlRow, { gap, width: gridWidth }]}>
+          {/* Brush sizes (left on iPad, centered when widened on iPhone). */}
+          <View
+            style={[
+              styles.controlRow,
+              { gap, width: gridWidth, justifyContent: gridJustify },
+            ]}
+          >
             <BrushSizeRow
               selectedRadius={brushSize}
               onSelect={(radius) => {
@@ -370,7 +428,12 @@ const ToolsSidebar = ({
           {(onStartOver || onPrint || onSave || onMyArtwork) && (
             <>
               <View style={styles.divider} />
-              <View style={[styles.toolGrid, { gap, width: gridWidth }]}>
+              <View
+                style={[
+                  styles.toolGrid,
+                  { gap, width: gridWidth, justifyContent: gridJustify },
+                ]}
+              >
                 <Pressable
                   onPress={() => {
                     tapLight();
@@ -456,6 +519,10 @@ const styles = StyleSheet.create({
   // the canvas column (12), NOT a bar-height offset. Left padding = gap.
   outer: {
     flexShrink: 0,
+    // Stretch to the row height so the rail card's maxHeight:'100%' + inner
+    // ScrollView actually cap/scroll on a short window. Tall window: card hugs
+    // content (shorter than the row) → no-op, iPad unchanged.
+    alignSelf: "stretch",
     paddingTop: 12,
     paddingBottom: 12,
     paddingLeft: 16,
@@ -464,6 +531,11 @@ const styles = StyleSheet.create({
   // 16 padding); grows to fit all controls. maxHeight caps it to the column
   // height so an unusually tall stack scrolls inside rather than overflowing.
   rail: {
+    // Hug content width (the 3-tile grid + padding) and align to the END of the
+    // column (right edge) so it doesn't stretch full-width and leave empty space
+    // inside when tiles shrink on a short window. Width is set inline = gridWidth
+    // + 32 padding. alignSelf:flex-end keeps it flush to the right rail position.
+    alignSelf: "flex-end",
     maxHeight: "100%",
     backgroundColor: COLORS.white,
     borderRadius: 24,

@@ -386,6 +386,15 @@ const ColoringImage = () => {
   // controls apply to both non-phone tiers.
   const isLandscapeLayout = coloringTier !== "phone";
 
+  // iPhone-landscape three-column: same rails+canvas as iPad, but NO header band
+  // — the back button floats as a small chip top-left over the cream bg, and
+  // progress/sound sit above the canvas (CanvasTopBar in the center column).
+  // iPad three-column keeps its normal header (it has the vertical room).
+  const isPhoneLandscapeThreeColumn =
+    coloringTier === "three-column" &&
+    deviceInfo.isLandscape &&
+    !deviceInfo.isTablet;
+
   // Portrait three-column (iPad held upright): the canvas is width-bound, so
   // ~half the screen height below it is empty. Make this tier scroll and hang
   // a "More Coloring Pages" grid in that dead space (web parity). Landscape
@@ -407,8 +416,10 @@ const ColoringImage = () => {
         {/* Focus-mode status bar binding — declarative hide. */}
         <FocusModeStatusBar />
 
-        {/* Header Area - Compact in phone landscape. Hidden in focus mode. */}
-        {!isFocusMode && (
+        {/* Header Area - Compact in phone landscape. Hidden in focus mode AND
+            in iPhone-landscape three-column (there the back button floats as a
+            chip, no header band — see the absolute back chip near the bottom). */}
+        {!isFocusMode && !isPhoneLandscapeThreeColumn && (
           <View
             style={[
               styles.header,
@@ -618,11 +629,27 @@ const ColoringImage = () => {
                     // pre-measure) so the canvas fits the VISIBLE area, not the
                     // full window. MoreColoringPages flows below.
                     { height: landscapeViewportH || deviceInfo.screenHeight },
+                    // iPhone-landscape: reserve a top band for the floating back
+                    // chip so the rails start below it (no overlap). The reduced
+                    // height passed to ColoringLayout keeps the rails fitting.
+                    isPhoneLandscapeThreeColumn && {
+                      paddingTop: Math.max(insets.top, 12) + 44,
+                    },
                   ]}
                 >
                   <ColoringLayout
                     width={deviceInfo.screenWidth}
                     height={deviceInfo.screenHeight}
+                    // iPhone-landscape reserves a top band for the back chip via
+                    // the block's paddingTop; tell ColoringLayout so the rails fit
+                    // the REDUCED height WITHOUT changing the tier (passing a
+                    // smaller height prop would drop it below the three-column
+                    // floor → middle tier, the bug).
+                    reservedTop={
+                      isPhoneLandscapeThreeColumn
+                        ? Math.max(insets.top, 12) + 44
+                        : 0
+                    }
                     onZoomIn={handleZoomIn}
                     onZoomOut={handleZoomOut}
                     onResetZoom={handleResetZoom}
@@ -813,6 +840,26 @@ const ColoringImage = () => {
             the rail's top-right corner is empty (zoom controls sit lower), so a
             plain corner X is clean on both iPad and phone. */}
         <FocusModeFloatingExit />
+
+        {/* Floating back chip — iPhone-landscape three-column only (non-focus).
+            Replaces the header band: a small white round chip top-left on the
+            cream bg, clear of the left rail (which starts below it). */}
+        {isPhoneLandscapeThreeColumn && !isFocusMode && (
+          <Pressable
+            style={({ pressed }) => [
+              styles.floatingBack,
+              {
+                top: Math.max(insets.top, 12),
+                left: Math.max(insets.left, 12),
+              },
+              pressed && styles.headerButtonPressed,
+            ]}
+            onPress={handleBack}
+            accessibilityLabel="Back"
+          >
+            <FontAwesomeIcon icon={faChevronLeft} size={18} color="#374151" />
+          </Pressable>
+        )}
       </LinearGradient>
     </View>
   );
@@ -852,6 +899,24 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
     shadowRadius: 2,
     elevation: 1,
+  },
+  // Floating back chip for iPhone-landscape three-column (no header band).
+  // Absolute, top-left on the cream bg — same white-round look as headerButton.
+  floatingBack: {
+    position: "absolute",
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "#FFFFFF",
+    borderWidth: 2,
+    borderColor: "#E8DFD6",
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.12,
+    shadowRadius: 8,
+    elevation: 6,
   },
   headerButtonCompact: {
     width: 36,

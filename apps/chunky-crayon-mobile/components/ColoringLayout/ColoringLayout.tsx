@@ -1,5 +1,6 @@
 import { ReactNode, useState } from "react";
 import { View, StyleSheet, type LayoutChangeEvent } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { COLORS } from "@/lib/design";
 import ColorPaletteSidebar from "@/components/ColorPaletteSidebar/ColorPaletteSidebar";
 import ToolsSidebar from "@/components/ToolsSidebar/ToolsSidebar";
@@ -43,6 +44,14 @@ type ColoringLayoutProps = {
    * before entering focus. Default false keeps the bar everywhere else.
    */
   hideTopBar?: boolean;
+  /**
+   * Vertical space reserved ABOVE this layout (e.g. iPhone-landscape's back-chip
+   * band, applied as the parent block's paddingTop). Subtracted from the rails'
+   * available height so they fit the real area — WITHOUT changing the tier
+   * (reducing the `height` prop itself would drop a short window below the
+   * three-column floor → middle tier).
+   */
+  reservedTop?: number;
 };
 
 /**
@@ -72,8 +81,20 @@ const ColoringLayout = ({
   onMyArtwork,
   scrollable = false,
   hideTopBar = false,
+  reservedTop = 0,
 }: ColoringLayoutProps) => {
   const tier = getColoringTier(width, height);
+  const insets = useSafeAreaInsets();
+
+  // Height the rails must fit into in the FIXED (landscape) tier: the layout
+  // height minus the top/bottom safe area and the rails' own column vertical
+  // padding (12+12). The rails resize their tiles/swatches to fit this (clamped
+  // to today's sizes as a CEIL, so a tall iPad window is a no-op). undefined in
+  // the scrollable (portrait/iPad-portrait) path → rails keep full content
+  // height + the outer page scroll, unchanged.
+  const railMaxHeight = scrollable
+    ? undefined
+    : Math.max(1, height - insets.top - insets.bottom - 24 - reservedTop);
 
   // Measured size of the FIXED-tier canvas slot (the View below the
   // CanvasTopBar). We MEASURE both axes via onLayout and fit the canvas inside
@@ -98,15 +119,29 @@ const ColoringLayout = ({
   const measured = fillBox.width > 0 && fillBox.height > 0;
 
   if (tier === "three-column") {
+    // Pass the REAL safe-area insets so the rail COLUMNS reserve the notch /
+    // Dynamic Island (canvas shrinks by the inset; rails keep their full card
+    // width). The rails must then NOT also subtract the inset in their own
+    // padding (they use a flat 8pt gutter) or it'd be double-counted and the
+    // card would be too narrow (the clipped 3rd tool column). iPad insets ≈ 0 →
+    // identical to before.
     const { leftWidth, rightWidth, canvasSize } = getLandscapeSidebarWidths(
       width,
       height,
-      0,
-      0,
+      insets.left,
+      insets.right,
+      // Same height the rails fit into — so the column split uses the SHRUNK
+      // card widths and the canvas reclaims the freed horizontal space.
+      railMaxHeight,
     );
     return (
       <View style={[styles.row, scrollable && styles.rowScrollable]}>
-        <ColorPaletteSidebar width={leftWidth} />
+        <ColorPaletteSidebar
+          width={leftWidth}
+          availableHeight={railMaxHeight}
+          // Reserve the notch on the left column so the card clears it.
+          edgeInset={insets.left}
+        />
         {/* Center column: progress bar + sound/music ABOVE the canvas
             (web's per-column placement), then the dominant canvas. */}
         <View style={styles.canvasCenter}>
@@ -130,6 +165,9 @@ const ColoringLayout = ({
         </View>
         <ToolsSidebar
           width={rightWidth}
+          availableHeight={railMaxHeight}
+          // Reserve the notch on the right column so the card clears it.
+          edgeInset={insets.right}
           // ToolsSidebar's `scrollable` prop means "render full content height,
           // no internal scroll cap" (the OUTER ScrollView handles it). In the
           // FIXED landscape tier there is no outer ScrollView, so we keep
