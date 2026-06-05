@@ -67,14 +67,27 @@ const StickerItem = ({ sticker, onPress }: StickerItemProps) => {
       onPress={onPress}
     >
       {/* Art fills the card and is CENTRED via contain + flex (web's flex-1
-          + object-contain). The previous fixed 56px box made the PNG read
-          off-centre. Locked = dimmed (RN has no CSS grayscale). */}
-      <Image
-        source={image}
-        style={[styles.stickerImage, !unlocked && styles.stickerImageLocked]}
-        contentFit="contain"
-        transition={150}
-      />
+          + object-contain). Locked stickers read as a GREY silhouette like
+          web (which uses CSS `grayscale`). RN/expo-image has no grayscale
+          filter, so we tint the art flat grey + blur it slightly — the
+          shape stays, the colour goes (matches web's grayscale + blur). */}
+      {unlocked ? (
+        <Image
+          source={image}
+          style={styles.stickerImage}
+          contentFit="contain"
+          transition={150}
+        />
+      ) : (
+        <Image
+          source={image}
+          style={[styles.stickerImage, styles.stickerImageLocked]}
+          contentFit="contain"
+          tintColor={COLORS.textMuted}
+          blurRadius={1}
+          transition={150}
+        />
+      )}
 
       {/* Name label under the sticker — always shown (web parity). */}
       <Text
@@ -460,9 +473,10 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   stickerImageLocked: {
-    // RN <Image> has no CSS grayscale; dim the art so locked reads as
-    // "not yet earned" like web's grayscale + opacity.
-    opacity: 0.28,
+    // tintColor (above) flattens the art to one grey, matching web's
+    // grayscale silhouette; opacity softens it to "not yet earned"
+    // (web pairs grayscale with opacity-30).
+    opacity: 0.45,
   },
   stickerName: {
     fontFamily: "TondoTrial-Bold",
