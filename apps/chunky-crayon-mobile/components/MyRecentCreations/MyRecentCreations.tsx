@@ -1,5 +1,7 @@
+import { useMemo } from "react";
 import { useRouter } from "expo-router";
 import useColoringImages from "@/hooks/api/useColoringImages";
+import { useFeed } from "@/hooks/api";
 import MyRecentCreationsView from "./MyRecentCreationsView";
 import type { MyRecentCreationsItem } from "./MyRecentCreationsView";
 
@@ -33,19 +35,31 @@ const MAX_ITEMS = 10;
 const MyRecentCreations = () => {
   const router = useRouter();
   const { data, isLoading } = useColoringImages();
+  // The kid's IN-PROGRESS coloured work — the same `feed.inProgressWork` source
+  // the My Art tab's "Keep Coloring" section renders. Each item carries a
+  // `previewUrl` snapshot of the page as coloured so far, so the strip shows the
+  // kid's progress instead of the blank line art. (My Art's SAVED archive is a
+  // different source; the strip mirrors the home feed's in-progress preview.)
+  const { data: feed } = useFeed();
 
-  // useColoringImages returns plain ColoringImage records (no
-  // user-progress preview). The smart wrapper just forwards
-  // `url` (line-art image) + `svgUrl` (line-art SVG fallback).
-  // FeedColoringImage's `previewUrl` (user's in-progress save) is a
-  // future enhancement when the recent-strip endpoint joins on
-  // SavedArtwork.previewUrl — same as web's
-  // getColoringImagesPaginated does server-side.
+  // coloringImageId → in-progress coloured preview snapshot.
+  const colouredByImageId = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const item of feed?.inProgressWork ?? []) {
+      if (item.previewUrl && !map.has(item.coloringImageId)) {
+        map.set(item.coloringImageId, item.previewUrl);
+      }
+    }
+    return map;
+  }, [feed?.inProgressWork]);
+
   const items: MyRecentCreationsItem[] = (data?.pages[0]?.coloringImages ?? [])
     .slice(0, MAX_ITEMS)
     .map((image) => ({
       id: image.id,
-      previewUrl: image.url ?? null,
+      // Prefer the kid's coloured save (shows their progress); fall back to the
+      // line-art raster, then the SVG, so a never-touched page still renders.
+      previewUrl: colouredByImageId.get(image.id) ?? image.url ?? null,
       svgUrl: image.svgUrl ?? null,
       title: image.title,
     }));
