@@ -18,6 +18,15 @@ coverage
 # Turbo
 .turbo
 
+# Editor / tooling config (machine-local, not shared)
+.vscode/
+.zed/
+.codex/
+.mcp.json
+
+# Expo dev cache (root-level; app-level .expo is ignored in app .gitignore)
+.expo/
+
 # Vercel
 .vercel
 
