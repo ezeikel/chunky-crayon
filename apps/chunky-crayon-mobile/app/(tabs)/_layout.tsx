@@ -2,6 +2,7 @@ import { useState } from "react";
 import { View, Pressable, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Tabs } from "expo-router";
+import { BlurView } from "expo-blur";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 // All-duotone icon family (smooth, not sharp) for a consistent, lively bar.
 import {
@@ -100,6 +101,20 @@ const CustomTabBar = ({ state, navigation, onCreatePress }: TabBarProps) => {
       pointerEvents="box-none"
     >
       <View style={styles.bar}>
+        {/* Frosted-glass background layer — its own rounded, clipped View so the
+            blur is masked to the pill's corners WITHOUT clipping the FAB cradle
+            that breaks the bar's top edge (which is why the blur can't live on
+            `bar` with overflow:hidden). A translucent-white wash sits over the
+            blur so the duotone icons stay crisp over busy artwork scrolling
+            behind. */}
+        <View style={styles.barBg} pointerEvents="none">
+          <BlurView
+            intensity={24}
+            tint="light"
+            style={StyleSheet.absoluteFill}
+          />
+          <View style={styles.barTint} />
+        </View>
         <View style={styles.side}>{LEFT_TABS.map(renderTab)}</View>
 
         {/* Centered Create FAB — raised above the bar in a white cradle
@@ -188,11 +203,13 @@ const styles = StyleSheet.create({
     paddingTop: 8,
     backgroundColor: "transparent",
   },
-  // The floating pill itself — rounded, white, soft shadow, no top border.
+  // The floating pill. Transparent itself (overflow stays visible so the FAB
+  // cradle can break the top edge); the frosted look is the barBg layer behind.
+  // Border + shadow draw the pill outline + lift.
   bar: {
     flexDirection: "row",
     alignItems: "flex-start",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "transparent",
     borderRadius: 28,
     paddingTop: 10,
     paddingBottom: 10,
@@ -204,6 +221,26 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 16,
     elevation: 8,
+  },
+  // Rounded, clipped background layer holding the blur + a translucent wash.
+  barBg: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    borderRadius: 28,
+    overflow: "hidden",
+  },
+  // Translucent-white wash over the blur — keeps icon contrast high while still
+  // letting a hint of the page show through the frosted glass.
+  barTint: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(255,255,255,0.72)",
   },
   // Each flanking group takes equal width and splits its two tabs
   // evenly, so the fixed-width center FAB slot lands dead-centre.
