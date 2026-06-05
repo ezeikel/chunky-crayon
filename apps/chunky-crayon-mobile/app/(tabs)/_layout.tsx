@@ -94,11 +94,15 @@ const CustomTabBar = ({ state, navigation }: TabBarProps) => {
         accessibilityState={{ selected: focused }}
         accessibilityLabel={t(item.labelKey)}
       >
-        <FontAwesomeIcon
-          icon={focused ? item.icon : item.iconLight}
-          size={22}
-          color={color}
-        />
+        {/* Active tab = a soft orange-tinted pill chip behind the icon so the
+            current tab reads as "lit up", not just a colour swap. */}
+        <View style={[styles.tabChip, focused && styles.tabChipActive]}>
+          <FontAwesomeIcon
+            icon={focused ? item.icon : item.iconLight}
+            size={22}
+            color={color}
+          />
+        </View>
         <Text style={[styles.tabLabel, { color }]} numberOfLines={1}>
           {t(item.labelKey)}
         </Text>
@@ -107,32 +111,43 @@ const CustomTabBar = ({ state, navigation }: TabBarProps) => {
   };
 
   return (
-    <View style={[styles.bar, { paddingBottom: insets.bottom || 10 }]}>
-      <View style={styles.side}>{LEFT_TABS.map(renderTab)}</View>
+    // Outer transparent wrapper: pads the floating pill in from the screen
+    // edges + lifts it above the home indicator so it reads as a hovering
+    // pill, not a docked bar.
+    <View
+      style={[styles.barWrap, { paddingBottom: Math.max(insets.bottom, 12) }]}
+      pointerEvents="box-none"
+    >
+      <View style={styles.bar}>
+        <View style={styles.side}>{LEFT_TABS.map(renderTab)}</View>
 
-      {/* Centered Create FAB — raised above the bar in a white cradle
+        {/* Centered Create FAB — raised above the bar in a white cradle
           ring so it reads as attached, not floating. Opens the modal. */}
-      <View style={styles.fabSlot}>
-        <View style={styles.fabCradle}>
-          <Pressable
-            style={({ pressed }) => [styles.fab, pressed && styles.fabPressed]}
-            onPress={() => {
-              tapMedium();
-              router.push("/create");
-            }}
-            accessibilityRole="button"
-            accessibilityLabel={tButton("createColoringPage")}
-          >
-            <FontAwesomeIcon
-              icon={faWandMagicSparkles}
-              size={26}
-              color="#FFFFFF"
-            />
-          </Pressable>
+        <View style={styles.fabSlot}>
+          <View style={styles.fabCradle}>
+            <Pressable
+              style={({ pressed }) => [
+                styles.fab,
+                pressed && styles.fabPressed,
+              ]}
+              onPress={() => {
+                tapMedium();
+                router.push("/create");
+              }}
+              accessibilityRole="button"
+              accessibilityLabel={tButton("createColoringPage")}
+            >
+              <FontAwesomeIcon
+                icon={faWandMagicSparkles}
+                size={26}
+                color="#FFFFFF"
+              />
+            </Pressable>
+          </View>
         </View>
-      </View>
 
-      <View style={styles.side}>{RIGHT_TABS.map(renderTab)}</View>
+        <View style={styles.side}>{RIGHT_TABS.map(renderTab)}</View>
+      </View>
     </View>
   );
 };
@@ -155,13 +170,28 @@ const FAB_SIZE = 58;
 const CRADLE = FAB_SIZE + 12;
 
 const styles = StyleSheet.create({
+  // Transparent wrapper pinned to the bottom; holds the floating pill clear of
+  // the screen edges + home indicator. Tinted gradient page bg shows through.
+  barWrap: {
+    paddingHorizontal: 16,
+    paddingTop: 8,
+  },
+  // The floating pill itself — rounded, white, soft shadow, no top border.
   bar: {
     flexDirection: "row",
     alignItems: "flex-start",
     backgroundColor: "#FFFFFF",
-    borderTopColor: "#F0E9DF",
-    borderTopWidth: 1,
-    paddingTop: 8,
+    borderRadius: 28,
+    paddingTop: 10,
+    paddingBottom: 10,
+    paddingHorizontal: 4,
+    borderWidth: 1,
+    borderColor: COLORS.bgCreamDark,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.1,
+    shadowRadius: 16,
+    elevation: 8,
   },
   // Each flanking group takes equal width and splits its two tabs
   // evenly, so the fixed-width center FAB slot lands dead-centre.
@@ -174,7 +204,18 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "flex-start",
     gap: 3,
-    paddingTop: 2,
+  },
+  // Icon sits in a rounded chip; the active chip gets an orange tint so the
+  // current tab reads as "lit", not just a colour change.
+  tabChip: {
+    width: 48,
+    height: 32,
+    borderRadius: 16,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  tabChipActive: {
+    backgroundColor: "rgba(228, 100, 68, 0.12)",
   },
   tabLabel: {
     fontFamily: FONTS.regular,

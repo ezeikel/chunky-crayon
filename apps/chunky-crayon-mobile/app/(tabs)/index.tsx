@@ -191,11 +191,11 @@ const HomeScreen = () => {
             ]}
             onPress={() => router.push("/challenges")}
           >
-            <View style={styles.challengeIcon}>
+            <View style={[styles.challengeIcon, styles.challengeIconGold]}>
               <FontAwesomeIcon
                 icon={faTrophy}
-                size={22}
-                color="#E46444"
+                size={30}
+                color="#F59E0B"
                 secondaryColor="#FDD835"
                 secondaryOpacity={1}
               />
@@ -208,7 +208,11 @@ const HomeScreen = () => {
                 {t("challenges.homeCardSubtitle")}
               </Text>
             </View>
-            <FontAwesomeIcon icon={faChevronRight} size={16} color="#9CA3AF" />
+            <FontAwesomeIcon
+              icon={faChevronRight}
+              size={16}
+              color={COLORS.crayonOrange}
+            />
           </Pressable>
 
           {/* My Characters card — Characters surface lives off Home (not a
@@ -225,11 +229,11 @@ const HomeScreen = () => {
             ]}
             onPress={() => router.push("/characters")}
           >
-            <View style={styles.challengeIcon}>
+            <View style={[styles.challengeIcon, styles.challengeIconPurple]}>
               <FontAwesomeIcon
                 icon={faUserAstronaut}
-                size={22}
-                color="#E46444"
+                size={30}
+                color="#A65979"
                 secondaryColor="#C18B9D"
                 secondaryOpacity={1}
               />
@@ -242,7 +246,11 @@ const HomeScreen = () => {
                 {t("characters.homeCardSubtitle")}
               </Text>
             </View>
-            <FontAwesomeIcon icon={faChevronRight} size={16} color="#9CA3AF" />
+            <FontAwesomeIcon
+              icon={faChevronRight}
+              size={16}
+              color={COLORS.lavender}
+            />
           </Pressable>
         </ScrollView>
       </LinearGradient>
@@ -283,37 +291,46 @@ const styles = StyleSheet.create({
   challengeCard: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 14,
+    gap: 16,
     marginTop: 20,
     backgroundColor: "#FFFFFF",
-    borderRadius: 20,
+    borderRadius: 24,
     paddingVertical: 16,
-    paddingHorizontal: 18,
+    paddingHorizontal: 16,
+    borderWidth: 1,
+    borderColor: COLORS.bgCreamDark,
     shadowColor: "#E46444",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 3,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 4,
   },
   challengeCardPressed: {
     opacity: 0.9,
-    transform: [{ scale: 0.99 }],
+    transform: [{ scale: 0.98 }],
   },
+  // Bigger, bolder icon medallion. Per-card tint (gold / purple) makes each
+  // section pop instead of every row sharing one pale orange circle.
   challengeIcon: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: "rgba(228, 100, 68, 0.1)",
+    width: 56,
+    height: 56,
+    borderRadius: 18,
     alignItems: "center",
     justifyContent: "center",
+  },
+  challengeIconGold: {
+    backgroundColor: "rgba(245, 158, 11, 0.14)",
+  },
+  challengeIconPurple: {
+    backgroundColor: "rgba(193, 139, 157, 0.18)",
   },
   challengeText: {
     flex: 1,
   },
   challengeTitle: {
     fontFamily: "TondoTrial-Bold",
-    fontSize: 17,
-    color: "#374151",
+    fontSize: 18,
+    color: COLORS.textPrimary,
   },
   challengeSubtitle: {
     fontFamily: "TondoTrial-Regular",
