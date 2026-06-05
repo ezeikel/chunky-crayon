@@ -4,12 +4,12 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  ActivityIndicator,
   Modal,
   Pressable,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
+import Spinner from "@/components/Spinner/Spinner";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faXmark } from "@fortawesome/pro-solid-svg-icons";
 import { faUserAstronaut } from "@fortawesome/pro-duotone-svg-icons";
@@ -94,7 +94,7 @@ const CharactersScreen = () => {
       <LinearGradient colors={["#FDFAF5", "#F5EEE5"]} style={styles.gradient}>
         {isLoading ? (
           <View style={styles.center}>
-            <ActivityIndicator size="large" color={COLORS.crayonOrange} />
+            <Spinner size={40} />
             <Text style={styles.muted}>{t("loading")}</Text>
           </View>
         ) : characters.length === 0 ? (

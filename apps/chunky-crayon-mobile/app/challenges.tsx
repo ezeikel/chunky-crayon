@@ -1,11 +1,5 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  Pressable,
-  ActivityIndicator,
-} from "react-native";
+import { View, Text, StyleSheet, ScrollView, Pressable } from "react-native";
+import Spinner from "@/components/Spinner/Spinner";
 import { toast } from "@/components/Toaster";
 import { LinearGradient } from "expo-linear-gradient";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
@@ -94,7 +88,7 @@ const WeeklyChallengeCard = ({
           disabled={isClaimingReward}
         >
           {isClaimingReward ? (
-            <ActivityIndicator size="small" color="#FFFFFF" />
+            <Spinner size={18} color="#FFFFFF" />
           ) : (
             <>
               <FontAwesomeIcon icon={faGift} size={18} color="#FFFFFF" />
@@ -280,7 +274,7 @@ const ChallengesScreen = () => {
 
           {isLoading ? (
             <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color="#E46444" />
+              <Spinner size={40} />
             </View>
           ) : (
             <>

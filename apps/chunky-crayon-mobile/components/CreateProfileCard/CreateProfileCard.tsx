@@ -1,12 +1,6 @@
 import { useState } from "react";
-import {
-  View,
-  Text,
-  Pressable,
-  TextInput,
-  StyleSheet,
-  ActivityIndicator,
-} from "react-native";
+import { View, Text, Pressable, TextInput, StyleSheet } from "react-native";
+import Spinner from "@/components/Spinner/Spinner";
 import ProfileAvatar from "@/components/ProfileAvatar";
 import AvatarPicker from "@/components/AvatarPicker";
 import { DEFAULT_AVATAR_ID } from "@/lib/avatars";
@@ -94,7 +88,7 @@ const CreateProfileCard = ({
           disabled={!canSubmit}
         >
           {isSubmitting ? (
-            <ActivityIndicator size="small" color="#FFFFFF" />
+            <Spinner size={18} color="#FFFFFF" />
           ) : (
             <Text style={styles.submitText}>Create</Text>
           )}

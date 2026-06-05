@@ -1,14 +1,8 @@
 import { useMemo, useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  Pressable,
-  ActivityIndicator,
-} from "react-native";
+import { View, Text, StyleSheet, ScrollView, Pressable } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Image } from "expo-image";
+import Spinner from "@/components/Spinner/Spinner";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faStar, faLock, faCheck } from "@fortawesome/pro-solid-svg-icons";
 import AppHeader from "@/components/AppHeader";
@@ -174,7 +168,7 @@ const StickersScreen = () => {
 
           {isLoading ? (
             <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color="#E46444" />
+              <Spinner size={40} />
               <Text style={styles.loadingText}>{t("loading")}</Text>
             </View>
           ) : (

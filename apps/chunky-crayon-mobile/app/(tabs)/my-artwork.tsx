@@ -4,11 +4,11 @@ import {
   StyleSheet,
   ScrollView,
   Pressable,
-  ActivityIndicator,
   useWindowDimensions,
 } from "react-native";
 import { Image } from "expo-image";
 import SafeSvgUri from "@/components/SafeSvgUri/SafeSvgUri";
+import Spinner from "@/components/Spinner/Spinner";
 import { LinearGradient } from "expo-linear-gradient";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faHeart, faPalette } from "@fortawesome/pro-solid-svg-icons";
@@ -66,7 +66,7 @@ const MyArtworkScreen = () => {
 
   const renderLoading = () => (
     <View style={styles.loadingContainer}>
-      <ActivityIndicator size="large" color="#E46444" />
+      <Spinner size={40} />
       <Text style={styles.loadingText}>{t("loading")}</Text>
     </View>
   );

@@ -10,9 +10,9 @@ import {
   Platform,
   Switch,
   TextInput,
-  ActivityIndicator,
   Modal,
 } from "react-native";
+import Spinner from "@/components/Spinner/Spinner";
 import { toast } from "@/components/Toaster";
 import ConfirmSheet from "@/components/ConfirmSheet";
 import { LinearGradient } from "expo-linear-gradient";
@@ -621,7 +621,7 @@ const SettingsScreen = () => {
                   disabled={signInLoading}
                 >
                   {signInLoading ? (
-                    <ActivityIndicator color="#FFFFFF" />
+                    <Spinner size={20} color="#FFFFFF" />
                   ) : (
                     <Text style={styles.magicLinkButtonText}>
                       Send Magic Link

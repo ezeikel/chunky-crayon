@@ -5,10 +5,10 @@ import {
   StyleSheet,
   Pressable,
   TextInput,
-  ActivityIndicator,
   ScrollView,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Spinner from "@/components/Spinner/Spinner";
 import { toast } from "@/components/Toaster";
 import ConfirmSheet from "@/components/ConfirmSheet";
 import { ModalBottomSheet } from "@swmansion/react-native-bottom-sheet";
@@ -177,7 +177,7 @@ const ProfileSwitcher = ({ isOpen, onClose }: ProfileSwitcherProps) => {
           >
             {profilesLoading ? (
               <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color="#E46444" />
+                <Spinner size={40} />
               </View>
             ) : (
               <>
@@ -202,7 +202,7 @@ const ProfileSwitcher = ({ isOpen, onClose }: ProfileSwitcherProps) => {
                           disabled={updateProfileMutation.isPending}
                         >
                           {updateProfileMutation.isPending ? (
-                            <ActivityIndicator size="small" color="#22C55E" />
+                            <Spinner size={18} color="#22C55E" />
                           ) : (
                             <FontAwesomeIcon
                               icon={faCheck}
@@ -276,10 +276,7 @@ const ProfileSwitcher = ({ isOpen, onClose }: ProfileSwitcherProps) => {
                                 disabled={deleteProfileMutation.isPending}
                               >
                                 {deleteProfileMutation.isPending ? (
-                                  <ActivityIndicator
-                                    size="small"
-                                    color="#EF4444"
-                                  />
+                                  <Spinner size={18} color="#EF4444" />
                                 ) : (
                                   <FontAwesomeIcon
                                     icon={faTrash}
