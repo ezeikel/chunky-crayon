@@ -55,7 +55,9 @@ const WeeklyChallengeCard = ({
       </View>
 
       <View style={styles.weeklyContent}>
-        <Text style={styles.weeklyIcon}>{def.icon}</Text>
+        <View style={styles.glyphMedallion}>
+          <Text style={styles.weeklyIcon}>{def.icon}</Text>
+        </View>
         <View style={styles.weeklyInfo}>
           <Text style={styles.weeklyTitle}>{def.title}</Text>
           <Text style={styles.weeklyDescription}>{def.description}</Text>
@@ -119,7 +121,9 @@ const PastChallengeCard = ({ challenge }: PastChallengeCardProps) => {
 
   return (
     <View style={[styles.pastCard, !isCompleted && styles.pastCardIncomplete]}>
-      <Text style={styles.pastIcon}>{def.icon}</Text>
+      <View style={styles.glyphMedallionSmall}>
+        <Text style={styles.pastIcon}>{def.icon}</Text>
+      </View>
       <View style={styles.pastInfo}>
         <Text style={styles.pastTitle}>{def.title}</Text>
         <Text style={styles.pastStatus}>
@@ -158,11 +162,18 @@ const AchievementCard = ({
   <View
     style={[styles.achievementCard, isLocked && styles.achievementCardLocked]}
   >
-    <View style={styles.achievementIconContainer}>
+    <View
+      style={[
+        styles.achievementIconContainer,
+        isLocked && styles.achievementIconLocked,
+      ]}
+    >
       <FontAwesomeIcon
         icon={isLocked ? faLock : faStar}
         size={20}
-        color={isLocked ? "#9CA3AF" : "#F59E0B"}
+        color={isLocked ? COLORS.textMuted : "#F59E0B"}
+        secondaryColor={isLocked ? COLORS.bgCreamDark : "#FDD835"}
+        secondaryOpacity={1}
       />
     </View>
     <View style={styles.achievementContent}>
@@ -415,7 +426,7 @@ const styles = StyleSheet.create({
   daysRemainingText: {
     fontFamily: "TondoTrial-Regular",
     fontSize: 12,
-    color: "#9CA3AF",
+    color: COLORS.textMuted,
   },
   weeklyContent: {
     flexDirection: "row",
@@ -423,8 +434,27 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   weeklyIcon: {
-    fontSize: 48,
+    fontSize: 32,
+  },
+  // Tinted squircle framing the challenge emoji glyph (so it's not floating
+  // text), matching the section-badge medallion language.
+  glyphMedallion: {
+    width: 56,
+    height: 56,
+    borderRadius: 18,
+    backgroundColor: "rgba(245,158,11,0.14)",
+    alignItems: "center",
+    justifyContent: "center",
     marginRight: 16,
+  },
+  glyphMedallionSmall: {
+    width: 44,
+    height: 44,
+    borderRadius: 14,
+    backgroundColor: "rgba(245,158,11,0.14)",
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 12,
   },
   weeklyInfo: {
     flex: 1,
@@ -432,13 +462,13 @@ const styles = StyleSheet.create({
   weeklyTitle: {
     fontFamily: "TondoTrial-Bold",
     fontSize: 20,
-    color: "#374151",
+    color: COLORS.textPrimary,
     marginBottom: 4,
   },
   weeklyDescription: {
     fontFamily: "TondoTrial-Regular",
     fontSize: 14,
-    color: "#6B7280",
+    color: COLORS.textSecondary,
   },
   weeklyProgress: {
     flexDirection: "row",
@@ -449,7 +479,7 @@ const styles = StyleSheet.create({
   progressBarLarge: {
     flex: 1,
     height: 10,
-    backgroundColor: "#E5E7EB",
+    backgroundColor: COLORS.bgCreamDark,
     borderRadius: 5,
     overflow: "hidden",
   },
@@ -464,7 +494,7 @@ const styles = StyleSheet.create({
   progressTextLarge: {
     fontFamily: "TondoTrial-Bold",
     fontSize: 14,
-    color: "#374151",
+    color: COLORS.textPrimary,
     minWidth: 40,
     textAlign: "right",
   },
@@ -554,8 +584,7 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   pastIcon: {
-    fontSize: 24,
-    marginRight: 12,
+    fontSize: 22,
   },
   pastInfo: {
     flex: 1,
@@ -563,12 +592,12 @@ const styles = StyleSheet.create({
   pastTitle: {
     fontFamily: "TondoTrial-Bold",
     fontSize: 14,
-    color: "#374151",
+    color: COLORS.textPrimary,
   },
   pastStatus: {
     fontFamily: "TondoTrial-Regular",
     fontSize: 12,
-    color: "#9CA3AF",
+    color: COLORS.textMuted,
   },
   pastCheck: {
     width: 28,
@@ -600,11 +629,14 @@ const styles = StyleSheet.create({
   achievementIconContainer: {
     width: 40,
     height: 40,
-    borderRadius: 10,
-    backgroundColor: "#FEF3C7",
+    borderRadius: 14,
+    backgroundColor: "rgba(245,158,11,0.14)",
     alignItems: "center",
     justifyContent: "center",
     marginRight: 12,
+  },
+  achievementIconLocked: {
+    backgroundColor: COLORS.bgCreamDark,
   },
   achievementContent: {
     flex: 1,
@@ -612,17 +644,17 @@ const styles = StyleSheet.create({
   achievementTitle: {
     fontFamily: "TondoTrial-Bold",
     fontSize: 15,
-    color: "#374151",
+    color: COLORS.textPrimary,
     marginBottom: 2,
   },
   achievementDescription: {
     fontFamily: "TondoTrial-Regular",
     fontSize: 13,
-    color: "#6B7280",
+    color: COLORS.textSecondary,
     marginBottom: 6,
   },
   textLocked: {
-    color: "#9CA3AF",
+    color: COLORS.textMuted,
   },
   achievementProgress: {
     flexDirection: "row",
@@ -632,7 +664,7 @@ const styles = StyleSheet.create({
   progressBarSmall: {
     flex: 1,
     height: 5,
-    backgroundColor: "#E5E7EB",
+    backgroundColor: COLORS.bgCreamDark,
     borderRadius: 2.5,
     overflow: "hidden",
   },

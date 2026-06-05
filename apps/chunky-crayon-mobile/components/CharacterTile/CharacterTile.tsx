@@ -113,11 +113,9 @@ const CharacterTile = ({ character, onPress, onRetry }: Props) => {
           <Animated.View style={[styles.pill, styles.pillDrawing, pulseStyle]}>
             <Text style={styles.pillTextDark}>{t("drawingBadge")}</Text>
           </Animated.View>
-        ) : isFailed ? (
-          <View style={[styles.pill, styles.pillRetry]}>
-            <Text style={styles.pillTextLight}>{t("retryBadge")}</Text>
-          </View>
-        ) : (
+        ) : isFailed ? // No RETRY pill — the rotate icon + "Tap to try again" in the card
+        // already say it, and the whole card is the retry tap target.
+        null : (
           <Text style={styles.species} numberOfLines={1}>
             {species}
           </Text>
@@ -127,7 +125,9 @@ const CharacterTile = ({ character, onPress, onRetry }: Props) => {
   );
 };
 
-/** The "add a new character" tile — sits at the end of the grid. */
+/** The "add a new character" tile — sits at the end of the grid. Fills the
+ *  cell (flex:1) so the dashed card has no empty strip, and reads as a friendly
+ *  invite: a chunky filled-orange + button in a soft circle + playful label. */
 export const AddCharacterTile = ({ onPress }: { onPress: () => void }) => {
   const t = useT("mobile.characters");
   return (
@@ -141,15 +141,11 @@ export const AddCharacterTile = ({ onPress }: { onPress: () => void }) => {
         pressed && styles.cardPressed,
       ]}
     >
-      <View style={styles.portraitArea}>
-        <FontAwesomeIcon
-          icon={faPlus}
-          size={44}
-          color={COLORS.crayonOrange}
-          secondaryColor={COLORS.secondaryOrange}
-          secondaryOpacity={1}
-        />
-        <Text style={styles.statusText}>{t("addCharacter")}</Text>
+      <View style={styles.addInner}>
+        <View style={styles.addPlusCircle}>
+          <FontAwesomeIcon icon={faPlus} size={34} color={COLORS.white} />
+        </View>
+        <Text style={styles.addLabel}>{t("addCharacter")}</Text>
       </View>
     </Pressable>
   );
@@ -175,6 +171,34 @@ const styles = StyleSheet.create({
     borderStyle: "dashed",
     borderColor: COLORS.crayonOrangeLight,
     backgroundColor: COLORS.bgCream,
+  },
+  // Fills the whole cell so the dashed card has no empty strip below.
+  addInner: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 12,
+    padding: 12,
+  },
+  // Chunky filled-orange + button — reads as an inviting "make one!" action.
+  addPlusCircle: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: COLORS.crayonOrange,
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: COLORS.crayonOrange,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.35,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  addLabel: {
+    fontFamily: FONTS.bold,
+    fontSize: 15,
+    color: COLORS.crayonOrange,
+    textAlign: "center",
   },
   cardPressed: {
     opacity: 0.9,
@@ -228,19 +252,10 @@ const styles = StyleSheet.create({
   pillDrawing: {
     backgroundColor: COLORS.yellow,
   },
-  pillRetry: {
-    backgroundColor: COLORS.crayonOrange,
-  },
   pillTextDark: {
     fontFamily: FONTS.bold,
     fontSize: 11,
     color: "#374151",
-    textTransform: "uppercase",
-  },
-  pillTextLight: {
-    fontFamily: FONTS.bold,
-    fontSize: 11,
-    color: COLORS.white,
     textTransform: "uppercase",
   },
 });
