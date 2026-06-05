@@ -9,6 +9,7 @@ import {
   faLock,
   faPartyHorn,
 } from "@fortawesome/pro-duotone-svg-icons";
+import LockedStickerArt from "@/components/LockedStickerArt";
 import { useT } from "@/lib/i18n/useT";
 import { COLORS, CRAYON, FONTS } from "@/lib/design";
 import { STICKER_IMAGES } from "@/lib/stickers";
@@ -86,23 +87,29 @@ const StickerDetailSheet = ({
                 {isUnlocked ? sticker.name : t("lockedTitle")}
               </Text>
 
-              {/* Big sticker — real bundled PNG (web parity), dimmed + lock
-                  badge when locked. */}
+              {/* Big sticker — real bundled PNG (web parity). Locked = a TRUE
+                  grayscale ghost via the shared LockedStickerArt (Skia
+                  ColorMatrix), same treatment as the grid so the two never
+                  drift. Unlocked = full-colour expo-image. */}
               <View
                 style={[
                   styles.bigTile,
                   isUnlocked ? styles.bigTileUnlocked : styles.bigTileLocked,
                 ]}
               >
-                <Image
-                  source={STICKER_IMAGES[sticker.id]}
-                  style={[
-                    styles.bigImage,
-                    !isUnlocked && styles.bigImageLocked,
-                  ]}
-                  contentFit="contain"
-                  transition={200}
-                />
+                {isUnlocked ? (
+                  <Image
+                    source={STICKER_IMAGES[sticker.id]}
+                    style={styles.bigImage}
+                    contentFit="contain"
+                    transition={200}
+                  />
+                ) : (
+                  <LockedStickerArt
+                    source={STICKER_IMAGES[sticker.id]}
+                    size={104}
+                  />
+                )}
                 {!isUnlocked && (
                   <View style={styles.lockBadge}>
                     <FontAwesomeIcon
@@ -227,14 +234,13 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.bgCream,
   },
   bigTileLocked: {
-    backgroundColor: "#F3F4F6",
+    // Warm cream (matches the grid's locked tile) — not a cool grey, which
+    // clashed with the app's warm palette.
+    backgroundColor: COLORS.bgCream,
   },
   bigImage: {
     width: 104,
     height: 104,
-  },
-  bigImageLocked: {
-    opacity: 0.3,
   },
   lockBadge: {
     position: "absolute",

@@ -1,24 +1,9 @@
 import { useMemo, useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  Pressable,
-  Image as RNImage,
-  type ImageSourcePropType,
-  type LayoutChangeEvent,
-} from "react-native";
+import { View, Text, StyleSheet, ScrollView, Pressable } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Image } from "expo-image";
-import {
-  Canvas,
-  Image as SkiaImage,
-  ColorMatrix,
-  Blur,
-  useImage,
-} from "@shopify/react-native-skia";
 import Spinner from "@/components/Spinner/Spinner";
+import LockedStickerArt from "@/components/LockedStickerArt";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faStar, faCheck } from "@fortawesome/pro-solid-svg-icons";
 import { faLock, faMedal, faPaw } from "@fortawesome/pro-duotone-svg-icons";
@@ -62,65 +47,6 @@ const RARITY_BORDER: Record<string, string> = {
   legendary: "#F59E0B",
 };
 
-// Rec.601 luminance grayscale matrix — every output RGB channel becomes the
-// weighted luminance of the input, so a dark crayon outline maps to dark grey
-// and a light fill to light grey (TRUE tonal grayscale, like web's CSS
-// `grayscale`). Alpha is passed through (last row), so transparent PNG corners
-// stay transparent. A flat `tintColor` cannot do this — it collapses every
-// pixel to one colour, which is why the old locked look was a featureless blob.
-const GRAYSCALE_MATRIX = [
-  0.2126, 0.7152, 0.0722, 0, 0, 0.2126, 0.7152, 0.0722, 0, 0, 0.2126, 0.7152,
-  0.0722, 0, 0, 0, 0, 0, 1, 0,
-];
-
-/**
- * Locked sticker art rendered as a true grayscale ghost (web parity:
- * `grayscale opacity-30 blur-[0.5px]`). expo-image has no grayscale filter, so
- * this draws the bundled PNG through a Skia ColorMatrix.
- *
- * - Loaded via useImage(resolveAssetSource(uri)) — `useImage(<require number>)`
- *   is unreliable for Skia (see ImageCanvas.tsx L259-262); resolveAssetSource
- *   gives the Metro http URI in dev + the asset:// URI in release.
- * - The Skia <Image> needs concrete numeric w/h (it can't size by flex/%), so
- *   we measure the cell with onLayout and only mount the Canvas once we have a
- *   non-zero size — this also sidesteps the 0-dim-canvas crash class entirely.
- * - Until the image decodes (or before first layout) we render a blank sized
- *   View — never the emoji/colour art, so there is no flash.
- */
-const LockedStickerArt = ({ source }: { source: ImageSourcePropType }) => {
-  const [size, setSize] = useState(0);
-  const uri = RNImage.resolveAssetSource(source)?.uri ?? null;
-  const img = useImage(uri);
-
-  const onLayout = (e: LayoutChangeEvent) => {
-    const { width, height } = e.nativeEvent.layout;
-    const next = Math.floor(Math.min(width, height));
-    if (next > 0 && next !== size) setSize(next);
-  };
-
-  return (
-    <View style={styles.stickerImage} onLayout={onLayout}>
-      {img && size > 0 ? (
-        // opacity-30 lives on the Canvas (web's opacity-30); the grayscale +
-        // blur live on the image's paint.
-        <Canvas style={{ width: size, height: size, opacity: 0.4 }}>
-          <SkiaImage
-            image={img}
-            x={0}
-            y={0}
-            width={size}
-            height={size}
-            fit="contain"
-          >
-            <ColorMatrix matrix={GRAYSCALE_MATRIX} />
-            <Blur blur={0.6} />
-          </SkiaImage>
-        </Canvas>
-      ) : null}
-    </View>
-  );
-};
-
 const StickerItem = ({ sticker, onPress }: StickerItemProps) => {
   const image = STICKER_IMAGES[sticker.id];
   const unlocked = sticker.isUnlocked;
@@ -155,7 +81,7 @@ const StickerItem = ({ sticker, onPress }: StickerItemProps) => {
           transition={150}
         />
       ) : (
-        <LockedStickerArt source={image} />
+        <LockedStickerArt source={image} style={styles.stickerImage} />
       )}
 
       {/* Name label under the sticker — always shown (web parity). */}
