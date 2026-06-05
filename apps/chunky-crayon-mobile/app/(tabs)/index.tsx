@@ -11,8 +11,6 @@ import { router } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import {
-  faWandMagicSparkles,
-  faClock,
   faSparkles,
   faTrophy,
   faChevronRight,
@@ -154,7 +152,11 @@ const HomeScreen = () => {
             )}
           </View>
 
-          {/* Create Magic Card */}
+          {/* Create form card — matches web's CreateColoringPageForm card
+              exactly: white, rounded, 2px cream-dark border, soft shadow, and
+              ONLY the form inside (no in-card heading / subtitle / ready pill /
+              decorative blobs). The "What do you want to color today?" greeting
+              + Colo mascot above this card are web's page header. */}
           <View
             style={[
               styles.card,
@@ -162,49 +164,10 @@ const HomeScreen = () => {
                 width: screenWidth - padding * 2,
                 alignSelf: "center",
                 marginTop: 24,
-                gap: 20,
               },
             ]}
           >
-            {/* Decorative blur circles */}
-            <View style={styles.topRightBlur} />
-            <View style={styles.bottomLeftBlur} />
-
-            {/* Header with icon */}
-            <View className="items-center z-10">
-              <View className="flex-row items-center justify-center gap-2 mb-3">
-                <FontAwesomeIcon
-                  icon={faWandMagicSparkles}
-                  size={24}
-                  color="#E46444"
-                  secondaryColor="#F1AE7E"
-                  secondaryOpacity={1}
-                />
-                <Text style={styles.headerTitle}>Create Magic!</Text>
-              </View>
-              <Text style={styles.headerSubtitle}>
-                Type, talk, or snap a photo!
-              </Text>
-            </View>
-
-            {/* Time notice */}
-            <View style={styles.timeNotice}>
-              <FontAwesomeIcon
-                icon={faClock}
-                size={14}
-                color="#E46444"
-                secondaryColor="#F1AE7E"
-                secondaryOpacity={1}
-              />
-              <Text style={styles.timeNoticeText}>
-                Ready in about 30 seconds
-              </Text>
-            </View>
-
-            {/* Form */}
-            <View style={styles.zIndex}>
-              <CreateColoringImageForm />
-            </View>
+            <CreateColoringImageForm />
           </View>
 
           {/* Recent creations strip — kid's active workbench.
@@ -390,67 +353,21 @@ const styles = StyleSheet.create({
     fontFamily: "TondoTrial-Regular",
     flexShrink: 1,
   },
+  // Matches web's CreateColoringPageForm card:
+  //   bg-white rounded-2xl shadow-card border-2 border-paper-cream-dark p-6
+  // shadow-card = a soft crayon-orange shadow at low opacity (web uses 0.08),
+  // border = paper-cream-dark (#F4EEE6 = COLORS.bgCreamDark).
   card: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.white,
     borderRadius: 16,
     padding: 24,
     borderWidth: 2,
-    borderColor: "#FFF5EB",
+    borderColor: COLORS.bgCreamDark,
     shadowColor: "#E46444",
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 16,
-    elevation: 6,
-    overflow: "hidden",
-  },
-  topRightBlur: {
-    position: "absolute",
-    top: -48,
-    right: -48,
-    width: 96,
-    height: 96,
-    backgroundColor: "rgba(255, 138, 101, 0.15)",
-    borderRadius: 48,
-  },
-  bottomLeftBlur: {
-    position: "absolute",
-    bottom: -32,
-    left: -32,
-    width: 80,
-    height: 80,
-    backgroundColor: "rgba(20, 184, 166, 0.15)",
-    borderRadius: 40,
-  },
-  zIndex: {
-    zIndex: 10,
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontFamily: "TondoTrial-Bold",
-    color: "#E46444",
-  },
-  headerSubtitle: {
-    fontSize: 16,
-    fontFamily: "TondoTrial-Regular",
-    color: "#374151",
-    textAlign: "center",
-    lineHeight: 22,
-  },
-  timeNotice: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    backgroundColor: "rgba(251, 191, 36, 0.2)",
-    borderRadius: 12,
-    zIndex: 10,
-  },
-  timeNoticeText: {
-    fontSize: 14,
-    fontFamily: "TondoTrial-Regular",
-    color: "#6B7280",
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 3,
   },
 });
 

@@ -48,7 +48,11 @@ const CreateModal = () => {
           ]}
           showsVerticalScrollIndicator={false}
         >
-          <CreateColoringImageForm />
+          {/* Same bordered white card as web's CreateColoringPageForm (and the
+              Home tab's inline create card) so both create surfaces match. */}
+          <View style={styles.card}>
+            <CreateColoringImageForm />
+          </View>
         </ScrollView>
       </LinearGradient>
     </View>
@@ -87,6 +91,20 @@ const styles = StyleSheet.create({
   },
   content: {
     paddingHorizontal: 16,
+  },
+  // Matches web's CreateColoringPageForm card + the Home tab's create card:
+  // bg-white rounded-2xl shadow-card border-2 border-paper-cream-dark p-6.
+  card: {
+    backgroundColor: COLORS.white,
+    borderRadius: 16,
+    padding: 24,
+    borderWidth: 2,
+    borderColor: COLORS.bgCreamDark,
+    shadowColor: "#E46444",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 3,
   },
 });
 
