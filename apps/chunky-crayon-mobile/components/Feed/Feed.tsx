@@ -166,25 +166,66 @@ const InProgressCard = memo(
 
 InProgressCard.displayName = "InProgressCard";
 
-// Section header component
+// Per-section icon medallion tints (matches the Stickers screen treatment:
+// a coloured icon in a soft tinted squircle so each section pops for kids).
+type SectionTint = "orange" | "gold" | "purple" | "teal" | "pink";
+const SECTION_TINTS: Record<
+  SectionTint,
+  { bg: string; primary: string; secondary: string }
+> = {
+  orange: {
+    bg: "rgba(228,100,68,0.12)",
+    primary: "#E46444",
+    secondary: "#F1AE7E",
+  },
+  gold: {
+    bg: "rgba(245,158,11,0.14)",
+    primary: "#F59E0B",
+    secondary: "#FDD835",
+  },
+  purple: {
+    bg: "rgba(193,139,157,0.18)",
+    primary: "#A65979",
+    secondary: "#C18B9D",
+  },
+  teal: {
+    bg: "rgba(127,176,105,0.16)",
+    primary: "#5E9C6E",
+    secondary: "#A8D08D",
+  },
+  pink: {
+    bg: "rgba(228,100,68,0.10)",
+    primary: "#E46444",
+    secondary: "#F2A18C",
+  },
+};
+
+// Section header — coloured icon medallion + bold title (Stickers-style).
 const SectionHeader = ({
   title,
   icon,
+  tint = "orange",
 }: {
   title: string;
   icon: IconDefinition;
-}) => (
-  <View style={styles.sectionHeader}>
-    <FontAwesomeIcon
-      icon={icon}
-      size={20}
-      color={COLORS.crayonOrange}
-      secondaryColor={COLORS.secondaryOrange}
-      secondaryOpacity={1}
-    />
-    <Text style={styles.sectionTitle}>{title}</Text>
-  </View>
-);
+  tint?: SectionTint;
+}) => {
+  const t = SECTION_TINTS[tint];
+  return (
+    <View style={styles.sectionHeader}>
+      <View style={[styles.sectionBadge, { backgroundColor: t.bg }]}>
+        <FontAwesomeIcon
+          icon={icon}
+          size={18}
+          color={t.primary}
+          secondaryColor={t.secondary}
+          secondaryOpacity={1}
+        />
+      </View>
+      <Text style={styles.sectionTitle}>{title}</Text>
+    </View>
+  );
+};
 
 // Horizontal scrolling section for coloring images
 const HorizontalSection = ({
@@ -192,11 +233,13 @@ const HorizontalSection = ({
   icon,
   items,
   cardSize,
+  tint,
 }: {
   title: string;
   icon: IconDefinition;
   items: FeedColoringImage[];
   cardSize: number;
+  tint?: SectionTint;
 }) => {
   const router = useRouter();
 
@@ -217,7 +260,7 @@ const HorizontalSection = ({
 
   return (
     <View style={styles.section}>
-      <SectionHeader title={title} icon={icon} />
+      <SectionHeader title={title} icon={icon} tint={tint} />
       <View style={{ height: cardSize, width: "100%" }}>
         <FlatList
           data={items}
@@ -261,7 +304,11 @@ const InProgressSection = ({
 
   return (
     <View style={styles.section}>
-      <SectionHeader title="Continue Coloring" icon={faPaintBrush} />
+      <SectionHeader
+        title="Continue Coloring"
+        icon={faPaintBrush}
+        tint="pink"
+      />
       <View style={{ height: cardSize, width: "100%" }}>
         <FlatList
           data={items}
@@ -305,7 +352,7 @@ const RecentArtSection = ({
 
   return (
     <View style={styles.section}>
-      <SectionHeader title="Your Art" icon={faPalette} />
+      <SectionHeader title="Your Art" icon={faPalette} tint="purple" />
       <View style={{ height: cardSize, width: "100%" }}>
         <FlatList
           data={artworks}
@@ -333,7 +380,7 @@ const ChallengeSection = ({
       style={styles.section}
       onPress={() => router.push("/challenges")}
     >
-      <SectionHeader title="Challenge" icon={faTrophy} />
+      <SectionHeader title="Challenge" icon={faTrophy} tint="gold" />
       <View style={styles.challengeCard}>
         <View style={styles.challengeContent}>
           <Text style={styles.challengeIcon}>{challenge.challenge.icon}</Text>
@@ -425,6 +472,7 @@ const Feed = () => {
           icon={faStar}
           items={[todaysPick]}
           cardSize={cardSize}
+          tint="orange"
         />
       )}
 
@@ -443,6 +491,7 @@ const Feed = () => {
         icon={faWandMagicSparkles}
         items={myCreations}
         cardSize={cardSize}
+        tint="teal"
       />
 
       {/* More to Color - Past daily images */}
@@ -451,6 +500,7 @@ const Feed = () => {
         icon={faCalendarWeek}
         items={moreToColor}
         cardSize={cardSize}
+        tint="pink"
       />
     </View>
   );
@@ -464,14 +514,22 @@ const styles = StyleSheet.create({
   sectionHeader: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
-    marginBottom: 12,
+    gap: 12,
+    marginBottom: 14,
     paddingHorizontal: outerPadding,
   },
+  // Coloured icon medallion (matches the Stickers section badges).
+  sectionBadge: {
+    width: 40,
+    height: 40,
+    borderRadius: 14,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: 19,
     fontFamily: "TondoTrial-Bold",
-    color: COLORS.textGray,
+    color: COLORS.textPrimary,
   },
   horizontalList: {
     paddingHorizontal: outerPadding,

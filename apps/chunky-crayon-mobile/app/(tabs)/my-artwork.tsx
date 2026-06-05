@@ -12,7 +12,10 @@ import Spinner from "@/components/Spinner/Spinner";
 import { LinearGradient } from "expo-linear-gradient";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faHeart, faPalette } from "@fortawesome/pro-solid-svg-icons";
-import { faPaintbrush } from "@fortawesome/pro-duotone-svg-icons";
+import {
+  faPaintbrush,
+  faHeart as faHeartDuotone,
+} from "@fortawesome/pro-duotone-svg-icons";
 import { useRouter } from "expo-router";
 import AppHeader from "@/components/AppHeader";
 import useHeaderData from "@/hooks/useHeaderData";
@@ -77,13 +80,15 @@ const MyArtworkScreen = () => {
     return (
       <View style={styles.gridContainer}>
         <View style={styles.sectionHeaderRow}>
-          <FontAwesomeIcon
-            icon={faPaintbrush}
-            size={18}
-            color={COLORS.crayonOrange}
-            secondaryColor={COLORS.crayonPeach}
-            secondaryOpacity={1}
-          />
+          <View style={[styles.sectionBadge, styles.sectionBadgePink]}>
+            <FontAwesomeIcon
+              icon={faPaintbrush}
+              size={18}
+              color={COLORS.crayonOrange}
+              secondaryColor={COLORS.crayonPeach}
+              secondaryOpacity={1}
+            />
+          </View>
           <Text style={styles.sectionTitle}>{t("keepColoring")}</Text>
         </View>
         <View style={styles.grid}>
@@ -131,7 +136,15 @@ const MyArtworkScreen = () => {
   const renderArtworkGrid = () => (
     <View style={styles.gridContainer}>
       <View style={styles.sectionHeaderRow}>
-        <FontAwesomeIcon icon={faHeart} size={16} color={COLORS.crayonOrange} />
+        <View style={[styles.sectionBadge, styles.sectionBadgeOrange]}>
+          <FontAwesomeIcon
+            icon={faHeartDuotone}
+            size={18}
+            color={COLORS.crayonOrange}
+            secondaryColor={COLORS.secondaryOrange}
+            secondaryOpacity={1}
+          />
+        </View>
         <Text style={styles.sectionTitle}>
           {t("savedCount", { count: artworks.length })}
         </Text>
@@ -285,8 +298,22 @@ const styles = StyleSheet.create({
   sectionHeaderRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
+    gap: 12,
     marginBottom: 16,
+  },
+  // Coloured icon medallion (matches the Stickers + Gallery section badges).
+  sectionBadge: {
+    width: 40,
+    height: 40,
+    borderRadius: 14,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  sectionBadgePink: {
+    backgroundColor: "rgba(228,100,68,0.10)",
+  },
+  sectionBadgeOrange: {
+    backgroundColor: "rgba(228,100,68,0.12)",
   },
   sectionTitle: {
     fontFamily: FONTS.bold,
