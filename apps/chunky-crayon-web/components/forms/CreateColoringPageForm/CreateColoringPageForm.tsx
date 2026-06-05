@@ -139,7 +139,9 @@ const MultiModeForm = ({
   // SceneInput) so it rides the same `description` + `isReady` path as
   // text mode — that's what enables FormCTA. Only the character mix-in
   // is scene-specific; the shared context has no slot for it.
-  const [sceneCharacterId, setSceneCharacterId] = useState<string | null>(null);
+  // Scene mode can feature up to MAX_SUBJECTS of the kid's characters (the
+  // "Your friends" row). Text mode uses the single-select CharacterPicker.
+  const [sceneCharacterIds, setSceneCharacterIds] = useState<string[]>([]);
   // Raw scene picker state + built description, lifted from SceneInput so
   // we can snapshot the in-progress scene into localStorage when the
   // paywall interrupts it (resume-after-checkout — see
@@ -229,7 +231,7 @@ const MultiModeForm = ({
       savePendingCreation({
         mode: 'scene',
         selection: sceneSelection,
-        characterId: sceneCharacterId,
+        characterIds: sceneCharacterIds,
         description: sceneDescription,
       });
     } else if (mode === 'text' && description.trim()) {
@@ -269,7 +271,7 @@ const MultiModeForm = ({
     if (saved.mode === 'scene') {
       setRestoredSelection(saved.selection);
       setSceneSelection(saved.selection);
-      setSceneCharacterId(saved.characterId);
+      setSceneCharacterIds(saved.characterIds);
       setSceneDescription(saved.description);
       setDescription(saved.description);
       setMode('scene');
@@ -356,11 +358,15 @@ const MultiModeForm = ({
                 description: desc,
                 locale,
                 quality,
-                // Scene mode mixes in its own (sentinel-driven) character;
-                // text mode uses the CharacterPicker selection.
-                characterId:
-                  (inputType === 'scene' ? sceneCharacterId : characterId) ??
-                  undefined,
+                // Scene mode can feature up to MAX_SUBJECTS of the kid's
+                // characters (the friends row); text mode uses the single
+                // CharacterPicker selection.
+                characterIds:
+                  inputType === 'scene'
+                    ? sceneCharacterIds
+                    : characterId
+                      ? [characterId]
+                      : [],
               });
 
         if (!result.ok) {
@@ -410,8 +416,8 @@ const MultiModeForm = ({
           // effect runs — without the key change, the new
           // initialSelection would be ignored.
           key={restoredSelection ? 'restored' : 'fresh'}
-          onChange={({ characterId: cId, selection, description: desc }) => {
-            setSceneCharacterId(cId);
+          onChange={({ characterIds: cIds, selection, description: desc }) => {
+            setSceneCharacterIds(cIds);
             setSceneSelection(selection);
             setSceneDescription(desc);
           }}
@@ -458,7 +464,7 @@ const MultiModeForm = ({
               secondAnswer,
               locale,
               quality,
-              characterId: characterId ?? undefined,
+              characterIds: characterId ? [characterId] : [],
             });
 
             if (!result.ok) {

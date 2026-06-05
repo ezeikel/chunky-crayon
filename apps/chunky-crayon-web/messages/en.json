@@ -1229,6 +1229,8 @@
       "skip": "Skip",
       "subjectAddCharacter": "Add character",
       "subjectTitle": "Who?",
+      "friendsTitle": "Your friends",
+      "subjectGroupTitle": "or pick one",
       "locationTitle": "Where?",
       "weatherTitle": "Weather",
       "activityTitle": "Doing what?",

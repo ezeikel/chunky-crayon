@@ -21,6 +21,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
+import { faUser, faUserPlus } from '@fortawesome/pro-duotone-svg-icons';
 import {
   SceneBuilder,
   type SceneLayer,
@@ -58,7 +59,8 @@ type SceneInputProps = {
    */
   onChange: (next: {
     description: string;
-    characterId: string | null;
+    /** The kid's selected characters (up to MAX_SUBJECTS), in pick order. */
+    characterIds: string[];
     selection: SceneSelection;
   }) => void;
   /**
@@ -109,13 +111,19 @@ const SceneInput = ({
     initialSelection ?? {},
   );
 
-  // First READY character is the one we mix in. v1 is one-character-per
-  // scene (same cap the CharacterPicker + server enforce).
-  const readyCharacter = useMemo(
-    () => characters.find((c) => c.status === 'READY') ?? null,
+  // The kid's READY characters, each a selectable "friend" in its own row.
+  // They share the subject layer's MAX_SUBJECTS cap with the preset animals,
+  // so any mix of up to two (two friends, two presets, or one of each) works.
+  const readyCharacters = useMemo(
+    () => characters.filter((c) => c.status === 'READY'),
     [characters],
   );
-  const hasCharacter = Boolean(readyCharacter);
+  const hasCharacter = readyCharacters.length > 0;
+  // Map a friend option key (`char:<id>`) back to the character.
+  const characterByOptionKey = useMemo(
+    () => new Map(readyCharacters.map((c) => [`char:${c.id}`, c])),
+    [readyCharacters],
+  );
 
   const layers = useMemo<SceneLayer[]>(() => {
     // Catalogue stores R2 keys (env-agnostic); resolve to a full public
@@ -135,33 +143,51 @@ const SceneInput = ({
       thumbnailUrl: resolveThumbnailUrl(o.thumbnailKey),
     });
 
+    // Friend group (the kid's saved characters) — one selectable disc per
+    // READY character showing its COLOUR portrait, plus an add-friend tile.
+    // Replaces the old single `your-character` sentinel (which rendered a
+    // star). Only when the characters feature is enabled.
+    const friendDuotone = {
+      primary: 'hsl(var(--crayon-purple))',
+      secondary: 'hsl(var(--crayon-pink))',
+    };
+    const friendOptions: SceneLayer['options'] = charactersEnabled
+      ? [
+          ...readyCharacters.map((c) => ({
+            key: `char:${c.id}`,
+            label: c.name,
+            icon: faUser,
+            duotone: friendDuotone,
+            // COLOUR portrait — line art is only the generation reference.
+            thumbnailUrl: c.portraitUrl ?? c.portraitLineArtUrl,
+            group: 'friends' as const,
+          })),
+          // Always-present add-friend tile (deep-links to /characters).
+          {
+            key: 'add-friend',
+            label: t('subjectAddCharacter'),
+            icon: faUserPlus,
+            duotone: friendDuotone,
+            thumbnailUrl: null,
+            group: 'friends' as const,
+            state: 'add' as const,
+          },
+        ]
+      : [];
+
+    // Preset subjects (animals etc.) — drop the legacy `your-character`
+    // sentinel; saved characters are now their own friend options above.
+    const presetOptions = SUBJECT_OPTIONS.filter(
+      (o) => o.key !== 'your-character',
+    ).map((o) => toTile({ ...o, label: t(`subject.${o.key}`) }));
+
     return [
       {
         id: 'subject',
         title: t('subjectTitle'),
         kind: 'multi',
         maxSelections: MAX_SUBJECTS,
-        options: SUBJECT_OPTIONS
-          // When the characters feature is gated off (flag or guest), the
-          // `your-character` sentinel is dropped wholesale — no add-tile,
-          // no locked tile, no dead-end at the auth wall.
-          .filter((o) => o.key !== 'your-character' || charactersEnabled)
-          .map((o) => {
-            if (o.key === 'your-character') {
-              // Two distinct states for the sentinel:
-              //   - has READY character → normal tile, label = character's name
-              //   - no character yet → "add" affordance, label "Add character",
-              //     tap routes to /characters (see handleLockedTap)
-              if (readyCharacter) {
-                return toTile({ ...o, label: readyCharacter.name });
-              }
-              return {
-                ...toTile({ ...o, label: t('subjectAddCharacter') }),
-                state: 'add' as const,
-              };
-            }
-            return toTile({ ...o, label: t(`subject.${o.key}`) });
-          }),
+        options: [...friendOptions, ...presetOptions],
       },
       {
         id: 'location',
@@ -196,59 +222,60 @@ const SceneInput = ({
         ),
       },
     ];
-  }, [t, readyCharacter, charactersEnabled]);
+  }, [t, readyCharacters, charactersEnabled]);
 
-  // Lock the My Character tile until there's a READY character to mix in.
-  // When the feature is gated off, the sentinel isn't rendered at all, so
-  // there's nothing to lock.
+  // The add-friend tile routes to /characters instead of selecting, so it's
+  // marked "locked" (SceneBuilder fires onLockedTap for locked tiles). The
+  // saved-character discs stay normal selectable tiles. (The tile still
+  // renders as an `add` affordance via its `state: 'add'`, not a lock icon.)
   const lockedKeys = useMemo(
-    () =>
-      charactersEnabled && !hasCharacter
-        ? { subject: ['your-character'] }
-        : undefined,
-    [charactersEnabled, hasCharacter],
+    () => (charactersEnabled ? { subject: ['add-friend'] } : undefined),
+    [charactersEnabled],
   );
 
-  // Derive description + characterId from picks. The description is
+  // Derive description + characterIds from picks. The description is
   // mirrored into InputModeContext via setDescription — that's what flips
-  // `isReady`, which is what FormCTA keys its enabled state off (same
-  // pattern VoiceInput uses to surface its transcript). The characterId
-  // is reported up via onChange because it's scene-specific and the
-  // shared context has no slot for it.
+  // `isReady`, which is what FormCTA keys its enabled state off. The
+  // characterIds are reported up via onChange because they're scene-specific
+  // and the shared context has no slot for them.
   const onChangeRef = useRef(onChange);
   onChangeRef.current = onChange;
   useEffect(() => {
-    const subjects = (selection.subject ?? []) as SubjectKey[];
+    const rawSubjects = selection.subject ?? [];
+    // Split the picks into preset subject keys (catalogue) vs friend keys
+    // (`char:<id>`). Friends contribute their NAME to the description and
+    // their ID to the character pipeline; presets are plain catalogue keys.
+    const presetSubjects = rawSubjects.filter(
+      (s) => !s.startsWith('char:') && s !== 'add-friend',
+    ) as SubjectKey[];
+    const pickedCharacters = rawSubjects
+      .map((s) => characterByOptionKey.get(s))
+      .filter((c): c is NonNullable<typeof c> => Boolean(c));
+
     const picks: ScenePicks = {
-      subjects,
+      subjects: presetSubjects,
       location: ((selection.location ?? [])[0] as LocationKey) ?? null,
       weather: ((selection.weather ?? [])[0] as WeatherKey) ?? null,
       activity: ((selection.activity ?? [])[0] as ActivityKey) ?? null,
       accent: ((selection.accent ?? [])[0] as AccentKey) ?? null,
-      characterName: readyCharacter?.name,
+      characterNames: pickedCharacters.map((c) => c.name),
     };
 
-    // Required layers gate a usable description: at least one subject AND
-    // a location. A lone `your-character` with no resolved name doesn't
-    // count as a subject (buildSceneDescription drops it).
-    const realSubjectCount = subjects.filter(
-      (s) => s !== 'your-character' || hasCharacter,
-    ).length;
+    // Required layers gate a usable description: at least one subject (preset
+    // OR a picked friend) AND a location.
+    const realSubjectCount = presetSubjects.length + pickedCharacters.length;
     const ready = realSubjectCount > 0 && Boolean(picks.location);
     const description = ready ? buildSceneDescription(picks) : '';
 
     setDescription(description);
     onChangeRef.current({
       description,
-      characterId:
-        subjects.includes('your-character') && readyCharacter
-          ? readyCharacter.id
-          : null,
+      characterIds: pickedCharacters.map((c) => c.id),
       // Raw picker state — the parent persists this so a paywall-
       // interrupted scene can be restored after checkout.
       selection,
     });
-  }, [selection, readyCharacter, hasCharacter, setDescription]);
+  }, [selection, characterByOptionKey, setDescription]);
 
   const handleSurpriseMe = () => {
     const rolled = rollRandomScene();
@@ -267,8 +294,8 @@ const SceneInput = ({
   };
 
   const handleLockedTap = (_layerId: string, optionKey: string) => {
-    if (optionKey === 'your-character') {
-      // No character yet — send them to make one rather than dead-ending.
+    if (optionKey === 'add-friend') {
+      // Route to character creation rather than selecting the add tile.
       router.push('/characters?from=create');
     }
   };
@@ -294,6 +321,8 @@ const SceneInput = ({
           create: t('create'),
           extrasTitle: t('extrasTitle'),
           skip: t('skip'),
+          friendsTitle: t('friendsTitle'),
+          subjectGroupTitle: t('subjectGroupTitle'),
         }}
       />
     </div>

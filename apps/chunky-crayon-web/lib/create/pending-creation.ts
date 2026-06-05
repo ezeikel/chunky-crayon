@@ -37,7 +37,8 @@ export type PendingCreation =
   | {
       mode: 'scene';
       selection: SceneSelection;
-      characterId: string | null;
+      /** The kid's picked characters (up to MAX_SUBJECTS), restored too. */
+      characterIds: string[];
       /** The built description — restored so the form is submit-ready. */
       description: string;
     }

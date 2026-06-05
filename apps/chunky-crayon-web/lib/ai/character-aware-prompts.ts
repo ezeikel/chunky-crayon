@@ -23,22 +23,42 @@
  * bundle pipeline uses; it produces cleaner coloring-page outputs than
  * a full-colour reference (less likely to bleed colour into the line-art).
  *
- * v1 cap: ONE character per scene. Memory + bundle work both confirmed
- * gpt-image-2 multi-subject fidelity is fragile.
+ * Cap: up to MAX_SUBJECTS (2) recurring characters per scene, any mix of
+ * the kid's saved characters. Each one's portrait is prepended to the
+ * worker's referenceImageUrls in the same order. (Was v1-capped at one;
+ * gpt-image-2 multi-subject fidelity is fragile, so two is the ceiling and
+ * each character carries its own reference portrait + named continuity
+ * block to keep both identities stable.)
  */
 
 import { GPT_IMAGE_STYLE_BLOCK, DIFFICULTY_MODIFIERS } from './prompts';
-import type { CharacterPromptInput } from './character-prompt-types';
+import type {
+  CharacterPromptInput,
+  CharacterForPrompt,
+} from './character-prompt-types';
+
+// One named continuity block per character. The "MUST match the reference
+// image exactly" line is load-bearing: without it gpt-image-2 happily
+// redraws a similar-but-not-the-same dragon. With two characters, the
+// reference portraits are sent in the same order the characters are listed,
+// so the model can map each block to its portrait.
+const characterContinuityBlock = (c: CharacterForPrompt): string => `
+"${c.name}", a ${c.species}:
+Distinguishing visual details that MUST be visible and match its reference image exactly:
+${c.signatureDetails.map((d) => `- ${d}`).join('\n')}
+Personality cues (shape the pose/activity, not the appearance):
+${c.traits.length > 0 ? c.traits.map((t) => `- ${t}`).join('\n') : '- friendly and curious'}`;
 
 /**
- * Build the gpt-image-2 prompt for a coloring page that must contain a
- * named, recurring character. The character's portrait is conditioned
- * via the worker's referenceImageUrls slot at the call site (not here).
+ * Build the gpt-image-2 prompt for a coloring page that must contain one or
+ * two named, recurring characters. Each character's portrait is conditioned
+ * via the worker's referenceImageUrls slot at the call site (not here), in
+ * the same order as `input.characters`.
  */
 export const buildCharacterAwareColoringPrompt = (
   input: CharacterPromptInput,
 ): string => {
-  const { description, character, difficulty } = input;
+  const { description, characters, difficulty } = input;
 
   // Difficulty block — only applied when the active profile has stepped
   // beyond BEGINNER. Matches the existing createDifficultyAwarePrompt
@@ -54,19 +74,24 @@ export const buildCharacterAwareColoringPrompt = (
         .join('\n')}\n`
     : '';
 
-  // CHARACTER continuity block. Mirrors the bundles pattern. The "MUST
-  // match the reference image exactly" line is load-bearing: without it
-  // gpt-image-2 happily redraws a similar-but-not-the-same dragon.
+  // CHARACTER continuity block. Mirrors the bundles pattern. The header
+  // differs for one vs two characters so the model knows both are required
+  // (and equal protagonists, not one main + one cameo).
+  const names = characters.map((c) => `"${c.name}"`);
+  const header =
+    characters.length > 1
+      ? `Character continuity — this page MUST include BOTH of these recurring characters, ${names.join(
+          ' and ',
+        )}, together in the same scene as equal protagonists.`
+      : `Character continuity — this page MUST include the recurring character ${names[0]}, a ${characters[0].species}.`;
+
   const continuityBlock = `
-Character continuity — this page MUST include the recurring character "${character.name}", a ${character.species}.
+${header}
+${characters.map(characterContinuityBlock).join('\n')}
 
-Distinguishing visual details that MUST be visible and match the reference image exactly:
-${character.signatureDetails.map((d) => `- ${d}`).join('\n')}
-
-Personality cues (use these to shape the pose and activity, not the appearance):
-${character.traits.length > 0 ? character.traits.map((t) => `- ${t}`).join('\n') : '- friendly and curious'}
-
-The character is the protagonist of the page; the user's scene description (above) describes what they are doing or where they are. Do NOT replace the character with a generic figure of the same species. If the scene description names a different character, draw "${character.name}" in that role instead.`;
+The character${characters.length > 1 ? 's are the protagonists' : ' is the protagonist'} of the page; the user's scene description (above) describes what they are doing or where they are. Do NOT replace ${
+    characters.length > 1 ? 'them' : 'the character'
+  } with a generic figure of the same species.`;
 
   return `Scene: ${description}.
 ${difficultyBlock}${continuityBlock}

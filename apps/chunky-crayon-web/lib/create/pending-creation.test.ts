@@ -24,7 +24,7 @@ describe('savePendingCreation / loadPendingCreation', () => {
     const intent: PendingCreation = {
       mode: 'scene',
       selection: { subject: ['cow'], location: ['beach'] },
-      characterId: null,
+      characterIds: [],
       description: 'a cow at the beach',
     };
     savePendingCreation(intent);

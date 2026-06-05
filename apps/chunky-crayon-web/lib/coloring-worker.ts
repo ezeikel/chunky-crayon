@@ -93,10 +93,11 @@ type BuildTextModeBodyArgs = {
   /** Active profile difficulty if any. BEGINNER falls through to the
    *  standard prompt (no difficulty modifiers). */
   difficulty?: Difficulty;
-  /** Optional character to feature. Mutually exclusive with difficulty
-   *  modifiers when present (character-aware prompt incorporates
-   *  difficulty internally). */
-  character?: CharacterInPrompt;
+  /** Optional character(s) to feature (up to 2). Mutually exclusive with
+   *  difficulty modifiers when present (the character-aware prompt
+   *  incorporates difficulty internally). Each portrait is prepended to
+   *  referenceImageUrls in this order. */
+  characters?: CharacterInPrompt[];
 };
 
 /**
@@ -119,30 +120,31 @@ export function buildTextModeWorkerBody({
   quality,
   creditCost,
   difficulty,
-  character,
+  characters,
 }: BuildTextModeBodyArgs): WorkerBody {
   let corePrompt: string;
   let referenceImageUrls: string[];
 
-  if (character) {
+  if (characters && characters.length > 0) {
     corePrompt = buildCharacterAwareColoringPrompt({
       description,
       locale,
       difficulty,
-      character: {
-        name: character.name,
-        species: character.species,
-        traits: character.traits,
-        signatureDetails: character.signatureDetails,
-      },
+      characters: characters.map((c) => ({
+        name: c.name,
+        species: c.species,
+        traits: c.traits,
+        signatureDetails: c.signatureDetails,
+      })),
     });
-    // Character portrait first; then top up with brand style refs so
-    // gpt-image-2 still knows the target line-art aesthetic. Cap at 4 to
-    // stay well within OpenAI's 16-ref limit and to avoid drowning the
-    // character ref in style refs.
+    // Each character's portrait first (in order), then top up with brand
+    // style refs so gpt-image-2 still knows the target line-art aesthetic.
+    // Total stays well within OpenAI's 16-ref limit: 2 portraits + 2 style
+    // refs = 4. We trim style refs so the character refs aren't drowned.
+    const styleRefCount = Math.max(0, 4 - characters.length);
     referenceImageUrls = [
-      character.portraitLineArtUrl,
-      ...REFERENCE_IMAGES.slice(0, 3),
+      ...characters.map((c) => c.portraitLineArtUrl),
+      ...REFERENCE_IMAGES.slice(0, styleRefCount),
     ];
   } else if (difficulty && difficulty !== 'BEGINNER') {
     corePrompt = prompts.createDifficultyAwarePrompt(description, difficulty);

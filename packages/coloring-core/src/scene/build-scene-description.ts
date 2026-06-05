@@ -18,11 +18,10 @@
  *   a dog and a cat in a forest playing together on a sunny day
  *   Sparky and a friendly dragon out at sea with magical sparkles
  *
- * The `your-character` subject is special: this builder is character-
- * agnostic, so the create form resolves the saved Character and passes its
- * display name in via `characterName`. If the sentinel is picked but no
- * name is supplied (character not yet resolved), the sentinel is dropped
- * from the subject list rather than emitting a dangling "and".
+ * Saved characters are handled outside the subject catalogue: the create
+ * form resolves each picked Character and passes its display name in via
+ * `characterNames` (up to MAX_SUBJECTS, any mix with preset subjects). The
+ * names are listed first, then the preset subject nouns, joined naturally.
  *
  * Single point of correctness: a malformed description here produces a
  * confusing coloring page the kid paid credits for. Pinned by
@@ -43,7 +42,7 @@ import {
 } from "./scene-catalog";
 
 export type ScenePicks = {
-  /** 1..MAX_SUBJECTS subject keys. Order is preserved in the output. */
+  /** Preset subject keys (catalogue animals etc.). Order preserved. */
   subjects: readonly SubjectKey[];
   /** Required for a valid scene. */
   location: LocationKey | null;
@@ -51,24 +50,15 @@ export type ScenePicks = {
   activity?: ActivityKey | null;
   accent?: AccentKey | null;
   /**
-   * Display name of the resolved saved Character, supplied by the create
-   * form when the `your-character` sentinel is among `subjects`. Undefined
-   * when the kid hasn't picked their character or it isn't resolved yet.
+   * Display names of the resolved saved Characters the kid picked (up to
+   * MAX_SUBJECTS). Listed before the preset subjects in the description.
+   * Empty / undefined when no character is picked.
    */
-  characterName?: string;
+  characterNames?: readonly string[];
 };
 
-const subjectNoun = (
-  key: SubjectKey,
-  characterName?: string,
-): string | null => {
-  if (key === "your-character") {
-    // Character-agnostic catalogue: only emit a fragment if the form
-    // resolved a real name. Otherwise the sentinel contributes nothing.
-    return characterName?.trim() ? characterName.trim() : null;
-  }
-  return SUBJECT_OPTIONS.find((s) => s.key === key)?.promptNoun ?? null;
-};
+const subjectNoun = (key: SubjectKey): string | null =>
+  SUBJECT_OPTIONS.find((s) => s.key === key)?.promptNoun ?? null;
 
 const locationPhrase = (key: LocationKey): string =>
   LOCATION_OPTIONS.find((l) => l.key === key)?.promptPhrase ?? "";
@@ -95,9 +85,14 @@ const joinSubjects = (nouns: string[]): string => {
  * this stays defensive so a stale client state can't crash the action).
  */
 export const buildSceneDescription = (picks: ScenePicks): string => {
-  const nouns = picks.subjects
-    .map((k) => subjectNoun(k, picks.characterName))
+  // Character names first (in pick order), then preset subject nouns.
+  const characterNouns = (picks.characterNames ?? [])
+    .map((n) => n.trim())
+    .filter((n) => n.length > 0);
+  const presetNouns = picks.subjects
+    .map((k) => subjectNoun(k))
     .filter((n): n is string => Boolean(n && n.trim()));
+  const nouns = [...characterNouns, ...presetNouns];
 
   // Defensive fallback: required layers missing. The form prevents this in
   // the happy path; keep a sensible string so a stale submit still yields

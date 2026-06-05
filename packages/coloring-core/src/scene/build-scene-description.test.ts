@@ -44,41 +44,42 @@ describe("buildSceneDescription", () => {
     );
   });
 
-  it("substitutes the resolved character name for the sentinel", () => {
+  it("lists a picked character name before a preset subject", () => {
     expect(
       buildSceneDescription({
-        subjects: ["your-character", "dragon"],
+        subjects: ["dragon"],
         location: "sea",
-        characterName: "Sparky",
+        characterNames: ["Sparky"],
       }),
     ).toBe("Sparky and a friendly dragon out at sea");
   });
 
-  it('drops the sentinel (no dangling "and") when no character name is supplied', () => {
+  it("lists two picked characters together", () => {
     expect(
       buildSceneDescription({
-        subjects: ["your-character", "dog"],
+        subjects: [],
         location: "forest",
+        characterNames: ["Sparky", "Rex"],
+      }),
+    ).toBe("Sparky and Rex in a forest");
+  });
+
+  it("ignores empty / whitespace-only character names", () => {
+    expect(
+      buildSceneDescription({
+        subjects: ["dog"],
+        location: "forest",
+        characterNames: ["   ", ""],
       }),
     ).toBe("a dog in a forest");
   });
 
-  it("drops the sentinel even when it is the only subject", () => {
-    // No name + only the sentinel -> nouns empty but location present.
+  it("builds a location-only scene when only a character name is given as empty", () => {
     expect(
       buildSceneDescription({
-        subjects: ["your-character"],
+        subjects: [],
         location: "beach",
-      }),
-    ).toBe("at the beach");
-  });
-
-  it("trims a whitespace-only character name as if absent", () => {
-    expect(
-      buildSceneDescription({
-        subjects: ["your-character"],
-        location: "beach",
-        characterName: "   ",
+        characterNames: [],
       }),
     ).toBe("at the beach");
   });

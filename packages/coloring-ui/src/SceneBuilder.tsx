@@ -72,6 +72,14 @@ export type SceneTileOption = {
    * Reads as "add one" not "denied".
    */
   state?: "add";
+  /**
+   * Optional visual grouping within the subject ("Who?") step. Options with
+   * `group: "friends"` (the kid's saved characters + an add-friend tile)
+   * render in their own row above the preset subjects. Undefined = a normal
+   * preset subject. Both groups share the layer's `maxSelections` cap, so
+   * picking friends + presets together still tops out at the cap.
+   */
+  group?: "friends";
 };
 
 export type SceneLayer = {
@@ -110,6 +118,12 @@ export type SceneBuilderLabels = {
   extrasTitle?: string;
   /** Skip-the-optional-step affordance, e.g. "Skip". */
   skip?: string;
+  /** Sub-heading above the saved-character row in the subject step, e.g.
+   *  "Your friends". Only shown when the subject layer has friend options. */
+  friendsTitle?: string;
+  /** Sub-heading above the preset-subjects row when a friends row is shown
+   *  above it, e.g. "or pick one". Keeps the two groups legible. */
+  subjectGroupTitle?: string;
 };
 
 export type SceneBuilderProps = {
@@ -536,6 +550,18 @@ const SceneBuilder = ({
   const locationLayer = layers[1];
   const extraLayers = useMemo(() => layers.slice(2), [layers]);
 
+  // Split the subject options into the kid's saved-character "friends" group
+  // (rendered as its own row in step 0) and the preset subjects. When there
+  // are no friend options the subject step renders as a single carousel.
+  const friendOptions = useMemo(
+    () => (subjectLayer?.options ?? []).filter((o) => o.group === "friends"),
+    [subjectLayer],
+  );
+  const presetOptions = useMemo(
+    () => (subjectLayer?.options ?? []).filter((o) => o.group !== "friends"),
+    [subjectLayer],
+  );
+
   // Steps: 0 = subject, 1 = location, 2 = (optional) extras. Extras only
   // exists as a step if there are extra layers to show. We don't surface
   // step numbers in the UI any more (kids don't read them); progress is
@@ -705,21 +731,64 @@ const SceneBuilder = ({
         </div>
       )}
 
-      {/* Step 1 — Who? (required) */}
+      {/* Step 1 — Who? (required). When the subject layer carries friend
+          options (the kid's saved characters), they render in their own
+          "Your friends" row above the preset subjects — both groups write to
+          the same selection, so the maxSelections cap is shared. */}
       {step === 0 && subjectLayer && (
         <div className="flex flex-col gap-4">
           {renderTitle(subjectLayer.title)}
-          <TileCarousel
-            layer={subjectLayer}
-            selected={selection[subjectLayer.id] ?? []}
-            locked={lockedKeys?.[subjectLayer.id] ?? []}
-            disabled={disabled}
-            lockedSuffix={labels.lockedSuffix}
-            onToggle={(k) => toggleOption(subjectLayer, k)}
-            onLockedTap={
-              onLockedTap ? (k) => onLockedTap(subjectLayer.id, k) : undefined
-            }
-          />
+          {friendOptions.length > 0 ? (
+            <>
+              <div className="flex flex-col gap-1.5">
+                {labels.friendsTitle && (
+                  <span className="px-1 text-sm font-semibold text-coloring-text-primary/70">
+                    {labels.friendsTitle}
+                  </span>
+                )}
+                <TileCarousel
+                  layer={{ ...subjectLayer, options: friendOptions }}
+                  selected={selection[subjectLayer.id] ?? []}
+                  locked={lockedKeys?.[subjectLayer.id] ?? []}
+                  disabled={disabled}
+                  lockedSuffix={labels.lockedSuffix}
+                  onToggle={(k) => toggleOption(subjectLayer, k)}
+                  onLockedTap={
+                    onLockedTap
+                      ? (k) => onLockedTap(subjectLayer.id, k)
+                      : undefined
+                  }
+                />
+              </div>
+              <div className="flex flex-col gap-1.5">
+                {labels.subjectGroupTitle && (
+                  <span className="px-1 text-sm font-semibold text-coloring-text-primary/70">
+                    {labels.subjectGroupTitle}
+                  </span>
+                )}
+                <TileCarousel
+                  layer={{ ...subjectLayer, options: presetOptions }}
+                  selected={selection[subjectLayer.id] ?? []}
+                  locked={lockedKeys?.[subjectLayer.id] ?? []}
+                  disabled={disabled}
+                  lockedSuffix={labels.lockedSuffix}
+                  onToggle={(k) => toggleOption(subjectLayer, k)}
+                />
+              </div>
+            </>
+          ) : (
+            <TileCarousel
+              layer={subjectLayer}
+              selected={selection[subjectLayer.id] ?? []}
+              locked={lockedKeys?.[subjectLayer.id] ?? []}
+              disabled={disabled}
+              lockedSuffix={labels.lockedSuffix}
+              onToggle={(k) => toggleOption(subjectLayer, k)}
+              onLockedTap={
+                onLockedTap ? (k) => onLockedTap(subjectLayer.id, k) : undefined
+              }
+            />
+          )}
           <div className="flex justify-end pt-1">
             <PrimaryAction
               icon={faArrowRight}

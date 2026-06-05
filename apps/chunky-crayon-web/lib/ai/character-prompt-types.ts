@@ -6,6 +6,13 @@
 
 import type { Difficulty } from '@one-colored-pixel/db';
 
+export type CharacterForPrompt = {
+  name: string;
+  species: string;
+  traits: readonly string[];
+  signatureDetails: readonly string[];
+};
+
 export type CharacterPromptInput = {
   /** The kid's typed/voiced/photo-described scene. */
   description: string;
@@ -13,11 +20,10 @@ export type CharacterPromptInput = {
   locale: string;
   /** Difficulty bucket (BEGINNER … EXPERT) — gates detail density. */
   difficulty?: Difficulty;
-  /** The recurring character that must appear in the scene. */
-  character: {
-    name: string;
-    species: string;
-    traits: readonly string[];
-    signatureDetails: readonly string[];
-  };
+  /**
+   * The recurring character(s) that must appear in the scene. v1 capped at
+   * one; now up to MAX_SUBJECTS (2) — any mix of the kid's saved characters.
+   * Each one's portrait is conditioned via the worker's referenceImageUrls.
+   */
+  characters: readonly CharacterForPrompt[];
 };

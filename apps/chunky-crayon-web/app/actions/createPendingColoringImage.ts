@@ -87,18 +87,24 @@ export type CreatePendingArgs = (
    *  resolves to a tier-appropriate default. */
   quality?: ImageQuality;
   /**
-   * Optional recurring character to feature in the generated page. When set,
+   * Optional recurring character(s) to feature in the generated page (up to
+   * MAX_CHARACTERS_PER_PAGE, any mix of the kid's saved characters). When set,
    * we swap the standard prompt for `buildCharacterAwareColoringPrompt`,
-   * prepend the character's line-art portrait to `referenceImageUrls`, and
-   * record a CharacterUsage row after worker dispatch. v1 cap is one
-   * character per scene (enforced here — the form picker also enforces it).
+   * prepend each character's line-art portrait to `referenceImageUrls` in
+   * order, and record a CharacterUsage row per character after worker
+   * dispatch. Ownership + READY are verified server-side for every id.
    *
    * Ignored on photo mode: the photo IS the reference there, and mixing
    * a character portrait with a kid-photo reference produces unpredictable
    * results. Photo mode also already debits 5 credits for its own pipeline.
    */
-  characterId?: string;
+  characterIds?: string[];
 };
+
+// Hard cap on featured characters per page (mirrors MAX_SUBJECTS=2 in the
+// scene catalogue + the picker). gpt-image-2 multi-subject fidelity is
+// fragile, so two is the ceiling.
+const MAX_CHARACTERS_PER_PAGE = 2;
 
 export type CreatePendingResult =
   | { ok: true; id: string }
@@ -341,11 +347,24 @@ export const createPendingColoringImage = async (
     signatureDetails: string[];
     portraitLineArtUrl: string;
   };
-  let resolvedCharacter: ResolvedCharacter | null = null;
-  if (args.characterId && args.mode !== 'photo' && userId && activeProfile) {
-    const character = await db.character.findFirst({
+  const resolvedCharacters: ResolvedCharacter[] = [];
+  // Dedup + cap the requested ids (a stale client could send dupes / too
+  // many). Order is preserved so the portrait order matches the picker.
+  const requestedIds = Array.from(new Set(args.characterIds ?? [])).slice(
+    0,
+    MAX_CHARACTERS_PER_PAGE,
+  );
+  if (
+    requestedIds.length > 0 &&
+    args.mode !== 'photo' &&
+    userId &&
+    activeProfile
+  ) {
+    // One query for all requested ids, scoped to the owner + active profile —
+    // a stale id from the client must NOT leak someone else's portrait.
+    const found = await db.character.findMany({
       where: {
-        id: args.characterId,
+        id: { in: requestedIds },
         userId,
         profileId: activeProfile.id,
         brand: BRAND,
@@ -360,41 +379,39 @@ export const createPendingColoringImage = async (
         status: true,
       },
     });
-    if (!character || character.status !== 'READY') {
-      // Refund what we just debited — character was selected client-side
-      // but isn't usable. Don't penalise the user for a stale UI state.
-      if (userId) {
-        await refundCredits(userId, cost).catch(() => {});
-      }
-      return {
-        ok: false,
-        error: 'character_not_ready',
-        message:
-          character?.status === 'GENERATING'
-            ? 'Character is still being drawn. Try again in a moment.'
-            : 'Character is not available.',
-      };
-    }
-    if (!character.portraitLineArtUrl) {
-      // READY without a line-art URL shouldn't happen, but the column is
-      // nullable in the schema. Soft-fail to refund + friendly error.
-      if (userId) {
-        await refundCredits(userId, cost).catch(() => {});
-      }
-      return {
-        ok: false,
-        error: 'character_not_ready',
-        message: 'Character portrait is missing. Try again later.',
-      };
-    }
-    resolvedCharacter = {
-      id: character.id,
-      name: character.name,
-      species: character.species,
-      traits: character.traits,
-      signatureDetails: character.signatureDetails,
-      portraitLineArtUrl: character.portraitLineArtUrl,
+    const byId = new Map(found.map((c) => [c.id, c]));
+    // Validate EVERY requested id (strict — don't silently drop a friend the
+    // kid picked). Any not-owned / not-READY / missing-portrait → refund +
+    // friendly error, same as the single-character path did.
+    const refundAndFail = async (
+      message: string,
+    ): Promise<CreatePendingResult> => {
+      if (userId) await refundCredits(userId, cost).catch(() => {});
+      return { ok: false, error: 'character_not_ready', message };
     };
+    for (const id of requestedIds) {
+      const c = byId.get(id);
+      if (!c || c.status !== 'READY') {
+        return refundAndFail(
+          c?.status === 'GENERATING'
+            ? 'A friend is still being drawn. Try again in a moment.'
+            : 'A friend is not available.',
+        );
+      }
+      if (!c.portraitLineArtUrl) {
+        return refundAndFail(
+          'A friend’s portrait is missing. Try again later.',
+        );
+      }
+      resolvedCharacters.push({
+        id: c.id,
+        name: c.name,
+        species: c.species,
+        traits: c.traits,
+        signatureDetails: c.signatureDetails,
+        portraitLineArtUrl: c.portraitLineArtUrl,
+      });
+    }
   }
 
   let workerBody: WorkerBody | null = null;
@@ -467,15 +484,16 @@ export const createPendingColoringImage = async (
         quality: resolvedQuality,
         creditCost: userId ? cost : 0,
         difficulty: activeProfile?.difficulty ?? undefined,
-        character: resolvedCharacter
-          ? {
-              name: resolvedCharacter.name,
-              species: resolvedCharacter.species,
-              traits: resolvedCharacter.traits,
-              signatureDetails: resolvedCharacter.signatureDetails,
-              portraitLineArtUrl: resolvedCharacter.portraitLineArtUrl,
-            }
-          : undefined,
+        characters:
+          resolvedCharacters.length > 0
+            ? resolvedCharacters.map((c) => ({
+                name: c.name,
+                species: c.species,
+                traits: c.traits,
+                signatureDetails: c.signatureDetails,
+                portraitLineArtUrl: c.portraitLineArtUrl,
+              }))
+            : undefined,
       });
     }
 
@@ -484,14 +502,16 @@ export const createPendingColoringImage = async (
     // Record character usage AFTER the worker has accepted the job — if the
     // worker rejected (404 / 5xx), the row above flips to FAILED and there
     // was never any value to log. Unique (characterId, coloringImageId)
-    // makes accidental double-writes a no-op.
-    if (resolvedCharacter) {
+    // makes accidental double-writes a no-op; createMany skipDuplicates does
+    // the whole set in one round-trip.
+    if (resolvedCharacters.length > 0) {
       await db.characterUsage
-        .create({
-          data: {
-            characterId: resolvedCharacter.id,
+        .createMany({
+          data: resolvedCharacters.map((c) => ({
+            characterId: c.id,
             coloringImageId: pending.id,
-          },
+          })),
+          skipDuplicates: true,
         })
         .catch((err) => {
           // Non-fatal: feature engagement analytics shouldn't tank a
