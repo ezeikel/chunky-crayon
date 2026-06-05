@@ -131,6 +131,19 @@ export type SceneBuilderProps = {
 const TILE_LG = 104;
 const TILE_SM = 76;
 
+// Soft colour wash behind a disc, derived from the option's duotone primary
+// (a #RRGGBB hex) at low opacity — so each disc sits on its own gentle colour
+// like the kids-app references, instead of flat white.
+const tintFromDuotone = (hex: string): string => {
+  const m = /^#?([0-9a-f]{6})$/i.exec(hex.trim());
+  if (!m) return "rgba(228,100,68,0.12)";
+  const n = parseInt(m[1], 16);
+  const r = (n >> 16) & 255;
+  const g = (n >> 8) & 255;
+  const b = n & 255;
+  return `rgba(${r}, ${g}, ${b}, 0.14)`;
+};
+
 type SceneTileProps = {
   option: SceneTileOption;
   selected: boolean;
@@ -170,7 +183,18 @@ const SceneTile = ({
         <Animated.View
           style={[
             styles.tileFace,
-            { width: box, height: box },
+            // Circular disc (kids-app pattern — Spotify Kids / Duolingo ABC),
+            // matching the Text-mode friend picker. A per-option soft colour
+            // wash sits behind the thumbnail so the row reads as a colourful
+            // set, not white cards.
+            {
+              width: box,
+              height: box,
+              borderRadius: box / 2,
+              backgroundColor: isAdd
+                ? "rgba(228,100,68,0.05)"
+                : tintFromDuotone(option.duotone.primary),
+            },
             selected
               ? styles.tileFaceSelected
               : isAdd
@@ -594,16 +618,22 @@ const styles = StyleSheet.create({
   tileFace: {
     alignItems: "center",
     justifyContent: "center",
-    borderRadius: 20,
-    borderWidth: 1,
+    // Circular disc with a chunky white "sticker" ring (borderRadius +
+    // background colour are set inline per option/size). Soft lift on every
+    // disc so they read as stickers, not flat circles.
+    borderWidth: 4,
+    borderColor: COLORS.white,
     overflow: "hidden",
-    backgroundColor: COLORS.white,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+    elevation: 3,
   },
-  tileFaceDefault: {
-    borderColor: COLORS.bgCreamDark,
-  },
+  tileFaceDefault: {},
   tileFaceSelected: {
-    borderColor: "transparent",
+    // Bold orange ring + a warmer halo when picked.
+    borderColor: COLORS.crayonOrange,
     shadowColor: "#FF8A3D",
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.35,
@@ -613,7 +643,6 @@ const styles = StyleSheet.create({
   tileFaceAdd: {
     borderColor: COLORS.crayonOrangeLight,
     borderStyle: "dashed",
-    backgroundColor: COLORS.bgCreamDark,
   },
   tileFaceDisabled: {
     opacity: 0.6,

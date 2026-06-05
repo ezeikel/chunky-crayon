@@ -202,28 +202,28 @@ export const SceneTile = ({
           className={cn(
             // `relative` so next/image's `fill` mode positions correctly
             // against this box (next/image absolutely-positions itself).
+            // Circular disc with a chunky white "sticker" ring (kids-app
+            // pattern — Spotify Kids / Duolingo ABC), matching the Text-mode
+            // friend picker. A soft per-option colour wash (set via the inline
+            // style below) sits behind the thumbnail so the row reads as a
+            // colourful set, not white cards.
             "relative block size-full overflow-hidden",
-            "rounded-coloring-card border bg-white",
+            "rounded-full border-4 border-white shadow-[0_4px_10px_rgba(0,0,0,0.08)]",
             "transition-all duration-coloring-base ease-coloring",
             "grid place-items-center",
-            // Calm selected state: gentle scale + soft drop-shadow halo +
-            // the check badge corner-popped on the outer wrapper. No heavy
-            // orange border, no orange label — those together read as
-            // alarming rather than "you picked this".
+            // Calm selected state: gentle scale + a bold orange ring + a soft
+            // warm halo + the check badge corner-popped on the outer wrapper.
             selected
-              ? "border-transparent scale-105 shadow-[0_6px_18px_rgba(255,138,61,0.35)]"
+              ? "scale-105 ring-3 ring-coloring-accent shadow-[0_6px_18px_rgba(255,138,61,0.35)]"
               : option.state === "add"
-                ? // "Add" affordance — dashed orange-tinted border + softer
-                  // cream wash so it reads as "tap to add", clearly
-                  // different from the normal solid-bordered tiles around
-                  // it. Not the same vocabulary as a locked tile (no grey
-                  // wash, no lock); not the same as a normal tile (border
-                  // is dashed + tinted).
+                ? // "Add" affordance — dashed orange-tinted ring + softer
+                  // cream wash so it reads as "tap to add", clearly different
+                  // from the normal discs around it.
                   "border-dashed border-coloring-accent/50 bg-coloring-surface"
-                : "border-coloring-surface-dark",
+                : "",
             !disabled &&
               !selected &&
-              "group-hover:border-coloring-accent/40 group-hover:bg-coloring-surface group-active:scale-95",
+              "group-hover:scale-105 group-active:scale-95",
             disabled && "opacity-60",
           )}
           style={
@@ -233,6 +233,9 @@ export const SceneTile = ({
             option.state === "add"
               ? undefined
               : ({
+                  // Soft colour wash behind the thumbnail, from the option's
+                  // duotone primary.
+                  backgroundColor: `color-mix(in srgb, ${option.duotone.primary} 14%, white)`,
                   "--fa-primary-color": option.duotone.primary,
                   "--fa-secondary-color": option.duotone.secondary,
                   "--fa-secondary-opacity": "1",
