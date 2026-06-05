@@ -3,19 +3,20 @@ import Spinner from "@/components/Spinner/Spinner";
 import { toast } from "@/components/Toaster";
 import { LinearGradient } from "expo-linear-gradient";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import { faCheck, faGift } from "@fortawesome/pro-solid-svg-icons";
 import {
   faTrophy,
   faLock,
-  faCheck,
-  faGift,
   faClock,
   faStar,
-} from "@fortawesome/pro-solid-svg-icons";
+} from "@fortawesome/pro-duotone-svg-icons";
 import { useUserContext } from "@/contexts";
 import {
   useChallenges,
   useClaimChallengeReward,
 } from "@/hooks/api/useChallenges";
+import SectionHeader from "@/components/SectionHeader/SectionHeader";
+import { COLORS } from "@/lib/design";
 import type { ChallengeWithProgress } from "@/api";
 
 // Weekly Challenge Card (current active challenge)
@@ -264,13 +265,14 @@ const ChallengesScreen = () => {
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
-          {/* Header */}
-          <View style={styles.header}>
-            <Text style={styles.headerTitle}>Challenges</Text>
-            <Text style={styles.headerSubtitle}>
-              Complete challenges to earn rewards!
-            </Text>
-          </View>
+          {/* Header — medallion + title + warm subtitle (shared language). */}
+          <SectionHeader
+            title="Challenges"
+            icon={faTrophy}
+            tint="gold"
+            subtitle="Complete challenges to earn rewards!"
+            style={styles.header}
+          />
 
           {isLoading ? (
             <View style={styles.loadingContainer}>
@@ -289,12 +291,20 @@ const ChallengesScreen = () => {
                 </View>
               ) : (
                 <View style={styles.noChallengeCard}>
-                  <FontAwesomeIcon icon={faTrophy} size={32} color="#D1D5DB" />
+                  <View style={styles.noChallengeMedallion}>
+                    <FontAwesomeIcon
+                      icon={faTrophy}
+                      size={34}
+                      color="#F59E0B"
+                      secondaryColor="#FDD835"
+                      secondaryOpacity={1}
+                    />
+                  </View>
                   <Text style={styles.noChallengeText}>
-                    No active challenge this week
+                    A brand-new challenge is on its way!
                   </Text>
                   <Text style={styles.noChallengeSubtext}>
-                    Check back soon for new challenges!
+                    Check back soon to earn more rewards.
                   </Text>
                 </View>
               )}
@@ -302,7 +312,11 @@ const ChallengesScreen = () => {
               {/* Past Challenges */}
               {history.length > 0 && (
                 <View style={styles.section}>
-                  <Text style={styles.sectionTitle}>Past Challenges</Text>
+                  <SectionHeader
+                    title="Past Challenges"
+                    icon={faClock}
+                    tint="purple"
+                  />
                   <View style={styles.pastList}>
                     {history.map((challenge) => (
                       <PastChallengeCard
@@ -316,7 +330,11 @@ const ChallengesScreen = () => {
 
               {/* Lifetime Achievements */}
               <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Lifetime Achievements</Text>
+                <SectionHeader
+                  title="Lifetime Achievements"
+                  icon={faStar}
+                  tint="gold"
+                />
                 <View style={styles.achievementsList}>
                   {achievements.map((achievement) => (
                     <AchievementCard
@@ -356,17 +374,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     marginBottom: 24,
   },
-  headerTitle: {
-    fontFamily: "TondoTrial-Bold",
-    fontSize: 28,
-    color: "#374151",
-    marginBottom: 4,
-  },
-  headerSubtitle: {
-    fontFamily: "TondoTrial-Regular",
-    fontSize: 16,
-    color: "#9CA3AF",
-  },
   loadingContainer: {
     paddingVertical: 60,
     alignItems: "center",
@@ -374,12 +381,6 @@ const styles = StyleSheet.create({
   section: {
     paddingHorizontal: 16,
     marginBottom: 24,
-  },
-  sectionTitle: {
-    fontFamily: "TondoTrial-Bold",
-    fontSize: 18,
-    color: "#374151",
-    marginBottom: 12,
   },
 
   // Weekly Challenge Card
@@ -500,30 +501,41 @@ const styles = StyleSheet.create({
     color: "#22C55E",
   },
 
-  // No Challenge Card
+  // No Challenge Card — warm white card + gold medallion (not a grey block).
   noChallengeCard: {
     marginHorizontal: 16,
     marginBottom: 24,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.white,
     borderRadius: 20,
+    borderWidth: 2,
+    borderColor: COLORS.bgCreamDark,
     padding: 32,
     alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
+    shadowColor: "#E46444",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 3,
+  },
+  noChallengeMedallion: {
+    width: 64,
+    height: 64,
+    borderRadius: 20,
+    backgroundColor: "rgba(245,158,11,0.14)",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 12,
   },
   noChallengeText: {
     fontFamily: "TondoTrial-Bold",
     fontSize: 16,
-    color: "#6B7280",
-    marginTop: 12,
+    color: COLORS.textPrimary,
   },
   noChallengeSubtext: {
     fontFamily: "TondoTrial-Regular",
     fontSize: 14,
-    color: "#9CA3AF",
+    color: COLORS.textMuted,
+    textAlign: "center",
     marginTop: 4,
   },
 

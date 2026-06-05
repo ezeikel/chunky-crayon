@@ -13,6 +13,7 @@ import Spinner from "@/components/Spinner/Spinner";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faXmark } from "@fortawesome/pro-solid-svg-icons";
 import { faUserAstronaut } from "@fortawesome/pro-duotone-svg-icons";
+import SectionHeader from "@/components/SectionHeader/SectionHeader";
 import CharacterTile, { AddCharacterTile } from "@/components/CharacterTile";
 import CharacterBuilder, {
   type CharacterDraft,
@@ -130,6 +131,13 @@ const CharactersScreen = () => {
             ]}
             showsVerticalScrollIndicator={false}
           >
+            <SectionHeader
+              title={t("title")}
+              icon={faUserAstronaut}
+              tint="orange"
+              subtitle={`${characters.length} / ${MAX_PER_PROFILE}`}
+              style={styles.sectionHeader}
+            />
             <View style={styles.grid}>
               {characters.map((c) => (
                 <View key={c.id} style={styles.gridCell}>
@@ -146,7 +154,18 @@ const CharactersScreen = () => {
                 </View>
               )}
             </View>
-            {atCap && <Text style={styles.fullHouse}>{t("fullHouse")}</Text>}
+            {atCap && (
+              <View style={styles.fullHousePill}>
+                <FontAwesomeIcon
+                  icon={faUserAstronaut}
+                  size={16}
+                  color={COLORS.crayonOrange}
+                  secondaryColor={COLORS.secondaryOrange}
+                  secondaryOpacity={1}
+                />
+                <Text style={styles.fullHouseText}>{t("fullHouse")}</Text>
+              </View>
+            )}
           </ScrollView>
         )}
       </LinearGradient>
@@ -288,13 +307,26 @@ const styles = StyleSheet.create({
     width: "47.5%",
     flexGrow: 1,
   },
-  fullHouse: {
+  // Content section header padding (the shared SectionHeader medallion).
+  sectionHeader: {
+    marginBottom: 16,
+  },
+  // "Full house" cap note as a soft cream pill, not a flat grey caption.
+  fullHousePill: {
+    flexDirection: "row",
+    alignItems: "center",
+    alignSelf: "center",
+    gap: 8,
+    marginTop: 20,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 16,
+    backgroundColor: COLORS.bgCreamDark,
+  },
+  fullHouseText: {
     fontFamily: FONTS.regular,
-    fontSize: 13,
-    color: COLORS.textMuted,
-    textAlign: "center",
-    marginTop: 16,
-    paddingHorizontal: 24,
+    fontSize: 14,
+    color: COLORS.textSecondary,
   },
   // ── builder modal ──
   modalHeader: {

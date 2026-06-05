@@ -67,7 +67,8 @@
         "worker": "Something went wrong drawing your friend.",
         "deleteFailed": "Couldn't remove that friend. Please try again.",
         "generic": "Something went wrong. Please try again."
-      }
+      },
+      "title": "My Characters"
     },
     "gallery": {
       "title": "Explore",

@@ -2,7 +2,12 @@ import { View, Text, Pressable, ScrollView, StyleSheet } from "react-native";
 import { Image } from "expo-image";
 import SafeSvgUri from "@/components/SafeSvgUri/SafeSvgUri";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { faArrowRight, faPalette } from "@fortawesome/pro-duotone-svg-icons";
+import {
+  faArrowRight,
+  faPalette,
+  faImages,
+} from "@fortawesome/pro-duotone-svg-icons";
+import SectionHeader from "@/components/SectionHeader/SectionHeader";
 import { tapLight } from "@/utils/haptics";
 import { FONTS, COLORS } from "@/lib/design";
 
@@ -76,23 +81,28 @@ const MyRecentCreationsView = ({
 
   return (
     <View style={styles.section}>
-      <View style={styles.headerRow}>
-        <Text style={styles.title}>My recent creations</Text>
-        <Pressable
-          style={({ pressed }) => [
-            styles.seeAllPill,
-            pressed && styles.pressed,
-          ]}
-          onPress={() => {
-            tapLight();
-            onSeeAllPress();
-          }}
-          accessibilityLabel="See all my pictures"
-        >
-          <Text style={styles.seeAllText}>See all my pictures</Text>
-          <FontAwesomeIcon icon={faArrowRight} size={12} color="#FFFFFF" />
-        </Pressable>
-      </View>
+      <SectionHeader
+        title="My recent creations"
+        icon={faImages}
+        tint="gold"
+        style={styles.header}
+        right={
+          <Pressable
+            style={({ pressed }) => [
+              styles.seeAllPill,
+              pressed && styles.pressed,
+            ]}
+            onPress={() => {
+              tapLight();
+              onSeeAllPress();
+            }}
+            accessibilityLabel="See all my pictures"
+          >
+            <Text style={styles.seeAllText}>See all my pictures</Text>
+            <FontAwesomeIcon icon={faArrowRight} size={12} color="#FFFFFF" />
+          </Pressable>
+        }
+      />
 
       <ScrollView
         horizontal
@@ -140,19 +150,9 @@ const styles = StyleSheet.create({
     width: "100%",
     marginTop: 24,
   },
-  headerRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+  // Horizontal padding for the shared SectionHeader on this strip.
+  header: {
     paddingHorizontal: 20,
-    marginBottom: 12,
-    gap: 12,
-  },
-  title: {
-    fontFamily: FONTS.bold,
-    fontSize: 22,
-    color: COLORS.textPrimary,
-    flexShrink: 1,
   },
   seeAllPill: {
     flexDirection: "row",

@@ -142,7 +142,13 @@ export const AddCharacterTile = ({ onPress }: { onPress: () => void }) => {
       ]}
     >
       <View style={styles.portraitArea}>
-        <FontAwesomeIcon icon={faPlus} size={44} color={COLORS.crayonOrange} />
+        <FontAwesomeIcon
+          icon={faPlus}
+          size={44}
+          color={COLORS.crayonOrange}
+          secondaryColor={COLORS.secondaryOrange}
+          secondaryOpacity={1}
+        />
         <Text style={styles.statusText}>{t("addCharacter")}</Text>
       </View>
     </Pressable>
@@ -157,8 +163,10 @@ const styles = StyleSheet.create({
     borderColor: COLORS.bgCreamDark,
     backgroundColor: COLORS.white,
     overflow: "hidden",
-    shadowColor: "#E46444",
-    shadowOffset: { width: 0, height: 2 },
+    // Crisp neutral soft shadow (matches the sticker-card "stuck on" feel)
+    // instead of a muddy low-opacity orange tint.
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.08,
     shadowRadius: 8,
     elevation: 3,
