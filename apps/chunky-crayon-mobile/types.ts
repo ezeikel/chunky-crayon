@@ -69,6 +69,10 @@ export type ColoringImage = {
   title: string;
   description: string;
   alt: string;
+  // Generation lifecycle. A freshly-created row (worker/pending flow) starts
+  // GENERATING with no svgUrl and is flipped to READY by the worker; the
+  // detail screen polls on this. Older sync-created rows arrive READY.
+  status?: "GENERATING" | "READY" | "FAILED";
   url?: string;
   svgUrl?: string;
   qrCodeUrl?: string;

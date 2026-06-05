@@ -300,6 +300,52 @@ export const createColoringImage = async (description: string) => {
   return response.data;
 };
 
+/**
+ * Result of the pending/worker create flow — mirrors web's
+ * CreatePendingResult exactly so the form can branch on `ok` / `error`
+ * like web's CreateColoringPageForm does.
+ */
+export type CreatePendingResult =
+  | { ok: true; id: string }
+  | {
+      ok: false;
+      error:
+        | "unauthorized"
+        | "invalid_input"
+        | "moderation_blocked"
+        | "insufficient_credits"
+        | "trial_cap_reached"
+        | "worker_unavailable"
+        | "character_not_ready"
+        | "unknown";
+      message?: string;
+      credits?: number;
+    };
+
+/**
+ * Text-mode create via the WORKER/PENDING pipeline (same path web uses) —
+ * inserts a GENERATING row + dispatches the Hetzner worker, returns in ~1s
+ * with the row id. The app navigates to /coloring-image/{id} and polls until
+ * the worker flips it to READY. Supports `characterId` so a chosen friend is
+ * featured in the page (the old sync `createColoringImage` had no character
+ * support).
+ */
+export const createPendingColoringImage = async (args: {
+  description: string;
+  locale?: string;
+  quality?: string;
+  characterId?: string;
+}): Promise<CreatePendingResult> => {
+  const response = await api.post("/mobile/coloring-images/create", {
+    mode: "text",
+    description: args.description,
+    locale: args.locale ?? "en",
+    ...(args.quality ? { quality: args.quality } : {}),
+    ...(args.characterId ? { characterId: args.characterId } : {}),
+  });
+  return response.data as CreatePendingResult;
+};
+
 export const describeSketch = async (
   base64Image: string,
 ): Promise<string | null> => {

@@ -2,7 +2,10 @@ import React, { useCallback, useState } from "react";
 import { View, StyleSheet } from "react-native";
 import { router } from "expo-router";
 import { queryClient } from "@/providers";
-import { createColoringImage, createColoringImageFromVoice } from "@/api";
+import {
+  createPendingColoringImage,
+  createColoringImageFromVoice,
+} from "@/api";
 import {
   InputModeProvider,
   useInputMode,
@@ -12,7 +15,9 @@ import {
   VoiceInputPanel,
   ImageInputPanel,
 } from "./inputs";
+import CharacterPicker from "@/components/CharacterPicker";
 import { useCredits, useRefreshEntitlements } from "@/hooks/useEntitlements";
+import { toast } from "@/components/Toaster";
 import PaywallRouter from "@/components/PaywallRouter";
 
 type ColoringImage = {
@@ -31,6 +36,9 @@ const VOICE_CREDIT_COST = 10;
 const CreateColoringImageFormContent = () => {
   const { mode, description, isProcessing, reset } = useInputMode();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  // Text-mode "Add a friend": the selected character to feature in the page,
+  // threaded into the create call. null = no friend (the default).
+  const [characterId, setCharacterId] = useState<string | null>(null);
   // Single flag — PaywallRouter picks the right surface (top-up for
   // subscribers out of credits, subscription plans for non-subscribers)
   // from the entitlement state itself, so the call site no longer
@@ -55,25 +63,50 @@ const CreateColoringImageFormContent = () => {
 
     setIsSubmitting(true);
     try {
-      const { coloringImage } = await createColoringImage(description);
+      // Worker/pending flow (same path web uses) — returns fast with a
+      // GENERATING row id; the detail screen polls until the worker flips it
+      // to READY. `characterId` features the chosen friend in the page.
+      const result = await createPendingColoringImage({
+        description,
+        characterId: characterId ?? undefined,
+      });
+
+      if (!result.ok) {
+        // Map the action's error codes to the right surface (mirrors web).
+        if (
+          result.error === "insufficient_credits" ||
+          result.error === "trial_cap_reached"
+        ) {
+          setShowPaywall(true);
+        } else if (result.error === "moderation_blocked") {
+          toast.error("Let's try a different idea for your picture!");
+        } else if (result.error === "character_not_ready") {
+          toast.error("That friend isn't ready yet. Try again in a moment.");
+        } else {
+          toast.error("Something went wrong. Please try again.");
+        }
+        return;
+      }
 
       // Refresh entitlements to update credit count
       refreshEntitlements();
 
-      // Reset the form
+      // Reset the form (clears the description + the friend selection)
       reset();
+      setCharacterId(null);
 
       // Refetch queries
       await queryClient.refetchQueries();
 
-      // Navigate to coloring image
-      router.push(`/coloring-image/${coloringImage.id}`);
+      // Navigate to the (still-GENERATING) coloring image; it polls to READY.
+      router.push(`/coloring-image/${result.id}`);
     } catch (error) {
       console.error("Failed to create coloring image:", error);
+      toast.error("Something went wrong. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
-  }, [description, reset, credits, refreshEntitlements]);
+  }, [description, characterId, reset, credits, refreshEntitlements]);
 
   const handleColoringImageCreated = useCallback(
     async (coloringImage: ColoringImage) => {
@@ -149,10 +182,15 @@ const CreateColoringImageFormContent = () => {
             />
           )}
           {mode === "text" && (
-            <TextInputPanel
-              onSubmit={handleSubmit}
-              isSubmitting={isSubmitting}
-            />
+            <View style={styles.textMode}>
+              {/* Add a friend — feature one of the kid's characters in the
+                  page (web parity). null = no friend. */}
+              <CharacterPicker value={characterId} onChange={setCharacterId} />
+              <TextInputPanel
+                onSubmit={handleSubmit}
+                isSubmitting={isSubmitting}
+              />
+            </View>
           )}
           {mode === "voice" && (
             <VoiceInputPanel
@@ -198,6 +236,9 @@ const styles = StyleSheet.create({
   },
   panelContainer: {
     minHeight: 180,
+  },
+  textMode: {
+    gap: 16,
   },
 });
 

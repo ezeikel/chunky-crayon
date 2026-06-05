@@ -49,6 +49,7 @@ import ActionSheet from "@/components/ActionSheet";
 import ConfirmSheet from "@/components/ConfirmSheet";
 import useColoringImage from "@/hooks/api/useColoringImage";
 import Loading from "@/components/Loading/Loading";
+import GeneratingScreen from "@/components/GeneratingScreen";
 import { toast } from "@/components/Toaster";
 import { tapLight, tapMedium, tapHeavy, notifySuccess } from "@/utils/haptics";
 import { COLORS } from "@/lib/design";
@@ -376,6 +377,36 @@ const ColoringImage = () => {
   }
 
   const { coloringImage } = data;
+
+  // A page created via the worker/pending flow lands here as GENERATING with
+  // no svgUrl. The canvas needs the line-art svg, so show the friendly
+  // "making your page" screen until the worker flips the row to READY
+  // (useColoringImage polls every 4s while GENERATING). FAILED falls through
+  // to the same screen with a back affordance rather than a broken canvas —
+  // the worker rarely fails text generation; a retry path can come later.
+  const isGenerating =
+    coloringImage.status === "GENERATING" || !coloringImage.svgUrl;
+  if (isGenerating || coloringImage.status === "FAILED") {
+    return (
+      <View style={styles.generatingRoot}>
+        <Stack.Screen options={{ headerShown: false }} />
+        <GeneratingScreen />
+        <Pressable
+          onPress={handleBack}
+          style={[styles.generatingBack, { top: insets.top + 12 }]}
+          accessibilityRole="button"
+          accessibilityLabel="Back"
+          hitSlop={8}
+        >
+          <FontAwesomeIcon
+            icon={faChevronLeft}
+            size={18}
+            color={COLORS.textPrimary}
+          />
+        </Pressable>
+      </View>
+    );
+  }
 
   // Layout is fit-based (coloringTier), not orientation. The non-phone
   // tiers (three-column rails / middle toolbar-on-top) are rendered by the
@@ -873,6 +904,26 @@ const CANVAS_CARD_PADDING = 12;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  // Generating state (worker still drawing the page): full-screen loader +
+  // a floating back chip so the user is never trapped on a blank canvas.
+  generatingRoot: {
+    flex: 1,
+  },
+  generatingBack: {
+    position: "absolute",
+    left: 16,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "rgba(255,255,255,0.9)",
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 3,
   },
   gradient: {
     flex: 1,
