@@ -77,6 +77,12 @@ export type SceneTileOption = {
    * Distinct from `locked`: an `add` tile IS tappable.
    */
   state?: "add";
+  /**
+   * Optional grouping within the subject step. `"friends"` options (the
+   * kid's saved characters + an add tile) render in their own row above the
+   * preset subjects. Both groups share the layer's maxSelections cap.
+   */
+  group?: "friends";
 };
 
 export type SceneLayer = {
@@ -102,6 +108,11 @@ export type SceneBuilderLabels = {
   create?: string;
   extrasTitle?: string;
   skip?: string;
+  /** Sub-heading above the saved-character row, e.g. "Your friends". */
+  friendsTitle?: string;
+  /** Sub-heading above the preset row when a friends row shows, e.g.
+   *  "or pick one". */
+  subjectGroupTitle?: string;
 };
 
 export type SceneBuilderProps = {
@@ -407,6 +418,17 @@ const SceneBuilder = ({
   const subjectLayer = layers[0];
   const locationLayer = layers[1];
   const extraLayers = useMemo(() => layers.slice(2), [layers]);
+
+  // Split subject options into the kid's saved-character "friends" row and the
+  // preset subjects. Empty friends → the subject step renders one carousel.
+  const friendOptions = useMemo(
+    () => (subjectLayer?.options ?? []).filter((o) => o.group === "friends"),
+    [subjectLayer],
+  );
+  const presetOptions = useMemo(
+    () => (subjectLayer?.options ?? []).filter((o) => o.group !== "friends"),
+    [subjectLayer],
+  );
   const hasExtras = extraLayers.length > 0;
   const [step, setStep] = useState(0);
 
@@ -462,21 +484,58 @@ const SceneBuilder = ({
         </View>
       )}
 
-      {/* Step 0 — Who? (required) */}
+      {/* Step 0 — Who? (required). When the subject layer carries friend
+          options (the kid's saved characters), they render in their own "Your
+          friends" row above the presets — both write to the same selection, so
+          the maxSelections cap is shared. */}
       {step === 0 && subjectLayer && (
         <View style={styles.step}>
           <Text style={styles.title}>{subjectLayer.title}</Text>
-          <TileCarousel
-            layer={subjectLayer}
-            selected={selection[subjectLayer.id] ?? []}
-            locked={lockedKeys?.[subjectLayer.id] ?? []}
-            disabled={disabled}
-            size="lg"
-            onToggle={(k) => toggleOption(subjectLayer, k)}
-            onLockedTap={
-              onLockedTap ? (k) => onLockedTap(subjectLayer.id, k) : undefined
-            }
-          />
+          {friendOptions.length > 0 ? (
+            <>
+              {labels.friendsTitle ? (
+                <Text style={styles.groupLabel}>{labels.friendsTitle}</Text>
+              ) : null}
+              <TileCarousel
+                layer={{ ...subjectLayer, options: friendOptions }}
+                selected={selection[subjectLayer.id] ?? []}
+                locked={lockedKeys?.[subjectLayer.id] ?? []}
+                disabled={disabled}
+                size="lg"
+                onToggle={(k) => toggleOption(subjectLayer, k)}
+                onLockedTap={
+                  onLockedTap
+                    ? (k) => onLockedTap(subjectLayer.id, k)
+                    : undefined
+                }
+              />
+              {labels.subjectGroupTitle ? (
+                <Text style={styles.groupLabel}>
+                  {labels.subjectGroupTitle}
+                </Text>
+              ) : null}
+              <TileCarousel
+                layer={{ ...subjectLayer, options: presetOptions }}
+                selected={selection[subjectLayer.id] ?? []}
+                locked={lockedKeys?.[subjectLayer.id] ?? []}
+                disabled={disabled}
+                size="lg"
+                onToggle={(k) => toggleOption(subjectLayer, k)}
+              />
+            </>
+          ) : (
+            <TileCarousel
+              layer={subjectLayer}
+              selected={selection[subjectLayer.id] ?? []}
+              locked={lockedKeys?.[subjectLayer.id] ?? []}
+              disabled={disabled}
+              size="lg"
+              onToggle={(k) => toggleOption(subjectLayer, k)}
+              onLockedTap={
+                onLockedTap ? (k) => onLockedTap(subjectLayer.id, k) : undefined
+              }
+            />
+          )}
           <View style={styles.navRowEnd}>
             <PrimaryAction
               icon={faArrowRight}
@@ -595,6 +654,14 @@ const styles = StyleSheet.create({
     fontSize: 24,
     color: COLORS.textPrimary,
     textAlign: "center",
+  },
+  // Sub-heading above a tile group in the subject step (Your friends / presets).
+  groupLabel: {
+    fontFamily: FONTS.semiBold,
+    fontSize: 14,
+    color: COLORS.textSecondary,
+    paddingHorizontal: 4,
+    marginBottom: -6,
   },
   subTitle: {
     fontFamily: FONTS.bold,

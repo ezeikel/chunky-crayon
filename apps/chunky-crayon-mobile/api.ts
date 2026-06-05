@@ -334,14 +334,17 @@ export const createPendingColoringImage = async (args: {
   description: string;
   locale?: string;
   quality?: string;
-  characterId?: string;
+  /** Up to MAX_SUBJECTS featured characters (any mix of the kid's). */
+  characterIds?: string[];
 }): Promise<CreatePendingResult> => {
   const response = await api.post("/mobile/coloring-images/create", {
     mode: "text",
     description: args.description,
     locale: args.locale ?? "en",
     ...(args.quality ? { quality: args.quality } : {}),
-    ...(args.characterId ? { characterId: args.characterId } : {}),
+    ...(args.characterIds && args.characterIds.length > 0
+      ? { characterIds: args.characterIds }
+      : {}),
   });
   return response.data as CreatePendingResult;
 };

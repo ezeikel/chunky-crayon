@@ -119,6 +119,8 @@
       "skip": "Skip",
       "subjectTitle": "Who?",
       "subjectAddCharacter": "Add character",
+      "friendsTitle": "Your friends",
+      "subjectGroupTitle": "or pick one",
       "lockedMakeCharacter": "(make a character first)",
       "locationTitle": "Where?",
       "weatherTitle": "Weather",

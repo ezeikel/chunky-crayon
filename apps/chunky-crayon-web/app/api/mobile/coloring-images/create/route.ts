@@ -48,14 +48,18 @@ export async function POST(request: NextRequest) {
       typeof body?.description === 'string' ? body.description : '';
     const locale = typeof body?.locale === 'string' ? body.locale : 'en';
 
+    const characterIds = Array.isArray(body?.characterIds)
+      ? body.characterIds.filter(
+          (id: unknown): id is string => typeof id === 'string',
+        )
+      : [];
+
     const args: CreatePendingArgs = {
       mode: 'text',
       description,
       locale,
       ...(body?.quality ? { quality: body.quality } : {}),
-      ...(typeof body?.characterId === 'string' && body.characterId
-        ? { characterId: body.characterId }
-        : {}),
+      ...(characterIds.length > 0 ? { characterIds } : {}),
     };
 
     const result = await createPendingColoringImage(args);

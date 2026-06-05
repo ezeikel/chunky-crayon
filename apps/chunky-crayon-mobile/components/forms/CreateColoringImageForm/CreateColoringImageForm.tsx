@@ -39,6 +39,9 @@ const CreateColoringImageFormContent = () => {
   // Text-mode "Add a friend": the selected character to feature in the page,
   // threaded into the create call. null = no friend (the default).
   const [characterId, setCharacterId] = useState<string | null>(null);
+  // Scene mode can feature up to MAX_SUBJECTS of the kid's characters (the
+  // "Your friends" row). Reported up from SceneInput.
+  const [sceneCharacterIds, setSceneCharacterIds] = useState<string[]>([]);
   // Single flag — PaywallRouter picks the right surface (top-up for
   // subscribers out of credits, subscription plans for non-subscribers)
   // from the entitlement state itself, so the call site no longer
@@ -65,10 +68,13 @@ const CreateColoringImageFormContent = () => {
     try {
       // Worker/pending flow (same path web uses) — returns fast with a
       // GENERATING row id; the detail screen polls until the worker flips it
-      // to READY. `characterId` features the chosen friend in the page.
+      // to READY. Scene mode features up to MAX_SUBJECTS of the kid's
+      // characters (the friends row); text mode uses the single picker.
+      const characterIds =
+        mode === "scene" ? sceneCharacterIds : characterId ? [characterId] : [];
       const result = await createPendingColoringImage({
         description,
-        characterId: characterId ?? undefined,
+        characterIds,
       });
 
       if (!result.ok) {
@@ -94,6 +100,7 @@ const CreateColoringImageFormContent = () => {
       // Reset the form (clears the description + the friend selection)
       reset();
       setCharacterId(null);
+      setSceneCharacterIds([]);
 
       // Refetch queries
       await queryClient.refetchQueries();
@@ -106,7 +113,15 @@ const CreateColoringImageFormContent = () => {
     } finally {
       setIsSubmitting(false);
     }
-  }, [description, characterId, reset, credits, refreshEntitlements]);
+  }, [
+    description,
+    characterId,
+    sceneCharacterIds,
+    mode,
+    reset,
+    credits,
+    refreshEntitlements,
+  ]);
 
   const handleColoringImageCreated = useCallback(
     async (coloringImage: ColoringImage) => {
@@ -174,6 +189,7 @@ const CreateColoringImageFormContent = () => {
           {mode === "scene" && (
             <SceneInput
               onCreate={handleSubmit}
+              onCharactersChange={setSceneCharacterIds}
               // Mirror web: when the kid can't generate (out of credits / no
               // sub), the Scene Create button stays inviting but opens the
               // paywall on tap — surfaced at Create, not after a built scene.
