@@ -4,7 +4,8 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Image } from "expo-image";
 import Spinner from "@/components/Spinner/Spinner";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { faStar, faLock, faCheck } from "@fortawesome/pro-solid-svg-icons";
+import { faStar, faCheck } from "@fortawesome/pro-solid-svg-icons";
+import { faLock, faMedal, faPaw } from "@fortawesome/pro-duotone-svg-icons";
 import AppHeader from "@/components/AppHeader";
 import StickerDetailSheet, {
   type StickerDetail,
@@ -13,6 +14,7 @@ import useHeaderData from "@/hooks/useHeaderData";
 import { useStickers, useMarkStickersAsViewed } from "@/hooks/api";
 import { useT } from "@/lib/i18n/useT";
 import { STICKER_IMAGES } from "@/lib/stickers";
+import { COLORS } from "@/lib/design";
 
 type StickerCategory = {
   id: string;
@@ -36,42 +38,69 @@ type StickerItemProps = {
   onPress: () => void;
 };
 
+// Rarity ring colour (web parity: rarityRing). Kids read colour, not labels.
+const RARITY_BORDER: Record<string, string> = {
+  common: COLORS.bgCreamDark,
+  uncommon: "#7FB069",
+  rare: "#C18B9D",
+  legendary: "#F59E0B",
+};
+
 const StickerItem = ({ sticker, onPress }: StickerItemProps) => {
-  const t = useT("mobile.stickers");
   const image = STICKER_IMAGES[sticker.id];
+  const unlocked = sticker.isUnlocked;
+  // The API already returns a human-readable sticker name (web resolves it via
+  // a stickerCatalog i18n bundle that mobile doesn't ship — use the name field).
+  const name = sticker.name;
+  const ringColor = unlocked
+    ? (RARITY_BORDER[sticker.rarity] ?? COLORS.bgCreamDark)
+    : COLORS.bgCreamDark;
 
   return (
     <Pressable
       style={({ pressed }) => [
         styles.stickerItem,
-        !sticker.isUnlocked && styles.stickerItemLocked,
+        { borderColor: ringColor },
+        !unlocked && styles.stickerItemLocked,
         pressed && styles.stickerItemPressed,
       ]}
       onPress={onPress}
     >
-      <View style={styles.stickerArt}>
-        {/* Real bundled sticker PNG (web parity: web's StickerCard renders
-            sticker.imageUrl). Locked = dimmed, matching web's grayscale/
-            opacity treatment (RN Image has no CSS grayscale, so dim via
-            opacity on the locked tile + this lower opacity). */}
-        <Image
-          source={image}
-          style={[
-            styles.stickerImage,
-            !sticker.isUnlocked && styles.stickerImageLocked,
-          ]}
-          contentFit="contain"
-          transition={150}
-        />
-        {!sticker.isUnlocked && (
-          <View style={styles.lockOverlay}>
-            <FontAwesomeIcon icon={faLock} size={16} color="#9CA3AF" />
-          </View>
-        )}
-      </View>
-      {sticker.isNew && sticker.isUnlocked && (
+      {/* Art fills the card and is CENTRED via contain + flex (web's flex-1
+          + object-contain). The previous fixed 56px box made the PNG read
+          off-centre. Locked = dimmed (RN has no CSS grayscale). */}
+      <Image
+        source={image}
+        style={[styles.stickerImage, !unlocked && styles.stickerImageLocked]}
+        contentFit="contain"
+        transition={150}
+      />
+
+      {/* Name label under the sticker — always shown (web parity). */}
+      <Text
+        style={[styles.stickerName, !unlocked && styles.stickerNameLocked]}
+        numberOfLines={1}
+      >
+        {name}
+      </Text>
+
+      {/* Lock badge — top-right, big + obvious (web's -top-3 -right-3). */}
+      {!unlocked && (
+        <View style={styles.lockBadge}>
+          <FontAwesomeIcon
+            icon={faLock}
+            size={14}
+            color={COLORS.textMuted}
+            secondaryColor={COLORS.bgCreamDark}
+            secondaryOpacity={1}
+          />
+        </View>
+      )}
+
+      {/* NEW star badge — freshly unlocked (web's orange star). */}
+      {unlocked && sticker.isNew && (
         <View style={styles.newBadge}>
-          <Text style={styles.newBadgeText}>{t("new")}</Text>
+          <FontAwesomeIcon icon={faStar} size={14} color="#FFFFFF" />
         </View>
       )}
     </Pressable>
@@ -152,7 +181,8 @@ const StickersScreen = () => {
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
-          {/* Header */}
+          {/* Header — title, count, and a filled progress bar with a star
+              endcap (web's Sticker Collection progress). */}
           <View style={styles.header}>
             <Text style={styles.headerTitle}>{t("title")}</Text>
             <View style={styles.collectionProgress}>
@@ -164,6 +194,21 @@ const StickersScreen = () => {
                 })}
               </Text>
             </View>
+            {totalStickers > 0 && (
+              <View style={styles.progressTrack}>
+                <View
+                  style={[
+                    styles.progressFill,
+                    {
+                      width: `${Math.min(100, Math.round((unlockedStickers / totalStickers) * 100))}%`,
+                    },
+                  ]}
+                />
+                <View style={styles.progressStar}>
+                  <FontAwesomeIcon icon={faStar} size={12} color="#FFFFFF" />
+                </View>
+              </View>
+            )}
           </View>
 
           {isLoading ? (
@@ -173,21 +218,54 @@ const StickersScreen = () => {
             </View>
           ) : (
             <>
-              {/* Sticker Categories */}
-              {stickerCategories.map((category) => (
-                <View key={category.id} style={styles.categorySection}>
-                  <Text style={styles.categoryTitle}>{category.name}</Text>
-                  <View style={styles.stickersGrid}>
-                    {category.stickers.map((sticker) => (
-                      <StickerItem
-                        key={sticker.id}
-                        sticker={sticker}
-                        onPress={() => handleStickerPress(sticker)}
-                      />
-                    ))}
+              {/* Sticker sections — each gets a coloured icon badge + an
+                  "unlocked / total" count under the title (web parity). The
+                  milestone section gets a gold medal; the rest get a paw. */}
+              {stickerCategories.map((category) => {
+                const isMilestone = /milestone/i.test(category.id);
+                const sectionUnlocked = category.stickers.filter(
+                  (s) => s.isUnlocked,
+                ).length;
+                return (
+                  <View key={category.id} style={styles.categorySection}>
+                    <View style={styles.sectionHeaderRow}>
+                      <View
+                        style={[
+                          styles.sectionBadge,
+                          isMilestone
+                            ? styles.sectionBadgeGold
+                            : styles.sectionBadgePaw,
+                        ]}
+                      >
+                        <FontAwesomeIcon
+                          icon={isMilestone ? faMedal : faPaw}
+                          size={18}
+                          color={isMilestone ? "#F59E0B" : "#7FB069"}
+                          secondaryColor={isMilestone ? "#FDD835" : "#A8D08D"}
+                          secondaryOpacity={1}
+                        />
+                      </View>
+                      <View>
+                        <Text style={styles.categoryTitle}>
+                          {category.name}
+                        </Text>
+                        <Text style={styles.sectionCount}>
+                          {sectionUnlocked} / {category.stickers.length}
+                        </Text>
+                      </View>
+                    </View>
+                    <View style={styles.stickersGrid}>
+                      {category.stickers.map((sticker) => (
+                        <StickerItem
+                          key={sticker.id}
+                          sticker={sticker}
+                          onPress={() => handleStickerPress(sticker)}
+                        />
+                      ))}
+                    </View>
                   </View>
-                </View>
-              ))}
+                );
+              })}
 
               {/* Unlock Hint */}
               <View style={styles.hintContainer}>
@@ -255,81 +333,149 @@ const styles = StyleSheet.create({
     color: "#6B7280",
   },
   categorySection: {
-    marginBottom: 24,
+    marginBottom: 28,
+  },
+  // Section header: coloured icon medallion + title + "unlocked / total" count.
+  sectionHeaderRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    paddingHorizontal: 16,
+    marginBottom: 14,
+  },
+  sectionBadge: {
+    width: 40,
+    height: 40,
+    borderRadius: 14,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  sectionBadgeGold: {
+    backgroundColor: "rgba(245, 158, 11, 0.14)",
+  },
+  sectionBadgePaw: {
+    backgroundColor: "rgba(127, 176, 105, 0.16)",
   },
   categoryTitle: {
     fontFamily: "TondoTrial-Bold",
-    fontSize: 18,
-    color: "#374151",
-    paddingHorizontal: 16,
-    marginBottom: 12,
+    fontSize: 19,
+    color: COLORS.textPrimary,
+  },
+  sectionCount: {
+    fontFamily: "TondoTrial-Regular",
+    fontSize: 13,
+    color: COLORS.textMuted,
+    marginTop: 1,
+  },
+  // Progress bar (web's Sticker Collection bar): cream track, orange fill,
+  // a white star endcap riding the right edge.
+  progressTrack: {
+    height: 16,
+    borderRadius: 8,
+    backgroundColor: COLORS.bgCreamDark,
+    marginTop: 12,
+    justifyContent: "center",
+  },
+  progressFill: {
+    position: "absolute",
+    left: 0,
+    top: 0,
+    bottom: 0,
+    backgroundColor: COLORS.crayonOrange,
+    borderRadius: 8,
+    minWidth: 16,
+  },
+  progressStar: {
+    position: "absolute",
+    right: 2,
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: "#F0A98C",
+    alignItems: "center",
+    justifyContent: "center",
   },
   stickersGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    paddingHorizontal: 12,
-    gap: 8,
+    paddingHorizontal: 16,
+    gap: 10,
   },
+  // Square card, white, rarity-coloured border (set inline). Art fills + a
+  // name label below, matching web's StickerCard. The chunky bottom shadow
+  // gives the "stuck on" sticker-book feel.
   stickerItem: {
-    width: "30%",
+    width: "31%",
     aspectRatio: 1,
-    backgroundColor: "rgba(255, 255, 255, 0.9)",
-    borderRadius: 16,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 20,
+    borderWidth: 2,
+    paddingTop: 10,
+    paddingHorizontal: 8,
+    paddingBottom: 6,
     alignItems: "center",
     justifyContent: "center",
-    shadowColor: "#E46444",
-    shadowOffset: { width: 0, height: 2 },
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.08,
     shadowRadius: 8,
     elevation: 3,
     position: "relative",
   },
   stickerItemLocked: {
-    opacity: 0.5,
+    borderStyle: "dashed",
+    backgroundColor: COLORS.bgCream,
   },
   stickerItemPressed: {
     transform: [{ scale: 0.95 }],
   },
-  stickerArt: {
-    width: 56,
-    height: 56,
-    alignItems: "center",
-    justifyContent: "center",
-  },
+  // Art FILLS the card area (flex:1) + contain → always centred. (The old
+  // fixed-56px box let asymmetric PNG whitespace read as off-centre.)
   stickerImage: {
+    flex: 1,
     width: "100%",
-    height: "100%",
   },
   stickerImageLocked: {
-    // RN <Image> has no CSS grayscale; the tile already dims to 0.5 via
-    // stickerItemLocked, and this drops the art further so locked stickers
-    // read as "not yet earned" like web's grayscale+opacity treatment.
-    opacity: 0.4,
+    // RN <Image> has no CSS grayscale; dim the art so locked reads as
+    // "not yet earned" like web's grayscale + opacity.
+    opacity: 0.28,
   },
-  lockOverlay: {
+  stickerName: {
+    fontFamily: "TondoTrial-Bold",
+    fontSize: 12,
+    color: COLORS.textPrimary,
+    textAlign: "center",
+    marginTop: 4,
+  },
+  stickerNameLocked: {
+    color: COLORS.textMuted,
+  },
+  // Lock + NEW badges sit top-right, overhanging the corner (web's -top/-right).
+  lockBadge: {
     position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
+    top: -8,
+    right: -8,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: "#FFFFFF",
+    borderWidth: 2,
+    borderColor: COLORS.bgCreamDark,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "rgba(255, 255, 255, 0.7)",
-    borderRadius: 8,
   },
   newBadge: {
     position: "absolute",
-    top: 4,
-    right: 4,
-    backgroundColor: "#E46444",
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 6,
-  },
-  newBadgeText: {
-    fontFamily: "TondoTrial-Bold",
-    fontSize: 8,
-    color: "#FFFFFF",
+    top: -8,
+    right: -8,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: COLORS.crayonOrange,
+    borderWidth: 2,
+    borderColor: "#FFFFFF",
+    alignItems: "center",
+    justifyContent: "center",
   },
   hintContainer: {
     flexDirection: "row",
