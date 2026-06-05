@@ -19,6 +19,7 @@ import {
   faCalendarWeek,
   faTrophy,
   faWandMagicSparkles,
+  faImage,
 } from "@fortawesome/pro-duotone-svg-icons";
 import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { useFeed } from "@/hooks/api";
@@ -77,7 +78,13 @@ const ColoringCard = memo(
             viewBox="0 0 1024 1024"
           />
         ) : (
-          <Text style={styles.placeholderText}>🎨</Text>
+          <FontAwesomeIcon
+            icon={faPalette}
+            size={36}
+            color={COLORS.secondaryOrange}
+            secondaryColor={COLORS.bgCreamDark}
+            secondaryOpacity={1}
+          />
         )}
         {/* Show indicator when there's progress */}
         {item.previewUrl && (
@@ -116,7 +123,13 @@ const ArtworkCard = memo(
             transition={200}
           />
         ) : (
-          <Text style={styles.placeholderText}>🖼️</Text>
+          <FontAwesomeIcon
+            icon={faImage}
+            size={36}
+            color={COLORS.lavender}
+            secondaryColor={COLORS.bgCreamDark}
+            secondaryOpacity={1}
+          />
         )}
       </View>
     </Pressable>
@@ -156,7 +169,13 @@ const InProgressCard = memo(
             viewBox="0 0 1024 1024"
           />
         ) : (
-          <Text style={styles.placeholderText}>🎨</Text>
+          <FontAwesomeIcon
+            icon={faPalette}
+            size={36}
+            color={COLORS.secondaryOrange}
+            secondaryColor={COLORS.bgCreamDark}
+            secondaryOpacity={1}
+          />
         )}
         {/* Palette overlay to indicate resumable coloring */}
         <View style={styles.progressOverlay}>
@@ -496,9 +515,6 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
     borderRadius: 8,
-  },
-  placeholderText: {
-    fontSize: 40,
   },
   errorContainer: {
     flex: 1,

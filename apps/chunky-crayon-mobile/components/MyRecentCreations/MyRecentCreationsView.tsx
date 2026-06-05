@@ -135,7 +135,13 @@ const MyRecentCreationsView = ({
                   viewBox="0 0 1024 1024"
                 />
               ) : (
-                <Text style={styles.placeholderText}>🎨</Text>
+                <FontAwesomeIcon
+                  icon={faPalette}
+                  size={32}
+                  color={COLORS.secondaryOrange}
+                  secondaryColor={COLORS.bgCreamDark}
+                  secondaryOpacity={1}
+                />
               )}
             </View>
           </Pressable>
@@ -189,9 +195,6 @@ const styles = StyleSheet.create({
   cardImage: {
     width: "100%",
     height: "100%",
-  },
-  placeholderText: {
-    fontSize: 32,
   },
   pressed: {
     transform: [{ scale: 0.97 }],

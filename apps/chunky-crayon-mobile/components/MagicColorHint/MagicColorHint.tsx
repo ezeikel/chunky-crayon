@@ -22,7 +22,7 @@ import Animated, {
   runOnJS,
 } from "react-native-reanimated";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { faLightbulb } from "@fortawesome/pro-duotone-svg-icons";
+import { faLightbulb, faXmark } from "@fortawesome/pro-duotone-svg-icons";
 import type { GridColorCell } from "@/types";
 import { tapLight, notifySuccess } from "@/utils/haptics";
 import { useCanvasStore } from "@/stores/canvasStore";
@@ -149,7 +149,7 @@ const MagicColorHint = ({
             onPress={handleDismiss}
             className="py-2 px-4 rounded-lg bg-gray-100 items-center justify-center"
           >
-            <Text style={styles.dismissText}>✕</Text>
+            <FontAwesomeIcon icon={faXmark} size={16} color="#4B5563" />
           </Pressable>
         </View>
       </View>
@@ -189,11 +189,6 @@ const styles = StyleSheet.create({
   useColorText: {
     color: "#FFF",
     fontFamily: "TondoTrial-Bold",
-    fontSize: 14,
-  },
-  dismissText: {
-    color: "#4B5563",
-    fontFamily: "TondoTrial-Regular",
     fontSize: 14,
   },
   arrow: {

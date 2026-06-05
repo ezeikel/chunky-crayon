@@ -1,5 +1,7 @@
 import { View, Text, StyleSheet } from "react-native";
 import Svg, { Circle } from "react-native-svg";
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import { faStar } from "@fortawesome/pro-duotone-svg-icons";
 import { useCanvasStore } from "@/stores/canvasStore";
 import { COLORS, FONTS } from "@/lib/design";
 
@@ -10,7 +12,8 @@ type ProgressIndicatorProps = {
 /**
  * Coloring progress indicator — mobile port of coloring-ui's kids
  * ProgressIndicator: a star-filling circular ring (40px, r=18, 3px
- * stroke) with a ⭐/🌟 in the centre and a bold orange N% beside it.
+ * stroke) with a duotone faStar in the centre (gold when complete, orange
+ * otherwise — FA over emoji in UI) and a bold orange N% beside it.
  *
  * Web values matched exactly: grey #E5E7EB track, orange #FB8C00 fill
  * (gold #FDD835 when complete). Hidden at 0% like web. Sits in a soft
@@ -61,7 +64,13 @@ const ProgressIndicator = ({ style }: ProgressIndicatorProps) => {
             strokeDashoffset={offset}
           />
         </Svg>
-        <Text style={styles.star}>{isComplete ? "🌟" : "⭐"}</Text>
+        <FontAwesomeIcon
+          icon={faStar}
+          size={14}
+          color={isComplete ? FILL_COMPLETE : FILL}
+          secondaryColor={isComplete ? "#FFF3C4" : COLORS.secondaryOrange}
+          secondaryOpacity={1}
+        />
       </View>
       <Text style={styles.progressText}>{progress}%</Text>
     </View>
@@ -92,9 +101,6 @@ const styles = StyleSheet.create({
   svg: {
     position: "absolute",
     transform: [{ rotate: "-90deg" }],
-  },
-  star: {
-    fontSize: 14,
   },
   progressText: {
     fontSize: 16,

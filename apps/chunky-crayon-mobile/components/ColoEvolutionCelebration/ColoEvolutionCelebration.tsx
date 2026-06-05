@@ -259,7 +259,7 @@ const ColoEvolutionCelebration = ({
                 onPress={onDismiss}
                 className="mt-6 px-8 py-3 bg-[#E46444] rounded-full shadow-lg"
               >
-                <Text style={styles.buttonText}>Awesome! 🎉</Text>
+                <Text style={styles.buttonText}>Awesome!</Text>
               </AnimatedTouchableOpacity>
             </Animated.View>
           </TouchableWithoutFeedback>

@@ -1,4 +1,6 @@
 import { View, Text, Pressable, StyleSheet } from "react-native";
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import { faPalette } from "@fortawesome/pro-duotone-svg-icons";
 import SafeSvgUri from "@/components/SafeSvgUri/SafeSvgUri";
 import { tapLight } from "@/utils/haptics";
 import { FONTS, COLORS } from "@/lib/design";
@@ -102,7 +104,13 @@ const MoreColoringPagesView = ({
                     viewBox="0 0 1024 1024"
                   />
                 ) : (
-                  <Text style={styles.placeholderText}>🎨</Text>
+                  <FontAwesomeIcon
+                    icon={faPalette}
+                    size={32}
+                    color={COLORS.secondaryOrange}
+                    secondaryColor={COLORS.bgCreamDark}
+                    secondaryOpacity={1}
+                  />
                 )}
               </View>
             </Pressable>
@@ -147,9 +155,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     padding: 8,
-  },
-  placeholderText: {
-    fontSize: 32,
   },
   pressed: {
     transform: [{ scale: 0.97 }],

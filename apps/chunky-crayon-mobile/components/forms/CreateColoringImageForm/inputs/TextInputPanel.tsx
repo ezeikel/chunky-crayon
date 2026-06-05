@@ -24,7 +24,7 @@ const TextInputPanel = ({ onSubmit, isSubmitting }: TextInputPanelProps) => {
         style={styles.textInput}
         onChangeText={setDescription}
         value={description}
-        placeholder="e.g. a pirate ship sailing through space 🚀"
+        placeholder="What do you want to color?"
         placeholderTextColor={COLORS.textMuted}
         multiline
         numberOfLines={4}
