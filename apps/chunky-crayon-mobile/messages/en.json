@@ -82,7 +82,11 @@
       "lockedTitle": "Locked sticker",
       "unlockedDefault": "You unlocked this!",
       "unlockHintDefault": "Keep coloring to unlock this sticker!",
-      "unlockedOn": "Unlocked {{date}}"
+      "unlockedOn": "Unlocked {{date}}",
+      "progressGreatStart": "Great start!",
+      "progressHalfway": "Halfway there! Keep going!",
+      "progressAlmost": "Almost there! You're doing great!",
+      "progressComplete": "Amazing! All stickers collected!"
     },
     "myArtwork": {
       "loading": "Loading your artwork...",

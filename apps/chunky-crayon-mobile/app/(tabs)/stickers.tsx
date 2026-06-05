@@ -150,6 +150,20 @@ const StickersScreen = () => {
 
   const totalStickers = data?.stats.totalPossible ?? 0;
   const unlockedStickers = data?.stats.totalUnlocked ?? 0;
+  // Encouragement message under the progress bar — same tiers + wording as web's
+  // ProgressBar (greatStart < 50% ≤ halfway < 75% ≤ almost < 100% = complete).
+  const progressPct =
+    totalStickers > 0
+      ? Math.round((unlockedStickers / totalStickers) * 100)
+      : 0;
+  const progressMessage =
+    progressPct >= 100
+      ? t("progressComplete")
+      : progressPct >= 75
+        ? t("progressAlmost")
+        : progressPct >= 50
+          ? t("progressHalfway")
+          : t("progressGreatStart");
 
   const handleStickerPress = (sticker: Sticker) => {
     // Mark as viewed if it's new
@@ -208,6 +222,9 @@ const StickersScreen = () => {
                   <FontAwesomeIcon icon={faStar} size={12} color="#FFFFFF" />
                 </View>
               </View>
+            )}
+            {totalStickers > 0 && (
+              <Text style={styles.progressMessage}>{progressMessage}</Text>
             )}
           </View>
 
@@ -394,6 +411,13 @@ const styles = StyleSheet.create({
     backgroundColor: "#F0A98C",
     alignItems: "center",
     justifyContent: "center",
+  },
+  progressMessage: {
+    fontFamily: "TondoTrial-Regular",
+    fontSize: 13,
+    color: COLORS.textMuted,
+    textAlign: "center",
+    marginTop: 8,
   },
   stickersGrid: {
     flexDirection: "row",

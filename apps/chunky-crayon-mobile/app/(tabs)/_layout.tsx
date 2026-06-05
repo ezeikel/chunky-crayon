@@ -1,23 +1,18 @@
-import { View, Pressable, Text, StyleSheet } from "react-native";
+import { View, Pressable, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Tabs, router } from "expo-router";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+// All-duotone icon family (smooth, not sharp) for a consistent, lively bar.
 import {
-  faHouseChimney,
-  faImages,
-  faNoteSticky,
+  faHouse,
+  faImage,
+  faStar,
   faHeart,
-  faWandMagicSparkles,
-} from "@fortawesome/pro-solid-svg-icons";
-import {
-  faHouseChimney as faHouseChimneyLight,
-  faImages as faImagesLight,
-  faNoteSticky as faNoteStickyLight,
-  faHeart as faHeartLight,
-} from "@fortawesome/pro-light-svg-icons";
+  faHatWizard,
+} from "@fortawesome/pro-duotone-svg-icons";
 import { useT } from "@/lib/i18n/useT";
 import { tapMedium } from "@/utils/haptics";
-import { COLORS, FONTS } from "@/lib/design";
+import { COLORS } from "@/lib/design";
 
 // Tab bar reads as: [Home] [Gallery] · (Create FAB) · [Stickers] [My Art].
 // Two flat tabs on each side of a centered, elevated Create FAB — the
@@ -26,33 +21,15 @@ import { COLORS, FONTS } from "@/lib/design";
 // the two flanking pairs share the remaining width equally, keeping the
 // FAB dead-centre.
 const LEFT_TABS = [
-  {
-    name: "index",
-    labelKey: "home",
-    icon: faHouseChimney,
-    iconLight: faHouseChimneyLight,
-  },
-  {
-    name: "gallery",
-    labelKey: "gallery",
-    icon: faImages,
-    iconLight: faImagesLight,
-  },
+  { name: "index", labelKey: "home", icon: faHouse },
+  { name: "gallery", labelKey: "gallery", icon: faImage },
 ] as const;
 
 const RIGHT_TABS = [
-  {
-    name: "stickers",
-    labelKey: "stickers",
-    icon: faNoteSticky,
-    iconLight: faNoteStickyLight,
-  },
-  {
-    name: "my-artwork",
-    labelKey: "myArt",
-    icon: faHeart,
-    iconLight: faHeartLight,
-  },
+  // Stickers = a STAR (rewards you earned). The old note/post-it read as
+  // "notes" to a kid, not "prizes".
+  { name: "stickers", labelKey: "stickers", icon: faStar },
+  { name: "my-artwork", labelKey: "myArt", icon: faHeart },
 ] as const;
 
 // Minimal shape of the props expo-router's Tabs passes to a custom
@@ -62,8 +39,7 @@ const RIGHT_TABS = [
 type TabItem = {
   name: string;
   labelKey: string;
-  icon: typeof faHouseChimney;
-  iconLight: typeof faHouseChimney;
+  icon: typeof faHouse;
 };
 type TabBarProps = {
   state: { index: number; routes: { name: string }[] };
@@ -79,7 +55,10 @@ const CustomTabBar = ({ state, navigation }: TabBarProps) => {
 
   const renderTab = (item: TabItem) => {
     const focused = focusedRouteName === item.name;
-    const color = focused ? COLORS.crayonOrange : "#9CA3AF";
+    // Duotone: active = brand orange + a lighter orange fill; inactive = muted
+    // grey two-tone. Icon-only (no text label) — the label is the a11y name.
+    const primary = focused ? COLORS.crayonOrange : "#9CA3AF";
+    const secondary = focused ? COLORS.secondaryOrange : "#C9CDD3";
     return (
       <Pressable
         key={item.name}
@@ -95,17 +74,16 @@ const CustomTabBar = ({ state, navigation }: TabBarProps) => {
         accessibilityLabel={t(item.labelKey)}
       >
         {/* Active tab = a soft orange-tinted pill chip behind the icon so the
-            current tab reads as "lit up", not just a colour swap. */}
+            current tab reads as "lit up". Icon-only — labels removed. */}
         <View style={[styles.tabChip, focused && styles.tabChipActive]}>
           <FontAwesomeIcon
-            icon={focused ? item.icon : item.iconLight}
-            size={22}
-            color={color}
+            icon={item.icon}
+            size={26}
+            color={primary}
+            secondaryColor={secondary}
+            secondaryOpacity={1}
           />
         </View>
-        <Text style={[styles.tabLabel, { color }]} numberOfLines={1}>
-          {t(item.labelKey)}
-        </Text>
       </Pressable>
     );
   };
@@ -138,9 +116,11 @@ const CustomTabBar = ({ state, navigation }: TabBarProps) => {
               accessibilityLabel={tButton("createColoringPage")}
             >
               <FontAwesomeIcon
-                icon={faWandMagicSparkles}
+                icon={faHatWizard}
                 size={26}
                 color="#FFFFFF"
+                secondaryColor="rgba(255,255,255,0.55)"
+                secondaryOpacity={1}
               />
             </Pressable>
           </View>
@@ -221,24 +201,19 @@ const styles = StyleSheet.create({
   tabItem: {
     flex: 1,
     alignItems: "center",
-    justifyContent: "flex-start",
-    gap: 3,
+    justifyContent: "center",
   },
-  // Icon sits in a rounded chip; the active chip gets an orange tint so the
-  // current tab reads as "lit", not just a colour change.
+  // Icon-only — sits in a rounded chip; the active chip gets an orange tint so
+  // the current tab reads as "lit", not just a colour change.
   tabChip: {
-    width: 48,
-    height: 32,
-    borderRadius: 16,
+    width: 56,
+    height: 40,
+    borderRadius: 20,
     alignItems: "center",
     justifyContent: "center",
   },
   tabChipActive: {
     backgroundColor: "rgba(228, 100, 68, 0.12)",
-  },
-  tabLabel: {
-    fontFamily: FONTS.regular,
-    fontSize: 11,
   },
   // Fixed center column the FAB cradle sits in.
   fabSlot: {
