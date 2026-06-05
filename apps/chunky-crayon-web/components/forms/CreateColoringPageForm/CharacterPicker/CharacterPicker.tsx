@@ -26,12 +26,23 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
-import { faBan, faUserPlus } from '@fortawesome/pro-duotone-svg-icons';
+import { faBan, faUserPlus, faCheck } from '@fortawesome/pro-duotone-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import cn from '@/utils/cn';
 import useCharacters from '@/hooks/useCharacters';
 import { trackEvent } from '@/utils/analytics-client';
 import { TRACKING_EVENTS } from '@/constants';
+
+// Soft per-disc colour washes (Duolingo-ABC kids pattern) — each friend
+// disc cycles through these so the row reads as a colourful set, not grey.
+const DISC_TINTS = [
+  'bg-crayon-orange/15',
+  'bg-crayon-blue/15',
+  'bg-crayon-green/15',
+  'bg-crayon-purple/15',
+  'bg-crayon-yellow/20',
+  'bg-crayon-pink/15',
+] as const;
 
 type Props = {
   /** Currently selected characterId, or null for "None". */
@@ -68,12 +79,12 @@ const CharacterPicker = ({ value, onChange }: Props) => {
           Add a friend{' '}
           <span className="font-normal text-neutral-400">(optional)</span>
         </span>
-        <div className="flex gap-3 overflow-x-auto pb-2">
+        <div className="flex gap-4 overflow-x-auto pb-2 pt-1">
           {SKELETON_ITEMS.map((_, i) => (
             <div
               // eslint-disable-next-line react/no-array-index-key
               key={i}
-              className="size-28 rounded-3xl bg-paper-cream-dark/30 animate-pulse shrink-0"
+              className="size-20 shrink-0 animate-pulse rounded-full border-4 border-white bg-paper-cream-dark/40 shadow-[0_4px_10px_rgba(0,0,0,0.08)]"
             />
           ))}
         </div>
@@ -135,31 +146,32 @@ const CharacterPicker = ({ value, onChange }: Props) => {
         <span className="font-normal text-neutral-400">(optional)</span>
       </span>
 
-      <div className="-mx-1 flex gap-3 overflow-x-auto px-1 pb-2 pt-1">
-        {/* "No friend" tile — first so it's the default and easy to bounce
-            back to. A duotone "ban" medallion reads friendlier to a kid than
-            a bare ∅ glyph (which looks like an error). */}
+      {/* Circular character discs — the kids-app pattern (Spotify Kids,
+          Duolingo ABC): each friend is a round disc on a soft colour
+          background with a chunky white "sticker" ring; the selected one
+          pops with a bold orange ring + scale + a check badge. */}
+      <div className="-mx-1 flex gap-4 overflow-x-auto px-1 pb-2 pt-1">
+        {/* "No friend" disc — first so it's the default and easy to bounce
+            back to. A duotone "ban" icon reads friendlier than a bare ∅. */}
         <button
           type="button"
           onClick={() => handleSelect(null)}
           aria-pressed={value === null}
-          className={cn(
-            'flex size-28 shrink-0 flex-col items-center justify-center gap-2 rounded-3xl border-2 transition-all',
-            value === null
-              ? 'scale-105 border-crayon-orange bg-crayon-orange/10 shadow-[0_4px_0_0_hsl(var(--crayon-orange)/0.3)]'
-              : 'border-paper-cream-dark bg-white shadow-[0_4px_0_0_hsl(var(--paper-cream-dark))] hover:border-crayon-orange',
-          )}
+          className="group flex shrink-0 flex-col items-center gap-1.5"
         >
           <span
             className={cn(
-              'flex size-11 items-center justify-center rounded-full transition-colors',
-              value === null ? 'bg-crayon-orange/15' : 'bg-paper-cream',
+              'relative grid size-20 place-items-center rounded-full border-4 border-white transition-all',
+              'shadow-[0_4px_10px_rgba(0,0,0,0.08)]',
+              value === null
+                ? 'scale-105 bg-crayon-orange/15 ring-3 ring-crayon-orange'
+                : 'bg-paper-cream group-hover:scale-105 group-hover:bg-paper-cream-dark',
             )}
           >
             <FontAwesomeIcon
               icon={faBan}
               className={cn(
-                'text-xl',
+                'text-2xl',
                 value === null ? 'text-crayon-orange' : 'text-neutral-400',
               )}
             />
@@ -174,11 +186,14 @@ const CharacterPicker = ({ value, onChange }: Props) => {
           </span>
         </button>
 
-        {ready.map((c) => {
+        {ready.map((c, i) => {
           const selected = value === c.id;
           // Show the COLOUR portrait — line art is only the generation
           // reference; a colour friend is far more inviting in the picker.
           const portrait = c.portraitUrl ?? c.portraitLineArtUrl;
+          // Rotate each disc through a soft colour wash (Duolingo-ABC style)
+          // so the row of friends reads as a colourful set, not grey cards.
+          const disc = DISC_TINTS[i % DISC_TINTS.length];
           return (
             <button
               type="button"
@@ -186,32 +201,45 @@ const CharacterPicker = ({ value, onChange }: Props) => {
               onClick={() => handleSelect(c.id)}
               aria-pressed={selected}
               aria-label={`Include ${c.name}, a ${c.species}, in this page`}
-              className={cn(
-                'flex size-28 shrink-0 flex-col items-center justify-between gap-1 rounded-3xl border-2 p-2 transition-all',
-                selected
-                  ? 'scale-105 border-crayon-orange bg-crayon-orange/10 shadow-[0_4px_0_0_hsl(var(--crayon-orange)/0.3)]'
-                  : 'border-paper-cream-dark bg-white shadow-[0_4px_0_0_hsl(var(--paper-cream-dark))] hover:border-crayon-orange',
-              )}
+              className="group flex shrink-0 flex-col items-center gap-1.5"
             >
-              <div className="relative flex w-full flex-1 items-center justify-center overflow-hidden rounded-2xl bg-paper-cream/60">
+              <span
+                className={cn(
+                  'relative grid size-20 place-items-center overflow-hidden rounded-full border-4 border-white transition-all',
+                  'shadow-[0_4px_10px_rgba(0,0,0,0.08)]',
+                  disc,
+                  selected
+                    ? 'scale-105 ring-3 ring-crayon-orange'
+                    : 'group-hover:scale-105',
+                )}
+              >
                 {portrait ? (
-                  // Portraits are R2-hosted webp/svg, ~96px rendered.
-                  // next/image lazy-loads off-screen tiles and serves a
+                  // Portraits are R2-hosted webp/svg, ~80px rendered.
+                  // next/image lazy-loads off-screen discs and serves a
                   // size-appropriate variant rather than the full upload.
                   <Image
                     src={portrait}
                     alt=""
                     fill
-                    sizes="96px"
+                    sizes="80px"
                     className="object-contain p-1"
                   />
                 ) : (
                   <span className="text-xs text-neutral-400">…</span>
                 )}
-              </div>
+                {/* Check badge on the selected disc (Mobbin kids pattern). */}
+                {selected && (
+                  <span className="absolute -right-0.5 -top-0.5 grid size-6 place-items-center rounded-full border-2 border-white bg-crayon-orange">
+                    <FontAwesomeIcon
+                      icon={faCheck}
+                      className="text-[10px] text-white"
+                    />
+                  </span>
+                )}
+              </span>
               <span
                 className={cn(
-                  'w-full truncate px-1 text-center font-tondo text-xs font-bold leading-tight',
+                  'max-w-20 truncate font-tondo text-xs font-bold leading-tight',
                   selected ? 'text-crayon-orange' : 'text-text-primary',
                 )}
               >
@@ -221,21 +249,21 @@ const CharacterPicker = ({ value, onChange }: Props) => {
           );
         })}
 
-        {/* "New friend" tile — always present so the add affordance never
+        {/* "New friend" disc — always present so the add affordance never
             hides behind the empty state. Deep-links to /characters. */}
         <Link
           href="/characters?from=create"
           aria-label="Make a new friend"
-          className="group flex size-28 shrink-0 flex-col items-center justify-center gap-2 rounded-3xl border-2 border-dashed border-crayon-orange/40 bg-crayon-orange/5 transition-all hover:scale-105 hover:border-crayon-orange hover:bg-crayon-orange/10"
+          className="group flex shrink-0 flex-col items-center gap-1.5"
         >
-          <span className="flex size-11 items-center justify-center rounded-full bg-crayon-orange shadow-[0_3px_0_0_hsl(var(--crayon-orange-dark))]">
+          <span className="grid size-20 place-items-center rounded-full border-4 border-dashed border-crayon-orange/40 bg-crayon-orange/5 transition-all group-hover:scale-105 group-hover:border-crayon-orange group-hover:bg-crayon-orange/10">
             <FontAwesomeIcon
               icon={faUserPlus}
-              className="text-lg text-white"
+              className="text-2xl text-crayon-orange"
               style={
                 {
-                  '--fa-secondary-color': '#fff',
-                  '--fa-secondary-opacity': '0.55',
+                  '--fa-secondary-color': 'hsl(var(--crayon-orange))',
+                  '--fa-secondary-opacity': '0.4',
                 } as React.CSSProperties
               }
             />
