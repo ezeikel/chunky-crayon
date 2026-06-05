@@ -1,7 +1,23 @@
 import { useMemo, useState } from "react";
-import { View, Text, StyleSheet, ScrollView, Pressable } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Pressable,
+  Image as RNImage,
+  type ImageSourcePropType,
+  type LayoutChangeEvent,
+} from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Image } from "expo-image";
+import {
+  Canvas,
+  Image as SkiaImage,
+  ColorMatrix,
+  Blur,
+  useImage,
+} from "@shopify/react-native-skia";
 import Spinner from "@/components/Spinner/Spinner";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faStar, faCheck } from "@fortawesome/pro-solid-svg-icons";
@@ -46,6 +62,65 @@ const RARITY_BORDER: Record<string, string> = {
   legendary: "#F59E0B",
 };
 
+// Rec.601 luminance grayscale matrix — every output RGB channel becomes the
+// weighted luminance of the input, so a dark crayon outline maps to dark grey
+// and a light fill to light grey (TRUE tonal grayscale, like web's CSS
+// `grayscale`). Alpha is passed through (last row), so transparent PNG corners
+// stay transparent. A flat `tintColor` cannot do this — it collapses every
+// pixel to one colour, which is why the old locked look was a featureless blob.
+const GRAYSCALE_MATRIX = [
+  0.2126, 0.7152, 0.0722, 0, 0, 0.2126, 0.7152, 0.0722, 0, 0, 0.2126, 0.7152,
+  0.0722, 0, 0, 0, 0, 0, 1, 0,
+];
+
+/**
+ * Locked sticker art rendered as a true grayscale ghost (web parity:
+ * `grayscale opacity-30 blur-[0.5px]`). expo-image has no grayscale filter, so
+ * this draws the bundled PNG through a Skia ColorMatrix.
+ *
+ * - Loaded via useImage(resolveAssetSource(uri)) — `useImage(<require number>)`
+ *   is unreliable for Skia (see ImageCanvas.tsx L259-262); resolveAssetSource
+ *   gives the Metro http URI in dev + the asset:// URI in release.
+ * - The Skia <Image> needs concrete numeric w/h (it can't size by flex/%), so
+ *   we measure the cell with onLayout and only mount the Canvas once we have a
+ *   non-zero size — this also sidesteps the 0-dim-canvas crash class entirely.
+ * - Until the image decodes (or before first layout) we render a blank sized
+ *   View — never the emoji/colour art, so there is no flash.
+ */
+const LockedStickerArt = ({ source }: { source: ImageSourcePropType }) => {
+  const [size, setSize] = useState(0);
+  const uri = RNImage.resolveAssetSource(source)?.uri ?? null;
+  const img = useImage(uri);
+
+  const onLayout = (e: LayoutChangeEvent) => {
+    const { width, height } = e.nativeEvent.layout;
+    const next = Math.floor(Math.min(width, height));
+    if (next > 0 && next !== size) setSize(next);
+  };
+
+  return (
+    <View style={styles.stickerImage} onLayout={onLayout}>
+      {img && size > 0 ? (
+        // opacity-30 lives on the Canvas (web's opacity-30); the grayscale +
+        // blur live on the image's paint.
+        <Canvas style={{ width: size, height: size, opacity: 0.4 }}>
+          <SkiaImage
+            image={img}
+            x={0}
+            y={0}
+            width={size}
+            height={size}
+            fit="contain"
+          >
+            <ColorMatrix matrix={GRAYSCALE_MATRIX} />
+            <Blur blur={0.6} />
+          </SkiaImage>
+        </Canvas>
+      ) : null}
+    </View>
+  );
+};
+
 const StickerItem = ({ sticker, onPress }: StickerItemProps) => {
   const image = STICKER_IMAGES[sticker.id];
   const unlocked = sticker.isUnlocked;
@@ -67,10 +142,11 @@ const StickerItem = ({ sticker, onPress }: StickerItemProps) => {
       onPress={onPress}
     >
       {/* Art fills the card and is CENTRED via contain + flex (web's flex-1
-          + object-contain). Locked stickers read as a GREY silhouette like
-          web (which uses CSS `grayscale`). RN/expo-image has no grayscale
-          filter, so we tint the art flat grey + blur it slightly — the
-          shape stays, the colour goes (matches web's grayscale + blur). */}
+          + object-contain). Unlocked = full-colour expo-image. Locked = a TRUE
+          grayscale ghost via Skia ColorMatrix (web parity: CSS `grayscale
+          opacity-30 blur-[0.5px]`) — the hue is stripped but the tonal range
+          survives, so the linework/crown/cape stay legible. Skia only mounts on
+          locked tiles, so the surface count shrinks to zero as stickers unlock. */}
       {unlocked ? (
         <Image
           source={image}
@@ -79,14 +155,7 @@ const StickerItem = ({ sticker, onPress }: StickerItemProps) => {
           transition={150}
         />
       ) : (
-        <Image
-          source={image}
-          style={[styles.stickerImage, styles.stickerImageLocked]}
-          contentFit="contain"
-          tintColor={COLORS.textMuted}
-          blurRadius={1}
-          transition={150}
-        />
+        <LockedStickerArt source={image} />
       )}
 
       {/* Name label under the sticker — always shown (web parity). */}
@@ -471,12 +540,8 @@ const styles = StyleSheet.create({
   stickerImage: {
     flex: 1,
     width: "100%",
-  },
-  stickerImageLocked: {
-    // tintColor (above) flattens the art to one grey, matching web's
-    // grayscale silhouette; opacity softens it to "not yet earned"
-    // (web pairs grayscale with opacity-30).
-    opacity: 0.45,
+    alignItems: "center",
+    justifyContent: "center",
   },
   stickerName: {
     fontFamily: "TondoTrial-Bold",
