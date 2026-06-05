@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { faCheck, faXmark } from "@fortawesome/pro-solid-svg-icons";
 import { tapMedium } from "@/utils/haptics";
-import { FONTS, COLORS } from "@/lib/design";
+import { FONTS, COLORS, SHEET_HANDLE } from "@/lib/design";
 import SquishyPressable from "@/components/SquishyPressable/SquishyPressable";
 
 /**
@@ -191,15 +191,12 @@ const styles = StyleSheet.create({
     backgroundColor: "#FDFAF5",
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
-    paddingTop: 12,
+    paddingTop: 16,
   },
+  // Shared canonical sheet handle (matches the coloring drawer + all sheets).
   handleIndicator: {
-    alignSelf: "center",
-    backgroundColor: COLORS.borderLight,
-    width: 40,
-    height: 4,
-    borderRadius: 2,
-    marginBottom: 4,
+    ...SHEET_HANDLE,
+    marginBottom: 8,
   },
   content: {
     paddingHorizontal: 24,

@@ -1,6 +1,7 @@
+import { useState } from "react";
 import { View, Pressable, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Tabs, router } from "expo-router";
+import { Tabs } from "expo-router";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 // All-duotone icon family (smooth, not sharp) for a consistent, lively bar.
 import {
@@ -10,6 +11,7 @@ import {
   faHeart,
   faHatWizard,
 } from "@fortawesome/pro-duotone-svg-icons";
+import CreateSheet from "@/components/CreateSheet/CreateSheet";
 import { useT } from "@/lib/i18n/useT";
 import { tapMedium } from "@/utils/haptics";
 import { COLORS } from "@/lib/design";
@@ -44,9 +46,10 @@ type TabItem = {
 type TabBarProps = {
   state: { index: number; routes: { name: string }[] };
   navigation: { navigate: (name: string) => void };
+  onCreatePress: () => void;
 };
 
-const CustomTabBar = ({ state, navigation }: TabBarProps) => {
+const CustomTabBar = ({ state, navigation, onCreatePress }: TabBarProps) => {
   const insets = useSafeAreaInsets();
   const t = useT("mobile.tabs");
   const tButton = useT("mobile.button");
@@ -100,7 +103,7 @@ const CustomTabBar = ({ state, navigation }: TabBarProps) => {
         <View style={styles.side}>{LEFT_TABS.map(renderTab)}</View>
 
         {/* Centered Create FAB — raised above the bar in a white cradle
-          ring so it reads as attached, not floating. Opens the modal. */}
+          ring so it reads as attached, not floating. Opens the create sheet. */}
         <View style={styles.fabSlot}>
           <View style={styles.fabCradle}>
             <Pressable
@@ -110,7 +113,7 @@ const CustomTabBar = ({ state, navigation }: TabBarProps) => {
               ]}
               onPress={() => {
                 tapMedium();
-                router.push("/create");
+                onCreatePress();
               }}
               accessibilityRole="button"
               accessibilityLabel={tButton("createColoringPage")}
@@ -133,28 +136,38 @@ const CustomTabBar = ({ state, navigation }: TabBarProps) => {
 };
 
 export default function TabLayout() {
+  // The Create sheet is owned here (always-mounted layout) and toggled by the
+  // centre FAB — an in-app ModalBottomSheet, NOT a native modal route, so it
+  // matches the app's other sheets (handle, swipe-to-dismiss, cream surface).
+  const [createOpen, setCreateOpen] = useState(false);
+
   return (
-    <Tabs
-      tabBar={(props) => <CustomTabBar {...props} />}
-      screenOptions={{
-        headerShown: false,
-        // position:absolute → expo-router/react-navigation does NOT reserve
-        // tab-bar height in the scene, so each screen renders full-height behind
-        // the (absolutely-positioned, transparent) custom pill. transparent bg
-        // so the page's cream gradient shows around it (no white strip).
-        tabBarStyle: {
-          position: "absolute",
-          backgroundColor: "transparent",
-          borderTopWidth: 0,
-          elevation: 0,
-        },
-      }}
-    >
-      <Tabs.Screen name="index" />
-      <Tabs.Screen name="gallery" />
-      <Tabs.Screen name="stickers" />
-      <Tabs.Screen name="my-artwork" />
-    </Tabs>
+    <>
+      <Tabs
+        tabBar={(props) => (
+          <CustomTabBar {...props} onCreatePress={() => setCreateOpen(true)} />
+        )}
+        screenOptions={{
+          headerShown: false,
+          // position:absolute → expo-router/react-navigation does NOT reserve
+          // tab-bar height in the scene, so each screen renders full-height
+          // behind the (absolutely-positioned, transparent) custom pill.
+          // transparent bg so the page's cream gradient shows around it.
+          tabBarStyle: {
+            position: "absolute",
+            backgroundColor: "transparent",
+            borderTopWidth: 0,
+            elevation: 0,
+          },
+        }}
+      >
+        <Tabs.Screen name="index" />
+        <Tabs.Screen name="gallery" />
+        <Tabs.Screen name="stickers" />
+        <Tabs.Screen name="my-artwork" />
+      </Tabs>
+      <CreateSheet isOpen={createOpen} onClose={() => setCreateOpen(false)} />
+    </>
   );
 }
 

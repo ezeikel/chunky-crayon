@@ -101,6 +101,10 @@
     "upsideDownHint": {
       "title": "Turn me around!",
       "subtitle": "Flip your phone the right way up to keep coloring."
+    },
+    "create": {
+      "greeting": "What do you want to color today?",
+      "subtitle": "Pick a way to start!"
     }
   },
   "createForm": {

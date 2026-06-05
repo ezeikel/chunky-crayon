@@ -30,6 +30,7 @@ import {
   useUpdateProfile,
   useDeleteProfile,
 } from "@/hooks/api/useProfiles";
+import { SHEET_HANDLE } from "@/lib/design";
 import type { Profile } from "@/api";
 
 type ProfileSwitcherProps = {
@@ -349,15 +350,12 @@ const styles = StyleSheet.create({
     backgroundColor: "#FDFAF5",
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
-    paddingTop: 12,
+    paddingTop: 16,
   },
+  // Shared canonical sheet handle (matches the coloring drawer + all sheets).
   handleIndicator: {
-    alignSelf: "center",
-    backgroundColor: "#D1D5DB",
-    width: 40,
-    height: 4,
-    borderRadius: 2,
-    marginBottom: 4,
+    ...SHEET_HANDLE,
+    marginBottom: 8,
   },
   header: {
     flexDirection: "row",

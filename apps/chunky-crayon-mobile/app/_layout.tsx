@@ -106,17 +106,6 @@ const RootLayout = () => {
             },
           }}
         />
-        {/* Create form — full-screen modal launched by the center
-            tab-bar FAB. Modal presentation so it slides up over the
-            current tab and dismisses back to it. */}
-        <Stack.Screen
-          name="create"
-          options={{
-            presentation: "modal",
-            headerShown: false,
-            animation: "slide_from_bottom",
-          }}
-        />
         {/* Account / browse routes reached from Home cards + the gated
             grown-ups corner, not the tab bar. Native-stack push with a
             back-button header (no home chrome on a detail route).

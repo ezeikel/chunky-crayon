@@ -9,7 +9,7 @@ import ColoAvatar from "@/components/ColoAvatar";
 import { getAccessory } from "@/lib/colo";
 import { COLO_ACCESSORY_IMAGES } from "@/lib/colo/colo-images";
 import type { ColoState } from "@/lib/colo";
-import { FONTS, COLORS } from "@/lib/design";
+import { FONTS, COLORS, SHEET_HANDLE } from "@/lib/design";
 
 /**
  * Kid-friendly Colo detail sheet — mobile port of web's
@@ -162,15 +162,12 @@ const styles = StyleSheet.create({
     backgroundColor: "#FDFAF5",
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
-    paddingTop: 12,
+    paddingTop: 16,
   },
+  // Shared canonical sheet handle (matches the coloring drawer + all sheets).
   handleIndicator: {
-    alignSelf: "center",
-    backgroundColor: COLORS.borderLight,
-    width: 40,
-    height: 4,
-    borderRadius: 2,
-    marginBottom: 4,
+    ...SHEET_HANDLE,
+    marginBottom: 8,
   },
   content: {
     paddingHorizontal: 24,

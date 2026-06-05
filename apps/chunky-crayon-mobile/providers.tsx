@@ -26,31 +26,35 @@ const ArtworkSyncMount = () => {
 const Providers = ({ children }: { children: React.ReactNode }) => {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <BottomSheetProvider>
-        <QueryClientProvider client={queryClient}>
-          <AuthProvider>
-            <SubscriptionProvider>
-              <UserProvider>
-                <ArtworkSyncMount />
-                <ColoProvider>
-                  <FocusModeProvider>{children}</FocusModeProvider>
-                </ColoProvider>
-              </UserProvider>
-            </SubscriptionProvider>
-          </AuthProvider>
-        </QueryClientProvider>
-        {/* Brand-styled toast host. Sits under BottomSheetProvider so
-            toasts render above any open sheet. ALL transient feedback
-            lives here (no Alert.alert). Destructive confirms use
-            ConfirmSheet (also a bottom sheet) so the experience stays
-            in-app and brand-styled. */}
-        <Toaster />
-        {/* Friendly "turn me around" overlay when an iPhone is held physically
-            upside-down (iOS won't rotate a notched iPhone's window there). Last
-            child so it covers every screen + any open sheet. iPhone-only by
-            construction (useUpsideDownHint is false on iPad / web / Android). */}
-        <UpsideDownHint />
-      </BottomSheetProvider>
+      {/* QueryClientProvider (+ the auth/user/colo data providers) must wrap
+          BottomSheetProvider, NOT the other way around. @swmansion's
+          ModalBottomSheet PORTALS its content up to the BottomSheetProvider
+          host — so any sheet that renders React-Query / context consumers
+          (e.g. the Create sheet's form → useEntitlements) needs those providers
+          ABOVE the sheet host, or it crashes with "No QueryClient set". */}
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <SubscriptionProvider>
+            <UserProvider>
+              <ArtworkSyncMount />
+              <ColoProvider>
+                <FocusModeProvider>
+                  <BottomSheetProvider>
+                    {children}
+                    {/* Toast host — under BottomSheetProvider so toasts render
+                        above any open sheet. ALL transient feedback lives here
+                        (no Alert.alert). Destructive confirms use ConfirmSheet. */}
+                    <Toaster />
+                    {/* "Turn me around" overlay for a physically-inverted
+                        iPhone. Last child so it covers every screen + sheet. */}
+                    <UpsideDownHint />
+                  </BottomSheetProvider>
+                </FocusModeProvider>
+              </ColoProvider>
+            </UserProvider>
+          </SubscriptionProvider>
+        </AuthProvider>
+      </QueryClientProvider>
     </GestureHandlerRootView>
   );
 };
