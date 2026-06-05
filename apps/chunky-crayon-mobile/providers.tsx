@@ -2,6 +2,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { BottomSheetProvider } from "@swmansion/react-native-bottom-sheet";
 import { Toaster } from "@/components/Toaster";
+import UpsideDownHint from "@/components/UpsideDownHint/UpsideDownHint";
 import {
   AuthProvider,
   ColoProvider,
@@ -44,6 +45,11 @@ const Providers = ({ children }: { children: React.ReactNode }) => {
             ConfirmSheet (also a bottom sheet) so the experience stays
             in-app and brand-styled. */}
         <Toaster />
+        {/* Friendly "turn me around" overlay when an iPhone is held physically
+            upside-down (iOS won't rotate a notched iPhone's window there). Last
+            child so it covers every screen + any open sheet. iPhone-only by
+            construction (useUpsideDownHint is false on iPad / web / Android). */}
+        <UpsideDownHint />
       </BottomSheetProvider>
     </GestureHandlerRootView>
   );

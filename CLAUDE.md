@@ -197,7 +197,7 @@ pnpm android           # Build and run on Android emulator
 
 **After ANY dependency change** — `pnpm add`/`remove`, a `node_modules` reinstall (`rm -rf node_modules && pnpm install`), or lockfile changes — a **prebuild + rebuild is REQUIRED** before the app will run. The installed native binary is stale until you do. This is the #1 cause of "it suddenly won't run": a dependency churned, but only the JS was reloaded against the old binary.
 
-**If `pnpm ios` fails at `pod install` with `react-native-skia: Skia prebuilt binaries not found`:** run `npx install-skia`, then re-run `pnpm prebuild:ios`. A `node_modules` reinstall wipes Skia's prebuilt native binaries; `install-skia` restores them. (Don't interpret this as a broken Skia install — it's expected after a reinstall.)
+**Skia prebuilt binaries (auto-healed):** a `node_modules` reinstall wipes Skia's prebuilt native binaries (`@shopify/react-native-skia/libs/ios` + `libs/macos`), which would make `pod install` fail with `react-native-skia: Skia prebuilt binaries not found`. The `prebuild`, `prebuild:ios`, and `prebuild:android` scripts now run `pnpm install-skia` first (idempotent), so the binaries are restored before `pod install` checks. You no longer run `npx install-skia` by hand. If you still hit the error (e.g. you ran `expo prebuild` directly instead of the pnpm script), run `pnpm install-skia` then re-run the prebuild. (Not a broken Skia install — expected after a reinstall.)
 
 **Debugging a running app:** inspect via Argent (`screenshot` / `describe` / `launch-app`) against the build that `pnpm ios` started. Do NOT spin up a separate Metro to inspect — it won't match the installed binary and will mislead you.
 

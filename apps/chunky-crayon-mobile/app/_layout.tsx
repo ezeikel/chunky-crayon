@@ -48,17 +48,21 @@ const RootLayout = () => {
     return unsub;
   }, []);
 
-  // Allow + DRIVE all orientations. The plist already whitelists all four, but
-  // Expo SDK 56 runs a scene-LESS UIWindow lifecycle (AppDelegate attaches the
-  // RN root via startReactNative(...in: window), no UIWindowScene). On iPad
-  // (iOS 16+) passive device rotation resizes the RN root logically —
-  // useWindowDimensions DOES report the swapped dims (verified: 1376x1032 in
-  // landscape) — but the actual UIWindow geometry never follows, so the
-  // portrait window just paints sideways. expo-screen-orientation's native
-  // module issues the orientation update the scene-less window can't do on its
-  // own. unlockAsync (allow-all) is the safe direction; we are NOT locking.
+  // DRIVE rotation. The plist whitelists all four, but Expo SDK 56 runs a
+  // scene-LESS UIWindow lifecycle (AppDelegate attaches the RN root via
+  // startReactNative(...in: window), no UIWindowScene). On iPad (iOS 16+)
+  // passive device rotation resizes the RN root logically — useWindowDimensions
+  // DOES report the swapped dims (verified: 1376x1032 in landscape) — but the
+  // actual UIWindow geometry never follows, so the portrait window just paints
+  // sideways. expo-screen-orientation's native module issues the orientation
+  // update the scene-less window can't do on its own.
   // (A UIApplicationSceneManifest would also fix the window but black-screens
   // this app — see app.config.ts; this is the scene-compatible alternative.)
+  // unlockAsync allows ALL FOUR orientations on every device — including
+  // upside-down portrait, which we WANT to rotate into. The tier decision
+  // (getColoringTier) keys off width/height, so upside-down portrait resolves
+  // to the same "phone" bottom-sheet as normal portrait and just renders
+  // flipped 180° by the OS.
   useEffect(() => {
     ScreenOrientation.unlockAsync().catch(() => {
       // Non-fatal: if the native module is unavailable the app still runs

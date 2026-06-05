@@ -93,6 +93,10 @@
       "emptyTitle": "Your Saved Artwork",
       "emptySubtitle": "Your favorite creations will appear here. Start coloring and save your masterpieces!",
       "emptyTip": "Tap the heart icon while coloring to save"
+    },
+    "upsideDownHint": {
+      "title": "Turn me around!",
+      "subtitle": "Flip your phone the right way up to keep coloring."
     }
   },
   "createForm": {
