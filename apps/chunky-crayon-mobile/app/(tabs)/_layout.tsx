@@ -199,16 +199,22 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
+    // Center the pill so on a wide screen (iPad) it stays a compact centered
+    // pill instead of stretching the tabs full-width.
+    alignItems: "center",
     paddingHorizontal: 16,
     paddingTop: 8,
     backgroundColor: "transparent",
   },
   // The floating pill. Transparent itself (overflow stays visible so the FAB
   // cradle can break the top edge); the frosted look is the barBg layer behind.
-  // Border + shadow draw the pill outline + lift.
+  // Border + shadow draw the pill outline + lift. Caps its width so the tabs
+  // group together on iPad rather than spreading across the screen.
   bar: {
     flexDirection: "row",
     alignItems: "flex-start",
+    width: "100%",
+    maxWidth: 440,
     backgroundColor: "transparent",
     borderRadius: 28,
     paddingTop: 10,

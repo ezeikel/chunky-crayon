@@ -1,17 +1,10 @@
 import { useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  Modal,
-  Pressable,
-} from "react-native";
+import { View, Text, StyleSheet, ScrollView, Pressable } from "react-native";
+import { ModalBottomSheet } from "@swmansion/react-native-bottom-sheet";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import Spinner from "@/components/Spinner/Spinner";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { faXmark } from "@fortawesome/pro-solid-svg-icons";
 import { faUserAstronaut } from "@fortawesome/pro-duotone-svg-icons";
 import SectionHeader from "@/components/SectionHeader/SectionHeader";
 import CharacterTile, { AddCharacterTile } from "@/components/CharacterTile";
@@ -28,7 +21,7 @@ import {
 } from "@/hooks/api";
 import type { Character } from "@/api";
 import { useT } from "@/lib/i18n/useT";
-import { COLORS, FONTS } from "@/lib/design";
+import { COLORS, FONTS, SHEET_HANDLE } from "@/lib/design";
 
 const MAX_PER_PROFILE = 8;
 
@@ -170,36 +163,20 @@ const CharactersScreen = () => {
         )}
       </LinearGradient>
 
-      {/* Create — full-screen builder modal. */}
-      <Modal
-        visible={builderOpen}
-        animationType="slide"
-        presentationStyle="pageSheet"
-        onRequestClose={() => setBuilderOpen(false)}
-      >
-        <View style={styles.root}>
-          <LinearGradient
-            colors={["#FDFAF5", "#F5EEE5"]}
-            style={styles.gradient}
-          >
-            <View style={[styles.modalHeader, { paddingTop: insets.top + 8 }]}>
-              <Text style={styles.modalTitle}>{t("newCharacter")}</Text>
-              <Pressable
-                onPress={() => setBuilderOpen(false)}
-                accessibilityLabel={t("close")}
-                hitSlop={8}
-                style={({ pressed }) => [
-                  styles.closeButton,
-                  pressed && styles.closePressed,
-                ]}
-              >
-                <FontAwesomeIcon
-                  icon={faXmark}
-                  size={20}
-                  color={COLORS.textMuted}
-                />
-              </Pressable>
-            </View>
+      {/* Create — character builder as an in-app bottom sheet (matches the
+          Create sheet + the app's other sheets): grab handle, swipe/scrim
+          dismiss, no redundant X. The builder wizard has its own "Pick your
+          friend" title + progress, so no outer header is needed. */}
+      {builderOpen && (
+        <ModalBottomSheet
+          index={1}
+          onIndexChange={(i) => {
+            if (i === 0) setBuilderOpen(false);
+          }}
+          scrimColor="rgba(0, 0, 0, 0.5)"
+        >
+          <View style={styles.sheetSurface}>
+            <View style={styles.sheetHandle} />
             <ScrollView
               contentContainerStyle={[
                 styles.modalBody,
@@ -212,9 +189,9 @@ const CharactersScreen = () => {
                 submitting={createCharacter.isPending}
               />
             </ScrollView>
-          </LinearGradient>
-        </View>
-      </Modal>
+          </View>
+        </ModalBottomSheet>
+      )}
 
       {/* Delete is parent-gated (web gates deleteCharacter). The gate opens
           on a READY-tile tap; passing it deletes. */}
@@ -328,28 +305,17 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: COLORS.textSecondary,
   },
-  // ── builder modal ──
-  modalHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 20,
-    paddingBottom: 12,
+  // ── builder bottom sheet ──
+  sheetSurface: {
+    backgroundColor: COLORS.bgCream,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    paddingTop: 16,
   },
-  modalTitle: {
-    fontFamily: FONTS.bold,
-    fontSize: 22,
-    color: COLORS.textPrimary,
+  sheetHandle: {
+    ...SHEET_HANDLE,
+    marginBottom: 8,
   },
-  closeButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: "rgba(0,0,0,0.05)",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  closePressed: { opacity: 0.6 },
   modalBody: {
     paddingHorizontal: 16,
     paddingTop: 8,
