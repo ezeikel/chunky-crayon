@@ -159,6 +159,16 @@ const SubscriptionPaywallModal = ({
   // CTA → front the purchase with the parental gate unless one already fired
   // upstream (skipParentalGate). Apple Kids Category requires this before the
   // purchase opportunity; StoreKit's passcode is not a substitute.
+  //
+  // TODO(parental-gate-session): each purchase opportunity is gated
+  // INDEPENDENTLY today. A parent who clears the gate on the onboarding "Start
+  // My Free Week" CTA and then opens "See all plans" is prompted AGAIN when they
+  // buy here. That's correct + safe for App Review (every purchase gated), just
+  // a touch repetitive. Follow-up: add a short-lived "gate passed recently"
+  // bypass (~2 min, cleared on app background) so a parent isn't re-prompted
+  // within one session. The web app already does this — mirror
+  // apps/chunky-crayon-web/components/ParentalGate/ParentalGateContext. Deferred
+  // intentionally; keep the always-gate default until then.
   const handlePurchasePress = useCallback(
     (pkg: PurchasesPackage) => {
       if (skipParentalGate) {
