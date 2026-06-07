@@ -11,7 +11,7 @@ import {
   faDinosaur,
 } from '@fortawesome/pro-duotone-svg-icons';
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
-import { trackEvent } from '@/utils/analytics-client';
+import { trackEvent, posthogDistinctIdHeader } from '@/utils/analytics-client';
 import { trackResourceSaved, trackViewContent } from '@/utils/pixels';
 import { recordResourceSaved } from '@/app/actions/conversions';
 import { TRACKING_EVENTS } from '@/constants';
@@ -92,7 +92,10 @@ const RewardChartForm = () => {
     try {
       const res = await fetch('/api/tools/reward-chart', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...posthogDistinctIdHeader(),
+        },
         body: JSON.stringify({
           childName,
           theme,

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import { trackEvent } from '@/utils/analytics-client';
+import { trackEvent, posthogDistinctIdHeader } from '@/utils/analytics-client';
 import { trackResourceSaved, trackViewContent } from '@/utils/pixels';
 import { recordResourceSaved } from '@/app/actions/conversions';
 import { TRACKING_EVENTS } from '@/constants';
@@ -40,7 +40,10 @@ const AbcTracingForm = () => {
     try {
       const res = await fetch('/api/tools/abc-tracing', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...posthogDistinctIdHeader(),
+        },
         body: JSON.stringify({
           childName,
           case: caseMode,

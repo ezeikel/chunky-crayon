@@ -62,11 +62,19 @@ const JoinColoringPageEmailListForm = ({
         description: t('signup.successDescription'),
       });
 
-      // Identify user in PostHog with their email for journey tracking
-      // This links their anonymous session to the email, so when they
-      // later create an account, PostHog connects the full journey
+      // Tag the CURRENT (still-anonymous) person with the email-subscriber
+      // properties — deliberately via setPersonProperties, NOT
+      // identify(email). Identifying by email here used to create a
+      // distinct email-keyed person that could never merge with the
+      // DB-id person the account flow + Stripe webhook write to (alias
+      // forbids reusing an id that was already a distinct_id, and a
+      // later identify(dbId) from an already-identified state won't
+      // merge). Leaving the browser anonymous means the eventual
+      // identify(dbId) in UserIdentify cleanly links this whole
+      // pre-account journey to the real user. The email itself is still
+      // captured as a person property for the re-activation path.
       if (state.email) {
-        posthog.identify(state.email, {
+        posthog.setPersonProperties({
           email: state.email,
           email_subscriber: true,
           email_signup_location: location,

@@ -1,8 +1,10 @@
 import 'server-only';
 
+import { headers } from 'next/headers';
 import { track as vercelTrackServer } from '@vercel/analytics/server';
 import { createPostHogClient } from '@/lib/posthog-server';
 import { getUserId, getCurrentUser } from '@/app/actions/user';
+import { POSTHOG_DISTINCT_ID_HEADER } from '@/constants';
 import type { EventProperties, TrackingEvent } from '@/types/analytics';
 
 // Clean properties for Vercel Analytics (only string, number, boolean, null)
@@ -56,6 +58,23 @@ export const track = async <
     const userId = await getUserId('track analytics event');
     const user = userId ? await getCurrentUser() : null;
 
+    // Fall back to the browser's distinct_id (forwarded as a header by
+    // the client fetch) when there's no logged-in user, so guest events
+    // tracked server-side attribute to the same person as the client
+    // events rather than collapsing onto the shared 'anonymous' id.
+    // Explicit arg wins; header is the fallback. Header reads can throw
+    // outside a request scope (e.g. background jobs) — swallow and skip.
+    let resolvedClientDistinctId = clientDistinctId;
+    if (!userId && !resolvedClientDistinctId) {
+      try {
+        const headersList = await headers();
+        resolvedClientDistinctId =
+          headersList.get(POSTHOG_DISTINCT_ID_HEADER) ?? undefined;
+      } catch {
+        // not in a request context — leave undefined
+      }
+    }
+
     const userProperties = user
       ? {
           email: user.email,
@@ -81,7 +100,7 @@ export const track = async <
       }
 
       posthog.capture({
-        distinctId: userId || clientDistinctId || 'anonymous',
+        distinctId: userId || resolvedClientDistinctId || 'anonymous',
         event,
         properties: enrichedProperties,
       });

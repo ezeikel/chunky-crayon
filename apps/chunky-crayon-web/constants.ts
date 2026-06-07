@@ -960,6 +960,18 @@ export const ARE_MOBILE_APPS_AVAILABLE =
   APP_STORE_LINKS.APPLE !== null || APP_STORE_LINKS.GOOGLE !== null;
 
 /**
+ * Header used to forward the browser's PostHog distinct_id from a client
+ * fetch to an API route, so server-side `track()` attributes the event
+ * to the same person the client-side events landed on. Without it, every
+ * logged-out caller of a server-tracked route collapses onto the shared
+ * 'anonymous' distinct_id (which is why tool_completed historically
+ * looked like a single person). Defined here — in a directive-free
+ * module imported by both client and server — to avoid importing across
+ * the 'use client' / 'server-only' boundary.
+ */
+export const POSTHOG_DISTINCT_ID_HEADER = 'x-ph-distinct-id';
+
+/**
  * Comprehensive tracking events for analytics dashboards.
  * Events are organized by category for easy filtering in PostHog.
  *

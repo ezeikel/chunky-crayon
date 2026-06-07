@@ -10,7 +10,7 @@ import {
   faRocket,
 } from '@fortawesome/pro-duotone-svg-icons';
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
-import { trackEvent } from '@/utils/analytics-client';
+import { trackEvent, posthogDistinctIdHeader } from '@/utils/analytics-client';
 import { trackResourceSaved, trackViewContent } from '@/utils/pixels';
 import { recordResourceSaved } from '@/app/actions/conversions';
 import { TRACKING_EVENTS } from '@/constants';
@@ -83,7 +83,10 @@ const BirthdayInviteForm = () => {
     try {
       const res = await fetch('/api/tools/birthday-invite', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...posthogDistinctIdHeader(),
+        },
         body: JSON.stringify({
           childName,
           age: ageValue,

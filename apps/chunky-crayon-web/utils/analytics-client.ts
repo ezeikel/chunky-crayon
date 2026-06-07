@@ -4,6 +4,7 @@ import { useCallback } from 'react';
 import { track as vercelTrack } from '@vercel/analytics';
 import { useSession } from 'next-auth/react';
 import posthog from 'posthog-js';
+import { POSTHOG_DISTINCT_ID_HEADER } from '@/constants';
 import type { EventProperties, TrackingEvent } from '@/types/analytics';
 
 type SessionUser = {
@@ -100,6 +101,35 @@ export const useAnalytics = () => {
   );
 
   return { track };
+};
+
+/**
+ * Returns the current browser's PostHog distinct_id, or undefined if
+ * PostHog hasn't initialised (SSR, blocked, etc.). Use when calling an
+ * API route that tracks server-side, so the route can pass it through to
+ * `track()` and keep submit→outcome events on one person.
+ *
+ * @example
+ * ```ts
+ * await fetch('/api/tools/abc-tracing', {
+ *   headers: {
+ *     'Content-Type': 'application/json',
+ *     ...posthogDistinctIdHeader(),
+ *   },
+ *   body: JSON.stringify(payload),
+ * });
+ * ```
+ */
+export const posthogDistinctIdHeader = (): Record<string, string> => {
+  if (typeof window === 'undefined' || !posthog?.get_distinct_id) {
+    return {};
+  }
+  try {
+    const id = posthog.get_distinct_id();
+    return id ? { [POSTHOG_DISTINCT_ID_HEADER]: id } : {};
+  } catch {
+    return {};
+  }
 };
 
 /**
