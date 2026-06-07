@@ -23,11 +23,20 @@ const SENTRY_RELEASE = `${Constants.expoConfig?.version ?? "0.0.0"}+${
 Sentry.init({
   // Modern public DSN (the legacy `:secret@` half is no longer used).
   dsn: "https://3ced8899cf0a5a8dd3b15c539379d654@o358156.ingest.us.sentry.io/4507397854330880",
+  // OFF in the simulator / local dev (`__DEV__`): a debug build with Metro HMR
+  // throws constant ReferenceErrors mid-edit (half-saved files get hot-injected)
+  // that flooded the dashboard and aren't real bugs. We don't need Sentry when
+  // we have the Metro console + debugger right there. ON for preview + prod
+  // builds (`__DEV__` is false in any release/EAS build), where a crash is real
+  // and we can't see it any other way.
+  enabled: !__DEV__,
   environment: process.env.EXPO_PUBLIC_ENVIRONMENT ?? "development",
   release: SENTRY_RELEASE,
   dist: String(Application.nativeBuildVersion ?? "0"),
-  // Full traces in dev for debugging; sample in prod to match web (0.2).
-  tracesSampleRate: __DEV__ ? 1.0 : 0.2,
+  // 100% performance traces on the builds we keep (preview + prod) — low volume
+  // (founder + a few family devices), so full fidelity beats sampling. (Moot in
+  // dev since `enabled` is false there.)
+  tracesSampleRate: 1.0,
   // Kids app — don't auto-attach IP/headers. We set id+email explicitly via
   // Sentry.setUser (AuthContext) so issues are still attributable.
   sendDefaultPii: false,
