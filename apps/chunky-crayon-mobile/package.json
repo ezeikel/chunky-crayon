@@ -36,6 +36,7 @@
     "eas:release:android": "eas build --profile production --platform android --auto-submit",
     "eas:submit:production": "eas submit --profile production",
     "release": "node scripts/release.mjs",
+    "eas-build-post-install": "cd ../.. && turbo run build --filter=@one-colored-pixel/translations --filter=@one-colored-pixel/canvas-sync --filter=@one-colored-pixel/coloring-core",
     "test": "jest --watchAll",
     "lint": "expo lint",
     "check-types": "tsc --noEmit",
