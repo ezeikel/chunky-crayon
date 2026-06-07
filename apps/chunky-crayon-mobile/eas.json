@@ -7,8 +7,7 @@
     "base": {
       "ios": {
         "resourceClass": "m-medium",
-        "image": "macos-sequoia-15.5-xcode-26.0",
-        "appleTeamId": "HGX827L49J"
+        "image": "macos-sequoia-15.5-xcode-26.0"
       },
       "android": {
         "image": "latest"
@@ -51,5 +50,12 @@
       "channel": "production"
     }
   },
-  "submit": {}
+  "submit": {
+    "production": {
+      "ios": {
+        "appleId": "developer@chewybytes.com",
+        "appleTeamId": "HGX827L49J"
+      }
+    }
+  }
 }
