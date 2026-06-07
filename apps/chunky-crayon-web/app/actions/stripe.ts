@@ -670,3 +670,106 @@ export const changeSubscription = async ({
     return null;
   }
 };
+
+/**
+ * Reconcile our DB subscription cache against Stripe (the source of
+ * truth).
+ *
+ * Stripe owns subscription state; the `subscriptions` table is a local
+ * read-cache kept in sync by the `customer.subscription.*` webhooks.
+ * That cache drifts whenever a webhook is missed or fires before its
+ * handler existed (e.g. an old row stuck on TRIALING while Stripe has
+ * since moved it to past_due). This re-pulls the live Stripe status for
+ * each candidate subscription and rewrites the row when it disagrees,
+ * so missed webhooks self-heal instead of leaving a row permanently
+ * stale.
+ *
+ * Only non-terminal rows are checked — CANCELLED/EXPIRED are end states
+ * we never need to re-fetch. Uses the same `mapStripeStatus` the webhook
+ * uses, so the cache converges on exactly what a live event would write.
+ *
+ * Called by the daily reconcile cron, and reusable for a one-off fix of
+ * a specific row.
+ */
+export const reconcileSubscriptionStatuses = async (options?: {
+  /** Limit to a single subscription (e.g. a targeted one-off fix). */
+  stripeSubscriptionId?: string;
+}): Promise<{
+  checked: number;
+  updated: Array<{
+    stripeSubscriptionId: string;
+    from: SubscriptionStatus;
+    to: SubscriptionStatus;
+  }>;
+  errors: Array<{ stripeSubscriptionId: string; error: string }>;
+}> => {
+  // Terminal states never change again, so skip them. Everything else
+  // (TRIALING, ACTIVE, PAST_DUE, PAUSED, INCOMPLETE, UNPAID) can still
+  // transition and is worth reconciling.
+  const candidates = await db.subscription.findMany({
+    where: {
+      status: {
+        notIn: [SubscriptionStatus.CANCELLED, SubscriptionStatus.EXPIRED],
+      },
+      // Only rows we can actually look up in Stripe. RevenueCat-only
+      // subscriptions (no Stripe id) are out of scope for this Stripe
+      // reconcile.
+      stripeSubscriptionId: options?.stripeSubscriptionId ?? { not: null },
+    },
+    select: { id: true, stripeSubscriptionId: true, status: true },
+  });
+
+  const updated: Array<{
+    stripeSubscriptionId: string;
+    from: SubscriptionStatus;
+    to: SubscriptionStatus;
+  }> = [];
+  const errors: Array<{ stripeSubscriptionId: string; error: string }> = [];
+
+  for (const row of candidates) {
+    // The `not: null` filter above guarantees this, but Prisma's select
+    // type still widens to `string | null`, so narrow explicitly.
+    const { stripeSubscriptionId } = row;
+    if (!stripeSubscriptionId) continue;
+
+    try {
+      // eslint-disable-next-line no-await-in-loop
+      const stripeSubscription =
+        await stripe.subscriptions.retrieve(stripeSubscriptionId);
+      const liveStatus = mapStripeStatusToSubscriptionStatus(
+        stripeSubscription.status,
+      );
+
+      if (liveStatus === row.status) continue;
+
+      // eslint-disable-next-line no-await-in-loop
+      await db.subscription.update({
+        where: { id: row.id },
+        data: { status: liveStatus },
+      });
+
+      // No subscriptionEvent row here on purpose: reconciliation is an
+      // internal cache correction, not a billing-lifecycle event, so it
+      // shouldn't pollute the lifecycle log (and avoids needing a new
+      // enum value + migration). The returned summary is the record of
+      // what changed; the cron logs it.
+      // eslint-disable-next-line no-console
+      console.log(
+        `[reconcile] ${stripeSubscriptionId}: ${row.status} -> ${liveStatus}`,
+      );
+
+      updated.push({
+        stripeSubscriptionId,
+        from: row.status,
+        to: liveStatus,
+      });
+    } catch (error) {
+      errors.push({
+        stripeSubscriptionId,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
+    }
+  }
+
+  return { checked: candidates.length, updated, errors };
+};

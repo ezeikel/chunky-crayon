@@ -44,6 +44,10 @@
       "schedule": "0 0 1 * *"
     },
     {
+      "path": "/api/subscription/reconcile",
+      "schedule": "0 6 * * *"
+    },
+    {
       "path": "/api/coloring-image/generate",
       "schedule": "0 8 * * *"
     },
