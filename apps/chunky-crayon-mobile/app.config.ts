@@ -1,4 +1,6 @@
 import { ExpoConfig, ConfigContext } from "expo/config";
+import { existsSync } from "fs";
+import { join } from "path";
 import pkg from "./package.json";
 
 export default ({ config }: ConfigContext): ExpoConfig => {
@@ -9,14 +11,51 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         .join(".")
     : "";
 
+  // Per-variant app identity (matches PTP). EXPO_PUBLIC_ENVIRONMENT is set per
+  // EAS build profile (eas.json) so dev / preview / prod produce DIFFERENT
+  // bundle ids + names + icons and can all install side-by-side on one device.
+  // Prod keeps the original com.chewybytes.chunkycrayon.app + "Chunky Crayon"
+  // (the live App Store identity — do NOT change). dev/preview get suffixed ids.
+  const env = process.env.EXPO_PUBLIC_ENVIRONMENT || "development";
+
+  const appName =
+    env === "production"
+      ? "Chunky Crayon"
+      : env === "preview"
+        ? "CC Internal"
+        : "CC Dev";
+
+  const bundleId =
+    env === "production"
+      ? "com.chewybytes.chunkycrayon.app"
+      : env === "preview"
+        ? "com.chewybytes.chunkycrayon.app.internal"
+        : "com.chewybytes.chunkycrayon.app.dev";
+
+  // Per-variant icons if present, else fall back to the prod icon. CC doesn't
+  // ship dev/preview-badged icons yet — drop in icon-preview.png / icon-dev.png
+  // + adaptive-icon-{preview,dev}.png later and they're picked up automatically
+  // (no config change). The existsSync guard means a missing badged icon never
+  // breaks a dev/preview build; it just shares the prod icon until then.
+  const variantSuffix =
+    env === "production" ? "" : env === "preview" ? "-preview" : "-dev";
+  const pickIcon = (base: string): string => {
+    const variantPath = `./assets/images/${base}${variantSuffix}.png`;
+    return existsSync(join(__dirname, variantPath))
+      ? variantPath
+      : `./assets/images/${base}.png`;
+  };
+  const icon = pickIcon("icon");
+  const adaptiveIcon = pickIcon("adaptive-icon");
+
   return {
     ...config,
-    name: "Chunky Crayon",
+    name: appName,
     slug: "chunky-crayon",
     owner: "chewybytes",
     version: pkg.version,
     orientation: "default",
-    icon: "./assets/images/icon.png",
+    icon,
     scheme: "chunkycrayon",
     userInterfaceStyle: "light",
     ios: {
@@ -39,7 +78,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       // management, orphaning the AppDelegate's window — the RN root never gets
       // a visible window and the app boots to a BLACK SCREEN on every device.
       requireFullScreen: false,
-      bundleIdentifier: "com.chewybytes.chunkycrayon.app",
+      bundleIdentifier: bundleId,
       infoPlist: {
         ITSAppUsesNonExemptEncryption: false,
         CFBundleURLTypes: [
@@ -54,10 +93,10 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     },
     android: {
       adaptiveIcon: {
-        foregroundImage: "./assets/images/adaptive-icon.png",
+        foregroundImage: adaptiveIcon,
         backgroundColor: "#FF9F6E",
       },
-      package: "com.chewybytes.chunkycrayon.app",
+      package: bundleId,
     },
     web: {
       bundler: "metro",
