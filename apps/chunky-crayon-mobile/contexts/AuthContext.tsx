@@ -129,17 +129,27 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const hasIdentifiedRef = React.useRef(false);
   React.useEffect(() => {
     if (user) {
+      // The backend names a fresh anonymous device user "Mobile User"
+      // (mobile-auth.ts) — a placeholder, not a real name. Don't send it to
+      // PostHog/Sentry: it makes every anonymous person show the SAME label in
+      // the person column (can't tell them apart). Real account = has an email;
+      // those carry their actual name. Anonymous users then show as their
+      // distinct_id (= DB user.id), exactly like web's anonymous persons.
+      const isPlaceholderName = user.name === "Mobile User";
+      const realName = user.name && !isPlaceholderName ? user.name : undefined;
+      const hasAccount = !!user.email;
+
       Sentry.setUser({
         id: user.id,
         email: user.email ?? undefined,
-        username: user.name ?? undefined,
+        username: realName,
       });
       identifyAnalytics(user.id, {
         email: user.email ?? undefined,
-        name: user.name ?? undefined,
+        name: realName,
         credits: user.credits,
         locale: getLocales()[0]?.languageTag,
-        has_account: true,
+        has_account: hasAccount,
       });
       hasIdentifiedRef.current = true;
     } else if (hasIdentifiedRef.current) {
