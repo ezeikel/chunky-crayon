@@ -1,6 +1,9 @@
+import { useState } from "react";
 import { View, Text, StyleSheet, ScrollView } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import { router } from "expo-router";
 import AppHeader from "@/components/AppHeader";
+import ParentalGate from "@/components/ParentalGate";
 import Feed from "@/components/Feed/Feed";
 import useHeaderData from "@/hooks/useHeaderData";
 import { useT } from "@/lib/i18n/useT";
@@ -17,6 +20,9 @@ import { COLORS, FONTS } from "@/lib/design";
 const GalleryScreen = () => {
   const headerData = useHeaderData();
   const t = useT("mobile.gallery");
+  // "For Grown-ups" door → parent gate → settings. Present on every tab so a
+  // parent can reach Settings from anywhere (gate keeps kids out).
+  const [isSettingsGateOpen, setIsSettingsGateOpen] = useState(false);
 
   return (
     <View style={styles.root}>
@@ -25,6 +31,7 @@ const GalleryScreen = () => {
           credits={headerData.credits}
           profileName={headerData.profileName}
           avatarId={headerData.avatarId}
+          onSettingsPress={() => setIsSettingsGateOpen(true)}
         />
         <ScrollView
           style={styles.scrollView}
@@ -38,6 +45,17 @@ const GalleryScreen = () => {
           <Feed />
         </ScrollView>
       </LinearGradient>
+
+      {/* Settings is parent-gated: the door opens this gate, success routes to
+          the settings stack. Same wiring as Home. */}
+      <ParentalGate
+        visible={isSettingsGateOpen}
+        onClose={() => setIsSettingsGateOpen(false)}
+        onSuccess={() => {
+          setIsSettingsGateOpen(false);
+          router.push("/settings");
+        }}
+      />
     </View>
   );
 };

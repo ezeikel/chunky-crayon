@@ -16,8 +16,10 @@ import {
   faPaintbrush,
   faHeart as faHeartDuotone,
 } from "@fortawesome/pro-duotone-svg-icons";
+import { useState } from "react";
 import { useRouter } from "expo-router";
 import AppHeader from "@/components/AppHeader";
+import ParentalGate from "@/components/ParentalGate";
 import useHeaderData from "@/hooks/useHeaderData";
 import { useFeed } from "@/hooks/api";
 import { useMergedArtworks } from "@/hooks/useMergedArtworks";
@@ -43,6 +45,8 @@ const MyArtworkScreen = () => {
   const { artworks, isLoading } = useMergedArtworks();
   const { data: feed } = useFeed();
   const router = useRouter();
+  // "For Grown-ups" door → parent gate → settings (present on every tab).
+  const [isSettingsGateOpen, setIsSettingsGateOpen] = useState(false);
   // In-progress "workbench" — coloring pages the kid has started but not
   // saved. Web splits my-stuff into this workbench + the saved archive;
   // mobile mirrors that with an "In Progress" section above "Saved".
@@ -190,6 +194,7 @@ const MyArtworkScreen = () => {
           credits={headerData.credits}
           profileName={headerData.profileName}
           avatarId={headerData.avatarId}
+          onSettingsPress={() => setIsSettingsGateOpen(true)}
         />
         <ScrollView
           style={{ flex: 1 }}
@@ -214,6 +219,17 @@ const MyArtworkScreen = () => {
           )}
         </ScrollView>
       </LinearGradient>
+
+      {/* Settings is parent-gated: door opens this gate, success routes to the
+          settings stack. Same wiring as Home. */}
+      <ParentalGate
+        visible={isSettingsGateOpen}
+        onClose={() => setIsSettingsGateOpen(false)}
+        onSuccess={() => {
+          setIsSettingsGateOpen(false);
+          router.push("/settings");
+        }}
+      />
     </View>
   );
 };

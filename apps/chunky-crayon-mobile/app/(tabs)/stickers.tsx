@@ -2,12 +2,14 @@ import { useMemo, useState } from "react";
 import { View, Text, StyleSheet, ScrollView, Pressable } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Image } from "expo-image";
+import { router } from "expo-router";
 import Spinner from "@/components/Spinner/Spinner";
 import LockedStickerArt from "@/components/LockedStickerArt";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faStar, faCheck } from "@fortawesome/pro-solid-svg-icons";
 import { faLock, faMedal, faPaw } from "@fortawesome/pro-duotone-svg-icons";
 import AppHeader from "@/components/AppHeader";
+import ParentalGate from "@/components/ParentalGate";
 import StickerDetailSheet, {
   type StickerDetail,
 } from "@/components/StickerDetailSheet";
@@ -124,6 +126,8 @@ const StickersScreen = () => {
     null,
   );
   const [sheetOpen, setSheetOpen] = useState(false);
+  // "For Grown-ups" door → parent gate → settings (present on every tab).
+  const [isSettingsGateOpen, setIsSettingsGateOpen] = useState(false);
 
   // Group stickers by category
   const stickerCategories = useMemo(() => {
@@ -197,6 +201,7 @@ const StickersScreen = () => {
           credits={headerData.credits}
           profileName={headerData.profileName}
           avatarId={headerData.avatarId}
+          onSettingsPress={() => setIsSettingsGateOpen(true)}
         />
         <ScrollView
           style={styles.scrollView}
@@ -306,6 +311,17 @@ const StickersScreen = () => {
         sticker={selectedSticker}
         isOpen={sheetOpen}
         onClose={() => setSheetOpen(false)}
+      />
+
+      {/* Settings is parent-gated: door opens this gate, success routes to the
+          settings stack. Same wiring as Home. */}
+      <ParentalGate
+        visible={isSettingsGateOpen}
+        onClose={() => setIsSettingsGateOpen(false)}
+        onSuccess={() => {
+          setIsSettingsGateOpen(false);
+          router.push("/settings");
+        }}
       />
     </View>
   );
