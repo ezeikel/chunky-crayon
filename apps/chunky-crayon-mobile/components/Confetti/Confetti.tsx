@@ -7,6 +7,8 @@ import Animated, {
   withDelay,
   Easing,
 } from "react-native-reanimated";
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import { faStar } from "@fortawesome/pro-solid-svg-icons";
 import { notifySuccess } from "@/utils/haptics";
 
 /**
@@ -45,9 +47,16 @@ const CC_CRAYON_COLORS = [
 ];
 
 const DEFAULT_DURATION = 1500;
-const SIDE_PARTICLES = 45;
-const CENTER_PARTICLES = 80;
+// Trimmed from 45/45/80 (170) → 34/34/62 (130). 130 pieces still reads as a
+// full burst; 170 cost frames on older iPads while the coloring Skia surface
+// was live underneath. See the perf note at the bottom.
+const SIDE_PARTICLES = 34;
+const CENTER_PARTICLES = 62;
 const CENTER_DELAY_MS = 250;
+
+// The piece shapes. `streamer` = thin tall ribbon, `star` = a small 5-point
+// star (the only brand-shaped glyph), the rest are the classic confetti mix.
+type ConfettiShape = "circle" | "rect" | "streamer" | "square" | "star";
 
 type ConfettiPiece = {
   startX: number; // 0..1 of width
@@ -59,7 +68,25 @@ type ConfettiPiece = {
   rotation: number; // final rotation, degrees
   color: string;
   size: number; // width in px
-  isCircle: boolean;
+  shape: ConfettiShape;
+  // Per-piece descent variance so the fall isn't synchronised.
+  gravity: number; // downward pull strength (px at p=1)
+  swayAmp: number; // horizontal sway amplitude during descent, px
+  swayFreq: number; // sway cycles over the flight
+  // 3D flutter — the piece "flips" edge-on as it tumbles (scaleX oscillates).
+  flutterFreq: number; // flutter cycles over the flight
+  flutterPhase: number; // starting phase so pieces aren't in lock-step
+};
+
+// Weighted shape pick — mostly rects/circles (classic), fewer streamers/stars
+// so the burst stays legible rather than busy.
+const pickShape = (): ConfettiShape => {
+  const r = Math.random();
+  if (r < 0.4) return "rect";
+  if (r < 0.68) return "circle";
+  if (r < 0.84) return "square";
+  if (r < 0.94) return "streamer";
+  return "star";
 };
 
 type BurstSpec = {
@@ -106,7 +133,16 @@ const generatePieces = (
       color:
         CC_CRAYON_COLORS[Math.floor(Math.random() * CC_CRAYON_COLORS.length)],
       size: (5 + Math.random() * 6) * burst.scalar,
-      isCircle: Math.random() > 0.5,
+      shape: pickShape(),
+      // Per-piece gravity (±25%) + terminal-velocity feel: lighter pieces
+      // (streamers) drift, heavier ones drop. Plus a gentle horizontal sway so
+      // the descent looks like fluttering paper, not a synchronised curtain.
+      gravity: 600 * (0.75 + Math.random() * 0.5),
+      swayAmp: 6 + Math.random() * 14,
+      swayFreq: 1.5 + Math.random() * 2.5,
+      // Flutter — each piece flips edge-on at its own rate/phase.
+      flutterFreq: 2 + Math.random() * 4,
+      flutterPhase: Math.random() * Math.PI * 2,
     };
   });
 };
@@ -244,15 +280,29 @@ const ConfettiPieceView = ({
 
   const animatedStyle = useAnimatedStyle(() => {
     const p = progress.value;
-    // Drift goes linearly — pieces don't curve sideways during fall.
-    const tx = piece.driftX * p;
-    // Arc: peakY contribution peaks at p=0.5 (parabolic), zero at
-    // p=0 and p=1. Then gravity adds a quadratic downward pull
-    // after the apex.
+    // Horizontal: the launch drift (linear) PLUS a gentle sway that grows as
+    // the piece slows and falls — fluttering paper drifts side-to-side, it
+    // doesn't track a straight line. Sway ramps in (×p) so the launch stays
+    // crisp and the wobble only shows during descent.
+    const sway = Math.sin(p * piece.swayFreq * Math.PI * 2) * piece.swayAmp * p;
+    const tx = piece.driftX * p + sway;
+    // Arc: peakY contribution peaks at p=0.5 (parabolic), zero at p=0 and p=1.
+    // Then per-piece gravity adds a quadratic downward pull after the apex so
+    // pieces fall at different rates (heavier ones drop, streamers drift).
     const arch = piece.peakY * (1 - Math.pow(2 * p - 1, 2));
-    const gravity = 600 * p * p;
+    const gravity = piece.gravity * p * p;
     const ty = arch + gravity;
     const rotate = piece.rotation * p;
+    // 3D flutter — scaleX oscillates so each piece flips edge-on as it tumbles,
+    // catching the eye like real confetti. abs(cos) so it never mirrors weirdly;
+    // floored at 0.2 so a piece never fully vanishes mid-flip. The single
+    // biggest realism win over flat 2D pieces.
+    const flip =
+      0.2 +
+      0.8 *
+        Math.abs(
+          Math.cos(p * piece.flutterFreq * Math.PI * 2 + piece.flutterPhase),
+        );
     // Fade out the last quarter so pieces don't snap out.
     const opacity = p < 0.75 ? 1 : 1 - (p - 0.75) / 0.25;
 
@@ -261,10 +311,39 @@ const ConfettiPieceView = ({
         { translateX: tx },
         { translateY: ty },
         { rotate: `${rotate}deg` },
+        { scaleX: flip },
       ],
       opacity,
     };
   });
+
+  // Per-shape geometry. Streamers are thin + tall (ribbon), squares are 1:1,
+  // rects are the classic 1:1.5, circles are round. Stars render a filled glyph
+  // instead of a coloured box.
+  const isStar = piece.shape === "star";
+  const dims = (() => {
+    switch (piece.shape) {
+      case "circle":
+        return {
+          width: piece.size,
+          height: piece.size,
+          radius: piece.size / 2,
+        };
+      case "square":
+        return { width: piece.size, height: piece.size, radius: 1 };
+      case "streamer":
+        return {
+          width: piece.size * 0.45,
+          height: piece.size * 2.4,
+          radius: 1,
+        };
+      case "star":
+        return { width: piece.size * 1.6, height: piece.size * 1.6, radius: 0 };
+      case "rect":
+      default:
+        return { width: piece.size, height: piece.size * 1.5, radius: 2 };
+    }
+  })();
 
   return (
     <Animated.View
@@ -273,14 +352,27 @@ const ConfettiPieceView = ({
           position: "absolute",
           top: piece.startY * screenHeight,
           left: piece.startX * screenWidth,
-          width: piece.size,
-          height: piece.isCircle ? piece.size : piece.size * 1.5,
-          borderRadius: piece.isCircle ? piece.size / 2 : 2,
+          width: dims.width,
+          height: dims.height,
+          alignItems: "center",
+          justifyContent: "center",
+        },
+        // Non-star pieces are a coloured box; the star draws its own glyph.
+        !isStar && {
+          borderRadius: dims.radius,
           backgroundColor: piece.color,
         },
         animatedStyle,
       ]}
-    />
+    >
+      {isStar && (
+        <FontAwesomeIcon
+          icon={faStar}
+          size={Math.round(piece.size * 1.6)}
+          color={piece.color}
+        />
+      )}
+    </Animated.View>
   );
 };
 

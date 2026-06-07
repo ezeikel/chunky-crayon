@@ -18,7 +18,6 @@ import ConfirmSheet from "@/components/ConfirmSheet";
 import { LinearGradient } from "expo-linear-gradient";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import {
-  faUsers,
   faCreditCard,
   faGlobe,
   faVolumeHigh,
@@ -35,7 +34,8 @@ import {
   faCheck,
   faInfoCircle,
   faBookOpen,
-} from "@fortawesome/pro-solid-svg-icons";
+  faPlus,
+} from "@fortawesome/pro-duotone-svg-icons";
 import { faHeart } from "@fortawesome/pro-regular-svg-icons";
 import {
   faGoogle,
@@ -46,14 +46,30 @@ import * as Application from "expo-application";
 import Constants from "expo-constants";
 import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import ProfileSwitcher from "@/components/ProfileSwitcher";
+import ProfileAvatar from "@/components/ProfileAvatar/ProfileAvatar";
 import SubscriptionManager from "@/components/SubscriptionManager";
 import { usePlanName, useCredits } from "@/hooks/useEntitlements";
+import {
+  useProfiles,
+  useActiveProfile,
+  useSetActiveProfile,
+} from "@/hooks/api/useProfiles";
+import {
+  PLAN_COLORS,
+  PLAN_ICONS,
+  PLAN_DISPLAY_NAMES_WITH_FREE,
+  type PlanKey,
+} from "@/lib/paywall/plans";
+import { COLORS, CRAYON, SHADOWS } from "@/lib/design";
+import { tapMedium } from "@/utils/haptics";
 import { useAuth } from "@/contexts";
 import { useOnboardingStore } from "@/stores/onboardingStore";
 
 type SettingsItemProps = {
   icon: IconDefinition;
   iconColor: string;
+  /** Lighter tint of the same hue for the duotone secondary layer. */
+  iconSecondaryColor?: string;
   title: string;
   subtitle?: string;
   onPress: () => void;
@@ -63,6 +79,7 @@ type SettingsItemProps = {
 const SettingsItem = ({
   icon,
   iconColor,
+  iconSecondaryColor,
   title,
   subtitle,
   onPress,
@@ -76,7 +93,13 @@ const SettingsItem = ({
     onPress={onPress}
   >
     <View style={[styles.iconContainer, { backgroundColor: `${iconColor}20` }]}>
-      <FontAwesomeIcon icon={icon} size={18} color={iconColor} />
+      <FontAwesomeIcon
+        icon={icon}
+        size={18}
+        color={iconColor}
+        secondaryColor={iconSecondaryColor ?? iconColor}
+        secondaryOpacity={iconSecondaryColor ? 1 : 0.4}
+      />
     </View>
     <View style={styles.itemContent}>
       <Text style={styles.itemTitle}>{title}</Text>
@@ -99,6 +122,7 @@ const SettingsItem = ({
 type SettingsToggleProps = {
   icon: IconDefinition;
   iconColor: string;
+  iconSecondaryColor?: string;
   title: string;
   subtitle?: string;
   value: boolean;
@@ -108,6 +132,7 @@ type SettingsToggleProps = {
 const SettingsToggle = ({
   icon,
   iconColor,
+  iconSecondaryColor,
   title,
   subtitle,
   value,
@@ -115,7 +140,13 @@ const SettingsToggle = ({
 }: SettingsToggleProps) => (
   <View style={styles.settingsItem}>
     <View style={[styles.iconContainer, { backgroundColor: `${iconColor}20` }]}>
-      <FontAwesomeIcon icon={icon} size={18} color={iconColor} />
+      <FontAwesomeIcon
+        icon={icon}
+        size={18}
+        color={iconColor}
+        secondaryColor={iconSecondaryColor ?? iconColor}
+        secondaryOpacity={iconSecondaryColor ? 1 : 0.4}
+      />
     </View>
     <View style={styles.itemContent}>
       <Text style={styles.itemTitle}>{title}</Text>
@@ -131,17 +162,81 @@ const SettingsToggle = ({
   </View>
 );
 
-const PLAN_DISPLAY_NAMES: Record<string, string> = {
-  FREE: "Free",
-  SPLASH: "Splash Plan",
-  RAINBOW: "Rainbow Plan",
-  SPARKLE: "Sparkle Plan",
+// One circular profile-avatar disc in the Account row. Active disc gets the
+// brand-orange ring + a check badge; the trailing "Add" disc is a dashed
+// outline with a plus. Mirrors the character/scene picker disc pattern.
+const PROFILE_DISC = 64;
+
+type ProfileDiscProps = {
+  avatarId: string;
+  name: string;
+  active: boolean;
+  onPress: () => void;
 };
+
+const ProfileDisc = ({ avatarId, name, active, onPress }: ProfileDiscProps) => (
+  <Pressable
+    style={styles.discWrap}
+    onPress={onPress}
+    accessibilityRole="button"
+    accessibilityState={{ selected: active }}
+    accessibilityLabel={`${name}${active ? ", current profile" : ""}`}
+  >
+    <View style={[styles.disc, active && styles.discActive]}>
+      <ProfileAvatar avatarId={avatarId} name={name} size="md" />
+    </View>
+    {active && (
+      <View style={styles.discCheck}>
+        <FontAwesomeIcon icon={faCheck} size={10} color={COLORS.white} />
+      </View>
+    )}
+    <Text style={styles.discName} numberOfLines={1}>
+      {name}
+    </Text>
+  </Pressable>
+);
+
+const AddProfileDisc = ({ onPress }: { onPress: () => void }) => (
+  <Pressable
+    style={styles.discWrap}
+    onPress={onPress}
+    accessibilityRole="button"
+    accessibilityLabel="Add a profile"
+  >
+    <View style={[styles.disc, styles.discAdd]}>
+      <FontAwesomeIcon
+        icon={faPlus}
+        size={20}
+        color={COLORS.crayonOrange}
+        secondaryColor={COLORS.secondaryOrange}
+        secondaryOpacity={1}
+      />
+    </View>
+    <Text style={styles.discName} numberOfLines={1}>
+      Add
+    </Text>
+  </Pressable>
+);
 
 const SettingsScreen = () => {
   const appVersion = Constants.expoConfig?.version || "1.0.0";
   const planName = usePlanName();
   const credits = useCredits();
+
+  // Profiles — active one drives the header card; the full list renders as the
+  // avatar-disc row. Switching is optimistic via React Query invalidation.
+  const { data: profilesData } = useProfiles();
+  const { data: activeProfileData } = useActiveProfile();
+  const setActiveProfile = useSetActiveProfile();
+  const profiles = profilesData?.profiles ?? [];
+  const activeProfile = activeProfileData?.activeProfile ?? null;
+
+  const isPaidPlan = planName !== "FREE";
+  const planLabel = PLAN_DISPLAY_NAMES_WITH_FREE[planName];
+  const planColor = isPaidPlan
+    ? PLAN_COLORS[planName as PlanKey]
+    : COLORS.crayonOrange;
+  const planIcon = isPaidPlan ? PLAN_ICONS[planName as PlanKey] : faCreditCard;
   const {
     isLoading: authLoading,
     isAuthenticated,
@@ -176,6 +271,16 @@ const SettingsScreen = () => {
 
   const handleManageProfiles = () => {
     setProfileSwitcherOpen(true);
+  };
+
+  const handleSelectProfile = (profileId: string) => {
+    if (profileId === activeProfile?.id) {
+      // Tapping the active profile opens the manager (rename/switch/add).
+      setProfileSwitcherOpen(true);
+      return;
+    }
+    tapMedium();
+    setActiveProfile.mutate(profileId);
   };
 
   const handleSubscription = () => {
@@ -312,63 +417,143 @@ const SettingsScreen = () => {
           contentContainerStyle={{ paddingBottom: 100, paddingTop: 16 }}
           showsVerticalScrollIndicator={false}
         >
+          {/* Profile header card — the active profile (avatar + name + plan
+              chip). Tapping opens the profile manager. */}
+          {activeProfile && (
+            <Pressable
+              style={({ pressed }) => [
+                styles.headerCard,
+                pressed && styles.headerCardPressed,
+              ]}
+              onPress={handleManageProfiles}
+              accessibilityRole="button"
+              accessibilityLabel={`${activeProfile.name}, manage profiles`}
+            >
+              <ProfileAvatar
+                avatarId={activeProfile.avatarId}
+                name={activeProfile.name}
+                size="lg"
+              />
+              <View style={styles.headerInfo}>
+                <Text style={styles.headerName} numberOfLines={1}>
+                  {activeProfile.name}
+                </Text>
+                <View
+                  style={[
+                    styles.planChip,
+                    { backgroundColor: `${planColor}26` },
+                  ]}
+                >
+                  <FontAwesomeIcon
+                    icon={planIcon}
+                    size={11}
+                    color={planColor}
+                    secondaryColor={planColor}
+                    secondaryOpacity={0.4}
+                  />
+                  <Text style={[styles.planChipText, { color: planColor }]}>
+                    {planLabel} Plan
+                  </Text>
+                </View>
+              </View>
+              <FontAwesomeIcon
+                icon={faChevronRight}
+                size={16}
+                color="#9CA3AF"
+              />
+            </Pressable>
+          )}
+
+          {/* Subscription banner — plan + credits, opens the manager. */}
+          <Pressable
+            style={({ pressed }) => [pressed && styles.bannerPressed]}
+            onPress={handleSubscription}
+            accessibilityRole="button"
+            accessibilityLabel={`${planLabel} plan, ${credits} credits. Manage subscription.`}
+          >
+            <LinearGradient
+              colors={[`${planColor}E6`, planColor]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.banner}
+            >
+              <View style={styles.bannerIcon}>
+                <FontAwesomeIcon
+                  icon={planIcon}
+                  size={22}
+                  color={COLORS.white}
+                  secondaryColor={COLORS.white}
+                  secondaryOpacity={0.45}
+                />
+              </View>
+              <View style={styles.bannerInfo}>
+                <Text style={styles.bannerTitle}>{planLabel} Plan</Text>
+                <Text style={styles.bannerSubtitle}>
+                  {credits.toLocaleString()} credit{credits === 1 ? "" : "s"}
+                  {isPaidPlan ? "" : " · Upgrade to keep coloring"}
+                </Text>
+              </View>
+              <View style={styles.bannerCta}>
+                <Text style={styles.bannerCtaText}>
+                  {isPaidPlan ? "Manage" : "Upgrade"}
+                </Text>
+                <FontAwesomeIcon
+                  icon={faChevronRight}
+                  size={12}
+                  color={COLORS.white}
+                />
+              </View>
+            </LinearGradient>
+          </Pressable>
+
+          {/* Profiles Section — avatar-disc row */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Profiles</Text>
+            {/* Avatar-disc row — each child profile as a tappable disc, active
+                one ringed, plus an Add disc (opens the manager). */}
+            <View style={styles.discRowCard}>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.discRow}
+              >
+                {profiles.map((profile) => (
+                  <ProfileDisc
+                    key={profile.id}
+                    avatarId={profile.avatarId}
+                    name={profile.name}
+                    active={profile.id === activeProfile?.id}
+                    onPress={() => handleSelectProfile(profile.id)}
+                  />
+                ))}
+                <AddProfileDisc onPress={handleManageProfiles} />
+              </ScrollView>
+            </View>
+          </View>
+
           {/* Account Section */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Account</Text>
             <View style={styles.sectionContent}>
               {isLinked ? (
-                <>
-                  <View style={styles.settingsItem}>
-                    <View
-                      style={[
-                        styles.iconContainer,
-                        { backgroundColor: "rgba(34, 197, 94, 0.2)" },
-                      ]}
-                    >
-                      <FontAwesomeIcon
-                        icon={faCheck}
-                        size={18}
-                        color="#22C55E"
-                      />
-                    </View>
-                    <View style={styles.itemContent}>
-                      <Text style={styles.itemTitle}>Signed In</Text>
-                      <Text style={styles.itemSubtitle}>
-                        {user?.email || "Syncing across devices"}
-                      </Text>
-                    </View>
-                  </View>
-                  <SettingsItem
-                    icon={faRightFromBracket}
-                    iconColor="#EF4444"
-                    title="Sign Out"
-                    subtitle="Your artwork stays on this device"
-                    onPress={handleSignOut}
-                  />
-                </>
+                <SettingsItem
+                  icon={faRightFromBracket}
+                  iconColor={COLORS.error}
+                  iconSecondaryColor="#FCA5A5"
+                  title="Sign Out"
+                  subtitle={user?.email || "Your artwork stays on this device"}
+                  onPress={handleSignOut}
+                />
               ) : (
                 <SettingsItem
                   icon={faLink}
-                  iconColor="#8B5CF6"
+                  iconColor={CRAYON.purple.base}
+                  iconSecondaryColor={CRAYON.purple.light}
                   title="Sign In"
                   subtitle="Sync artwork across devices"
                   onPress={handleSignIn}
                 />
               )}
-              <SettingsItem
-                icon={faUsers}
-                iconColor="#E46444"
-                title="Manage Profiles"
-                subtitle="Add or switch child profiles"
-                onPress={handleManageProfiles}
-              />
-              <SettingsItem
-                icon={faCreditCard}
-                iconColor="#F1AE7E"
-                title="Subscription & Credits"
-                subtitle={`${PLAN_DISPLAY_NAMES[planName] || "Free Plan"} · ${credits.toLocaleString()} credit${credits === 1 ? "" : "s"}`}
-                onPress={handleSubscription}
-              />
             </View>
           </View>
 
@@ -378,14 +563,16 @@ const SettingsScreen = () => {
             <View style={styles.sectionContent}>
               <SettingsItem
                 icon={faGlobe}
-                iconColor="#E46444"
+                iconColor={CRAYON.blue.base}
+                iconSecondaryColor={CRAYON.blue.light}
                 title="Language"
                 subtitle="English"
                 onPress={handleLanguage}
               />
               <SettingsToggle
                 icon={faVolumeHigh}
-                iconColor="#F1AE7E"
+                iconColor={CRAYON.yellow.dark}
+                iconSecondaryColor={CRAYON.yellow.base}
                 title="Sound Effects"
                 subtitle="Button taps and actions"
                 value={soundEffectsEnabled}
@@ -393,7 +580,8 @@ const SettingsScreen = () => {
               />
               <SettingsToggle
                 icon={faMusic}
-                iconColor="#E46444"
+                iconColor={CRAYON.purple.base}
+                iconSecondaryColor={CRAYON.purple.light}
                 title="Background Music"
                 subtitle="Ambient sounds while coloring"
                 value={backgroundMusicEnabled}
@@ -408,21 +596,24 @@ const SettingsScreen = () => {
             <View style={styles.sectionContent}>
               <SettingsItem
                 icon={faCircleQuestion}
-                iconColor="#F1AE7E"
+                iconColor={CRAYON.green.base}
+                iconSecondaryColor={CRAYON.green.light}
                 title="Help & FAQ"
                 subtitle="Get answers to common questions"
                 onPress={handleSupport}
               />
               <SettingsItem
                 icon={faEnvelope}
-                iconColor="#E46444"
+                iconColor={COLORS.crayonOrange}
+                iconSecondaryColor={COLORS.secondaryOrange}
                 title="Contact Us"
                 subtitle="support@chunkycrayon.com"
                 onPress={handleSupport}
               />
               <SettingsItem
                 icon={faStar}
-                iconColor="#F1AE7E"
+                iconColor={CRAYON.pink.base}
+                iconSecondaryColor={CRAYON.pink.light}
                 title="Rate the App"
                 subtitle="Share your feedback"
                 onPress={handleRateApp}
@@ -436,13 +627,15 @@ const SettingsScreen = () => {
             <View style={styles.sectionContent}>
               <SettingsItem
                 icon={faShieldCheck}
-                iconColor="#F1AE7E"
+                iconColor={CRAYON.green.dark}
+                iconSecondaryColor={CRAYON.green.base}
                 title="Privacy Policy"
                 onPress={handlePrivacy}
               />
               <SettingsItem
                 icon={faFileLines}
-                iconColor="#E46444"
+                iconColor={CRAYON.blue.base}
+                iconSecondaryColor={CRAYON.blue.light}
                 title="Terms of Service"
                 onPress={handleTerms}
               />
@@ -455,7 +648,8 @@ const SettingsScreen = () => {
             <View style={styles.sectionContent}>
               <SettingsItem
                 icon={faBookOpen}
-                iconColor="#F1AE7E"
+                iconColor={CRAYON.yellow.dark}
+                iconSecondaryColor={CRAYON.yellow.base}
                 title="View Onboarding"
                 subtitle="Replay the welcome tour"
                 onPress={() => {
@@ -474,6 +668,8 @@ const SettingsScreen = () => {
                     icon={faInfoCircle}
                     size={18}
                     color="#9CA3AF"
+                    secondaryColor="#9CA3AF"
+                    secondaryOpacity={0.4}
                   />
                 </View>
                 <View style={styles.itemContent}>
@@ -690,6 +886,154 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.08,
     shadowRadius: 8,
     elevation: 3,
+  },
+  // Profile header card
+  headerCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginHorizontal: 16,
+    marginBottom: 16,
+    padding: 16,
+    borderRadius: 20,
+    backgroundColor: "rgba(255, 255, 255, 0.9)",
+    ...SHADOWS.md,
+  },
+  headerCardPressed: {
+    backgroundColor: "#F9FAFB",
+  },
+  headerInfo: {
+    flex: 1,
+    marginLeft: 16,
+  },
+  headerName: {
+    fontFamily: "TondoTrial-Bold",
+    fontSize: 22,
+    color: COLORS.textGray,
+    marginBottom: 6,
+  },
+  planChip: {
+    flexDirection: "row",
+    alignItems: "center",
+    alignSelf: "flex-start",
+    gap: 5,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 999,
+  },
+  planChipText: {
+    fontFamily: "TondoTrial-Bold",
+    fontSize: 12,
+  },
+  // Subscription banner
+  banner: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginHorizontal: 16,
+    marginBottom: 24,
+    padding: 16,
+    borderRadius: 20,
+    ...SHADOWS.md,
+  },
+  bannerPressed: {
+    opacity: 0.9,
+  },
+  bannerIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 14,
+    backgroundColor: "rgba(255, 255, 255, 0.25)",
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 14,
+  },
+  bannerInfo: {
+    flex: 1,
+  },
+  bannerTitle: {
+    fontFamily: "TondoTrial-Bold",
+    fontSize: 17,
+    color: COLORS.white,
+  },
+  bannerSubtitle: {
+    fontFamily: "TondoTrial-Regular",
+    fontSize: 13,
+    color: "rgba(255, 255, 255, 0.9)",
+    marginTop: 2,
+  },
+  bannerCta: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    backgroundColor: "rgba(255, 255, 255, 0.22)",
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 999,
+  },
+  bannerCtaText: {
+    fontFamily: "TondoTrial-Bold",
+    fontSize: 13,
+    color: COLORS.white,
+  },
+  // Profile avatar disc row
+  discRowCard: {
+    backgroundColor: "rgba(255, 255, 255, 0.9)",
+    borderRadius: 16,
+    paddingVertical: 12,
+    shadowColor: "#E46444",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  discRow: {
+    paddingHorizontal: 16,
+    gap: 14,
+  },
+  discWrap: {
+    alignItems: "center",
+    width: PROFILE_DISC + 8,
+  },
+  disc: {
+    width: PROFILE_DISC,
+    height: PROFILE_DISC,
+    borderRadius: PROFILE_DISC / 2,
+    borderWidth: 4,
+    borderColor: COLORS.white,
+    alignItems: "center",
+    justifyContent: "center",
+    overflow: "hidden",
+    backgroundColor: COLORS.bgCream,
+    ...SHADOWS.md,
+  },
+  discActive: {
+    borderColor: COLORS.crayonOrange,
+    transform: [{ scale: 1.06 }],
+  },
+  discAdd: {
+    borderStyle: "dashed",
+    borderColor: COLORS.crayonOrange,
+    backgroundColor: "rgba(228, 100, 68, 0.08)",
+  },
+  discCheck: {
+    position: "absolute",
+    top: -2,
+    right: 4,
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: COLORS.crayonOrange,
+    borderWidth: 2,
+    borderColor: COLORS.white,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  discName: {
+    fontFamily: "TondoTrial-Bold",
+    fontSize: 11,
+    color: COLORS.textGray,
+    marginTop: 6,
+    maxWidth: PROFILE_DISC + 8,
+    textAlign: "center",
   },
   settingsItem: {
     flexDirection: "row",

@@ -4,14 +4,16 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Tabs } from "expo-router";
 import { BlurView } from "expo-blur";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-// All-duotone icon family (smooth, not sharp) for a consistent, lively bar.
+// Duotone Regular (fadr) icon family — outlined two-tone (dark stroke + light
+// interior fill), not the filled Duotone Solid. Gives the bar a softer, hollow
+// look while still carrying the brand-orange duotone on the active tab.
 import {
   faHouse,
   faImage,
   faStar,
   faHeart,
   faHatWizard,
-} from "@fortawesome/pro-duotone-svg-icons";
+} from "@fortawesome/duotone-regular-svg-icons";
 import CreateSheet from "@/components/CreateSheet/CreateSheet";
 import { useT } from "@/lib/i18n/useT";
 import { tapMedium } from "@/utils/haptics";

@@ -35,8 +35,6 @@ import {
   BlendMode,
   BlurStyle,
   createPicture,
-  Paragraph,
-  TextAlign,
   Fill,
   ImageFormat,
   ColorType,
@@ -77,7 +75,7 @@ import {
   getVisibleActions,
   type BrushType,
 } from "@/stores/canvasStore";
-import { getCanvasSticker, CANVAS_STICKER_IMAGES } from "@/lib/canvasStickers";
+import { CANVAS_STICKER_IMAGES } from "@/lib/canvasStickers";
 import {
   createBrushPaint,
   createSimplePaint,
@@ -250,9 +248,9 @@ type ImageCanvasProps = {
 /**
  * One placed canvas sticker, drawn as its bundled transparent PNG. Hooks can't
  * run inside the renderStickers .map, so each sticker is its own component
- * that calls useImage. Resolves the bundled asset by catalog id; falls back to
- * a Skia Paragraph emoji render for legacy emoji-only saves (no catalog id /
- * unknown id). Centred on the tap point, sized by the action's stickerSize.
+ * that calls useImage. Resolves the bundled asset by catalog id. Centred on the
+ * tap point, sized by the action's stickerSize. Stickers are illustrated PNGs;
+ * a save without a known catalog id renders nothing (no emoji fallback).
  */
 const StickerActionImage = ({ action }: { action: DrawingAction }) => {
   const catalogId = action.stickerCatalogId;
@@ -283,25 +281,10 @@ const StickerActionImage = ({ action }: { action: DrawingAction }) => {
     );
   }
 
-  // PNG sticker (has a catalog id) still decoding: render NOTHING until the
-  // image is ready. Do NOT fall through to the emoji glyph — a PNG sticker
-  // carries action.sticker as a LEGACY fallback glyph too, so falling through
-  // flashed the emoji for the frames before useImage resolved, then swapped to
-  // the PNG (the "shows an old emoji then rotates" flash). The decode is fast;
-  // a blank frame or two is invisible, an emoji→PNG swap is not.
-  if (catalogId) return null;
-
-  // Fallback: genuinely legacy emoji-only save (no catalog id) → Skia Paragraph
-  // colour-emoji render.
-  const glyph = action.sticker;
-  if (!glyph) return null;
-  const para = Skia.ParagraphBuilder.Make({ textAlign: TextAlign.Center })
-    .pushStyle({ fontSize: size })
-    .addText(glyph)
-    .pop()
-    .build();
-  para.layout(size);
-  return <Paragraph paragraph={para} x={x} y={y} width={size} />;
+  // Either the PNG is still decoding, or this is a legacy save with no known
+  // catalog id — render nothing. (Decode is fast, so a blank frame or two is
+  // invisible. Stickers are illustrated PNGs; there is no emoji fallback.)
+  return null;
 };
 
 const ImageCanvas = ({
@@ -1701,11 +1684,9 @@ const ImageCanvas = ({
       // Haptic feedback for sticker placement
       tapHeavy();
 
-      // `selectedSticker` is a catalog id; record the id + emoji fallback (the
-      // PNG itself resolves from the bundled registry at render time, web
-      // parity). stickerCatalogId/stickerImageUrl ride to the wire for
-      // cross-device replay.
-      const sticker = getCanvasSticker(selectedSticker);
+      // `selectedSticker` is a catalog id; the PNG resolves from the bundled
+      // registry at render time (web parity). stickerCatalogId/stickerImageUrl
+      // ride to the wire for cross-device replay.
       // The stored stickerSize (20-150 slider, default 80) is in CANVAS-pixel
       // terms, like web's 32/48/64. But placement records the sticker in SVG
       // viewBox space (coords come from touchToSvgCoords, ~1024-wide), where a
@@ -1718,7 +1699,7 @@ const ImageCanvas = ({
       const action: DrawingAction = {
         type: "sticker",
         color: selectedColor, // Not used but required by type
-        sticker: sticker?.emoji ?? selectedSticker, // legacy fallback glyph
+        sticker: selectedSticker, // catalog id (wire stickerId)
         stickerCatalogId: selectedSticker,
         stickerImageUrl: `/images/stickers/canvas/${selectedSticker}.png`,
         stickerX: coords.x,
@@ -2524,10 +2505,9 @@ const ImageCanvas = ({
   ]);
 
   // Render stickers as bundled transparent PNGs (web parity — the canvas
-  // tool stamps PNGs, not emoji). Each placed sticker resolves its catalog id
-  // to a bundled asset via StickerActionImage (which calls useImage). Legacy
-  // emoji-only saves (no stickerCatalogId) fall back to the Skia Paragraph
-  // emoji render inside that child.
+  // tool stamps illustrated PNGs, not emoji). Each placed sticker resolves its
+  // catalog id to a bundled asset via StickerActionImage (which calls useImage).
+  // Legacy saves with no known catalog id render nothing (no emoji fallback).
   const renderStickers = useMemo(() => {
     return visibleActions
       .filter(

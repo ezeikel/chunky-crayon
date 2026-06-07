@@ -346,18 +346,3 @@ export const createPatternPaint = (
 
   return paint;
 };
-
-/**
- * Pattern display info for UI
- */
-export const PATTERN_INFO: Record<
-  PatternType,
-  { icon: string; label: string }
-> = {
-  dots: { icon: "⚫", label: "Dots" },
-  stripes: { icon: "📊", label: "Stripes" },
-  hearts: { icon: "❤️", label: "Hearts" },
-  stars: { icon: "⭐", label: "Stars" },
-  zigzag: { icon: "〰️", label: "Zigzag" },
-  confetti: { icon: "🎉", label: "Confetti" },
-};

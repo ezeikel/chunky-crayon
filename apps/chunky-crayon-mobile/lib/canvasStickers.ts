@@ -11,8 +11,8 @@ import type { ImageSourcePropType } from "react-native";
  * catalog) rather than importing the web-oriented coloring-ui package into the
  * RN bundle — the same duplicate-catalog pattern as lib/colo/catalog.ts and
  * lib/avatars.ts. `STICKER_IMAGES` resolves a sticker id → bundled PNG via a
- * static require() map (Metro needs static paths). `emoji` is the legacy
- * fallback the Skia render uses if a sticker id has no bundled image.
+ * static require() map (Metro needs static paths). Every sticker is an
+ * illustrated PNG; there is no emoji fallback.
  */
 
 export type CanvasStickerCategory =
@@ -27,77 +27,51 @@ export type CanvasSticker = {
   id: string;
   name: string;
   category: CanvasStickerCategory;
-  emoji: string;
 };
 
 export const CANVAS_STICKERS: CanvasSticker[] = [
   // stars
-  { id: "star-classic", name: "Star", category: "stars", emoji: "⭐" },
-  {
-    id: "star-shooting",
-    name: "Shooting Star",
-    category: "stars",
-    emoji: "💫",
-  },
-  { id: "sparkles", name: "Sparkles", category: "stars", emoji: "✨" },
-  { id: "star-burst", name: "Star Burst", category: "stars", emoji: "🌟" },
-  {
-    id: "moon-crescent",
-    name: "Crescent Moon",
-    category: "stars",
-    emoji: "🌙",
-  },
-  { id: "comet", name: "Comet", category: "stars", emoji: "☄️" },
+  { id: "star-classic", name: "Star", category: "stars" },
+  { id: "star-shooting", name: "Shooting Star", category: "stars" },
+  { id: "sparkles", name: "Sparkles", category: "stars" },
+  { id: "star-burst", name: "Star Burst", category: "stars" },
+  { id: "moon-crescent", name: "Crescent Moon", category: "stars" },
+  { id: "comet", name: "Comet", category: "stars" },
   // hearts
-  { id: "heart-red", name: "Red Heart", category: "hearts", emoji: "❤️" },
-  { id: "heart-double", name: "Two Hearts", category: "hearts", emoji: "💕" },
-  {
-    id: "heart-sparkle",
-    name: "Sparkle Heart",
-    category: "hearts",
-    emoji: "💖",
-  },
-  {
-    id: "heart-arrow",
-    name: "Heart with Arrow",
-    category: "hearts",
-    emoji: "💘",
-  },
-  {
-    id: "heart-rainbow",
-    name: "Rainbow Heart",
-    category: "hearts",
-    emoji: "🩷",
-  },
-  { id: "heart-wings", name: "Winged Heart", category: "hearts", emoji: "💝" },
+  { id: "heart-red", name: "Red Heart", category: "hearts" },
+  { id: "heart-double", name: "Two Hearts", category: "hearts" },
+  { id: "heart-sparkle", name: "Sparkle Heart", category: "hearts" },
+  { id: "heart-arrow", name: "Heart with Arrow", category: "hearts" },
+  { id: "heart-rainbow", name: "Rainbow Heart", category: "hearts" },
+  { id: "heart-wings", name: "Winged Heart", category: "hearts" },
   // shapes
-  { id: "circle", name: "Circle", category: "shapes", emoji: "🔵" },
-  { id: "square", name: "Square", category: "shapes", emoji: "🟦" },
-  { id: "triangle", name: "Triangle", category: "shapes", emoji: "🔺" },
-  { id: "diamond", name: "Diamond", category: "shapes", emoji: "💎" },
-  { id: "hexagon", name: "Hexagon", category: "shapes", emoji: "⬡" },
-  { id: "star-outline", name: "Star Shape", category: "shapes", emoji: "⭐" },
+  { id: "circle", name: "Circle", category: "shapes" },
+  { id: "square", name: "Square", category: "shapes" },
+  { id: "triangle", name: "Triangle", category: "shapes" },
+  { id: "diamond", name: "Diamond", category: "shapes" },
+  { id: "hexagon", name: "Hexagon", category: "shapes" },
+  { id: "star-outline", name: "Star Shape", category: "shapes" },
   // nature
-  { id: "flower-daisy", name: "Daisy", category: "nature", emoji: "🌼" },
-  { id: "sun-smiley", name: "Sunshine", category: "nature", emoji: "☀️" },
-  { id: "rainbow", name: "Rainbow", category: "nature", emoji: "🌈" },
-  { id: "cloud", name: "Cloud", category: "nature", emoji: "☁️" },
-  { id: "butterfly", name: "Butterfly", category: "nature", emoji: "🦋" },
-  { id: "leaf", name: "Leaf", category: "nature", emoji: "🍃" },
+  { id: "flower-daisy", name: "Daisy", category: "nature" },
+  { id: "sun-smiley", name: "Sunshine", category: "nature" },
+  { id: "rainbow", name: "Rainbow", category: "nature" },
+  { id: "cloud", name: "Cloud", category: "nature" },
+  { id: "butterfly", name: "Butterfly", category: "nature" },
+  { id: "leaf", name: "Leaf", category: "nature" },
   // animals
-  { id: "cat", name: "Cat", category: "animals", emoji: "🐱" },
-  { id: "dog", name: "Dog", category: "animals", emoji: "🐶" },
-  { id: "bunny", name: "Bunny", category: "animals", emoji: "🐰" },
-  { id: "bear", name: "Bear", category: "animals", emoji: "🐻" },
-  { id: "fox", name: "Fox", category: "animals", emoji: "🦊" },
-  { id: "fish", name: "Fish", category: "animals", emoji: "🐠" },
+  { id: "cat", name: "Cat", category: "animals" },
+  { id: "dog", name: "Dog", category: "animals" },
+  { id: "bunny", name: "Bunny", category: "animals" },
+  { id: "bear", name: "Bear", category: "animals" },
+  { id: "fox", name: "Fox", category: "animals" },
+  { id: "fish", name: "Fish", category: "animals" },
   // fun
-  { id: "crown", name: "Crown", category: "fun", emoji: "👑" },
-  { id: "rocket", name: "Rocket", category: "fun", emoji: "🚀" },
-  { id: "balloon", name: "Balloon", category: "fun", emoji: "🎈" },
-  { id: "gift", name: "Gift", category: "fun", emoji: "🎁" },
-  { id: "cupcake", name: "Cupcake", category: "fun", emoji: "🧁" },
-  { id: "party-popper", name: "Party Popper", category: "fun", emoji: "🎉" },
+  { id: "crown", name: "Crown", category: "fun" },
+  { id: "rocket", name: "Rocket", category: "fun" },
+  { id: "balloon", name: "Balloon", category: "fun" },
+  { id: "gift", name: "Gift", category: "fun" },
+  { id: "cupcake", name: "Cupcake", category: "fun" },
+  { id: "party-popper", name: "Party Popper", category: "fun" },
 ];
 
 export const CANVAS_STICKER_CATEGORIES: {

@@ -53,17 +53,26 @@ const RootLayout = () => {
   // startReactNative(...in: window), no UIWindowScene). On iPad (iOS 16+)
   // passive device rotation resizes the RN root logically — useWindowDimensions
   // DOES report the swapped dims (verified: 1376x1032 in landscape) — but the
-  // actual UIWindow geometry never follows, so the portrait window just paints
-  // sideways. expo-screen-orientation's native module issues the orientation
-  // update the scene-less window can't do on its own.
-  // (A UIApplicationSceneManifest would also fix the window but black-screens
-  // this app — see app.config.ts; this is the scene-compatible alternative.)
-  // unlockAsync allows ALL FOUR orientations on every device — including
-  // upside-down portrait, which we WANT to rotate into. The tier decision
-  // (getColoringTier) keys off width/height, so upside-down portrait resolves
-  // to the same "phone" bottom-sheet as normal portrait and just renders
-  // flipped 180° by the OS.
+  // actual UIWindow geometry never followed, so the portrait window just painted
+  // sideways.
+  //
+  // The fix is NOT expo-screen-orientation's imperative lockAsync/unlockAsync
+  // (those resolve but don't rotate the scene-less window — react-native-screens
+  // 4.25.2 globally swizzles supportedInterfaceOrientations on every
+  // UIViewController, and the imperative call doesn't feed that swizzle). Instead
+  // we declare the orientation on the route via `screenOrientation` in
+  // screenOptions. rn-screens' swizzled method resolves from the per-screen
+  // RNSScreenWindowTraits, so it ENFORCES the orientation through its own working
+  // path — which is the one that actually issues the geometry update the
+  // scene-less window can't do on its own. Working WITH the swizzle instead of
+  // fighting it. "all" = the app supports all four; the tier decision
+  // (getColoringTier) keys off width/height so each orientation lays out
+  // correctly. No native fork, no UIApplicationSceneManifest (which black-screens
+  // this app — see app.config.ts).
   useEffect(() => {
+    // Belt-and-braces: clear any leftover imperative lock from a prior session
+    // so the declarative screenOrientation is the sole authority. unlockAsync
+    // alone never fixed the sideways paint; the screenOrientation prop does.
     ScreenOrientation.unlockAsync().catch(() => {
       // Non-fatal: if the native module is unavailable the app still runs
       // portrait-first (the iPad-first default). Don't crash startup over it.
@@ -76,7 +85,7 @@ const RootLayout = () => {
 
   return (
     <Providers>
-      <Stack screenOptions={{ headerShown: false }}>
+      <Stack screenOptions={{ headerShown: false, orientation: "all" }}>
         <Stack.Screen
           name="onboarding"
           options={{
