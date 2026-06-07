@@ -48,6 +48,18 @@ app-example
 ios/
 android/
 
+# ...but NOT the local Nitro modules' ios/ and android/ dirs. The broad ios/ and
+# android/ rules above (meant for the Expo-generated app project) also match
+# modules/*/{ios,android} and modules/*/nitrogen/generated/{ios,android} at any
+# depth. Those are committed-by-intent source: the Nitrogen-generated autolinking
+# files + the module's build.gradle/CMakeLists are NOT produced by `expo prebuild`,
+# so a from-git EAS build (which archives only tracked files) fails `pod install`
+# with "cannot load FloodFill+autolinking.rb" without them. Un-ignore them.
+!modules/**/ios/
+!modules/**/ios/**
+!modules/**/android/
+!modules/**/android/**
+
 .cursor/
 
 *.zip
