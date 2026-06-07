@@ -24,14 +24,11 @@ const Loading = ({ className, size = 'md', text }: LoadingProps) => (
   >
     <FontAwesomeIcon
       icon={faSpinnerThird}
-      className={cn('animate-spin', sizeClasses[size])}
-      style={
-        {
-          '--fa-primary-color': 'hsl(var(--crayon-orange))',
-          '--fa-secondary-color': 'hsl(var(--crayon-teal))',
-          '--fa-secondary-opacity': '0.6',
-        } as React.CSSProperties
-      }
+      className={cn(
+        'animate-spin',
+        '[--fa-primary-color:hsl(var(--crayon-orange))] [--fa-secondary-color:hsl(var(--crayon-teal))] [--fa-secondary-opacity:0.6]',
+        sizeClasses[size],
+      )}
     />
     {text && (
       <p className="font-tondo text-sm text-text-secondary animate-pulse">

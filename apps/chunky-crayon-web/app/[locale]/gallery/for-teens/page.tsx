@@ -2,7 +2,10 @@ import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  FontAwesomeIcon,
+  type CSSVariables,
+} from '@fortawesome/react-fontawesome';
 import {
   faGamepadModern,
   faArrowRight,
@@ -216,7 +219,7 @@ const ForTeensContent = async ({ locale }: { locale: string }) => {
     '--fa-primary-color': 'hsl(var(--crayon-blue))',
     '--fa-secondary-color': 'hsl(var(--crayon-purple))',
     '--fa-secondary-opacity': '1',
-  } as React.CSSProperties;
+  } as React.CSSProperties & CSSVariables;
 
   return (
     <>

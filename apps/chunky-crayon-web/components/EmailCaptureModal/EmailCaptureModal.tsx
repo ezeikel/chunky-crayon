@@ -125,14 +125,7 @@ const EmailCaptureModal = ({ sourceSlug }: EmailCaptureModalProps = {}) => {
           <div className="flex items-center justify-center gap-2 mb-2">
             <FontAwesomeIcon
               icon={faSparkles}
-              className="text-2xl"
-              style={
-                {
-                  '--fa-primary-color': 'hsl(var(--crayon-orange))',
-                  '--fa-secondary-color': 'hsl(var(--crayon-yellow))',
-                  '--fa-secondary-opacity': '1',
-                } as React.CSSProperties
-              }
+              className="text-2xl [--fa-primary-color:hsl(var(--crayon-orange))] [--fa-secondary-color:hsl(var(--crayon-yellow))] [--fa-secondary-opacity:1]"
             />
           </div>
           <DialogTitle className="text-center font-tondo text-2xl">

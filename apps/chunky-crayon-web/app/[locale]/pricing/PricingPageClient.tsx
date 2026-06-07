@@ -202,14 +202,7 @@ const PricingPageClient = ({
                   <span className="absolute -top-4 left-1/2 -translate-x-1/2 -rotate-[3deg] bg-gradient-to-br from-crayon-orange to-crayon-orange-dark text-white text-sm font-tondo font-bold px-6 py-2 rounded-full shadow-[0_6px_16px_rgba(218,115,83,0.35)] whitespace-nowrap inline-flex items-center gap-2 ring-2 ring-white/40">
                     <FontAwesomeIcon
                       icon={faSparkles}
-                      className="text-sm"
-                      style={
-                        {
-                          '--fa-primary-color': '#ffffff',
-                          '--fa-secondary-color': '#fde68a',
-                          '--fa-secondary-opacity': '1',
-                        } as React.CSSProperties
-                      }
+                      className="text-sm [--fa-primary-color:#ffffff] [--fa-secondary-color:#fde68a] [--fa-secondary-opacity:1]"
                     />
                     {t('mostPopular')}
                   </span>
@@ -343,14 +336,7 @@ const PricingPageClient = ({
                   <span className="flex items-center justify-center gap-1.5 text-xs text-text-secondary text-center mt-1">
                     <FontAwesomeIcon
                       icon={faShieldCheck}
-                      className="text-crayon-orange"
-                      style={
-                        {
-                          '--fa-primary-color': 'hsl(var(--crayon-orange))',
-                          '--fa-secondary-color': 'hsl(var(--crayon-yellow))',
-                          '--fa-secondary-opacity': '1',
-                        } as React.CSSProperties
-                      }
+                      className="text-crayon-orange [--fa-primary-color:hsl(var(--crayon-orange))] [--fa-secondary-color:hsl(var(--crayon-yellow))] [--fa-secondary-opacity:1]"
                     />
                     {t('trustStrip.guarantee')}
                   </span>
@@ -688,14 +674,7 @@ const PricingPageClient = ({
               >
                 <FontAwesomeIcon
                   icon={icon}
-                  className="text-2xl text-crayon-orange"
-                  style={
-                    {
-                      '--fa-primary-color': 'hsl(var(--crayon-orange))',
-                      '--fa-secondary-color': 'hsl(var(--crayon-yellow))',
-                      '--fa-secondary-opacity': '1',
-                    } as React.CSSProperties
-                  }
+                  className="text-2xl text-crayon-orange [--fa-primary-color:hsl(var(--crayon-orange))] [--fa-secondary-color:hsl(var(--crayon-yellow))] [--fa-secondary-opacity:1]"
                 />
                 <span className="text-sm text-text-secondary text-center leading-snug">
                   {t(`included.${key}`)}

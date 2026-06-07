@@ -104,14 +104,7 @@ const StickerCard = ({
         >
           <FontAwesomeIcon
             icon={faLock}
-            className="text-lg"
-            style={
-              {
-                '--fa-primary-color': 'hsl(var(--text-muted))',
-                '--fa-secondary-color': 'hsl(var(--paper-cream-dark))',
-                '--fa-secondary-opacity': '1',
-              } as React.CSSProperties
-            }
+            className="text-lg [--fa-primary-color:hsl(var(--text-muted))] [--fa-secondary-color:hsl(var(--paper-cream-dark))] [--fa-secondary-opacity:1]"
           />
         </span>
       )}

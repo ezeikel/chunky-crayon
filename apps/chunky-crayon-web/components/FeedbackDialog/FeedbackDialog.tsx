@@ -3,7 +3,10 @@
 import { useState, useEffect } from 'react';
 import { usePostHog } from 'posthog-js/react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  FontAwesomeIcon,
+  type CSSVariables,
+} from '@fortawesome/react-fontawesome';
 import {
   faBug,
   faLightbulb,
@@ -35,7 +38,7 @@ const feedbackTypeConfig: Record<
     icon: IconDefinition;
     color: string;
     bgColor: string;
-    iconStyle: React.CSSProperties;
+    iconStyle: React.CSSProperties & CSSVariables;
   }
 > = {
   bug: {
@@ -46,7 +49,7 @@ const feedbackTypeConfig: Record<
       '--fa-primary-color': 'hsl(350, 80%, 55%)',
       '--fa-secondary-color': 'hsl(350, 70%, 70%)',
       '--fa-secondary-opacity': '0.6',
-    } as React.CSSProperties,
+    } as React.CSSProperties & CSSVariables,
   },
   idea: {
     icon: faLightbulb,
@@ -56,7 +59,7 @@ const feedbackTypeConfig: Record<
       '--fa-primary-color': 'hsl(var(--crayon-orange))',
       '--fa-secondary-color': 'hsl(var(--crayon-orange-light))',
       '--fa-secondary-opacity': '0.7',
-    } as React.CSSProperties,
+    } as React.CSSProperties & CSSVariables,
   },
   help: {
     icon: faCircleQuestion,
@@ -66,7 +69,7 @@ const feedbackTypeConfig: Record<
       '--fa-primary-color': 'hsl(var(--crayon-sky))',
       '--fa-secondary-color': 'hsl(var(--crayon-teal))',
       '--fa-secondary-opacity': '0.7',
-    } as React.CSSProperties,
+    } as React.CSSProperties & CSSVariables,
   },
   other: {
     icon: faCommentDots,
@@ -76,7 +79,7 @@ const feedbackTypeConfig: Record<
       '--fa-primary-color': 'hsl(var(--crayon-purple))',
       '--fa-secondary-color': 'hsl(var(--crayon-pink))',
       '--fa-secondary-opacity': '0.7',
-    } as React.CSSProperties,
+    } as React.CSSProperties & CSSVariables,
   },
 };
 
@@ -224,7 +227,7 @@ const FeedbackDialog = ({
                   '--fa-primary-color': 'hsl(var(--text-secondary))',
                   '--fa-secondary-color': 'hsl(var(--text-secondary))',
                   '--fa-secondary-opacity': '0.5',
-                } as React.CSSProperties
+                } as React.CSSProperties & CSSVariables
               }
             />
           </button>
@@ -348,7 +351,7 @@ const FeedbackDialog = ({
                               '--fa-primary-color': 'white',
                               '--fa-secondary-color': 'white',
                               '--fa-secondary-opacity': '0.5',
-                            } as React.CSSProperties
+                            } as React.CSSProperties & CSSVariables
                           }
                         />
                         {t('sending')}
@@ -381,7 +384,7 @@ const FeedbackDialog = ({
                         '--fa-primary-color': 'hsl(var(--crayon-green))',
                         '--fa-secondary-color': 'hsl(var(--crayon-green-dark))',
                         '--fa-secondary-opacity': '0.7',
-                      } as React.CSSProperties
+                      } as React.CSSProperties & CSSVariables
                     }
                   />
                 </div>

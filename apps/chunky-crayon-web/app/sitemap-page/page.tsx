@@ -1,7 +1,10 @@
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import Link from 'next/link';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  FontAwesomeIcon,
+  type CSSVariables,
+} from '@fortawesome/react-fontawesome';
 import {
   faSitemap,
   faBaby,
@@ -37,7 +40,7 @@ const SitemapPage = () => {
     '--fa-primary-color': 'hsl(var(--crayon-orange))',
     '--fa-secondary-color': 'hsl(var(--crayon-yellow))',
     '--fa-secondary-opacity': '1',
-  } as React.CSSProperties;
+  } as React.CSSProperties & CSSVariables;
 
   const sections: SitemapSection[] = [
     {

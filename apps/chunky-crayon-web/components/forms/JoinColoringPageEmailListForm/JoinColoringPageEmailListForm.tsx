@@ -157,14 +157,7 @@ const JoinColoringPageEmailListForm = ({
           <div className="inline-flex items-center gap-2 mb-2">
             <FontAwesomeIcon
               icon={faEnvelopeOpenText}
-              className="text-xl"
-              style={
-                {
-                  '--fa-primary-color': 'hsl(var(--crayon-orange))',
-                  '--fa-secondary-color': 'hsl(var(--crayon-pink))',
-                  '--fa-secondary-opacity': '0.8',
-                } as React.CSSProperties
-              }
+              className="text-xl [--fa-primary-color:hsl(var(--crayon-orange))] [--fa-secondary-color:hsl(var(--crayon-pink))] [--fa-secondary-opacity:0.8]"
             />
             <h3 className="font-tondo font-bold text-lg text-gradient-orange">
               {t('signup.title')}

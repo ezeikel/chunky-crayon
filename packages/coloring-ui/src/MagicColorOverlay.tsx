@@ -1,6 +1,9 @@
 "use client";
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  FontAwesomeIcon,
+  type CSSVariables,
+} from "@fortawesome/react-fontawesome";
 import {
   faWandMagicSparkles,
   faFaceFrownOpen,
@@ -52,17 +55,20 @@ const DEFAULTS: Required<MagicColorOverlayMessages> = {
   tryAgain: "Try Again",
 };
 
+// FA v7 types the icon `style` prop as `CSSProperties & CSSVariables`, so the
+// `--fa-*` custom properties must carry the FA-variable typing (a plain
+// `CSSProperties` cast drops it and no longer satisfies the prop).
 const magicIconStyle = {
   "--fa-primary-color": "var(--color-coloring-accent)",
   "--fa-secondary-color": "var(--color-coloring-highlight)",
   "--fa-secondary-opacity": "1",
-} as React.CSSProperties;
+} as React.CSSProperties & CSSVariables;
 
 const errorIconStyle = {
   "--fa-primary-color": "var(--color-coloring-error-bg)",
   "--fa-secondary-color": "var(--color-coloring-warning-bg)",
   "--fa-secondary-opacity": "1",
-} as React.CSSProperties;
+} as React.CSSProperties & CSSVariables;
 
 /**
  * Overlay shown over the canvas while the legacy magic-tool warm-up is

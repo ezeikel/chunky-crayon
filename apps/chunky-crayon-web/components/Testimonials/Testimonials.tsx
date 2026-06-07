@@ -1,6 +1,9 @@
 'use client';
 
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  FontAwesomeIcon,
+  type CSSVariables,
+} from '@fortawesome/react-fontawesome';
 import { faQuoteLeft } from '@fortawesome/pro-solid-svg-icons';
 import { faStar, faSparkles } from '@fortawesome/pro-duotone-svg-icons';
 import { useTranslations } from 'next-intl';
@@ -56,13 +59,13 @@ export const StarRating = ({ rating }: { rating: number }) => {
     '--fa-primary-color': 'hsl(var(--crayon-yellow))',
     '--fa-secondary-color': 'hsl(var(--crayon-orange))',
     '--fa-secondary-opacity': '1',
-  } as React.CSSProperties;
+  } as React.CSSProperties & CSSVariables;
 
   const emptyStyle = {
     '--fa-primary-color': '#e5e7eb',
     '--fa-secondary-color': '#d1d5db',
     '--fa-secondary-opacity': '1',
-  } as React.CSSProperties;
+  } as React.CSSProperties & CSSVariables;
 
   const filled = Math.floor(rating);
 
@@ -137,7 +140,7 @@ const SocialProofHeader = () => {
     '--fa-primary-color': 'hsl(var(--crayon-orange))',
     '--fa-secondary-color': 'hsl(var(--crayon-yellow))',
     '--fa-secondary-opacity': '1',
-  } as React.CSSProperties;
+  } as React.CSSProperties & CSSVariables;
 
   return (
     <div className="text-center mb-10 md:mb-12">

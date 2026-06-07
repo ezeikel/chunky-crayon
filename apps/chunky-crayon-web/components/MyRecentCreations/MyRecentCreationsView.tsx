@@ -58,14 +58,7 @@ const MyRecentCreationsView = ({
         <div className="mx-auto mb-3 flex size-14 items-center justify-center rounded-full bg-crayon-orange/10">
           <FontAwesomeIcon
             icon={faPalette}
-            className="text-2xl"
-            style={
-              {
-                '--fa-primary-color': 'hsl(var(--crayon-orange))',
-                '--fa-secondary-color': 'hsl(var(--crayon-yellow))',
-                '--fa-secondary-opacity': '1',
-              } as React.CSSProperties
-            }
+            className="text-2xl [--fa-primary-color:hsl(var(--crayon-orange))] [--fa-secondary-color:hsl(var(--crayon-yellow))] [--fa-secondary-opacity:1]"
           />
         </div>
         <p className="font-tondo text-lg font-bold text-text-primary">

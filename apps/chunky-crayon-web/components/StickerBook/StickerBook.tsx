@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import type { CSSVariables } from '@fortawesome/react-fontawesome';
 import {
   faMedal,
   faPaw,
@@ -154,7 +155,7 @@ const StickerBook = ({ unlockedStickers, className }: StickerBookProps) => {
                         '--fa-primary-color': section.primary,
                         '--fa-secondary-color': section.secondary,
                         '--fa-secondary-opacity': '1',
-                      } as React.CSSProperties
+                      } as React.CSSProperties & CSSVariables
                     }
                   />
                 </span>

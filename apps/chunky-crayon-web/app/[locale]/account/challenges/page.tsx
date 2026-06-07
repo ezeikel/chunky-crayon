@@ -2,7 +2,10 @@
 
 import { useState, useTransition, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  FontAwesomeIcon,
+  type CSSVariables,
+} from '@fortawesome/react-fontawesome';
 import {
   faTrophy,
   faHistory,
@@ -82,7 +85,7 @@ const ChallengesPage = () => {
     '--fa-primary-color': 'hsl(var(--crayon-orange))',
     '--fa-secondary-color': 'hsl(var(--crayon-yellow))',
     '--fa-secondary-opacity': '1',
-  } as React.CSSProperties;
+  } as React.CSSProperties & CSSVariables;
 
   if (isLoading) {
     return (
@@ -135,7 +138,7 @@ const ChallengesPage = () => {
                 '--fa-primary-color': 'hsl(var(--crayon-orange))',
                 '--fa-secondary-color': 'hsl(var(--crayon-yellow))',
                 '--fa-secondary-opacity': '1',
-              } as React.CSSProperties
+              } as React.CSSProperties & CSSVariables
             }
           />
           This Week&apos;s Challenge

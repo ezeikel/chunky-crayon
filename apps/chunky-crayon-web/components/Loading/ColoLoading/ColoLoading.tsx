@@ -222,24 +222,12 @@ const ColoLoading = ({
             <>
               <FontAwesomeIcon
                 icon={faSparkles}
-                className="absolute -top-4 -right-4 text-2xl animate-pulse text-crayon-yellow"
-                style={
-                  {
-                    '--fa-secondary-color': 'hsl(var(--crayon-orange))',
-                    '--fa-secondary-opacity': 0.9,
-                  } as React.CSSProperties
-                }
+                className="absolute -top-4 -right-4 text-2xl animate-pulse text-crayon-yellow [--fa-secondary-color:hsl(var(--crayon-orange))] [--fa-secondary-opacity:0.9]"
               />
               <FontAwesomeIcon
                 icon={faStars}
-                className="absolute -bottom-2 -left-4 text-xl animate-pulse text-crayon-pink"
-                style={
-                  {
-                    animationDelay: '-0.5s',
-                    '--fa-secondary-color': 'hsl(var(--crayon-purple))',
-                    '--fa-secondary-opacity': 0.9,
-                  } as React.CSSProperties
-                }
+                className="absolute -bottom-2 -left-4 text-xl animate-pulse text-crayon-pink [--fa-secondary-color:hsl(var(--crayon-purple))] [--fa-secondary-opacity:0.9]"
+                style={{ animationDelay: '-0.5s' }}
               />
             </>
           )}
@@ -290,13 +278,9 @@ const ColoLoading = ({
           >
             <FontAwesomeIcon
               icon={LOADING_ICONS[currentMessageIndex]}
-              className="text-4xl text-crayon-orange"
               // FA duotone secondary uses --fa-secondary-* CSS vars; lean
               // pink-light to colour the back-layer warmly.
-              style={{
-                ['--fa-secondary-color' as string]: 'rgb(255 192 192 / 1)',
-                ['--fa-secondary-opacity' as string]: 0.8,
-              }}
+              className="text-4xl text-crayon-orange [--fa-secondary-color:rgb(255_192_192_/_1)] [--fa-secondary-opacity:0.8]"
             />
           </div>
         )}

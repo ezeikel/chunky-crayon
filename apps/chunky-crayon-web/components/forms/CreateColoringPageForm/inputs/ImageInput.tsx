@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import type { CSSVariables } from '@fortawesome/react-fontawesome';
 import {
   faCameraRetro,
   faImages,
@@ -147,14 +148,7 @@ const ImageInput = ({ className }: ImageInputProps) => {
       >
         <FontAwesomeIcon
           icon={faFaceDizzy}
-          className="text-6xl"
-          style={
-            {
-              '--fa-primary-color': 'hsl(var(--crayon-orange))',
-              '--fa-secondary-color': 'hsl(var(--crayon-teal))',
-              '--fa-secondary-opacity': '0.6',
-            } as React.CSSProperties
-          }
+          className="text-6xl [--fa-primary-color:hsl(var(--crayon-orange))] [--fa-secondary-color:hsl(var(--crayon-teal))] [--fa-secondary-opacity:0.6]"
         />
         <p className="text-center text-text-primary font-tondo font-bold text-lg">
           {t(errorKey)}
@@ -180,14 +174,7 @@ const ImageInput = ({ className }: ImageInputProps) => {
       >
         <FontAwesomeIcon
           icon={faSpinnerThird}
-          className="text-5xl animate-spin"
-          style={
-            {
-              '--fa-primary-color': 'hsl(var(--crayon-orange))',
-              '--fa-secondary-color': 'hsl(var(--crayon-teal))',
-              '--fa-secondary-opacity': '0.6',
-            } as React.CSSProperties
-          }
+          className="text-5xl animate-spin [--fa-primary-color:hsl(var(--crayon-orange))] [--fa-secondary-color:hsl(var(--crayon-teal))] [--fa-secondary-opacity:0.6]"
         />
         <p className="text-center text-text-primary font-tondo font-bold">
           {state === 'capturing'
@@ -260,14 +247,7 @@ const ImageInput = ({ className }: ImageInputProps) => {
             <p className="text-center text-text-primary font-tondo text-base leading-relaxed">
               <FontAwesomeIcon
                 icon={isChildDrawing ? faPencil : faCamera}
-                className="mr-2"
-                style={
-                  {
-                    '--fa-primary-color': 'hsl(var(--crayon-orange))',
-                    '--fa-secondary-color': 'hsl(var(--crayon-teal))',
-                    '--fa-secondary-opacity': '0.6',
-                  } as React.CSSProperties
-                }
+                className="mr-2 [--fa-primary-color:hsl(var(--crayon-orange))] [--fa-secondary-color:hsl(var(--crayon-teal))] [--fa-secondary-opacity:0.6]"
               />
               <span className="font-bold">{t('imageInput.iSee')}</span>{' '}
               {aiDescription}
@@ -405,7 +385,7 @@ const ImageInput = ({ className }: ImageInputProps) => {
                   ? 'hsl(var(--crayon-teal))'
                   : 'hsl(var(--text-muted))',
                 '--fa-secondary-opacity': '1',
-              } as React.CSSProperties
+              } as React.CSSProperties & CSSVariables
             }
           />
           <p className="font-tondo text-sm text-text-muted text-center">

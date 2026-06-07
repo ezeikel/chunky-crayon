@@ -2,7 +2,10 @@
 
 import * as React from "react";
 import { Toaster as SonnerToaster, toast as sonnerToast } from "sonner";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  FontAwesomeIcon,
+  type CSSVariables,
+} from "@fortawesome/react-fontawesome";
 import {
   faCircleCheck,
   faCircleExclamation,
@@ -26,13 +29,13 @@ const duotone = (
   secondary: string,
   primaryOpacity = "1",
   secondaryOpacity = "0.85",
-): React.CSSProperties =>
+): React.CSSProperties & CSSVariables =>
   ({
     "--fa-primary-color": primary,
     "--fa-secondary-color": secondary,
     "--fa-primary-opacity": primaryOpacity,
     "--fa-secondary-opacity": secondaryOpacity,
-  }) as React.CSSProperties;
+  }) as React.CSSProperties & CSSVariables;
 
 const variantIcons = {
   success: (

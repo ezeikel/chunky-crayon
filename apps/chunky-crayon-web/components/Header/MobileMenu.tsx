@@ -4,7 +4,10 @@ import { useState, useEffect, useTransition } from 'react';
 import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  FontAwesomeIcon,
+  type CSSVariables,
+} from '@fortawesome/react-fontawesome';
 import {
   faBars,
   faXmark,
@@ -80,7 +83,7 @@ const MobileMenu = ({
       '--fa-primary-color': 'hsl(var(--crayon-orange))',
       '--fa-secondary-color': 'hsl(var(--crayon-teal))',
       '--fa-secondary-opacity': '0.8',
-    } as React.CSSProperties;
+    } as React.CSSProperties & CSSVariables;
 
     if (item.isFeedback) {
       return (
@@ -192,7 +195,7 @@ const MobileMenu = ({
       '--fa-primary-color': 'hsl(var(--crayon-yellow-dark))',
       '--fa-secondary-color': 'hsl(var(--crayon-orange))',
       '--fa-secondary-opacity': '1',
-    } as React.CSSProperties;
+    } as React.CSSProperties & CSSVariables;
 
     return (
       <div className="flex items-center gap-3 p-3 font-tondo font-bold text-text-primary">
@@ -231,7 +234,7 @@ const MobileMenu = ({
               '--fa-primary-color': 'hsl(var(--crayon-orange))',
               '--fa-secondary-color': 'hsl(var(--crayon-teal))',
               '--fa-secondary-opacity': '0.8',
-            } as React.CSSProperties
+            } as React.CSSProperties & CSSVariables
           }
         />
       </button>
@@ -265,7 +268,7 @@ const MobileMenu = ({
                       '--fa-primary-color': 'hsl(var(--crayon-orange))',
                       '--fa-secondary-color': 'hsl(var(--crayon-teal))',
                       '--fa-secondary-opacity': '0.8',
-                    } as React.CSSProperties
+                    } as React.CSSProperties & CSSVariables
                   }
                 />
               </button>

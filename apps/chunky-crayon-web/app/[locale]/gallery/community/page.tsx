@@ -2,7 +2,10 @@ import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  FontAwesomeIcon,
+  type CSSVariables,
+} from '@fortawesome/react-fontawesome';
 import { faUsers, faArrowLeft } from '@fortawesome/pro-duotone-svg-icons';
 import { auth } from '@/auth';
 import PageWrap from '@/components/PageWrap/PageWrap';
@@ -63,7 +66,7 @@ const CommunityGalleryContent = async ({
     '--fa-primary-color': 'hsl(var(--crayon-purple))',
     '--fa-secondary-color': 'hsl(var(--crayon-pink))',
     '--fa-secondary-opacity': '1',
-  } as React.CSSProperties;
+  } as React.CSSProperties & CSSVariables;
 
   return (
     <>

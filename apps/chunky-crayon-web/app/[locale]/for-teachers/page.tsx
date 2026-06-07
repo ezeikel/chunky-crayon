@@ -10,12 +10,6 @@ import { faCalendarStar } from '@fortawesome/pro-duotone-svg-icons/faCalendarSta
 import { faCheck } from '@fortawesome/pro-duotone-svg-icons/faCheck';
 import TeacherHubViewTracker from '@/components/TeacherHubViewTracker';
 
-const DUOTONE_STYLE = {
-  '--fa-primary-color': 'hsl(var(--crayon-orange))',
-  '--fa-secondary-color': 'hsl(var(--crayon-teal))',
-  '--fa-secondary-opacity': '1',
-} as React.CSSProperties;
-
 type PageParams = { locale: string };
 
 const HUB_PATH = '/for-teachers';
@@ -65,8 +59,7 @@ const TeacherHubPage = () => (
         <div className="flex items-start gap-4">
           <FontAwesomeIcon
             icon={faStar}
-            className="text-3xl mt-1"
-            style={DUOTONE_STYLE}
+            className="text-3xl mt-1 [--fa-primary-color:hsl(var(--crayon-orange))] [--fa-secondary-color:hsl(var(--crayon-teal))] [--fa-secondary-opacity:1]"
           />
           <div>
             <h2 className="font-tondo text-2xl font-bold text-primary mb-1">
@@ -87,8 +80,7 @@ const TeacherHubPage = () => (
         <div className="flex items-start gap-4">
           <FontAwesomeIcon
             icon={faPalette}
-            className="text-3xl mt-1"
-            style={DUOTONE_STYLE}
+            className="text-3xl mt-1 [--fa-primary-color:hsl(var(--crayon-orange))] [--fa-secondary-color:hsl(var(--crayon-teal))] [--fa-secondary-opacity:1]"
           />
           <div>
             <h2 className="font-tondo text-2xl font-bold text-primary mb-1">
@@ -109,8 +101,7 @@ const TeacherHubPage = () => (
         <div className="flex items-start gap-4">
           <FontAwesomeIcon
             icon={faCakeCandles}
-            className="text-3xl mt-1"
-            style={DUOTONE_STYLE}
+            className="text-3xl mt-1 [--fa-primary-color:hsl(var(--crayon-orange))] [--fa-secondary-color:hsl(var(--crayon-teal))] [--fa-secondary-opacity:1]"
           />
           <div>
             <h2 className="font-tondo text-2xl font-bold text-primary mb-1">
@@ -131,8 +122,7 @@ const TeacherHubPage = () => (
         <div className="flex items-start gap-4">
           <FontAwesomeIcon
             icon={faBookOpen}
-            className="text-3xl mt-1"
-            style={DUOTONE_STYLE}
+            className="text-3xl mt-1 [--fa-primary-color:hsl(var(--crayon-orange))] [--fa-secondary-color:hsl(var(--crayon-teal))] [--fa-secondary-opacity:1]"
           />
           <div>
             <h2 className="font-tondo text-2xl font-bold text-primary mb-1">
@@ -153,8 +143,7 @@ const TeacherHubPage = () => (
         <div className="flex items-start gap-4">
           <FontAwesomeIcon
             icon={faCalendarStar}
-            className="text-3xl mt-1"
-            style={DUOTONE_STYLE}
+            className="text-3xl mt-1 [--fa-primary-color:hsl(var(--crayon-orange))] [--fa-secondary-color:hsl(var(--crayon-teal))] [--fa-secondary-opacity:1]"
           />
           <div>
             <h2 className="font-tondo text-2xl font-bold text-primary mb-1">
@@ -178,32 +167,28 @@ const TeacherHubPage = () => (
         <li className="flex gap-3">
           <FontAwesomeIcon
             icon={faCheck}
-            className="mt-1 shrink-0"
-            style={DUOTONE_STYLE}
+            className="mt-1 shrink-0 [--fa-primary-color:hsl(var(--crayon-orange))] [--fa-secondary-color:hsl(var(--crayon-teal))] [--fa-secondary-opacity:1]"
           />
           No student data stored. Ever. Typed names stay in the browser.
         </li>
         <li className="flex gap-3">
           <FontAwesomeIcon
             icon={faCheck}
-            className="mt-1 shrink-0"
-            style={DUOTONE_STYLE}
+            className="mt-1 shrink-0 [--fa-primary-color:hsl(var(--crayon-orange))] [--fa-secondary-color:hsl(var(--crayon-teal))] [--fa-secondary-opacity:1]"
           />
           No signup required to download any printable.
         </li>
         <li className="flex gap-3">
           <FontAwesomeIcon
             icon={faCheck}
-            className="mt-1 shrink-0"
-            style={DUOTONE_STYLE}
+            className="mt-1 shrink-0 [--fa-primary-color:hsl(var(--crayon-orange))] [--fa-secondary-color:hsl(var(--crayon-teal))] [--fa-secondary-opacity:1]"
           />
           No ads, no tracking pixels beyond analytics.
         </li>
         <li className="flex gap-3">
           <FontAwesomeIcon
             icon={faCheck}
-            className="mt-1 shrink-0"
-            style={DUOTONE_STYLE}
+            className="mt-1 shrink-0 [--fa-primary-color:hsl(var(--crayon-orange))] [--fa-secondary-color:hsl(var(--crayon-teal))] [--fa-secondary-opacity:1]"
           />
           Print-ready PDFs; works on any classroom printer.
         </li>

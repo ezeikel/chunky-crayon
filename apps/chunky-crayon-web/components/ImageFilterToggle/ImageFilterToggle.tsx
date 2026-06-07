@@ -48,20 +48,12 @@ const ImageFilterToggle = ({
       >
         <FontAwesomeIcon
           icon={faUsers}
-          className="text-lg"
-          style={
+          className={cn(
+            'text-lg',
             show === 'all'
-              ? ({
-                  '--fa-primary-color': '#ffffff',
-                  '--fa-secondary-color': '#ffffff',
-                  '--fa-secondary-opacity': '0.7',
-                } as React.CSSProperties)
-              : ({
-                  '--fa-primary-color': 'hsl(var(--crayon-teal))',
-                  '--fa-secondary-color': 'hsl(var(--crayon-orange))',
-                  '--fa-secondary-opacity': '0.8',
-                } as React.CSSProperties)
-          }
+              ? '[--fa-primary-color:#ffffff] [--fa-secondary-color:#ffffff] [--fa-secondary-opacity:0.7]'
+              : '[--fa-primary-color:hsl(var(--crayon-teal))] [--fa-secondary-color:hsl(var(--crayon-orange))] [--fa-secondary-opacity:0.8]',
+          )}
         />
         Everyone&apos;s
       </button>
@@ -81,20 +73,12 @@ const ImageFilterToggle = ({
       >
         <FontAwesomeIcon
           icon={faUser}
-          className="text-lg"
-          style={
+          className={cn(
+            'text-lg',
             show === 'user'
-              ? ({
-                  '--fa-primary-color': '#ffffff',
-                  '--fa-secondary-color': '#ffffff',
-                  '--fa-secondary-opacity': '0.7',
-                } as React.CSSProperties)
-              : ({
-                  '--fa-primary-color': 'hsl(var(--crayon-orange))',
-                  '--fa-secondary-color': 'hsl(var(--crayon-teal))',
-                  '--fa-secondary-opacity': '0.8',
-                } as React.CSSProperties)
-          }
+              ? '[--fa-primary-color:#ffffff] [--fa-secondary-color:#ffffff] [--fa-secondary-opacity:0.7]'
+              : '[--fa-primary-color:hsl(var(--crayon-orange))] [--fa-secondary-color:hsl(var(--crayon-teal))] [--fa-secondary-opacity:0.8]',
+          )}
         />
         Mine
       </button>

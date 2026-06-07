@@ -1,6 +1,9 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  FontAwesomeIcon,
+  type CSSVariables,
+} from '@fortawesome/react-fontawesome';
 import {
   faWandMagicSparkles,
   faRotateRight,
@@ -66,13 +69,13 @@ const CharacterTile = ({
     '--fa-primary-color': 'hsl(var(--crayon-orange))',
     '--fa-secondary-color': 'hsl(var(--crayon-yellow))',
     '--fa-secondary-opacity': '0.8',
-  } as React.CSSProperties;
+  } as React.CSSProperties & CSSVariables;
 
   const retryIconStyle = {
     '--fa-primary-color': 'hsl(var(--crayon-orange))',
     '--fa-secondary-color': 'hsl(var(--crayon-pink))',
     '--fa-secondary-opacity': '0.8',
-  } as React.CSSProperties;
+  } as React.CSSProperties & CSSVariables;
 
   const inner = (
     <>

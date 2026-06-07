@@ -1,6 +1,9 @@
 'use client';
 
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  FontAwesomeIcon,
+  type CSSVariables,
+} from '@fortawesome/react-fontawesome';
 import {
   faSparkles,
   faPalette,
@@ -26,7 +29,7 @@ const DashboardHeader = ({ coloState }: DashboardHeaderProps) => {
     '--fa-primary-color': 'hsl(var(--crayon-orange))',
     '--fa-secondary-color': 'hsl(var(--crayon-yellow))',
     '--fa-secondary-opacity': '1',
-  } as React.CSSProperties;
+  } as React.CSSProperties & CSSVariables;
 
   return (
     <div className="text-center mb-6 md:mb-8">

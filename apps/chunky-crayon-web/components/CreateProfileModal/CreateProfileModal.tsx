@@ -164,14 +164,7 @@ const CreateProfileModal = ({
           <div className="mx-auto flex size-16 items-center justify-center rounded-full bg-crayon-orange/10">
             <FontAwesomeIcon
               icon={faUserPlus}
-              className="text-3xl"
-              style={
-                {
-                  '--fa-primary-color': 'hsl(var(--crayon-orange))',
-                  '--fa-secondary-color': 'hsl(var(--crayon-yellow))',
-                  '--fa-secondary-opacity': '1',
-                } as React.CSSProperties
-              }
+              className="text-3xl [--fa-primary-color:hsl(var(--crayon-orange))] [--fa-secondary-color:hsl(var(--crayon-yellow))] [--fa-secondary-opacity:1]"
             />
           </div>
           <DialogTitle className="font-tondo text-2xl font-bold text-text-primary md:text-3xl">

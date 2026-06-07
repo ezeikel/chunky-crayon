@@ -1,7 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  FontAwesomeIcon,
+  type CSSVariables,
+} from '@fortawesome/react-fontawesome';
 import { faChevronDown } from '@fortawesome/pro-solid-svg-icons';
 import { faCircleQuestion } from '@fortawesome/pro-duotone-svg-icons';
 import { useTranslations } from 'next-intl';
@@ -96,7 +99,7 @@ const FAQ = ({ className, namespace = 'homepage' }: FAQProps) => {
     '--fa-primary-color': 'hsl(var(--crayon-orange))',
     '--fa-secondary-color': 'hsl(var(--crayon-yellow))',
     '--fa-secondary-opacity': '1',
-  } as React.CSSProperties;
+  } as React.CSSProperties & CSSVariables;
 
   // Get the appropriate FAQ IDs based on namespace
   const faqIds = namespace === 'pricing' ? PRICING_FAQ_IDS : HOMEPAGE_FAQ_IDS;

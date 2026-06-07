@@ -4,7 +4,10 @@ import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  FontAwesomeIcon,
+  type CSSVariables,
+} from '@fortawesome/react-fontawesome';
 import {
   faClock,
   faArrowRight,
@@ -61,13 +64,13 @@ const RecentCreations = ({ className }: RecentCreationsProps) => {
     '--fa-primary-color': 'hsl(var(--crayon-teal))',
     '--fa-secondary-color': 'hsl(var(--crayon-blue))',
     '--fa-secondary-opacity': '1',
-  } as React.CSSProperties;
+  } as React.CSSProperties & CSSVariables;
 
   const heartIconStyle = {
     '--fa-primary-color': 'hsl(var(--crayon-pink))',
     '--fa-secondary-color': 'hsl(var(--crayon-pink-light))',
     '--fa-secondary-opacity': '1',
-  } as React.CSSProperties;
+  } as React.CSSProperties & CSSVariables;
 
   return (
     <section className={cn('w-full', className)}>

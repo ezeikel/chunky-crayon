@@ -3,7 +3,10 @@
 import { useParams } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import { usePathname, useRouter, type Locale } from '@/i18n/routing';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  FontAwesomeIcon,
+  type CSSVariables,
+} from '@fortawesome/react-fontawesome';
 import { faGlobe, faCheck } from '@fortawesome/pro-duotone-svg-icons';
 import {
   DropdownMenu,
@@ -74,7 +77,7 @@ const LanguageSwitcher = ({
     '--fa-primary-color': 'hsl(var(--crayon-orange))',
     '--fa-secondary-color': 'hsl(var(--crayon-teal))',
     '--fa-secondary-opacity': '0.8',
-  } as React.CSSProperties;
+  } as React.CSSProperties & CSSVariables;
 
   return (
     <DropdownMenu>

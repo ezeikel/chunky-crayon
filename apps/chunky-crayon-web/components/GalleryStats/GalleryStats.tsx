@@ -1,4 +1,5 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import type { CSSVariables } from '@fortawesome/react-fontawesome';
 import {
   faImages,
   faPalette,
@@ -54,27 +55,27 @@ const TONE_ICON_BG: Record<Stat['tone'], string> = {
   yellow: 'bg-crayon-yellow/15',
 };
 
-const TONE_DUOTONE: Record<Stat['tone'], React.CSSProperties> = {
+const TONE_DUOTONE: Record<Stat['tone'], React.CSSProperties & CSSVariables> = {
   orange: {
     '--fa-primary-color': 'hsl(var(--crayon-orange))',
     '--fa-secondary-color': 'hsl(var(--crayon-yellow))',
     '--fa-secondary-opacity': '1',
-  } as React.CSSProperties,
+  } as React.CSSProperties & CSSVariables,
   green: {
     '--fa-primary-color': 'hsl(var(--crayon-green))',
     '--fa-secondary-color': 'hsl(var(--crayon-teal))',
     '--fa-secondary-opacity': '1',
-  } as React.CSSProperties,
+  } as React.CSSProperties & CSSVariables,
   purple: {
     '--fa-primary-color': 'hsl(var(--crayon-purple))',
     '--fa-secondary-color': 'hsl(var(--crayon-pink))',
     '--fa-secondary-opacity': '1',
-  } as React.CSSProperties,
+  } as React.CSSProperties & CSSVariables,
   yellow: {
     '--fa-primary-color': 'hsl(var(--crayon-yellow))',
     '--fa-secondary-color': 'hsl(var(--crayon-orange))',
     '--fa-secondary-opacity': '1',
-  } as React.CSSProperties,
+  } as React.CSSProperties & CSSVariables,
 };
 
 export type GalleryStatsData = {

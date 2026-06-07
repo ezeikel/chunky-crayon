@@ -39,28 +39,14 @@ const SubmitButton = forwardRef<HTMLButtonElement, SubmitButtonProps>(
         {icon && !pending ? (
           <FontAwesomeIcon
             icon={icon}
-            className="text-lg"
-            style={
-              {
-                '--fa-primary-color': 'white',
-                '--fa-secondary-color': 'rgba(255, 255, 255, 0.85)',
-                '--fa-secondary-opacity': '1',
-              } as React.CSSProperties
-            }
+            className="text-lg [--fa-primary-color:white] [--fa-secondary-color:rgba(255,_255,_255,_0.85)] [--fa-secondary-opacity:1]"
           />
         ) : null}
         {text || 'Submit'}
         {pending ? (
           <FontAwesomeIcon
             icon={faSpinnerThird}
-            className="text-lg animate-spin"
-            style={
-              {
-                '--fa-primary-color': 'white',
-                '--fa-secondary-color': 'rgba(255, 255, 255, 0.6)',
-                '--fa-secondary-opacity': '1',
-              } as React.CSSProperties
-            }
+            className="text-lg animate-spin [--fa-primary-color:white] [--fa-secondary-color:rgba(255,_255,_255,_0.6)] [--fa-secondary-opacity:1]"
           />
         ) : null}
       </Button>

@@ -191,14 +191,7 @@ const ParentalGateModal = ({
           <FontAwesomeIcon
             icon={faHandWave}
             aria-hidden="true"
-            className="text-5xl animate-wave [transform-origin:bottom_right]"
-            style={
-              {
-                '--fa-primary-color': 'hsl(var(--crayon-orange))',
-                '--fa-secondary-color': 'hsl(var(--crayon-yellow))',
-                '--fa-secondary-opacity': '1',
-              } as React.CSSProperties
-            }
+            className="text-5xl animate-wave [transform-origin:bottom_right] [--fa-primary-color:hsl(var(--crayon-orange))] [--fa-secondary-color:hsl(var(--crayon-yellow))] [--fa-secondary-opacity:1]"
           />
           <DialogTitle className="font-tondo text-2xl font-bold md:text-3xl">
             {t('title')}

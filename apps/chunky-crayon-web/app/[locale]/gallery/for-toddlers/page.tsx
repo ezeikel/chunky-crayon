@@ -2,7 +2,10 @@ import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  FontAwesomeIcon,
+  type CSSVariables,
+} from '@fortawesome/react-fontawesome';
 import {
   faBaby,
   faArrowRight,
@@ -207,7 +210,7 @@ const ForToddlersContent = async ({ locale }: { locale: string }) => {
     '--fa-primary-color': 'hsl(var(--crayon-purple))',
     '--fa-secondary-color': 'hsl(var(--crayon-pink))',
     '--fa-secondary-opacity': '1',
-  } as React.CSSProperties;
+  } as React.CSSProperties & CSSVariables;
 
   return (
     <>

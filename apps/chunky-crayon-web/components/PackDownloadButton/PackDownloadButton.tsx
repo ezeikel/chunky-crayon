@@ -1,7 +1,10 @@
 'use client';
 
 import { useCallback } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  FontAwesomeIcon,
+  type CSSVariables,
+} from '@fortawesome/react-fontawesome';
 import { faDownload } from '@fortawesome/pro-duotone-svg-icons';
 import { trackEvent } from '@/utils/analytics-client';
 import { TRACKING_EVENTS } from '@/constants';
@@ -44,7 +47,7 @@ const PackDownloadButton = ({
     '--fa-primary-color': 'hsl(var(--crayon-yellow))',
     '--fa-secondary-color': 'hsl(var(--crayon-yellow))',
     '--fa-secondary-opacity': '0.5',
-  } as React.CSSProperties;
+  } as React.CSSProperties & CSSVariables;
 
   return (
     <a

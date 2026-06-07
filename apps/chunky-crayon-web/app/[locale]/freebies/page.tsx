@@ -14,14 +14,6 @@ import ViewContentTracker from '@/components/ViewContentTracker/ViewContentTrack
 
 type PageParams = { locale: string };
 
-// Duotone icon palette — mirrors the convention in InputModeSelector so
-// tool cards read as part of the same visual family.
-const DUOTONE_STYLE = {
-  '--fa-primary-color': 'hsl(var(--crayon-orange))',
-  '--fa-secondary-color': 'hsl(var(--crayon-teal))',
-  '--fa-secondary-opacity': '1',
-} as React.CSSProperties;
-
 const HUB_PATH = '/freebies';
 const HUB_DESCRIPTION =
   'Free printable tools for ages 3–8: personalized reward charts, coloring pages, birthday invites, ABC worksheets and more. No signup required.';
@@ -150,8 +142,7 @@ const ToolsHubPage = async ({ params }: { params: Promise<PageParams> }) => {
                 <div className="flex items-start justify-between">
                   <FontAwesomeIcon
                     icon={tool.icon}
-                    className="text-3xl"
-                    style={DUOTONE_STYLE}
+                    className="text-3xl [--fa-primary-color:hsl(var(--crayon-orange))] [--fa-secondary-color:hsl(var(--crayon-teal))] [--fa-secondary-opacity:1]"
                   />
                   {!tool.available && (
                     <span className="text-xs font-tondo font-bold text-crayon-orange bg-crayon-orange/10 px-2 py-1 rounded-full">

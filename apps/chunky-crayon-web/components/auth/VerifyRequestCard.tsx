@@ -23,14 +23,7 @@ const VerifyRequestCard = () => {
         <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[hsl(var(--crayon-orange))]/10">
           <FontAwesomeIcon
             icon={faEnvelopeCircleCheck}
-            className="h-8 w-8"
-            style={
-              {
-                '--fa-primary-color': 'hsl(var(--crayon-orange))',
-                '--fa-secondary-color': 'hsl(var(--crayon-teal))',
-                '--fa-secondary-opacity': '0.6',
-              } as React.CSSProperties
-            }
+            className="h-8 w-8 [--fa-primary-color:hsl(var(--crayon-orange))] [--fa-secondary-color:hsl(var(--crayon-teal))] [--fa-secondary-opacity:0.6]"
           />
         </div>
         <CardTitle className="text-2xl">{t('verifyRequest.title')}</CardTitle>

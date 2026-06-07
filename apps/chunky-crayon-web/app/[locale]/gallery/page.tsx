@@ -3,7 +3,10 @@ import { Suspense } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { getTranslations } from 'next-intl/server';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  FontAwesomeIcon,
+  type CSSVariables,
+} from '@fortawesome/react-fontawesome';
 import {
   faSparkles,
   faUsers,
@@ -87,7 +90,7 @@ const DailyImageSection = async ({ locale }: { locale: string }) => {
     '--fa-primary-color': 'hsl(var(--crayon-orange))',
     '--fa-secondary-color': 'hsl(var(--crayon-yellow))',
     '--fa-secondary-opacity': '1',
-  } as React.CSSProperties;
+  } as React.CSSProperties & CSSVariables;
 
   return (
     <section className="mb-12">
@@ -227,7 +230,7 @@ const OurLatestImages = async ({
     '--fa-primary-color': 'hsl(var(--crayon-orange))',
     '--fa-secondary-color': 'hsl(var(--crayon-yellow))',
     '--fa-secondary-opacity': '1',
-  } as React.CSSProperties;
+  } as React.CSSProperties & CSSVariables;
 
   // Difficulty chip targets always reset to page 1 — selecting a new
   // filter on page 3 of the previous filter is rarely what you want.
@@ -381,7 +384,7 @@ const CommunityHighlights = async ({ locale }: { locale: string }) => {
     '--fa-primary-color': 'hsl(var(--crayon-purple))',
     '--fa-secondary-color': 'hsl(var(--crayon-pink))',
     '--fa-secondary-opacity': '1',
-  } as React.CSSProperties;
+  } as React.CSSProperties & CSSVariables;
 
   return (
     <section className="mb-12">
@@ -578,7 +581,7 @@ const DifficultyCards = async ({ locale }: { locale: string }) => {
     '--fa-primary-color': 'hsl(var(--crayon-green))',
     '--fa-secondary-color': 'hsl(var(--crayon-blue))',
     '--fa-secondary-opacity': '1',
-  } as React.CSSProperties;
+  } as React.CSSProperties & CSSVariables;
 
   return (
     <section className="mb-12">
@@ -662,7 +665,7 @@ const BrowseByTopicCards = ({ locale: _locale }: { locale: string }) => {
                 '--fa-primary-color': 'hsl(var(--crayon-orange))',
                 '--fa-secondary-color': 'hsl(var(--crayon-yellow))',
                 '--fa-secondary-opacity': '1',
-              } as React.CSSProperties
+              } as React.CSSProperties & CSSVariables
             }
           />
           <h2 className="font-tondo font-bold text-2xl text-text-primary">
@@ -710,7 +713,7 @@ const CategoryCards = async ({ locale }: { locale: string }) => {
     '--fa-primary-color': 'hsl(var(--crayon-blue))',
     '--fa-secondary-color': 'hsl(var(--crayon-green))',
     '--fa-secondary-opacity': '1',
-  } as React.CSSProperties;
+  } as React.CSSProperties & CSSVariables;
 
   return (
     <section className="mb-12">

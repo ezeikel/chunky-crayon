@@ -42,14 +42,7 @@ const ColoringHabitatCallout = async ({
           <div className="shrink-0 w-14 h-14 rounded-full bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center">
             <FontAwesomeIcon
               icon={faLeaf}
-              className="text-2xl"
-              style={
-                {
-                  '--fa-primary-color': '#10b981',
-                  '--fa-secondary-color': '#059669',
-                  '--fa-secondary-opacity': '1',
-                } as React.CSSProperties
-              }
+              className="text-2xl [--fa-primary-color:#10b981] [--fa-secondary-color:#059669] [--fa-secondary-opacity:1]"
             />
           </div>
           <div className="flex-1">

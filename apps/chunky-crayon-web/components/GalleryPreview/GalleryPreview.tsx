@@ -1,7 +1,10 @@
 import Link from 'next/link';
 import { getTranslations, getLocale } from 'next-intl/server';
 import { getColoringImageUrl } from '@/lib/seo/coloring-image-url';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  FontAwesomeIcon,
+  type CSSVariables,
+} from '@fortawesome/react-fontawesome';
 import {
   faCalendarStar,
   faUsers,
@@ -31,7 +34,7 @@ const DailyImagePreview = async () => {
     '--fa-primary-color': 'hsl(var(--crayon-orange))',
     '--fa-secondary-color': 'hsl(var(--crayon-yellow))',
     '--fa-secondary-opacity': '1',
-  } as React.CSSProperties;
+  } as React.CSSProperties & CSSVariables;
 
   return (
     <div className="bg-gradient-to-br from-crayon-yellow/20 to-crayon-orange/20 rounded-3xl p-6">
@@ -97,7 +100,7 @@ const CommunityPreview = async () => {
     '--fa-primary-color': 'hsl(var(--crayon-purple))',
     '--fa-secondary-color': 'hsl(var(--crayon-pink))',
     '--fa-secondary-opacity': '1',
-  } as React.CSSProperties;
+  } as React.CSSProperties & CSSVariables;
 
   return (
     <div className="bg-gradient-to-br from-crayon-purple/10 to-crayon-pink/10 rounded-3xl p-6">
@@ -152,7 +155,7 @@ const CategoryPreview = async () => {
     '--fa-primary-color': 'hsl(var(--crayon-blue))',
     '--fa-secondary-color': 'hsl(var(--crayon-green))',
     '--fa-secondary-opacity': '1',
-  } as React.CSSProperties;
+  } as React.CSSProperties & CSSVariables;
 
   return (
     <div className="bg-gradient-to-br from-crayon-blue/10 to-crayon-green/10 rounded-3xl p-6">

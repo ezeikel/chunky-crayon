@@ -35,14 +35,7 @@ const BlockReasonPill = ({ blockState }: BlockReasonPillProps) => {
         <FontAwesomeIcon
           icon={faLock}
           aria-hidden="true"
-          className="text-xs"
-          style={
-            {
-              '--fa-primary-color': 'hsl(var(--crayon-orange))',
-              '--fa-secondary-color': 'hsl(var(--crayon-orange))',
-              '--fa-secondary-opacity': '0.4',
-            } as React.CSSProperties
-          }
+          className="text-xs [--fa-primary-color:hsl(var(--crayon-orange))] [--fa-secondary-color:hsl(var(--crayon-orange))] [--fa-secondary-opacity:0.4]"
         />
         {t(STATE_TRANSLATION_KEY[blockState])}
       </span>

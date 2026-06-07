@@ -1,6 +1,9 @@
 'use client';
 
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  FontAwesomeIcon,
+  type CSSVariables,
+} from '@fortawesome/react-fontawesome';
 import { faPenNib } from '@fortawesome/pro-duotone-svg-icons';
 import { useTranslations } from 'next-intl';
 import cn from '@/utils/cn';
@@ -19,7 +22,7 @@ const BlogHeader = ({ title, description, className }: BlogHeaderProps) => {
     '--fa-primary-color': 'hsl(var(--crayon-orange))',
     '--fa-secondary-color': 'hsl(var(--crayon-yellow))',
     '--fa-secondary-opacity': '1',
-  } as React.CSSProperties;
+  } as React.CSSProperties & CSSVariables;
 
   return (
     <header className={cn('text-center mb-10 md:mb-12', className)}>

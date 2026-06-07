@@ -3,7 +3,10 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { User } from '@one-colored-pixel/db/types';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  FontAwesomeIcon,
+  type CSSVariables,
+} from '@fortawesome/react-fontawesome';
 import {
   faCreditCard,
   faGear,
@@ -98,13 +101,13 @@ const iconStyle = {
   '--fa-primary-color': 'hsl(var(--crayon-orange))',
   '--fa-secondary-color': 'hsl(var(--crayon-teal))',
   '--fa-secondary-opacity': '0.8',
-} as React.CSSProperties;
+} as React.CSSProperties & CSSVariables;
 
 const coinsStyle = {
   '--fa-primary-color': 'hsl(var(--crayon-yellow-dark))',
   '--fa-secondary-color': 'hsl(var(--crayon-orange))',
   '--fa-secondary-opacity': '1',
-} as React.CSSProperties;
+} as React.CSSProperties & CSSVariables;
 
 type HeaderDropdownProps = {
   user: Partial<User>;

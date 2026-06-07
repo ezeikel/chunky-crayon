@@ -91,13 +91,7 @@ const LatestComicStripCard = async () => {
               <FontAwesomeIcon
                 icon={faComment}
                 size="sm"
-                style={
-                  {
-                    '--fa-primary-color': 'hsl(var(--crayon-teal))',
-                    '--fa-secondary-color': 'hsl(var(--crayon-orange))',
-                    '--fa-secondary-opacity': '0.8',
-                  } as React.CSSProperties
-                }
+                className="[--fa-primary-color:hsl(var(--crayon-teal))] [--fa-secondary-color:hsl(var(--crayon-orange))] [--fa-secondary-opacity:0.8]"
               />
               <span className="text-xs font-rooney-sans uppercase tracking-wide text-text-tertiary">
                 {formatTheme(strip.theme)}

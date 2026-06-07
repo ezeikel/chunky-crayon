@@ -1,6 +1,9 @@
 'use client';
 
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  FontAwesomeIcon,
+  type CSSVariables,
+} from '@fortawesome/react-fontawesome';
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { StaggerItem, CountUp } from '@/components/motion';
 
@@ -21,7 +24,7 @@ const AnimatedStatCard = ({
     '--fa-primary-color': 'hsl(var(--crayon-orange))',
     '--fa-secondary-color': 'hsl(var(--crayon-yellow))',
     '--fa-secondary-opacity': '1',
-  } as React.CSSProperties;
+  } as React.CSSProperties & CSSVariables;
 
   return (
     <StaggerItem className="flex flex-col items-center text-center p-6 bg-white/80 backdrop-blur-sm rounded-2xl border-2 border-paper-cream-dark shadow-sm hover:shadow-md transition-shadow">

@@ -453,14 +453,7 @@ const ColoAvatar = ({
                     <FontAwesomeIcon
                       key={i}
                       icon={faStar}
-                      className="text-lg"
-                      style={
-                        {
-                          '--fa-primary-color': 'hsl(var(--crayon-yellow))',
-                          '--fa-secondary-color': 'hsl(var(--crayon-orange))',
-                          '--fa-secondary-opacity': '1',
-                        } as React.CSSProperties
-                      }
+                      className="text-lg [--fa-primary-color:hsl(var(--crayon-yellow))] [--fa-secondary-color:hsl(var(--crayon-orange))] [--fa-secondary-opacity:1]"
                     />
                   ))}
                 </div>

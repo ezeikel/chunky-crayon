@@ -3,7 +3,11 @@
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faStar, faLock, faPartyHorn } from '@fortawesome/pro-duotone-svg-icons';
+import {
+  faStar,
+  faLock,
+  faPartyHorn,
+} from '@fortawesome/pro-duotone-svg-icons';
 import { useTranslations } from 'next-intl';
 import {
   Dialog,
@@ -110,14 +114,7 @@ const StickerDetailModal = ({
               <span className="absolute -top-3 -right-3 flex h-12 w-12 items-center justify-center rounded-full border-3 border-paper-cream-dark bg-white shadow-md">
                 <FontAwesomeIcon
                   icon={faLock}
-                  className="text-xl"
-                  style={
-                    {
-                      '--fa-primary-color': 'hsl(var(--text-muted))',
-                      '--fa-secondary-color': 'hsl(var(--paper-cream-dark))',
-                      '--fa-secondary-opacity': '1',
-                    } as React.CSSProperties
-                  }
+                  className="text-xl [--fa-primary-color:hsl(var(--text-muted))] [--fa-secondary-color:hsl(var(--paper-cream-dark))] [--fa-secondary-opacity:1]"
                 />
               </span>
             )}
@@ -142,14 +139,7 @@ const StickerDetailModal = ({
               <span className="flex h-12 w-12 items-center justify-center rounded-full bg-crayon-orange/10">
                 <FontAwesomeIcon
                   icon={faPartyHorn}
-                  className="text-2xl"
-                  style={
-                    {
-                      '--fa-primary-color': 'hsl(var(--crayon-orange))',
-                      '--fa-secondary-color': 'hsl(var(--crayon-yellow))',
-                      '--fa-secondary-opacity': '1',
-                    } as React.CSSProperties
-                  }
+                  className="text-2xl [--fa-primary-color:hsl(var(--crayon-orange))] [--fa-secondary-color:hsl(var(--crayon-yellow))] [--fa-secondary-opacity:1]"
                 />
               </span>
               <p className="font-tondo text-lg font-bold text-crayon-orange">
@@ -172,14 +162,7 @@ const StickerDetailModal = ({
               <span className="flex h-10 w-10 items-center justify-center rounded-full bg-crayon-purple/10">
                 <FontAwesomeIcon
                   icon={faLock}
-                  className="text-lg"
-                  style={
-                    {
-                      '--fa-primary-color': 'hsl(var(--crayon-purple))',
-                      '--fa-secondary-color': 'hsl(var(--crayon-pink))',
-                      '--fa-secondary-opacity': '1',
-                    } as React.CSSProperties
-                  }
+                  className="text-lg [--fa-primary-color:hsl(var(--crayon-purple))] [--fa-secondary-color:hsl(var(--crayon-pink))] [--fa-secondary-opacity:1]"
                 />
               </span>
               <p className="font-tondo text-base font-bold text-text-primary">

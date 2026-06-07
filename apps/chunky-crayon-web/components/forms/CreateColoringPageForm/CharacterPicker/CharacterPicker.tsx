@@ -108,13 +108,7 @@ const CharacterPicker = ({ value, onChange }: Props) => {
           <span className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-crayon-orange shadow-[0_3px_0_0_hsl(var(--crayon-orange-dark))]">
             <FontAwesomeIcon
               icon={faUserPlus}
-              className="text-xl text-white"
-              style={
-                {
-                  '--fa-secondary-color': '#fff',
-                  '--fa-secondary-opacity': '0.55',
-                } as React.CSSProperties
-              }
+              className="text-xl text-white [--fa-secondary-color:#fff] [--fa-secondary-opacity:0.55]"
             />
           </span>
           <span className="font-tondo">
@@ -259,13 +253,7 @@ const CharacterPicker = ({ value, onChange }: Props) => {
           <span className="grid size-20 place-items-center rounded-full border-4 border-dashed border-crayon-orange/40 bg-crayon-orange/5 transition-all group-hover:scale-105 group-hover:border-crayon-orange group-hover:bg-crayon-orange/10">
             <FontAwesomeIcon
               icon={faUserPlus}
-              className="text-2xl text-crayon-orange"
-              style={
-                {
-                  '--fa-secondary-color': 'hsl(var(--crayon-orange))',
-                  '--fa-secondary-opacity': '0.4',
-                } as React.CSSProperties
-              }
+              className="text-2xl text-crayon-orange [--fa-secondary-color:hsl(var(--crayon-orange))] [--fa-secondary-opacity:0.4]"
             />
           </span>
           <span className="font-tondo text-xs font-bold text-crayon-orange">

@@ -195,14 +195,7 @@ const SignInOptions = () => {
               <>
                 <FontAwesomeIcon
                   icon={faSpinnerThird}
-                  className="mr-2 h-4 w-4 animate-spin"
-                  style={
-                    {
-                      '--fa-primary-color': 'hsl(var(--crayon-orange))',
-                      '--fa-secondary-color': 'hsl(var(--crayon-teal))',
-                      '--fa-secondary-opacity': '0.6',
-                    } as React.CSSProperties
-                  }
+                  className="mr-2 h-4 w-4 animate-spin [--fa-primary-color:hsl(var(--crayon-orange))] [--fa-secondary-color:hsl(var(--crayon-teal))] [--fa-secondary-opacity:0.6]"
                 />
                 <span className="min-w-0 truncate">{t('sendingLink')}</span>
               </>

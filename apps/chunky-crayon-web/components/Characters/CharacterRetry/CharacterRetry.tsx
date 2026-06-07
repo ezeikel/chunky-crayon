@@ -15,7 +15,10 @@ import { useTransition } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  FontAwesomeIcon,
+  type CSSVariables,
+} from '@fortawesome/react-fontawesome';
 import { faRotateRight } from '@fortawesome/pro-duotone-svg-icons';
 import { regenerateCharacterPortrait } from '@/app/actions/characters';
 
@@ -46,7 +49,7 @@ const CharacterRetry = ({ id, name }: Props) => {
     '--fa-primary-color': 'hsl(var(--crayon-orange))',
     '--fa-secondary-color': 'hsl(var(--crayon-pink))',
     '--fa-secondary-opacity': '0.8',
-  } as React.CSSProperties;
+  } as React.CSSProperties & CSSVariables;
 
   return (
     <div className="flex flex-col items-center text-center py-12 gap-6">

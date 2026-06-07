@@ -44,12 +44,6 @@ const AddCharacterButton = ({ variant = 'tile', disabled = false }: Props) => {
   const pillClasses =
     'inline-flex items-center gap-2 rounded-full bg-crayon-orange text-white px-6 py-3 text-lg font-bold min-h-[56px] shadow-card hover:scale-105 active:scale-95 transition-transform disabled:opacity-40 disabled:cursor-not-allowed';
 
-  const plusDuotone = {
-    '--fa-primary-color': 'hsl(var(--crayon-orange))',
-    '--fa-secondary-color': 'hsl(var(--crayon-yellow))',
-    '--fa-secondary-opacity': '0.8',
-  } as React.CSSProperties;
-
   const handleClick = () => {
     // Guest path: route to signin with callback so we land back here after auth.
     if (isGuest || isLoading) {
@@ -70,8 +64,11 @@ const AddCharacterButton = ({ variant = 'tile', disabled = false }: Props) => {
       >
         <FontAwesomeIcon
           icon={faPlus}
-          className={variant === 'tile' ? 'text-6xl' : 'text-lg'}
-          style={variant === 'tile' ? plusDuotone : undefined}
+          className={
+            variant === 'tile'
+              ? 'text-6xl [--fa-primary-color:hsl(var(--crayon-orange))] [--fa-secondary-color:hsl(var(--crayon-yellow))] [--fa-secondary-opacity:0.8]'
+              : 'text-lg'
+          }
         />
         <span
           className={

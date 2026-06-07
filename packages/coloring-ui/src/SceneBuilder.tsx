@@ -2,7 +2,10 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  FontAwesomeIcon,
+  type CSSVariables,
+} from "@fortawesome/react-fontawesome";
 import {
   faDice,
   faArrowLeft,
@@ -253,7 +256,7 @@ export const SceneTile = ({
                   "--fa-primary-color": option.duotone.primary,
                   "--fa-secondary-color": option.duotone.secondary,
                   "--fa-secondary-opacity": "1",
-                } as React.CSSProperties)
+                } as React.CSSProperties & CSSVariables)
           }
         >
           {option.state === "add" ? (

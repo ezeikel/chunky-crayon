@@ -3,7 +3,10 @@ import { Suspense } from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  FontAwesomeIcon,
+  type CSSVariables,
+} from '@fortawesome/react-fontawesome';
 import { faTag } from '@fortawesome/pro-duotone-svg-icons';
 import PageWrap from '@/components/PageWrap/PageWrap';
 import Breadcrumbs from '@/components/Breadcrumbs';
@@ -86,7 +89,7 @@ const TagGalleryContent = async ({
     '--fa-primary-color': 'hsl(var(--crayon-blue))',
     '--fa-secondary-color': 'hsl(var(--crayon-green))',
     '--fa-secondary-opacity': '1',
-  } as React.CSSProperties;
+  } as React.CSSProperties & CSSVariables;
 
   // JSON-LD CollectionPage schema
   const collectionSchema = {

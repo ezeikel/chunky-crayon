@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  FontAwesomeIcon,
+  type CSSVariables,
+} from '@fortawesome/react-fontawesome';
 import {
   faCircleCheck,
   faHeadset,
@@ -62,7 +65,7 @@ const modalIconStyle = {
   '--fa-primary-color': 'hsl(var(--crayon-orange))',
   '--fa-secondary-color': 'hsl(var(--crayon-yellow))',
   '--fa-secondary-opacity': '1',
-} as React.CSSProperties;
+} as React.CSSProperties & CSSVariables;
 
 const Stage = ({ children }: { children: React.ReactNode }) => (
   <main className="min-h-screen bg-paper p-8">{children}</main>

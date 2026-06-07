@@ -356,13 +356,7 @@ const StreamingCanvasView = ({
         <FontAwesomeIcon
           icon={faFaceDizzy}
           size="6x"
-          style={
-            {
-              '--fa-primary-color': 'hsl(var(--crayon-orange))',
-              '--fa-secondary-color': 'hsl(var(--crayon-yellow))',
-              '--fa-secondary-opacity': '1',
-            } as React.CSSProperties
-          }
+          className="[--fa-primary-color:hsl(var(--crayon-orange))] [--fa-secondary-color:hsl(var(--crayon-yellow))] [--fa-secondary-opacity:1]"
         />
         <h2 className="font-tondo font-bold text-2xl text-text-primary text-center">
           Oh no, we couldn&apos;t finish your coloring page.
@@ -503,13 +497,7 @@ const StreamingCanvasView = ({
                     >
                       <FontAwesomeIcon
                         icon={LOADING_ICONS[iconIndex]}
-                        className="text-2xl text-crayon-orange"
-                        style={
-                          {
-                            '--fa-secondary-color': 'rgb(255 192 192 / 1)',
-                            '--fa-secondary-opacity': 0.8,
-                          } as React.CSSProperties
-                        }
+                        className="text-2xl text-crayon-orange [--fa-secondary-color:rgb(255_192_192_/_1)] [--fa-secondary-opacity:0.8]"
                       />
                     </div>
                   )}

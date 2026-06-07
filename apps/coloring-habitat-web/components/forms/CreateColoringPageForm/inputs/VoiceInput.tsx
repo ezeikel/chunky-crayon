@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import type { CSSVariables } from "@fortawesome/react-fontawesome";
 import {
   faMicrophoneLines,
   faStop,
@@ -157,13 +158,7 @@ const VoiceInput = ({ className, onComplete }: VoiceInputProps) => {
         <FontAwesomeIcon
           icon={faMicrophoneSlash}
           size="4x"
-          style={
-            {
-              "--fa-primary-color": "hsl(var(--crayon-orange))",
-              "--fa-secondary-color": "hsl(var(--crayon-teal))",
-              "--fa-secondary-opacity": "1",
-            } as React.CSSProperties
-          }
+          className="[--fa-primary-color:hsl(var(--crayon-orange))] [--fa-secondary-color:hsl(var(--crayon-teal))] [--fa-secondary-opacity:1]"
         />
         <p className="text-center text-text-primary font-tondo font-bold text-xl md:text-2xl">
           {ERROR_COPY.not_supported}
@@ -183,13 +178,7 @@ const VoiceInput = ({ className, onComplete }: VoiceInputProps) => {
         <FontAwesomeIcon
           icon={faFaceDizzy}
           size="4x"
-          style={
-            {
-              "--fa-primary-color": "hsl(var(--crayon-orange))",
-              "--fa-secondary-color": "hsl(var(--crayon-yellow))",
-              "--fa-secondary-opacity": "1",
-            } as React.CSSProperties
-          }
+          className="[--fa-primary-color:hsl(var(--crayon-orange))] [--fa-secondary-color:hsl(var(--crayon-yellow))] [--fa-secondary-opacity:1]"
         />
         <p className="text-center text-text-primary font-tondo font-bold text-xl md:text-2xl">
           {error ? ERROR_COPY[error] : ERROR_COPY.timeout}
@@ -218,14 +207,7 @@ const VoiceInput = ({ className, onComplete }: VoiceInputProps) => {
           <FontAwesomeIcon
             icon={faMicrophoneLines}
             size="4x"
-            className="opacity-50"
-            style={
-              {
-                "--fa-primary-color": "hsl(var(--crayon-orange))",
-                "--fa-secondary-color": "hsl(var(--crayon-orange))",
-                "--fa-secondary-opacity": "0.6",
-              } as React.CSSProperties
-            }
+            className="opacity-50 [--fa-primary-color:hsl(var(--crayon-orange))] [--fa-secondary-color:hsl(var(--crayon-orange))] [--fa-secondary-opacity:0.6]"
           />
         </div>
         <p className="text-center text-text-primary font-tondo font-bold text-lg">
@@ -246,14 +228,7 @@ const VoiceInput = ({ className, onComplete }: VoiceInputProps) => {
       >
         <FontAwesomeIcon
           icon={faSpinnerThird}
-          className="text-5xl animate-spin"
-          style={
-            {
-              "--fa-primary-color": "hsl(var(--crayon-orange))",
-              "--fa-secondary-color": "hsl(var(--crayon-teal))",
-              "--fa-secondary-opacity": "0.6",
-            } as React.CSSProperties
-          }
+          className="text-5xl animate-spin [--fa-primary-color:hsl(var(--crayon-orange))] [--fa-secondary-color:hsl(var(--crayon-teal))] [--fa-secondary-opacity:0.6]"
         />
         <p className="text-center text-text-primary font-tondo font-bold">
           One moment
@@ -318,14 +293,7 @@ const VoiceInput = ({ className, onComplete }: VoiceInputProps) => {
       >
         <FontAwesomeIcon
           icon={faSpinnerThird}
-          className="text-5xl animate-spin"
-          style={
-            {
-              "--fa-primary-color": "hsl(var(--crayon-orange))",
-              "--fa-secondary-color": "hsl(var(--crayon-pink))",
-              "--fa-secondary-opacity": "0.6",
-            } as React.CSSProperties
-          }
+          className="text-5xl animate-spin [--fa-primary-color:hsl(var(--crayon-orange))] [--fa-secondary-color:hsl(var(--crayon-pink))] [--fa-secondary-opacity:0.6]"
         />
         <p className="text-center text-text-primary font-tondo font-bold">
           Creating your page
@@ -367,7 +335,7 @@ const VoiceInput = ({ className, onComplete }: VoiceInputProps) => {
               ? "rgba(255, 255, 255, 0.8)"
               : "hsl(var(--text-muted))",
             "--fa-secondary-opacity": "1",
-          } as React.CSSProperties
+          } as React.CSSProperties & CSSVariables
         }
         aria-label="Start voice conversation"
       >

@@ -56,14 +56,7 @@ const AuthErrorCard = ({ error }: Props) => {
         <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-100">
           <FontAwesomeIcon
             icon={faTriangleExclamation}
-            className="h-8 w-8"
-            style={
-              {
-                '--fa-primary-color': 'hsl(var(--destructive))',
-                '--fa-secondary-color': 'hsl(var(--destructive))',
-                '--fa-secondary-opacity': '0.4',
-              } as React.CSSProperties
-            }
+            className="h-8 w-8 [--fa-primary-color:hsl(var(--destructive))] [--fa-secondary-color:hsl(var(--destructive))] [--fa-secondary-opacity:0.4]"
           />
         </div>
         <CardTitle className="text-2xl">{t('error.title')}</CardTitle>

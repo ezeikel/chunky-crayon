@@ -124,14 +124,7 @@ const FormCTA = ({
           >
             <FontAwesomeIcon
               icon={faWandMagicSparkles}
-              className="text-lg"
-              style={
-                {
-                  '--fa-primary-color': 'white',
-                  '--fa-secondary-color': 'rgba(255, 255, 255, 0.85)',
-                  '--fa-secondary-opacity': '1',
-                } as React.CSSProperties
-              }
+              className="text-lg [--fa-primary-color:white] [--fa-secondary-color:rgba(255,_255,_255,_0.85)] [--fa-secondary-opacity:1]"
             />
             {t('buttonCreate')}
           </Button>

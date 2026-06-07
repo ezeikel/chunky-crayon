@@ -183,14 +183,7 @@ const ColorAsYouGoClient = ({
         <div className="text-center max-w-2xl mx-auto">
           <FontAwesomeIcon
             icon={faPalette}
-            className="text-3xl mb-4"
-            style={
-              {
-                '--fa-primary-color': 'hsl(var(--crayon-orange))',
-                '--fa-secondary-color': 'hsl(var(--crayon-teal))',
-                '--fa-secondary-opacity': '0.6',
-              } as React.CSSProperties
-            }
+            className="text-3xl mb-4 [--fa-primary-color:hsl(var(--crayon-orange))] [--fa-secondary-color:hsl(var(--crayon-teal))] [--fa-secondary-opacity:0.6]"
           />
           <h2 className="font-tondo text-2xl font-bold mb-3 text-text-primary">
             {t('subscribePitch.title')}

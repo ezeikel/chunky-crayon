@@ -163,14 +163,7 @@ const PaywallModal = ({
           <FontAwesomeIcon
             icon={STATE_ICON[state]}
             aria-hidden="true"
-            className="text-5xl"
-            style={
-              {
-                '--fa-primary-color': 'hsl(var(--crayon-orange))',
-                '--fa-secondary-color': 'hsl(var(--crayon-yellow))',
-                '--fa-secondary-opacity': '1',
-              } as React.CSSProperties
-            }
+            className="text-5xl [--fa-primary-color:hsl(var(--crayon-orange))] [--fa-secondary-color:hsl(var(--crayon-yellow))] [--fa-secondary-opacity:1]"
           />
           <DialogTitle className="font-tondo text-2xl font-bold md:text-3xl">
             {t(`${pickCopyKey(state)}.title`)}
