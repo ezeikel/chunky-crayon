@@ -1396,7 +1396,9 @@
         "flowers": "Flowers",
         "space-stars": "Stars",
         "balloons": "Balloons"
-      }
+      },
+      "friendsTitle": "내 친구들",
+      "subjectGroupTitle": "또는 하나 골라요"
     },
     "blockReason": {
       "guestLimit": "무료 횟수를 모두 썼어요",

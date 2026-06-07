@@ -1396,7 +1396,9 @@
         "flowers": "Flowers",
         "space-stars": "Stars",
         "balloons": "Balloons"
-      }
+      },
+      "friendsTitle": "おともだち",
+      "subjectGroupTitle": "または えらぶ"
     },
     "blockReason": {
       "guestLimit": "無料回数が終わりました",

@@ -1396,7 +1396,9 @@
         "flowers": "Flowers",
         "space-stars": "Stars",
         "balloons": "Balloons"
-      }
+      },
+      "friendsTitle": "Tus amigos",
+      "subjectGroupTitle": "o elige uno"
     },
     "blockReason": {
       "guestLimit": "Se acabaron los intentos gratis",
