@@ -7,8 +7,16 @@ import React, {
   useMemo,
   ReactNode,
 } from "react";
+import * as Sentry from "@sentry/react-native";
+import { getLocales } from "expo-localization";
 import { toast } from "@/components/Toaster";
 import { useQueryClient } from "@tanstack/react-query";
+import {
+  identify as identifyAnalytics,
+  reset as resetAnalytics,
+  track,
+} from "@/utils/analytics";
+import { ANALYTICS_EVENTS } from "@/constants/analytics";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import * as AppleAuthentication from "expo-apple-authentication";
 import { LoginManager, AccessToken } from "react-native-fbsdk-next";
@@ -111,6 +119,39 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     refreshAuth();
   }, [refreshAuth]);
 
+  // Keep Sentry + PostHog identity in sync with the auth user so every
+  // crash/error AND every analytics event is attributable to a person/device
+  // (which kid's iPad). `user.id` is the DB user id (the registered device OR
+  // signed-in account) — the SAME id web uses, so web↔mobile and guest→account
+  // collapse onto one person. Fires on every sign-in path (sets `user`) and on
+  // logout (clears it). Mirrors web's UserIdentify. (Plan/credits person props
+  // refresh from entitlements elsewhere; here we set what `user` carries.)
+  const hasIdentifiedRef = React.useRef(false);
+  React.useEffect(() => {
+    if (user) {
+      Sentry.setUser({
+        id: user.id,
+        email: user.email ?? undefined,
+        username: user.name ?? undefined,
+      });
+      identifyAnalytics(user.id, {
+        email: user.email ?? undefined,
+        name: user.name ?? undefined,
+        credits: user.credits,
+        locale: getLocales()[0]?.languageTag,
+        has_account: true,
+      });
+      hasIdentifiedRef.current = true;
+    } else if (hasIdentifiedRef.current) {
+      // Only reset on an actual logout transition (was identified → null), not
+      // the initial null before auth resolves — that would wipe the anonymous
+      // session PostHog is already capturing.
+      Sentry.setUser(null);
+      resetAnalytics();
+      hasIdentifiedRef.current = false;
+    }
+  }, [user]);
+
   // Google Sign-In
   const signInWithGoogleHandler =
     useCallback(async (): Promise<OAuthSignInResponse | null> => {
@@ -130,6 +171,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
         // Send to our server
         const response = await signInWithGoogle(idToken);
+
+        track(ANALYTICS_EVENTS.AUTH_SIGN_IN_COMPLETED, { method: "google" });
 
         // After successful OAuth, the user is authenticated and linked (has email)
         // Update state directly to avoid race conditions with refreshAuth
@@ -184,6 +227,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           givenName: credential.fullName?.givenName ?? undefined,
           familyName: credential.fullName?.familyName ?? undefined,
         });
+
+        track(ANALYTICS_EVENTS.AUTH_SIGN_IN_COMPLETED, { method: "apple" });
 
         // After successful OAuth, the user is authenticated and linked (has email)
         // Update state directly to avoid race conditions with refreshAuth
@@ -246,6 +291,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
         // Send to our server
         const response = await signInWithFacebook(data.accessToken);
+
+        track(ANALYTICS_EVENTS.AUTH_SIGN_IN_COMPLETED, { method: "facebook" });
 
         // After successful OAuth, the user is authenticated and linked (has email)
         // Update state directly to avoid race conditions with refreshAuth
@@ -343,6 +390,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   // Sign Out
   const signOut = useCallback(async () => {
+    track(ANALYTICS_EVENTS.AUTH_SIGN_OUT);
+
     try {
       setIsLoading(true);
 

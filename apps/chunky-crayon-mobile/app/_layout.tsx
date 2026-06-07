@@ -5,15 +5,32 @@ import { Redirect, Stack } from "expo-router";
 import { useFonts } from "expo-font";
 import * as ScreenOrientation from "expo-screen-orientation";
 import * as Sentry from "@sentry/react-native";
+import Constants from "expo-constants";
+import * as Application from "expo-application";
 import Providers from "@/providers";
 import { useOnboardingStore } from "@/stores/onboardingStore";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { setHapticsEnabled } from "@/utils/haptics";
 
+// release/dist must match the source maps uploaded at build time (the
+// @sentry/react-native EAS plugin uploads them keyed on this), so a crash from
+// a given binary symbolicates. version+build is stable per binary; dist = the
+// native build number. environment lets us split preview from production.
+const SENTRY_RELEASE = `${Constants.expoConfig?.version ?? "0.0.0"}+${
+  Application.nativeBuildVersion ?? "0"
+}`;
+
 Sentry.init({
-  dsn: "https://3ced8899cf0a5a8dd3b15c539379d654:590a9050ad3be778d873c840cb48012c@o358156.ingest.us.sentry.io/4507397854330880",
-  tracesSampleRate: 1.0,
-  sendDefaultPii: true,
+  // Modern public DSN (the legacy `:secret@` half is no longer used).
+  dsn: "https://3ced8899cf0a5a8dd3b15c539379d654@o358156.ingest.us.sentry.io/4507397854330880",
+  environment: process.env.EXPO_PUBLIC_ENVIRONMENT ?? "development",
+  release: SENTRY_RELEASE,
+  dist: String(Application.nativeBuildVersion ?? "0"),
+  // Full traces in dev for debugging; sample in prod to match web (0.2).
+  tracesSampleRate: __DEV__ ? 1.0 : 0.2,
+  // Kids app — don't auto-attach IP/headers. We set id+email explicitly via
+  // Sentry.setUser (AuthContext) so issues are still attributable.
+  sendDefaultPii: false,
 });
 
 const RootLayout = () => {
