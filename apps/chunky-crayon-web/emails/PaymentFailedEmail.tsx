@@ -12,117 +12,164 @@ import {
   Text,
 } from '@react-email/components';
 
+/**
+ * Dunning stage, mapped from Stripe's retry schedule in the
+ * `invoice.payment_failed` webhook:
+ *  - `first`  — first failed attempt. Gentle, reassuring, "probably the bank".
+ *  - `retry`  — a later retry is still failing. Nudge toward a different card.
+ *  - `final`  — Stripe's last scheduled attempt. Clear stakes, still kind.
+ */
+export type PaymentFailedStage = 'first' | 'retry' | 'final';
+
 type PaymentFailedEmailProps = {
   userName?: string;
   planName: string;
-  attemptCount: number;
   billingPortalUrl: string;
+  stage?: PaymentFailedStage;
 };
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://chunkycrayon.com';
 
+// Per-stage copy. Kept as a lookup (not inline conditionals) so the
+// three messages read as one coherent sequence and are easy to tweak.
+// House rules honoured: no em dashes, no "AI", US/UK-neutral spelling,
+// no emoji.
+const STAGE_COPY: Record<
+  PaymentFailedStage,
+  {
+    preview: string;
+    badge: string;
+    heading: string;
+    cta: string;
+    body: (planName: string) => string[];
+    closing: string;
+  }
+> = {
+  first: {
+    preview: "Your card didn't go through, but nothing's lost yet.",
+    badge: 'Payment update',
+    heading: 'A little hiccup with your payment',
+    cta: 'Update my card',
+    body: (planName) => [
+      `We just tried to start your Chunky Crayon ${planName} plan, but your card did not go through. This happens more than you would think, and it is almost never anything you did wrong. Often the bank simply blocks the first charge to a new place.`,
+      'The quickest fix is to pop in a different card. It takes about thirty seconds, and your little one’s coloring picks up right where it left off.',
+      'No rush tonight. We will try again in a few days, and everything you have made so far is safe.',
+    ],
+    closing: 'Warmly,',
+  },
+  retry: {
+    preview:
+      "We tried again and it's still being declined. A different card usually does the trick.",
+    badge: 'Still trying',
+    heading: 'Still can’t get your card to work',
+    cta: 'Try a different card',
+    body: (planName) => [
+      'We gave your card another try and it is still being turned away. When this keeps happening, it is usually the card’s bank declining the type of payment rather than anything to do with your account.',
+      'The fix that works almost every time: add a different card. A second card, or a debit card instead of credit, and you are sorted.',
+      `Your ${planName} plan is still active for now, so there is no interruption yet. Updating today keeps it that way.`,
+    ],
+    closing: 'Thanks for sticking with us,',
+  },
+  final: {
+    preview:
+      'One more attempt coming up. Add a working card to keep coloring without a break.',
+    badge: 'Last try',
+    heading: 'Last try before your plan pauses',
+    cta: 'Keep my plan active',
+    body: (planName) => [
+      `This is our last attempt to renew your Chunky Crayon ${planName} plan. If this one does not go through, your plan will pause and the extra creations and features will go quiet for a while.`,
+      'You can keep everything running with one quick step: add a card that works.',
+      'If now is not the right time, that is completely okay. Your account and everything you have made will stay safe, and you are welcome back whenever you like.',
+    ],
+    closing: 'Always here when you need us,',
+  },
+};
+
 const PaymentFailedEmail = ({
   userName,
   planName,
-  attemptCount,
   billingPortalUrl,
-}: PaymentFailedEmailProps) => (
-  <Html>
-    <Head />
-    <Preview>
-      Action needed: Your Chunky Crayon payment couldn't be processed
-    </Preview>
-    <Body style={main}>
-      <Container style={container}>
-        {/* Header */}
-        <Section style={header}>
-          <Link href={baseUrl} style={logoLink}>
-            <Img
-              src="https://www.chunkycrayon.com/logos/cc-logo.png"
-              width="44"
-              height="48"
-              alt="Chunky Crayon"
-              style={logo}
-            />
-          </Link>
-        </Section>
+  stage = 'first',
+}: PaymentFailedEmailProps) => {
+  const copy = STAGE_COPY[stage];
 
-        {/* Alert Icon */}
-        <Section style={alertSection}>
-          <Text style={alertEmoji}>⚠️</Text>
-          <Heading style={alertTitle}>Payment Issue</Heading>
-        </Section>
+  return (
+    <Html>
+      <Head />
+      <Preview>{copy.preview}</Preview>
+      <Body style={main}>
+        <Container style={container}>
+          {/* Header */}
+          <Section style={header}>
+            <Link href={baseUrl} style={logoLink}>
+              <Img
+                src="https://www.chunkycrayon.com/logos/cc-logo.png"
+                width="44"
+                height="48"
+                alt="Chunky Crayon"
+                style={logo}
+              />
+            </Link>
+          </Section>
 
-        {/* Main Content */}
-        <Section style={content}>
-          <Text style={greeting}>Hi{userName ? ` ${userName}` : ''},</Text>
-          <Text style={paragraph}>
-            We tried to process your payment for your{' '}
-            <strong>{planName}</strong> subscription, but it didn&apos;t go
-            through.
-          </Text>
-          {attemptCount > 1 && (
-            <Text style={paragraph}>
-              This is attempt #{attemptCount}. Please update your payment method
-              to keep your subscription active.
+          {/* Stage badge + heading */}
+          <Section style={alertSection}>
+            <Text style={alertBadge}>{copy.badge}</Text>
+            <Heading style={alertTitle}>{copy.heading}</Heading>
+          </Section>
+
+          {/* Main Content */}
+          <Section style={content}>
+            <Text style={greeting}>Hi{userName ? ` ${userName}` : ''},</Text>
+            {copy.body(planName).map((line) => (
+              <Text key={line.slice(0, 32)} style={paragraph}>
+                {line}
+              </Text>
+            ))}
+          </Section>
+
+          {/* CTA */}
+          <Section style={ctaSection}>
+            <Link href={billingPortalUrl} style={ctaButton}>
+              {copy.cta}
+            </Link>
+            <Text style={ctaSubtext}>
+              You can also manage your plan from your account settings.
             </Text>
-          )}
-        </Section>
+          </Section>
 
-        {/* What Happens Next */}
-        <Section style={infoSection}>
-          <Heading as="h2" style={infoTitle}>
-            What happens next?
-          </Heading>
-          <Text style={infoItem}>
-            <span style={bullet}>•</span> We&apos;ll retry your payment in a few
-            days
-          </Text>
-          <Text style={infoItem}>
-            <span style={bullet}>•</span> Your credits will continue to work for
-            now
-          </Text>
-          <Text style={infoItem}>
-            <span style={bullet}>•</span> Update your payment method to avoid
-            interruption
-          </Text>
-        </Section>
+          <Hr style={hr} />
 
-        {/* CTA */}
-        <Section style={ctaSection}>
-          <Link href={billingPortalUrl} style={ctaButton}>
-            Update Payment Method
-          </Link>
-          <Text style={ctaSubtext}>
-            You can also manage your subscription from your account settings
-          </Text>
-        </Section>
-
-        <Hr style={hr} />
-
-        {/* Footer */}
-        <Section style={footer}>
-          <Text style={footerText}>
-            Need help? Reply to this email and we&apos;ll sort it out together.
-          </Text>
-          <Text style={footerLinks}>
-            <Link href={`${baseUrl}/privacy`} style={footerLink}>
-              Privacy Policy
-            </Link>
-            {' | '}
-            <Link href={`${baseUrl}/terms`} style={footerLink}>
-              Terms of Service
-            </Link>
-          </Text>
-          <Text style={footerCopyright}>
-            &copy; {new Date().getFullYear()} Chunky Crayon. All rights
-            reserved.
-          </Text>
-        </Section>
-      </Container>
-    </Body>
-  </Html>
-);
+          {/* Footer */}
+          <Section style={footer}>
+            <Text style={footerText}>
+              {copy.closing}
+              <br />
+              Colo and the Chunky Crayon team
+            </Text>
+            <Text style={footerText}>
+              Need a hand? Just reply to this email and we will sort it out
+              together.
+            </Text>
+            <Text style={footerLinks}>
+              <Link href={`${baseUrl}/privacy`} style={footerLink}>
+                Privacy Policy
+              </Link>
+              {' | '}
+              <Link href={`${baseUrl}/terms`} style={footerLink}>
+                Terms of Service
+              </Link>
+            </Text>
+            <Text style={footerCopyright}>
+              &copy; {new Date().getFullYear()} Chunky Crayon. All rights
+              reserved.
+            </Text>
+          </Section>
+        </Container>
+      </Body>
+    </Html>
+  );
+};
 
 // Styles - matching the warm palette from other emails
 const main = {
@@ -163,8 +210,16 @@ const alertSection = {
   border: '2px solid #FFE0B2',
 };
 
-const alertEmoji = {
-  fontSize: '48px',
+const alertBadge = {
+  display: 'inline-block',
+  fontSize: '12px',
+  fontWeight: '700',
+  letterSpacing: '0.08em',
+  textTransform: 'uppercase' as const,
+  color: '#E65100',
+  backgroundColor: '#FFE0B2',
+  borderRadius: '999px',
+  padding: '6px 14px',
   margin: '0 0 16px',
 };
 
@@ -191,35 +246,6 @@ const paragraph = {
   lineHeight: '26px',
   color: '#3F3127',
   margin: '0 0 16px',
-};
-
-const infoSection = {
-  backgroundColor: '#FFFFFF',
-  borderRadius: '16px',
-  padding: '24px',
-  margin: '24px 0',
-  border: '2px solid #F5F0E8',
-};
-
-const infoTitle = {
-  fontSize: '18px',
-  fontWeight: '600',
-  color: '#DA7353',
-  margin: '0 0 16px',
-  textAlign: 'center' as const,
-};
-
-const infoItem = {
-  fontSize: '14px',
-  color: '#3F3127',
-  margin: '0 0 12px',
-  paddingLeft: '8px',
-};
-
-const bullet = {
-  marginRight: '8px',
-  color: '#DA7353',
-  fontWeight: '600',
 };
 
 const ctaSection = {

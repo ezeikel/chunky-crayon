@@ -20,7 +20,9 @@ import DailyColoringEmail from '@/emails/DailyColoringEmail';
 import { getDailyUpsell, type DailyUpsell } from '@/lib/email-upsell';
 import WelcomeEmail from '@/emails/WelcomeEmail';
 import MagicLinkEmail from '@/emails/MagicLinkEmail';
-import PaymentFailedEmail from '@/emails/PaymentFailedEmail';
+import PaymentFailedEmail, {
+  type PaymentFailedStage,
+} from '@/emails/PaymentFailedEmail';
 import TrialEndingEmail from '@/emails/TrialEndingEmail';
 import TrialStartedEmail from '@/emails/TrialStartedEmail';
 import SocialDigestEmail from '@/emails/SocialDigestEmail';
@@ -528,17 +530,32 @@ const resolveDailyUpsell = async (): Promise<DailyUpsell> => {
 };
 
 // Send payment failed notification email
+// Stage-specific subject lines, paired with the per-stage body copy in
+// PaymentFailedEmail. The dunning sequence (first → retry → final) is
+// driven by the Stripe `invoice.payment_failed` webhook; see
+// resolvePaymentFailedStage in the webhook route.
+const PAYMENT_FAILED_SUBJECTS: Record<PaymentFailedStage, string> = {
+  first: 'A little hiccup with your Chunky Crayon payment',
+  retry: "Still can't get your card to work",
+  final: 'Last try before your Splash plan pauses',
+};
+
 export const sendPaymentFailedEmail = async ({
   email,
   userName,
   planName,
-  attemptCount,
+  stage = 'first',
   stripeCustomerId,
 }: {
   email: string;
   userName?: string | null;
   planName: string;
-  attemptCount: number;
+  /**
+   * Dunning stage, derived from Stripe's retry state. Defaults to
+   * `first` so a manual one-off send (e.g. for a customer who failed
+   * before this sequence existed) gets the gentle message.
+   */
+  stage?: PaymentFailedStage;
   stripeCustomerId: string;
 }): Promise<{ success: boolean; error?: string }> => {
   try {
@@ -552,19 +569,19 @@ export const sendPaymentFailedEmail = async ({
       PaymentFailedEmail({
         userName: userName || undefined,
         planName,
-        attemptCount,
         billingPortalUrl: portalSession.url,
+        stage,
       }),
     );
 
     await resend.emails.send({
       from: getResendFromAddress('billing', 'Chunky Crayon'),
       to: email,
-      subject: `Action needed: Your payment couldn't be processed`,
+      subject: PAYMENT_FAILED_SUBJECTS[stage],
       html: emailHtml,
     });
 
-    console.log(`📧 Sent payment failed email to: ${email}`);
+    console.log(`📧 Sent payment failed email (${stage}) to: ${email}`);
     return { success: true };
   } catch (error) {
     console.error(`Failed to send payment failed email to ${email}:`, error);

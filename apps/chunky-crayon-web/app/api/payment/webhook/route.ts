@@ -23,6 +23,7 @@ import {
   sendTrialEndingEmail,
   sendTrialStartedEmail,
 } from '@/app/actions/email';
+import type { PaymentFailedStage } from '@/emails/PaymentFailedEmail';
 import { trackWithUser } from '@/utils/analytics-server';
 import {
   sendPurchaseConversionEvents,
@@ -839,12 +840,27 @@ export const POST = async (req: Request) => {
       }
     }
   } else if (stripeEvent.type === 'invoice.payment_failed') {
-    // Handle failed payment - log and optionally notify user
+    // Handle failed payment - log and notify user with a stage-aware
+    // dunning email.
     const invoiceData = stripeEvent.data.object as unknown as {
       subscription: string | null;
       attempt_count: number;
+      // null once Stripe has no further retry scheduled — i.e. this was
+      // the last attempt, so the subscription is about to lapse.
+      next_payment_attempt: number | null;
       id: string;
     };
+
+    // Map Stripe's retry state to the email sequence:
+    //  - no further retry scheduled  → `final` (last chance)
+    //  - first attempt               → `first` (gentle)
+    //  - any middle retry            → `retry` (nudge)
+    const paymentFailedStage: PaymentFailedStage =
+      invoiceData.next_payment_attempt === null
+        ? 'final'
+        : invoiceData.attempt_count <= 1
+          ? 'first'
+          : 'retry';
 
     if (invoiceData.subscription) {
       const subscriptionId = invoiceData.subscription;
@@ -878,12 +894,12 @@ export const POST = async (req: Request) => {
           },
         });
 
-        // Send email notification to user about failed payment
+        // Send stage-aware dunning email to the user.
         await sendPaymentFailedEmail({
           email: subscription.user.email,
           userName: subscription.user.name,
           planName: subscription.planName,
-          attemptCount: invoiceData.attempt_count,
+          stage: paymentFailedStage,
           stripeCustomerId: subscription.user.stripeCustomerId,
         });
       }
