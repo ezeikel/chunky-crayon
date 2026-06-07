@@ -3,6 +3,16 @@ import { SkPath } from "@shopify/react-native-skia";
 import type { PaletteVariant } from "@/lib/coloring/palette";
 import { makeActionId } from "@one-colored-pixel/canvas-sync";
 import { getDeviceId } from "@/lib/auth";
+import { track } from "@/utils/analytics";
+import { ANALYTICS_EVENTS } from "@/constants/analytics";
+
+// "Has fired PAGE_FIRST_STROKE" guard, scoped to the currently-loaded image.
+// Holds the imageId we've already fired for so the event fires exactly ONCE per
+// page load. Reset on reset()/setImageId(new id) (page-load boundaries — incl.
+// Start Over, which clears history) so the next real stroke counts as the first
+// again. Module-level (not store state) since this is fire-and-forget bookkeeping,
+// not rendered UI — and addAction runs on the JS thread where track() is safe.
+let firstStrokeFiredForImageId: string | null = null;
 
 // Per-session monotonic creation counter — the `seq` ordering tiebreak for
 // same-millisecond actions in the append-merge.
@@ -400,6 +410,22 @@ export const useCanvasStore = create<CanvasState & CanvasActions>(
         historyIndex: newHistory.length - 1,
         isDirty: true,
       });
+
+      // PAGE_FIRST_STROKE: fire the FIRST time a real user stroke commits after
+      // a page loads. Only `stroke` actions count (not clear/magic/fill/sticker
+      // or restored history), and only once per imageId until the next page-load
+      // boundary resets the guard. tool = the active drawing tool for the stroke.
+      if (
+        stamped.type === "stroke" &&
+        imageId &&
+        firstStrokeFiredForImageId !== imageId
+      ) {
+        firstStrokeFiredForImageId = imageId;
+        track(ANALYTICS_EVENTS.PAGE_FIRST_STROKE, {
+          coloringImageId: imageId,
+          tool: stamped.brushType ?? get().selectedTool,
+        });
+      }
     },
 
     undo: () => {
@@ -497,6 +523,12 @@ export const useCanvasStore = create<CanvasState & CanvasActions>(
       console.log(
         `[CANVAS_STORE] SET_IMAGE_ID - New ID: ${id}, Previous: ${get().imageId}`,
       );
+      // New page loaded → reset the PAGE_FIRST_STROKE guard so the next real
+      // stroke on this image fires the event again (a different id is a fresh
+      // page; the same id reloading is also a fresh load boundary).
+      if (id !== get().imageId) {
+        firstStrokeFiredForImageId = null;
+      }
       set({ imageId: id });
     },
 
@@ -510,6 +542,9 @@ export const useCanvasStore = create<CanvasState & CanvasActions>(
       console.log(
         `[CANVAS_STORE] RESET - Clearing state for image: ${currentState.imageId}, History: ${currentState.history.length} items`,
       );
+      // Start Over clears the page → re-arm PAGE_FIRST_STROKE so the next real
+      // stroke after a reset counts as the first stroke again.
+      firstStrokeFiredForImageId = null;
       // Reset to initial state but preserve capture function
       set({
         ...initialState,

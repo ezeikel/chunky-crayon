@@ -32,6 +32,8 @@ import {
 } from "@/hooks/api/useProfiles";
 import { SHEET_HANDLE } from "@/lib/design";
 import { tapMedium, tapLight } from "@/utils/haptics";
+import { track } from "@/utils/analytics";
+import { ANALYTICS_EVENTS } from "@/constants/analytics";
 import type { Profile } from "@/api";
 
 type ProfileSwitcherProps = {
@@ -83,6 +85,11 @@ const ProfileSwitcher = ({ isOpen, onClose }: ProfileSwitcherProps) => {
   const handleSelectProfile = async (profile: Profile) => {
     if (profile.id === activeProfile?.id) return;
 
+    track(ANALYTICS_EVENTS.PROFILE_SWITCHED, {
+      toProfileId: profile.id,
+      profileCount: profiles.length,
+    });
+
     // Profile switch is a navigation-level / significant action.
     tapMedium();
 
@@ -100,6 +107,9 @@ const ProfileSwitcher = ({ isOpen, onClose }: ProfileSwitcherProps) => {
   }) => {
     try {
       await createProfile.mutateAsync(input);
+      track(ANALYTICS_EVENTS.PROFILE_CREATED, {
+        profileCount: profiles.length + 1,
+      });
       setIsCreating(false);
     } catch {
       toast.error("Couldn't create profile. Please try again.");
@@ -143,6 +153,10 @@ const ProfileSwitcher = ({ isOpen, onClose }: ProfileSwitcherProps) => {
     if (!deleteTargetProfile) return;
     try {
       await deleteProfileMutation.mutateAsync(deleteTargetProfile.id);
+      track(ANALYTICS_EVENTS.PROFILE_DELETED, {
+        deletedProfileId: deleteTargetProfile.id,
+        profileCount: profiles.length - 1,
+      });
     } catch {
       toast.error("Couldn't delete profile. Please try again.");
     } finally {

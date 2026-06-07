@@ -37,6 +37,8 @@ import {
 } from "@/lib/paywall/plans";
 import { formatPackagePrice } from "@/hooks/usePaywall";
 import ParentalGate from "@/components/ParentalGate";
+import { track } from "@/utils/analytics";
+import { ANALYTICS_EVENTS } from "@/constants/analytics";
 import PaywallHero from "./PaywallHero";
 import PaywallSocialProof from "./PaywallSocialProof";
 import PlanRow from "./PlanRow";
@@ -73,6 +75,8 @@ type SubscriptionPaywallModalProps = {
    * opens this after the user is already in a gated grown-ups area).
    */
   skipParentalGate?: boolean;
+  /** Where the paywall was opened from — carried on paywall analytics. */
+  source?: string;
 };
 
 type BillingCycle = "monthly" | "annual";
@@ -82,6 +86,7 @@ const SubscriptionPaywallModal = ({
   onClose,
   onSuccess,
   skipParentalGate = false,
+  source,
 }: SubscriptionPaywallModalProps) => {
   const insets = useSafeAreaInsets();
   const { data: offering } = useOfferings();
@@ -110,6 +115,13 @@ const SubscriptionPaywallModal = ({
       );
     }
   }, [visible, bodyProgress]);
+
+  // Fire PAYWALL_VIEWED once each time the paywall opens.
+  useEffect(() => {
+    if (visible) {
+      track(ANALYTICS_EVENTS.PAYWALL_VIEWED, { source });
+    }
+  }, [visible, source]);
 
   const bodyStyle = useAnimatedStyle(() => ({
     opacity: bodyProgress.value,
@@ -171,13 +183,18 @@ const SubscriptionPaywallModal = ({
   // intentionally; keep the always-gate default until then.
   const handlePurchasePress = useCallback(
     (pkg: PurchasesPackage) => {
+      track(ANALYTICS_EVENTS.PRICING_PLAN_CLICKED, {
+        planName: getPackagePlanName(pkg),
+        billingCycle: cycle,
+        price: formatPackagePrice(pkg),
+      });
       if (skipParentalGate) {
         executePurchase(pkg);
         return;
       }
       setGatePackage(pkg);
     },
-    [skipParentalGate, executePurchase],
+    [skipParentalGate, executePurchase, cycle],
   );
 
   const handleGateSuccess = useCallback(() => {
@@ -189,6 +206,15 @@ const SubscriptionPaywallModal = ({
   const handleGateClose = useCallback(() => {
     setGatePackage(null);
   }, []);
+
+  // Wrap onClose so a user-initiated dismiss (X button / hardware back /
+  // swipe) fires PAYWALL_DISMISSED. The post-purchase onClose path goes
+  // through executePurchase, which still calls onClose directly — those are
+  // successful conversions, not dismissals.
+  const handleClose = useCallback(() => {
+    track(ANALYTICS_EVENTS.PAYWALL_DISMISSED, { source });
+    onClose();
+  }, [onClose, source]);
 
   const handleRestore = useCallback(async () => {
     try {
@@ -207,12 +233,12 @@ const SubscriptionPaywallModal = ({
         visible={visible}
         animationType="slide"
         presentationStyle="overFullScreen"
-        onRequestClose={onClose}
+        onRequestClose={handleClose}
       >
         <View style={[styles.container, { paddingTop: insets.top }]}>
           {/* Close button floats over the hero so the hero owns the top. */}
           <SquishyPressable
-            onPress={onClose}
+            onPress={handleClose}
             scaleTo={0.9}
             accessibilityRole="button"
             accessibilityLabel="Close"

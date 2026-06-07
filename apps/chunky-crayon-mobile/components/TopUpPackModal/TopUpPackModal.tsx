@@ -19,6 +19,8 @@ import SquishyPressable from "@/components/SquishyPressable";
 import CreditPackRow from "@/components/CreditPackRow";
 import PaywallHero from "@/components/SubscriptionPaywallModal/PaywallHero";
 import { useRefreshEntitlements } from "@/hooks/useEntitlements";
+import { track } from "@/utils/analytics";
+import { ANALYTICS_EVENTS } from "@/constants/analytics";
 
 type TopUpPackModalProps = {
   visible: boolean;
@@ -115,6 +117,10 @@ const TopUpPackModal = ({
     async (pkg: PurchasesPackage) => {
       try {
         await purchaseMutation.mutateAsync(pkg);
+        track(ANALYTICS_EVENTS.CREDIT_PACK_PURCHASED, {
+          creditAmount: getCreditAmount(pkg),
+          platform: "revenuecat",
+        });
         onSuccess?.();
         onClose();
       } catch (error) {

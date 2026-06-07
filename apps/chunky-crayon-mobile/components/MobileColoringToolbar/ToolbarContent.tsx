@@ -14,6 +14,9 @@ import {
   notifyWarning,
   selectionChanged,
 } from "@/utils/haptics";
+import { track } from "@/utils/analytics";
+import { ANALYTICS_EVENTS } from "@/constants/analytics";
+import { COLORING_PALETTE_VARIANTS } from "@/lib/coloring/palette";
 import ToolTile from "@/components/coloring/ToolTile";
 import BrushSizeRow from "@/components/coloring/BrushSizeRow";
 import PaletteVariantPills from "@/components/coloring/PaletteVariantPills";
@@ -103,6 +106,16 @@ const ToolbarContent = () => {
     (config: ColoringToolConfig) => {
       // Magic tools need the region store; ignore taps until ready.
       if (config.isMagic && !magicReady) return;
+      track(ANALYTICS_EVENTS.TOOL_SELECTED, {
+        tool: config.id,
+        previousTool: useCanvasStore.getState().selectedTool,
+      });
+      if (config.brushType) {
+        track(ANALYTICS_EVENTS.BRUSH_TYPE_CHANGED, {
+          fromType: useCanvasStore.getState().brushType,
+          toType: config.brushType,
+        });
+      }
       tapLight();
       setTool(config.tool);
       if (config.brushType) setBrushType(config.brushType);
@@ -126,6 +139,7 @@ const ToolbarContent = () => {
 
   const handleUndo = () => {
     if (canUndo()) {
+      track(ANALYTICS_EVENTS.CANVAS_UNDO);
       tapMedium();
       undo();
     } else {
@@ -135,6 +149,7 @@ const ToolbarContent = () => {
 
   const handleRedo = () => {
     if (canRedo()) {
+      track(ANALYTICS_EVENTS.CANVAS_REDO);
       tapMedium();
       redo();
     } else {
@@ -196,7 +211,13 @@ const ToolbarContent = () => {
           <View style={styles.section}>
             <PaletteVariantPills
               selected={paletteVariant}
-              onSelect={setPaletteVariant}
+              onSelect={(variant) => {
+                track(ANALYTICS_EVENTS.PALETTE_VARIANT_CHANGED, {
+                  fromVariant: useCanvasStore.getState().paletteVariant,
+                  toVariant: variant,
+                });
+                setPaletteVariant(variant);
+              }}
               columns={4}
             />
           </View>
@@ -210,6 +231,12 @@ const ToolbarContent = () => {
               variant={paletteVariant}
               selectedColor={isMagicToolActive ? "" : selectedColor}
               onSelect={(color) => {
+                track(ANALYTICS_EVENTS.PAGE_COLOR_SELECTED, {
+                  color,
+                  colorName: COLORING_PALETTE_VARIANTS[paletteVariant]?.find(
+                    (s) => s.hex.toLowerCase() === color.toLowerCase(),
+                  )?.name,
+                });
                 selectionChanged();
                 setColor(color);
               }}
@@ -226,6 +253,10 @@ const ToolbarContent = () => {
         <BrushSizeRow
           selectedRadius={brushSize}
           onSelect={(radius) => {
+            track(ANALYTICS_EVENTS.BRUSH_SIZE_CHANGED, {
+              fromSize: useCanvasStore.getState().brushSize,
+              toSize: radius,
+            });
             tapLight();
             setBrushSize(radius);
           }}

@@ -16,9 +16,15 @@ import {
   ImageInputPanel,
 } from "./inputs";
 import CharacterPicker from "@/components/CharacterPicker";
-import { useCredits, useRefreshEntitlements } from "@/hooks/useEntitlements";
+import {
+  useCredits,
+  useRefreshEntitlements,
+  useHasSubscription,
+} from "@/hooks/useEntitlements";
 import { toast } from "@/components/Toaster";
 import PaywallRouter from "@/components/PaywallRouter";
+import { track } from "@/utils/analytics";
+import { ANALYTICS_EVENTS } from "@/constants/analytics";
 
 type ColoringImage = {
   id: string;
@@ -52,9 +58,17 @@ const CreateColoringImageFormContent = () => {
   // open the paywall at all); the routing decision lives in PaywallRouter.
   const credits = useCredits();
   const refreshEntitlements = useRefreshEntitlements();
+  const isSubscriber = useHasSubscription();
 
   const handleSubmit = useCallback(async () => {
     if (!description.trim()) return;
+
+    // Fire the funnel-top event as soon as the kid submits (mode is the
+    // input type for scene/text; voice + image have their own handlers).
+    track(ANALYTICS_EVENTS.CREATION_SUBMITTED, {
+      inputType: mode,
+      descriptionLength: description.trim().length,
+    });
 
     // Not enough credits — open the paywall. PaywallRouter decides
     // whether that's the subscription plans (non-subscriber) or a
@@ -65,6 +79,9 @@ const CreateColoringImageFormContent = () => {
     }
 
     setIsSubmitting(true);
+    // Generation actually kicks off here (past the credit gate).
+    track(ANALYTICS_EVENTS.CREATION_STARTED, { mode, isSubscriber });
+    const startedAt = Date.now();
     try {
       // Worker/pending flow (same path web uses) — returns fast with a
       // GENERATING row id; the detail screen polls until the worker flips it
@@ -94,6 +111,12 @@ const CreateColoringImageFormContent = () => {
         return;
       }
 
+      // Generation kicked off successfully (GENERATING row created).
+      track(ANALYTICS_EVENTS.CREATION_COMPLETED, {
+        coloringImageId: result.id,
+        durationMs: Date.now() - startedAt,
+      });
+
       // Refresh entitlements to update credit count
       refreshEntitlements();
 
@@ -108,6 +131,7 @@ const CreateColoringImageFormContent = () => {
       // Navigate to the (still-GENERATING) coloring image; it polls to READY.
       router.push(`/coloring-image/${result.id}`);
     } catch (error) {
+      track(ANALYTICS_EVENTS.CREATION_FAILED, { error: String(error) });
       console.error("Failed to create coloring image:", error);
       toast.error("Something went wrong. Please try again.");
     } finally {
@@ -121,6 +145,7 @@ const CreateColoringImageFormContent = () => {
     reset,
     credits,
     refreshEntitlements,
+    isSubscriber,
   ]);
 
   const handleColoringImageCreated = useCallback(
@@ -142,22 +167,30 @@ const CreateColoringImageFormContent = () => {
   const handleVoiceSubmit = useCallback(
     async (firstAnswer: string, secondAnswer: string) => {
       setIsSubmitting(true);
+      // Voice generation actually kicks off here (panel already credit-gated).
+      track(ANALYTICS_EVENTS.CREATION_STARTED, { mode: "voice", isSubscriber });
+      const startedAt = Date.now();
       try {
         const { coloringImage } = await createColoringImageFromVoice(
           firstAnswer,
           secondAnswer,
         );
+        track(ANALYTICS_EVENTS.CREATION_COMPLETED, {
+          coloringImageId: coloringImage.id,
+          durationMs: Date.now() - startedAt,
+        });
         refreshEntitlements();
         reset();
         await queryClient.refetchQueries();
         router.push(`/coloring-image/${coloringImage.id}`);
       } catch (error) {
+        track(ANALYTICS_EVENTS.CREATION_FAILED, { error: String(error) });
         console.error("Failed to create voice coloring image:", error);
       } finally {
         setIsSubmitting(false);
       }
     },
-    [reset, refreshEntitlements],
+    [reset, refreshEntitlements, isSubscriber],
   );
 
   const handlePaywallClose = useCallback(() => {

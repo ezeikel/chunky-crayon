@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { View, Text, StyleSheet, ScrollView, Pressable } from "react-native";
 import { ModalBottomSheet } from "@swmansion/react-native-bottom-sheet";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -23,6 +23,8 @@ import type { Character } from "@/api";
 import { useT } from "@/lib/i18n/useT";
 import { COLORS, FONTS, SHEET_HANDLE } from "@/lib/design";
 import { tapMedium, tapHeavy } from "@/utils/haptics";
+import { track } from "@/utils/analytics";
+import { ANALYTICS_EVENTS } from "@/constants/analytics";
 
 const MAX_PER_PROFILE = 8;
 
@@ -52,6 +54,10 @@ const CharactersScreen = () => {
 
   const characters = data?.characters ?? [];
   const atCap = characters.length >= MAX_PER_PROFILE;
+
+  useEffect(() => {
+    track(ANALYTICS_EVENTS.CHARACTER_GRID_VIEWED);
+  }, []);
 
   const handleCreate = (draft: CharacterDraft) => {
     createCharacter.mutate(draft, {
@@ -107,6 +113,9 @@ const CharactersScreen = () => {
             <Text style={styles.emptySubtitle}>{t("emptySubtitle")}</Text>
             <Pressable
               onPress={() => {
+                track(ANALYTICS_EVENTS.CHARACTER_CREATE_STARTED, {
+                  source: "empty_state",
+                });
                 tapMedium(); // creating a new character — significant nav action
                 setBuilderOpen(true);
               }}
@@ -152,6 +161,9 @@ const CharactersScreen = () => {
                 <View style={styles.gridCell}>
                   <AddCharacterTile
                     onPress={() => {
+                      track(ANALYTICS_EVENTS.CHARACTER_CREATE_STARTED, {
+                        source: "add_tile",
+                      });
                       tapMedium(); // add-new tile — creating a new character
                       setBuilderOpen(true);
                     }}

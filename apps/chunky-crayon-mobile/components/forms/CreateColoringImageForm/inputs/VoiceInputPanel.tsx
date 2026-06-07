@@ -24,6 +24,8 @@ import Button from "@/components/Button";
 import Spinner from "@/components/Spinner/Spinner";
 import { useT } from "@/lib/i18n/useT";
 import { COLORS, FONTS } from "@/lib/design";
+import { track } from "@/utils/analytics";
+import { ANALYTICS_EVENTS } from "@/constants/analytics";
 
 /**
  * Mobile 2-turn conversational voice input — RN port of web's VoiceInput.tsx.
@@ -96,6 +98,20 @@ const VoiceInputPanel = ({
 
   const hasEnoughCredits = credits >= voiceCreditCost;
   const handedOffRef = useRef(false);
+  const recordingStartedRef = useRef(false);
+
+  // Fire VOICE_INPUT_STARTED once, the first time the conversation enters a
+  // recording state (the kid is now actively talking). Reset on idle/error so
+  // a fresh conversation re-fires.
+  useEffect(() => {
+    const recording = (RECORDING_STATES as readonly string[]).includes(state);
+    if (recording && !recordingStartedRef.current) {
+      recordingStartedRef.current = true;
+      track(ANALYTICS_EVENTS.VOICE_INPUT_STARTED);
+    } else if (state === "idle" || state === "error") {
+      recordingStartedRef.current = false;
+    }
+  }, [state]);
 
   // Idle-mic gentle pulse (matches web's animate-pulse on the big mic).
   const pulse = useSharedValue(1);
@@ -147,11 +163,22 @@ const VoiceInputPanel = ({
     }
     if (handedOffRef.current) return;
     handedOffRef.current = true;
+    // Both turns captured + transcribed — the voice conversation is done,
+    // regardless of whether the credit gate below lets it through.
+    track(ANALYTICS_EVENTS.VOICE_INPUT_COMPLETED, {
+      transcriptionLength: `${firstAnswer} ${secondAnswer}`.trim().length,
+    });
     if (!hasEnoughCredits) {
       onShowPaywall();
       reset();
       return;
     }
+    // Funnel-top: both turns captured + credit-gated, kid is submitting a
+    // voice description. descriptionLength = combined transcript length.
+    track(ANALYTICS_EVENTS.CREATION_SUBMITTED, {
+      inputType: "voice",
+      descriptionLength: `${firstAnswer} ${secondAnswer}`.trim().length,
+    });
     // Submit the two transcripts through the voice-specific create path.
     onVoiceSubmit(firstAnswer, secondAnswer);
   }, [

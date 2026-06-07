@@ -32,6 +32,8 @@ import {
   faArrowRight,
 } from "@fortawesome/pro-duotone-svg-icons";
 import { COLORS, CRAYON } from "@/lib/design";
+import { track } from "@/utils/analytics";
+import { ANALYTICS_EVENTS } from "@/constants/analytics";
 import OnboardingSlide from "./OnboardingSlide";
 import OnboardingPaywallSlide from "./OnboardingPaywallSlide";
 import OnboardingColoringSlide from "./OnboardingColoringSlide";
@@ -39,6 +41,15 @@ import OnboardingColoringSlide from "./OnboardingColoringSlide";
 const SLIDE_COUNT = 5;
 const COLORING_SLIDE_INDEX = 3;
 const PAYWALL_SLIDE_INDEX = 4;
+
+// Stable slide keys for analytics (so a funnel reads by name, not index).
+const SLIDE_KEYS = [
+  "creativity",
+  "safety",
+  "colo",
+  "coloring",
+  "paywall",
+] as const;
 
 type OnboardingCarouselProps = {
   onComplete: () => void;
@@ -50,6 +61,25 @@ const OnboardingCarousel = ({ onComplete }: OnboardingCarouselProps) => {
   const scrollRef = useRef<ScrollView>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const [scrollEnabled, setScrollEnabled] = useState(true);
+  // Furthest slide the user reached — drives skip-DEPTH (how far before they
+  // bailed) and onboarding_completed's reachedPaywall.
+  const maxIndexRef = useRef(0);
+
+  // Onboarding funnel: one event per slide the user lands on (which slides,
+  // how far they get). Mobile-only — web has no carousel.
+  useEffect(() => {
+    if (activeIndex > maxIndexRef.current) maxIndexRef.current = activeIndex;
+    track(ANALYTICS_EVENTS.ONBOARDING_SLIDE_VIEWED, {
+      slideIndex: activeIndex,
+      slideKey: SLIDE_KEYS[activeIndex] ?? String(activeIndex),
+      totalSlides: SLIDE_COUNT,
+    });
+    if (activeIndex === PAYWALL_SLIDE_INDEX) {
+      track(ANALYTICS_EVENTS.ONBOARDING_PAYWALL_SHOWN, {
+        source: "onboarding",
+      });
+    }
+  }, [activeIndex]);
 
   const handleScroll = useCallback(
     (event: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -85,9 +115,34 @@ const OnboardingCarousel = ({ onComplete }: OnboardingCarouselProps) => {
     }
   }, [activeIndex, scrollToIndex]);
 
+  // The terminal of onboarding (paywall convert/dismiss OR skip). Fire
+  // onboarding_completed once with how far they got, then hand off.
+  const completeOnboarding = useCallback(
+    (via: "skip" | "finished") => {
+      track(ANALYTICS_EVENTS.ONBOARDING_COMPLETED, {
+        via,
+        maxSlideReached: maxIndexRef.current,
+        maxSlideKey:
+          SLIDE_KEYS[maxIndexRef.current] ?? String(maxIndexRef.current),
+        reachedPaywall: maxIndexRef.current >= PAYWALL_SLIDE_INDEX,
+        totalSlides: SLIDE_COUNT,
+      });
+      onComplete();
+    },
+    [onComplete],
+  );
+
   const handleSkip = useCallback(() => {
-    onComplete();
-  }, [onComplete]);
+    // Skip DEPTH: which slide they bailed on + how far they'd seen. The
+    // founder's explicit "how far they get if they skip it".
+    track(ANALYTICS_EVENTS.ONBOARDING_SKIPPED, {
+      slideIndex: activeIndex,
+      slideKey: SLIDE_KEYS[activeIndex] ?? String(activeIndex),
+      maxSlideReached: maxIndexRef.current,
+      totalSlides: SLIDE_COUNT,
+    });
+    completeOnboarding("skip");
+  }, [activeIndex, completeOnboarding]);
 
   const isPaywallSlide = activeIndex === PAYWALL_SLIDE_INDEX;
   const isColoringSlide = activeIndex === COLORING_SLIDE_INDEX;
@@ -218,7 +273,7 @@ const OnboardingCarousel = ({ onComplete }: OnboardingCarouselProps) => {
 
         {/* Slide 5: Paywall */}
         <OnboardingPaywallSlide
-          onComplete={onComplete}
+          onComplete={() => completeOnboarding("finished")}
           isActive={activeIndex === PAYWALL_SLIDE_INDEX}
         />
       </ScrollView>

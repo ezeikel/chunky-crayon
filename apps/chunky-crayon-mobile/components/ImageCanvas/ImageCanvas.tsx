@@ -75,7 +75,7 @@ import {
   getVisibleActions,
   type BrushType,
 } from "@/stores/canvasStore";
-import { CANVAS_STICKER_IMAGES } from "@/lib/canvasStickers";
+import { CANVAS_STICKER_IMAGES, getCanvasSticker } from "@/lib/canvasStickers";
 import {
   createBrushPaint,
   createSimplePaint,
@@ -135,6 +135,8 @@ import {
   notifySuccess,
   brushHaptics,
 } from "@/utils/haptics";
+import { track } from "@/utils/analytics";
+import { ANALYTICS_EVENTS } from "@/constants/analytics";
 
 import type { LayoutMode } from "@/utils/deviceUtils";
 import { getOptimalCanvasDimensions } from "@/hooks/useResponsiveLayout";
@@ -1710,6 +1712,14 @@ const ImageCanvas = ({
         sourceHeight: svgDimensions?.height,
       };
       addAction(action);
+
+      // Web folds sticker placement into page_stroke_made (a sticker is "what
+      // you place", same role as a stroke). Match that so funnels unify.
+      track(ANALYTICS_EVENTS.PAGE_STROKE_MADE, {
+        stickerId: selectedSticker,
+        stickerName: getCanvasSticker(selectedSticker)?.name,
+        kind: "sticker",
+      });
     },
     [
       selectedTool,
@@ -1878,8 +1888,20 @@ const ImageCanvas = ({
     if (autoColorFiredRef.current) return;
     if (!svgDimensions) return;
     const applied = applyAutoColor();
-    if (applied) autoColorFiredRef.current = true;
-  }, [isAutoColorActive, svgDimensions, applyAutoColor]);
+    if (applied) {
+      autoColorFiredRef.current = true;
+      track(ANALYTICS_EVENTS.AUTO_COLOR_USED, {
+        coloringImageId: coloringImage.id,
+        paletteVariant,
+      });
+    }
+  }, [
+    isAutoColorActive,
+    svgDimensions,
+    applyAutoColor,
+    coloringImage.id,
+    paletteVariant,
+  ]);
 
   // Dismiss magic hint
   const handleDismissMagicHint = useCallback(() => {

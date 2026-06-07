@@ -69,6 +69,8 @@ import {
   FocusModeToggleButton,
   FocusModeFloatingExit,
 } from "@/components/FocusMode";
+import { track } from "@/utils/analytics";
+import { ANALYTICS_EVENTS } from "@/constants/analytics";
 
 // ── Draw-scroll arbitration, isolated from the route's render ────────────────
 // The canvas toggles page-scroll OFF while you draw (ImageCanvas calls
@@ -131,7 +133,7 @@ const DrawScrollView = ({
 };
 
 const ColoringImage = () => {
-  const { id } = useLocalSearchParams();
+  const { id, source } = useLocalSearchParams();
   const router = useRouter();
   const { data, isLoading } = useColoringImage(id as string);
   // scroll state lives in DrawScrollProvider (see above) so a stroke's
@@ -237,6 +239,9 @@ const ColoringImage = () => {
 
   // Save to Photos — capture the canvas, write a PNG, save to the library.
   const handleSaveToPhotos = useCallback(async () => {
+    track(ANALYTICS_EVENTS.SAVE_TO_GALLERY_CLICKED, {
+      coloringImageId: id as string,
+    });
     // Read captureCanvas non-reactively (it's set by the canvas on mount). This
     // avoids subscribing the route to it, keeping the route's only reactive
     // store dep `scale` (see the selector note above).
@@ -321,6 +326,9 @@ const ColoringImage = () => {
 
   // Print — build a PDF (line art + QR) and open the system print/share sheet.
   const handlePrint = useCallback(async () => {
+    track(ANALYTICS_EVENTS.PRINT_CLICKED, {
+      coloringImageId: id as string,
+    });
     const image = data?.coloringImage;
     if (!image?.svgUrl) {
       toast.error(PRINT_FAIL_MSG);
@@ -354,7 +362,7 @@ const ColoringImage = () => {
     } finally {
       setIsPrinting(false);
     }
-  }, [data?.coloringImage]);
+  }, [data?.coloringImage, id]);
 
   // Debug storage on mount
   useEffect(() => {
@@ -363,6 +371,35 @@ const ColoringImage = () => {
     );
     debugCanvasStorage();
   }, [id, layoutMode]);
+
+  // Lifecycle analytics. PAGE_VIEWED fires once on mount (per coloring image).
+  // PAGE_COLORED fires on unmount/session-end with how long the page was open
+  // and how many stroke actions were committed — the session-level "colored"
+  // signal, distinct from the per-stroke PAGE_FIRST_STROKE fired in the store.
+  // strokeCount is read non-reactively from the canvas store at teardown so the
+  // effect stays mount/unmount-only (no per-stroke re-subscribe).
+  useEffect(() => {
+    const coloringImageId = id as string;
+    const sessionStartedAt = Date.now();
+    track(ANALYTICS_EVENTS.PAGE_VIEWED, {
+      coloringImageId,
+      source: typeof source === "string" ? source : undefined,
+    });
+    return () => {
+      const { history } = useCanvasStore.getState();
+      const strokeCount = history.filter(
+        (a) => a.type === "stroke" && a.undone !== true,
+      ).length;
+      track(ANALYTICS_EVENTS.PAGE_COLORED, {
+        coloringImageId,
+        sessionDurationMs: Date.now() - sessionStartedAt,
+        strokeCount,
+      });
+    };
+    // Keyed by id so navigating between coloring pages closes one session and
+    // opens the next.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
 
   const handleBack = () => {
     router.back();

@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { View, Text, StyleSheet, ScrollView, Pressable } from "react-native";
 import Spinner from "@/components/Spinner/Spinner";
 import { toast } from "@/components/Toaster";
@@ -17,6 +18,8 @@ import {
 } from "@/hooks/api/useChallenges";
 import SectionHeader from "@/components/SectionHeader/SectionHeader";
 import { tapMedium } from "@/utils/haptics";
+import { track } from "@/utils/analytics";
+import { ANALYTICS_EVENTS } from "@/constants/analytics";
 import { COLORS } from "@/lib/design";
 import type { ChallengeWithProgress } from "@/api";
 
@@ -213,6 +216,10 @@ const ChallengesScreen = () => {
   const currentChallenge = challengesData?.currentChallenge;
   const history = challengesData?.history || [];
 
+  useEffect(() => {
+    track(ANALYTICS_EVENTS.CHALLENGE_VIEWED);
+  }, []);
+
   // Get artwork count from active profile for lifetime achievements
   const artworkCount = activeProfile?.artworkCount ?? 0;
 
@@ -254,6 +261,10 @@ const ChallengesScreen = () => {
 
   const handleClaimReward = async () => {
     if (!currentChallenge) return;
+
+    track(ANALYTICS_EVENTS.CHALLENGE_REWARD_CLAIMED, {
+      challengeId: currentChallenge.weeklyChallengeId,
+    });
 
     // tapMedium: claiming a reward is a significant, intentional action
     tapMedium();

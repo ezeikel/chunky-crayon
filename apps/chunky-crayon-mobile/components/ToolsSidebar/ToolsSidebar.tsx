@@ -9,6 +9,8 @@ import {
 } from "@fortawesome/pro-duotone-svg-icons";
 import { useCanvasStore } from "@/stores/canvasStore";
 import { tapLight, tapMedium, notifyWarning } from "@/utils/haptics";
+import { track } from "@/utils/analytics";
+import { ANALYTICS_EVENTS } from "@/constants/analytics";
 import { COLORS } from "@/lib/design";
 import ToolTile from "@/components/coloring/ToolTile";
 import BrushSizeRow from "@/components/coloring/BrushSizeRow";
@@ -142,6 +144,16 @@ const ToolsSidebar = ({
     (config: ColoringToolConfig) => {
       // Magic tools need the region store; ignore taps until ready.
       if (config.isMagic && !magicReady) return;
+      track(ANALYTICS_EVENTS.TOOL_SELECTED, {
+        tool: config.id,
+        previousTool: useCanvasStore.getState().selectedTool,
+      });
+      if (config.brushType) {
+        track(ANALYTICS_EVENTS.BRUSH_TYPE_CHANGED, {
+          fromType: useCanvasStore.getState().brushType,
+          toType: config.brushType,
+        });
+      }
       tapLight();
       setTool(config.tool);
       if (config.brushType) setBrushType(config.brushType);
@@ -165,6 +177,7 @@ const ToolsSidebar = ({
 
   const handleUndo = () => {
     if (canUndo()) {
+      track(ANALYTICS_EVENTS.CANVAS_UNDO);
       tapMedium();
       undo();
     } else {
@@ -174,6 +187,7 @@ const ToolsSidebar = ({
 
   const handleRedo = () => {
     if (canRedo()) {
+      track(ANALYTICS_EVENTS.CANVAS_REDO);
       tapMedium();
       redo();
     } else {
@@ -293,6 +307,10 @@ const ToolsSidebar = ({
             <BrushSizeRow
               selectedRadius={brushSize}
               onSelect={(radius) => {
+                track(ANALYTICS_EVENTS.BRUSH_SIZE_CHANGED, {
+                  fromSize: useCanvasStore.getState().brushSize,
+                  toSize: radius,
+                });
                 tapLight();
                 setBrushSize(radius);
               }}

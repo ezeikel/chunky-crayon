@@ -5,7 +5,19 @@ import PaletteVariantPills from "@/components/coloring/PaletteVariantPills";
 import ColorSwatchGrid from "@/components/coloring/ColorSwatchGrid";
 import StickerPickerGrid from "@/components/coloring/StickerPickerGrid";
 import { selectionChanged } from "@/utils/haptics";
+import { track } from "@/utils/analytics";
+import { ANALYTICS_EVENTS } from "@/constants/analytics";
+import {
+  COLORING_PALETTE_VARIANTS,
+  type PaletteVariant,
+} from "@/lib/coloring/palette";
 import { getLandscapeRailFit } from "@/constants/Sizes";
+
+/** Resolve a swatch's friendly name from its hex within the active variant. */
+const swatchName = (variant: PaletteVariant, hex: string): string | undefined =>
+  COLORING_PALETTE_VARIANTS[variant]?.find(
+    (s) => s.hex.toLowerCase() === hex.toLowerCase(),
+  )?.name;
 
 type ColorPaletteSidebarProps = {
   /** Full width of the left column (rail + canvas gap + notch inset), from the layout. */
@@ -76,8 +88,20 @@ const ColorPaletteSidebar = ({
 
   const handleColorSelect = (color: string) => {
     if (isMagicToolActive) return;
+    track(ANALYTICS_EVENTS.PAGE_COLOR_SELECTED, {
+      color,
+      colorName: swatchName(paletteVariant, color),
+    });
     selectionChanged();
     setColor(color);
+  };
+
+  const handleVariantSelect = (variant: PaletteVariant) => {
+    track(ANALYTICS_EVENTS.PALETTE_VARIANT_CHANGED, {
+      fromVariant: useCanvasStore.getState().paletteVariant,
+      toVariant: variant,
+    });
+    setPaletteVariant(variant);
   };
 
   return (
@@ -102,7 +126,7 @@ const ColorPaletteSidebar = ({
             {/* Mood-variant pills (2-up) — fixed at the top of the card. */}
             <PaletteVariantPills
               selected={paletteVariant}
-              onSelect={setPaletteVariant}
+              onSelect={handleVariantSelect}
               columns={2}
               pillHeight={pillHeight}
             />

@@ -7,6 +7,8 @@ import * as ImagePicker from "expo-image-picker";
 import * as Haptics from "expo-haptics";
 import { useInputMode } from "./InputModeContext";
 import Spinner from "@/components/Spinner/Spinner";
+import { track } from "@/utils/analytics";
+import { ANALYTICS_EVENTS } from "@/constants/analytics";
 
 // =============================================================================
 // Design Tokens (matching web tailwind config)
@@ -75,6 +77,7 @@ const ImageInputPanel = ({
       });
 
       if (!result.canceled && result.assets[0]) {
+        track(ANALYTICS_EVENTS.IMAGE_INPUT_CAPTURED, { source: "camera" });
         setSelectedImage(result.assets[0].uri);
         setBase64Image(result.assets[0].base64 || null);
       }
@@ -104,6 +107,7 @@ const ImageInputPanel = ({
       });
 
       if (!result.canceled && result.assets[0]) {
+        track(ANALYTICS_EVENTS.IMAGE_INPUT_UPLOADED, { source: "file_picker" });
         setSelectedImage(result.assets[0].uri);
         setBase64Image(result.assets[0].base64 || null);
       }
@@ -116,6 +120,13 @@ const ImageInputPanel = ({
   const processImage = useCallback(async () => {
     if (!base64Image) return;
 
+    // Funnel-top: kid tapped "Create coloring page" from a photo. No text
+    // description in image mode, so descriptionLength is 0.
+    track(ANALYTICS_EVENTS.CREATION_SUBMITTED, {
+      inputType: "image",
+      descriptionLength: 0,
+    });
+
     // Check credits before processing
     if (!hasEnoughCredits) {
       onShowPaywall();
@@ -123,25 +134,37 @@ const ImageInputPanel = ({
     }
 
     setIsProcessing(true);
+    // Generation actually kicks off here (past the credit gate).
+    track(ANALYTICS_EVENTS.CREATION_STARTED, { mode: "image" });
+    const startedAt = Date.now();
     try {
       const { generateFromPhoto } = await import("@/api");
       const response = await generateFromPhoto(base64Image);
 
       if (response.coloringImage) {
+        track(ANALYTICS_EVENTS.CREATION_COMPLETED, {
+          coloringImageId: response.coloringImage.id,
+          durationMs: Date.now() - startedAt,
+        });
         await Haptics.notificationAsync(
           Haptics.NotificationFeedbackType.Success,
         );
         onColoringImageCreated(response.coloringImage);
       } else if (response.error) {
+        track(ANALYTICS_EVENTS.CREATION_FAILED, { error: response.error });
         setError(response.error);
         toast.error(response.error);
       } else {
+        track(ANALYTICS_EVENTS.CREATION_FAILED, {
+          error: "no_coloring_image_returned",
+        });
         setError("Failed to create coloring page from photo.");
         toast.error(
           "Couldn't make a coloring page from your photo. Try again!",
         );
       }
     } catch (error) {
+      track(ANALYTICS_EVENTS.CREATION_FAILED, { error: String(error) });
       console.error("Failed to generate coloring page:", error);
       setError("Something went wrong. Please try again.");
       toast.error("Something went wrong. Please try again.");

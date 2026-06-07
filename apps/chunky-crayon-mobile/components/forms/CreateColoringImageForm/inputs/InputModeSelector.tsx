@@ -11,6 +11,8 @@ import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { toast } from "sonner-native";
 import { COLORS } from "@/lib/design";
 import { tapLight } from "@/utils/haptics";
+import { track } from "@/utils/analytics";
+import { ANALYTICS_EVENTS } from "@/constants/analytics";
 import Button from "@/components/Button/Button";
 import ParentalGate from "@/components/ParentalGate";
 import { useUnlockedModes } from "@/hooks/api";
@@ -113,6 +115,10 @@ const InputModeSelector = ({ disabled }: InputModeSelectorProps) => {
       (isGateableMode(option.mode) && isUnlocked(option.mode))
     ) {
       await tapLight();
+      track(ANALYTICS_EVENTS.INPUT_MODE_CHANGED, {
+        from: currentMode,
+        to: option.mode,
+      });
       setMode(option.mode);
       return;
     }
@@ -135,6 +141,10 @@ const InputModeSelector = ({ disabled }: InputModeSelectorProps) => {
       // server didn't confirm so they know it may not stick across devices.
       toast.error("Couldn't save that unlock. It may not stick — try again.");
     }
+    track(ANALYTICS_EVENTS.INPUT_MODE_CHANGED, {
+      from: currentMode,
+      to: mode,
+    });
     setMode(mode);
   };
 

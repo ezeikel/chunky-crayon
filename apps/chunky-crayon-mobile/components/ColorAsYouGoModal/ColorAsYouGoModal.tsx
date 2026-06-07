@@ -20,6 +20,8 @@ import CreditPackRow from "@/components/CreditPackRow";
 import PaywallHero from "@/components/SubscriptionPaywallModal/PaywallHero";
 import PaywallSocialProof from "@/components/SubscriptionPaywallModal/PaywallSocialProof";
 import { useRefreshEntitlements } from "@/hooks/useEntitlements";
+import { track } from "@/utils/analytics";
+import { ANALYTICS_EVENTS } from "@/constants/analytics";
 
 type ColorAsYouGoModalProps = {
   visible: boolean;
@@ -116,6 +118,10 @@ const ColorAsYouGoModal = ({
     async (pkg: PurchasesPackage) => {
       try {
         await purchaseMutation.mutateAsync(pkg);
+        track(ANALYTICS_EVENTS.CREDIT_PACK_PURCHASED, {
+          creditAmount: getCreditAmount(pkg),
+          platform: "revenuecat",
+        });
         onSuccess?.();
         onClose();
       } catch (error) {

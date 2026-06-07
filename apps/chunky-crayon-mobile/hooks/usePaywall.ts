@@ -7,6 +7,8 @@ import {
   restorePurchases,
   getCustomerInfo,
 } from "@/lib/revenuecat";
+import { track } from "@/utils/analytics";
+import { ANALYTICS_EVENTS } from "@/constants/analytics";
 
 /**
  * Hook to get available subscription offerings/packages
@@ -29,9 +31,17 @@ export function usePurchase() {
 
   return useMutation({
     mutationFn: async (packageToPurchase: PurchasesPackage) => {
+      track(ANALYTICS_EVENTS.CHECKOUT_STARTED, {
+        productType: "subscription",
+        platform: "revenuecat",
+      });
       return purchasePackage(packageToPurchase);
     },
     onSuccess: () => {
+      track(ANALYTICS_EVENTS.CHECKOUT_COMPLETED, {
+        productType: "subscription",
+        platform: "revenuecat",
+      });
       // Invalidate customer info to refresh subscription status
       queryClient.invalidateQueries({
         queryKey: ["revenuecat", "customerInfo"],
@@ -50,6 +60,11 @@ export function usePurchase() {
         return;
       }
 
+      track(ANALYTICS_EVENTS.CHECKOUT_FAILED, {
+        productType: "subscription",
+        platform: "revenuecat",
+      });
+
       toast.error("Couldn't process your purchase. Please try again.");
     },
   });
@@ -63,6 +78,7 @@ export function useRestorePurchases() {
 
   return useMutation({
     mutationFn: async () => {
+      track(ANALYTICS_EVENTS.RESTORE_PURCHASES_CLICKED);
       return restorePurchases();
     },
     onSuccess: (customerInfo) => {

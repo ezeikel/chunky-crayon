@@ -70,6 +70,8 @@ import {
 import { useSettingsStore } from "@/stores/settingsStore";
 import { useAuth } from "@/contexts";
 import { useOnboardingStore } from "@/stores/onboardingStore";
+import { track } from "@/utils/analytics";
+import { ANALYTICS_EVENTS } from "@/constants/analytics";
 
 type SettingsItemProps = {
   icon: IconDefinition;
@@ -299,6 +301,13 @@ const SettingsScreen = () => {
   };
 
   const handleLanguage = () => {
+    // Locale switching is still a placeholder ("coming soon"); the app is
+    // English-only today. Fire with the current locale so the event exists in
+    // the funnel and lights up the moment a real toggle ships.
+    track(ANALYTICS_EVENTS.LANGUAGE_CHANGED, {
+      fromLocale: "en",
+      toLocale: "en",
+    });
     toast.info("Language settings coming soon!");
   };
 
