@@ -48,14 +48,6 @@
       },
       "autoIncrement": true,
       "channel": "production"
-    },
-    "beta": {
-      "extends": "production",
-      "env": {
-        "EXPO_PUBLIC_ENVIRONMENT": "beta"
-      },
-      "autoIncrement": true,
-      "channel": "beta"
     }
   },
   "submit": {}

@@ -34,7 +34,6 @@
     "eas:build:production": "eas build --profile production",
     "eas:release:ios": "eas build --profile production --platform ios --auto-submit",
     "eas:release:android": "eas build --profile production --platform android --auto-submit",
-    "eas:submit:beta": "eas submit --profile beta",
     "eas:submit:production": "eas submit --profile production",
     "test": "jest --watchAll",
     "lint": "expo lint",
