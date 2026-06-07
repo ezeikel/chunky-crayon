@@ -1,6 +1,35 @@
 import { SignJWT, jwtVerify } from 'jose';
 import { db, AgeGroup, Difficulty } from '@one-colored-pixel/db';
 import { computeMergedCredits } from './mobile-auth-credits';
+import { createPostHogClient } from './posthog-server';
+
+/**
+ * Stitch an anonymous person's PostHog history onto the target (surviving)
+ * person when an anon device signs in with an email that ALREADY has an account
+ * (2nd device, or web-first-then-mobile). Both distinct_ids are
+ * already-identified PostHog persons (anon was identified on mobile, target on
+ * web/another device), so plain `alias` is refused — `$merge_dangerously` is the
+ * sanctioned one-off for exactly this case (the anon row is being deleted, so
+ * the irreversibility caveat is moot). Without this, the anon device's
+ * pre-signin events strand on the dead cuid. Best-effort: never block sign-in.
+ */
+async function mergePostHogPersons(
+  anonDistinctId: string,
+  targetDistinctId: string,
+): Promise<void> {
+  const posthog = createPostHogClient();
+  if (!posthog) return;
+  try {
+    posthog.capture({
+      distinctId: targetDistinctId,
+      event: '$merge_dangerously',
+      properties: { alias: anonDistinctId },
+    });
+    await posthog.shutdown();
+  } catch {
+    // Analytics must never break the sign-in flow.
+  }
+}
 
 const JWT_SECRET = new TextEncoder().encode(
   process.env.MOBILE_AUTH_SECRET ||
@@ -108,8 +137,14 @@ export async function getOrCreateDeviceUser(deviceId: string): Promise<{
       deviceId,
       user: {
         create: {
-          // Anonymous user - no email
-          name: 'Mobile User',
+          // Anonymous device user — no email AND no name (both null is the
+          // honest "anonymous, not yet known" state, mirroring each other).
+          // Previously defaulted name to 'Mobile User', which leaked a
+          // placeholder into every consumer (PostHog person list showed a wall
+          // of identical 'Mobile User' labels, Sentry, any UI greeting). `name`
+          // is String? in the schema; readers already null-guard it (mobile
+          // type is `name: string | null`). A real name is set when the user
+          // signs in (handleMobileOAuthSignIn) or stays null while anonymous.
           profiles: {
             create: {
               name: 'Artist',
@@ -410,6 +445,10 @@ export async function handleMobileOAuthSignIn(
           currentUser.id,
           existingUserWithEmail.id,
         );
+        // Stitch the anon device's PostHog history onto the surviving person
+        // (the anon cuid is about to be gone). DB merge already moved the
+        // subscription/credits/ledger/content above.
+        await mergePostHogPersons(currentUser.id, existingUserWithEmail.id);
         wasMerged = true;
 
         // Recreate device session (merge deletes the old one)
