@@ -36,6 +36,7 @@ import {
   type PlanKey,
 } from "@/lib/paywall/plans";
 import { formatPackagePrice } from "@/hooks/usePaywall";
+import ParentalGate from "@/components/ParentalGate";
 import PaywallHero from "./PaywallHero";
 import PaywallSocialProof from "./PaywallSocialProof";
 import PlanRow from "./PlanRow";
@@ -64,9 +65,12 @@ type SubscriptionPaywallModalProps = {
   onClose: () => void;
   onSuccess?: () => void;
   /**
-   * Subscriptions don't require the parental gate today — Apple's native
-   * purchase sheet already requires Face ID / passcode. Accepted for
-   * parity with the other paywall modals; may wire a soft gate later.
+   * Front the purchase with the parental gate (the math-question modal) by
+   * default. Apple's KIDS CATEGORY requires a parental gate before ANY purchase
+   * opportunity — the StoreKit passcode / Face ID sheet is explicitly NOT a
+   * substitute (verified 2026, guidelines 1.3 + 5.1.4). Only pass `true` when a
+   * gate has ALREADY fired upstream in the same flow (e.g. SubscriptionManager
+   * opens this after the user is already in a gated grown-ups area).
    */
   skipParentalGate?: boolean;
 };
@@ -77,11 +81,16 @@ const SubscriptionPaywallModal = ({
   visible,
   onClose,
   onSuccess,
+  skipParentalGate = false,
 }: SubscriptionPaywallModalProps) => {
   const insets = useSafeAreaInsets();
   const { data: offering } = useOfferings();
   const purchaseMutation = usePurchase();
   const restoreMutation = useRestorePurchases();
+
+  // Parental gate before the purchase (Kids Category requirement). Holds the
+  // package the user tapped buy on until the grown-up clears the gate.
+  const [gatePackage, setGatePackage] = useState<PurchasesPackage | null>(null);
 
   const [cycle, setCycle] = useState<BillingCycle>("annual");
   // Which plan the rows have selected — the single bottom CTA buys this
@@ -132,7 +141,9 @@ const SubscriptionPaywallModal = ({
     return cycle === "annual" ? plans?.annual : plans?.monthly;
   });
 
-  const handlePurchase = useCallback(
+  // The actual buy — runs only after the parental gate clears (or immediately
+  // when a gate already fired upstream, e.g. from the gated Settings area).
+  const executePurchase = useCallback(
     async (pkg: PurchasesPackage) => {
       try {
         await purchaseMutation.mutateAsync(pkg);
@@ -144,6 +155,30 @@ const SubscriptionPaywallModal = ({
     },
     [purchaseMutation, onSuccess, onClose],
   );
+
+  // CTA → front the purchase with the parental gate unless one already fired
+  // upstream (skipParentalGate). Apple Kids Category requires this before the
+  // purchase opportunity; StoreKit's passcode is not a substitute.
+  const handlePurchasePress = useCallback(
+    (pkg: PurchasesPackage) => {
+      if (skipParentalGate) {
+        executePurchase(pkg);
+        return;
+      }
+      setGatePackage(pkg);
+    },
+    [skipParentalGate, executePurchase],
+  );
+
+  const handleGateSuccess = useCallback(() => {
+    const pkg = gatePackage;
+    setGatePackage(null);
+    if (pkg) executePurchase(pkg);
+  }, [gatePackage, executePurchase]);
+
+  const handleGateClose = useCallback(() => {
+    setGatePackage(null);
+  }, []);
 
   const handleRestore = useCallback(async () => {
     try {
@@ -157,201 +192,213 @@ const SubscriptionPaywallModal = ({
   const isRestoring = restoreMutation.isPending;
 
   return (
-    <Modal
-      visible={visible}
-      animationType="slide"
-      presentationStyle="overFullScreen"
-      onRequestClose={onClose}
-    >
-      <View style={[styles.container, { paddingTop: insets.top }]}>
-        {/* Close button floats over the hero so the hero owns the top. */}
-        <SquishyPressable
-          onPress={onClose}
-          scaleTo={0.9}
-          accessibilityRole="button"
-          accessibilityLabel="Close"
-          hitSlop={8}
-          style={[styles.closeButton, { top: insets.top + 8 }]}
-        >
-          <View style={styles.closeCircle}>
-            <FontAwesomeIcon icon={faXmark} size={20} color="#6B5344" />
-          </View>
-        </SquishyPressable>
+    <>
+      <Modal
+        visible={visible}
+        animationType="slide"
+        presentationStyle="overFullScreen"
+        onRequestClose={onClose}
+      >
+        <View style={[styles.container, { paddingTop: insets.top }]}>
+          {/* Close button floats over the hero so the hero owns the top. */}
+          <SquishyPressable
+            onPress={onClose}
+            scaleTo={0.9}
+            accessibilityRole="button"
+            accessibilityLabel="Close"
+            hitSlop={8}
+            style={[styles.closeButton, { top: insets.top + 8 }]}
+          >
+            <View style={styles.closeCircle}>
+              <FontAwesomeIcon icon={faXmark} size={20} color="#6B5344" />
+            </View>
+          </SquishyPressable>
 
-        <ScrollView
-          contentContainerStyle={styles.scroll}
-          showsVerticalScrollIndicator={false}
-        >
-          {/* Hero — fanned coloring pages, springs in on each open. */}
-          <PaywallHero play={visible} />
+          <ScrollView
+            contentContainerStyle={styles.scroll}
+            showsVerticalScrollIndicator={false}
+          >
+            {/* Hero — fanned coloring pages, springs in on each open. */}
+            <PaywallHero play={visible} />
 
-          <Animated.View style={[styles.body, bodyStyle]}>
-            <Text style={styles.title}>Unlock unlimited coloring</Text>
-            <Text style={styles.subtitle}>
-              Make as many pages as they like. Print them or color on screen.
-            </Text>
+            <Animated.View style={[styles.body, bodyStyle]}>
+              <Text style={styles.title}>Unlock unlimited coloring</Text>
+              <Text style={styles.subtitle}>
+                Make as many pages as they like. Print them or color on screen.
+              </Text>
 
-            <PaywallSocialProof />
+              <PaywallSocialProof />
 
-            {/* Monthly / yearly toggle + trial banner. */}
-            <View style={styles.toggleRow}>
-              {(["monthly", "annual"] as BillingCycle[]).map((key) => {
-                const active = cycle === key;
-                return (
-                  <SquishyPressable
-                    key={key}
-                    onPress={() => setCycle(key)}
-                    scaleTo={0.96}
-                    accessibilityRole="button"
-                    accessibilityState={{ selected: active }}
-                    style={styles.toggleItem}
-                  >
-                    <View
-                      style={[
-                        styles.toggleButton,
-                        active && styles.toggleButtonActive,
-                      ]}
+              {/* Monthly / yearly toggle + trial banner. */}
+              <View style={styles.toggleRow}>
+                {(["monthly", "annual"] as BillingCycle[]).map((key) => {
+                  const active = cycle === key;
+                  return (
+                    <SquishyPressable
+                      key={key}
+                      onPress={() => setCycle(key)}
+                      scaleTo={0.96}
+                      accessibilityRole="button"
+                      accessibilityState={{ selected: active }}
+                      style={styles.toggleItem}
                     >
-                      <Text
+                      <View
                         style={[
-                          styles.toggleText,
-                          active && styles.toggleTextActive,
+                          styles.toggleButton,
+                          active && styles.toggleButtonActive,
                         ]}
                       >
-                        {key === "monthly" ? "Monthly" : "Yearly"}
-                      </Text>
-                      {key === "annual" && (
-                        <View style={styles.saveBadge}>
-                          <Text style={styles.saveBadgeText}>
-                            2 months free
-                          </Text>
-                        </View>
-                      )}
-                    </View>
-                  </SquishyPressable>
-                );
-              })}
-            </View>
-
-            {/* Compact selectable plan rows. Show the loader whenever
-                there are no plans to render yet — loading OR an
-                errored/empty offering — so we never leave a blank gap
-                (RevenueCat can resolve to error with no data). */}
-            {hasPlans ? (
-              <View style={styles.plans}>
-                {PLAN_DISPLAY_ORDER.map((planKey: PlanKey) => {
-                  const plans = plansByName[planKey];
-                  const pkg =
-                    cycle === "annual" ? plans?.annual : plans?.monthly;
-                  if (!pkg) return null;
-                  return (
-                    <PlanRow
-                      key={planKey}
-                      planKey={planKey}
-                      pkg={pkg}
-                      cycle={cycle}
-                      credits={getCreditsForPlan(pkg)}
-                      isBestValue={planKey === RECOMMENDED_PLAN}
-                      isSelected={selectedPlan === planKey}
-                      onPress={() => setSelectedPlan(planKey)}
-                    />
+                        <Text
+                          style={[
+                            styles.toggleText,
+                            active && styles.toggleTextActive,
+                          ]}
+                        >
+                          {key === "monthly" ? "Monthly" : "Yearly"}
+                        </Text>
+                        {key === "annual" && (
+                          <View style={styles.saveBadge}>
+                            <Text style={styles.saveBadgeText}>
+                              2 months free
+                            </Text>
+                          </View>
+                        )}
+                      </View>
+                    </SquishyPressable>
                   );
                 })}
               </View>
-            ) : (
-              <View style={styles.loadingContainer}>
-                <Spinner size={36} color="#E46444" />
-                <Text style={styles.loadingText}>Loading plans…</Text>
-              </View>
-            )}
 
-            {/* ONE big trial-framed CTA — buys the selected plan. */}
-            {hasPlans && selectedPkg && (
-              <View style={styles.ctaBlock}>
-                <SquishyPressable
-                  onPress={() => handlePurchase(selectedPkg)}
-                  disabled={isPurchasing}
-                  scaleTo={0.97}
-                  accessibilityRole="button"
-                  accessibilityLabel={`Start 7-day free trial of ${PLAN_DISPLAY_NAMES[selectedPlan]}`}
-                  style={styles.ctaPressable}
-                >
-                  <View style={styles.cta}>
-                    <Text style={styles.ctaText}>Start 7-day free trial</Text>
-                  </View>
-                </SquishyPressable>
-                <Text style={styles.ctaMicrocopy}>
-                  Then {formatPackagePrice(selectedPkg)}/
-                  {cycle === "annual" ? "year" : "month"}. Cancel any time
-                  before then.
-                </Text>
-                <View style={styles.guaranteeRow}>
-                  <FontAwesomeIcon
-                    icon={faShieldCheck}
-                    size={14}
-                    color="#E46444"
-                  />
-                  <Text style={styles.guaranteeText}>
-                    {PAYWALL_TRUST.guarantee}
-                  </Text>
+              {/* Compact selectable plan rows. Show the loader whenever
+                there are no plans to render yet — loading OR an
+                errored/empty offering — so we never leave a blank gap
+                (RevenueCat can resolve to error with no data). */}
+              {hasPlans ? (
+                <View style={styles.plans}>
+                  {PLAN_DISPLAY_ORDER.map((planKey: PlanKey) => {
+                    const plans = plansByName[planKey];
+                    const pkg =
+                      cycle === "annual" ? plans?.annual : plans?.monthly;
+                    if (!pkg) return null;
+                    return (
+                      <PlanRow
+                        key={planKey}
+                        planKey={planKey}
+                        pkg={pkg}
+                        cycle={cycle}
+                        credits={getCreditsForPlan(pkg)}
+                        isBestValue={planKey === RECOMMENDED_PLAN}
+                        isSelected={selectedPlan === planKey}
+                        onPress={() => setSelectedPlan(planKey)}
+                      />
+                    );
+                  })}
                 </View>
-              </View>
-            )}
-
-            <SquishyPressable
-              onPress={handleRestore}
-              disabled={isRestoring}
-              scaleTo={0.96}
-              accessibilityRole="button"
-              accessibilityLabel="Restore purchases"
-              style={styles.restoreButton}
-            >
-              {isRestoring ? (
-                <Spinner size={18} color="#7A6F66" />
               ) : (
-                <Text style={styles.restoreText}>Restore purchases</Text>
+                <View style={styles.loadingContainer}>
+                  <Spinner size={36} color="#E46444" />
+                  <Text style={styles.loadingText}>Loading plans…</Text>
+                </View>
               )}
-            </SquishyPressable>
 
-            <Text style={styles.legalText}>
-              Subscriptions renew automatically. Cancel any time in{" "}
-              <Text style={styles.legalBold}>Settings</Text>.
-            </Text>
+              {/* ONE big trial-framed CTA — buys the selected plan. */}
+              {hasPlans && selectedPkg && (
+                <View style={styles.ctaBlock}>
+                  <SquishyPressable
+                    onPress={() => handlePurchasePress(selectedPkg)}
+                    disabled={isPurchasing}
+                    scaleTo={0.97}
+                    accessibilityRole="button"
+                    accessibilityLabel={`Start 7-day free trial of ${PLAN_DISPLAY_NAMES[selectedPlan]}`}
+                    style={styles.ctaPressable}
+                  >
+                    <View style={styles.cta}>
+                      <Text style={styles.ctaText}>Start 7-day free trial</Text>
+                    </View>
+                  </SquishyPressable>
+                  <Text style={styles.ctaMicrocopy}>
+                    Then {formatPackagePrice(selectedPkg)}/
+                    {cycle === "annual" ? "year" : "month"}. Cancel any time
+                    before then.
+                  </Text>
+                  <View style={styles.guaranteeRow}>
+                    <FontAwesomeIcon
+                      icon={faShieldCheck}
+                      size={14}
+                      color="#E46444"
+                    />
+                    <Text style={styles.guaranteeText}>
+                      {PAYWALL_TRUST.guarantee}
+                    </Text>
+                  </View>
+                </View>
+              )}
 
-            <View style={styles.legalLinks}>
               <SquishyPressable
-                onPress={() =>
-                  Linking.openURL("https://chunkycrayon.com/terms")
-                }
-                scaleTo={0.94}
-                accessibilityRole="link"
-                accessibilityLabel="Terms of Service"
+                onPress={handleRestore}
+                disabled={isRestoring}
+                scaleTo={0.96}
+                accessibilityRole="button"
+                accessibilityLabel="Restore purchases"
+                style={styles.restoreButton}
               >
-                <Text style={styles.legalLink}>Terms of Service</Text>
+                {isRestoring ? (
+                  <Spinner size={18} color="#7A6F66" />
+                ) : (
+                  <Text style={styles.restoreText}>Restore purchases</Text>
+                )}
               </SquishyPressable>
-              <Text style={styles.legalDot}>·</Text>
-              <SquishyPressable
-                onPress={() =>
-                  Linking.openURL("https://chunkycrayon.com/privacy")
-                }
-                scaleTo={0.94}
-                accessibilityRole="link"
-                accessibilityLabel="Privacy Policy"
-              >
-                <Text style={styles.legalLink}>Privacy Policy</Text>
-              </SquishyPressable>
+
+              <Text style={styles.legalText}>
+                Subscriptions renew automatically. Cancel any time in{" "}
+                <Text style={styles.legalBold}>Settings</Text>.
+              </Text>
+
+              <View style={styles.legalLinks}>
+                <SquishyPressable
+                  onPress={() =>
+                    Linking.openURL("https://chunkycrayon.com/terms")
+                  }
+                  scaleTo={0.94}
+                  accessibilityRole="link"
+                  accessibilityLabel="Terms of Service"
+                >
+                  <Text style={styles.legalLink}>Terms of Service</Text>
+                </SquishyPressable>
+                <Text style={styles.legalDot}>·</Text>
+                <SquishyPressable
+                  onPress={() =>
+                    Linking.openURL("https://chunkycrayon.com/privacy")
+                  }
+                  scaleTo={0.94}
+                  accessibilityRole="link"
+                  accessibilityLabel="Privacy Policy"
+                >
+                  <Text style={styles.legalLink}>Privacy Policy</Text>
+                </SquishyPressable>
+              </View>
+            </Animated.View>
+          </ScrollView>
+
+          {isPurchasing && (
+            <View style={styles.loadingOverlay}>
+              <Spinner size={36} color="#FFFFFF" />
+              <Text style={styles.loadingOverlayText}>Processing…</Text>
             </View>
-          </Animated.View>
-        </ScrollView>
+          )}
+        </View>
+      </Modal>
 
-        {isPurchasing && (
-          <View style={styles.loadingOverlay}>
-            <Spinner size={36} color="#FFFFFF" />
-            <Text style={styles.loadingOverlayText}>Processing…</Text>
-          </View>
-        )}
-      </View>
-    </Modal>
+      {/* Parental gate fronting the purchase (Kids Category). Renders as a
+          sibling so it layers over the paywall modal. */}
+      <ParentalGate
+        visible={gatePackage !== null}
+        onClose={handleGateClose}
+        onSuccess={handleGateSuccess}
+        title="Parent Verification"
+        subtitle="Please verify you are a parent to start a subscription"
+      />
+    </>
   );
 };
 
