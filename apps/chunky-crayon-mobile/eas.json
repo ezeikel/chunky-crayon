@@ -7,7 +7,8 @@
     "base": {
       "ios": {
         "resourceClass": "m-medium",
-        "image": "macos-sequoia-15.5-xcode-26.0"
+        "image": "macos-sequoia-15.5-xcode-26.0",
+        "appleTeamId": "HGX827L49J"
       },
       "android": {
         "image": "latest"

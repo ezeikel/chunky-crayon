@@ -11,6 +11,32 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         .join(".")
     : "";
 
+  // Facebook Login config. Guard like googleIosClientId above: if the vars are
+  // absent the SDK plugin + URL scheme are omitted entirely, rather than baking
+  // the literal "fbundefined" scheme / appID "undefined" (which silently breaks
+  // FB auth in a build that otherwise looks fine). When EXPO_PUBLIC_FACEBOOK_APP_ID
+  // and EXPO_PUBLIC_FACEBOOK_CLIENT_TOKEN are present (EAS env), FB login wires up.
+  const facebookAppId = process.env.EXPO_PUBLIC_FACEBOOK_APP_ID;
+  const facebookClientToken = process.env.EXPO_PUBLIC_FACEBOOK_CLIENT_TOKEN;
+  const facebookEnabled = Boolean(facebookAppId && facebookClientToken);
+
+  // Built as a typed plugin entry so the conditional spread below keeps the
+  // [name, options] tuple shape (a bare spread of [[...]] widens to string[] and
+  // breaks tuple inference for every plugin after it).
+  const facebookPlugin: NonNullable<ExpoConfig["plugins"]> = facebookEnabled
+    ? [
+        [
+          "react-native-fbsdk-next",
+          {
+            appID: facebookAppId,
+            displayName: "Chunky Crayon",
+            clientToken: facebookClientToken,
+            scheme: "chunkycrayon",
+          },
+        ],
+      ]
+    : [];
+
   // Per-variant app identity (matches PTP). EXPO_PUBLIC_ENVIRONMENT is set per
   // EAS build profile (eas.json) so dev / preview / prod produce DIFFERENT
   // bundle ids + names + icons and can all install side-by-side on one device.
@@ -85,7 +111,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
           {
             CFBundleURLSchemes: [
               googleIosClientId,
-              `fb${process.env.EXPO_PUBLIC_FACEBOOK_APP_ID}`,
+              ...(facebookEnabled ? [`fb${facebookAppId}`] : []),
             ],
           },
         ],
@@ -132,15 +158,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       "expo-image",
       "expo-localization",
       "@react-native-google-signin/google-signin",
-      [
-        "react-native-fbsdk-next",
-        {
-          appID: `${process.env.EXPO_PUBLIC_FACEBOOK_APP_ID}`,
-          displayName: "Chunky Crayon",
-          clientToken: `${process.env.EXPO_PUBLIC_FACEBOOK_CLIENT_TOKEN}`,
-          scheme: "chunkycrayon",
-        },
-      ],
+      ...facebookPlugin,
       [
         "expo-image-picker",
         {
