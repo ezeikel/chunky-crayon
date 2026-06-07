@@ -15,10 +15,8 @@ import {
   identifyUser,
   logoutUser,
   getCustomerInfo,
-  hasActiveSubscription,
-  getActivePlanName,
-  isInTrialPeriod,
 } from "@/lib/revenuecat";
+import { useEntitlements } from "@/hooks/useEntitlements";
 import { useAuth } from "./AuthContext";
 
 type SubscriptionContextType = {
@@ -52,6 +50,13 @@ export const SubscriptionProvider = ({
 }: SubscriptionProviderProps) => {
   const queryClient = useQueryClient();
   const { user } = useAuth();
+  // The AUTHORITATIVE entitlement source: our backend's /entitlements, which
+  // reads the shared `subscriptions` table (BOTH Stripe-web and RevenueCat-
+  // mobile rows, keyed on user.id). RevenueCat's customerInfo only knows about
+  // App Store purchases, so deriving hasSubscription from it would wrongly
+  // report a web (Stripe) subscriber as NOT subscribed. Source the derived
+  // state from here; keep RC customerInfo only for RC-specific needs.
+  const { data: entitlements } = useEntitlements();
   const [isInitialized, setIsInitialized] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [customerInfo, setCustomerInfo] = useState<CustomerInfo | null>(null);
@@ -138,12 +143,14 @@ export const SubscriptionProvider = ({
     }
   }, [queryClient]);
 
-  // Derived subscription state from customer info
-  const hasSubscription = customerInfo
-    ? hasActiveSubscription(customerInfo)
-    : false;
-  const planName = customerInfo ? getActivePlanName(customerInfo) : null;
-  const isTrialing = customerInfo ? isInTrialPeriod(customerInfo) : false;
+  // Derived subscription state from the AUTHORITATIVE backend entitlements
+  // (not RC customerInfo) so a web Stripe subscriber is correctly recognised
+  // on mobile. customerInfo stays available above for any RC-specific use.
+  const hasSubscription = entitlements?.hasAccess ?? false;
+  // Only surface a plan name when actually subscribed (matches the prior
+  // null-when-no-sub semantics; avoids a consumer reading "FREE" as a plan).
+  const planName = hasSubscription ? (entitlements?.plan ?? null) : null;
+  const isTrialing = entitlements?.isTrialing ?? false;
 
   const value = useMemo<SubscriptionContextType>(
     () => ({
