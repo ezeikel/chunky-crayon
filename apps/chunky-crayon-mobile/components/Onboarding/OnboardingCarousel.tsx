@@ -30,7 +30,8 @@ import {
   faStar,
   faPaw,
   faArrowRight,
-} from "@fortawesome/pro-solid-svg-icons";
+} from "@fortawesome/pro-duotone-svg-icons";
+import { COLORS, CRAYON } from "@/lib/design";
 import OnboardingSlide from "./OnboardingSlide";
 import OnboardingPaywallSlide from "./OnboardingPaywallSlide";
 import OnboardingColoringSlide from "./OnboardingColoringSlide";
@@ -65,6 +66,18 @@ const OnboardingCarousel = ({ onComplete }: OnboardingCarouselProps) => {
     },
     [width],
   );
+
+  // On rotate the window width changes but the native scroll offset stays at the
+  // old pixel value, so the view would land BETWEEN two now-wider pages. Re-snap
+  // the offset to the current page instantly so rotating (e.g. while on the
+  // coloring slide) keeps you on that slide instead of drifting to a neighbour.
+  useEffect(() => {
+    scrollRef.current?.scrollTo({ x: activeIndex * width, animated: false });
+    // activeIndex intentionally omitted from deps: re-snap fires on rotation
+    // (width change) only, using the index current at that moment. Including it
+    // would also fire on every page change, fighting the user's own swipe.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [width]);
 
   const handleNext = useCallback(() => {
     if (activeIndex < SLIDE_COUNT - 1) {
@@ -111,7 +124,7 @@ const OnboardingCarousel = ({ onComplete }: OnboardingCarouselProps) => {
         {/* Slide 1: Creativity — Floating Bob */}
         <OnboardingSlide
           title="Endless Creativity, Zero Mess"
-          description="Your child creates unique coloring pages by speaking, drawing, or snapping a photo. AI brings their imagination to life."
+          description="Your child dreams it up by talking, drawing, or snapping a photo. We turn it into a coloring page made just for them."
           renderVisual={() => <FloatingIcons />}
           isActive={activeIndex === 0}
         />
@@ -131,7 +144,9 @@ const OnboardingCarousel = ({ onComplete }: OnboardingCarouselProps) => {
                   <FontAwesomeIcon
                     icon={faShieldCheck}
                     size={64}
-                    color="#10B981"
+                    color={COLORS.success}
+                    secondaryColor="#6EE7B7"
+                    secondaryOpacity={1}
                   />
                 </Animated.View>
               </Animated.View>
@@ -140,13 +155,25 @@ const OnboardingCarousel = ({ onComplete }: OnboardingCarouselProps) => {
                   entering={FadeInDown.delay(400).duration(400)}
                   style={styles.safeBadge}
                 >
-                  <FontAwesomeIcon icon={faLock} size={14} color="#6B7280" />
+                  <FontAwesomeIcon
+                    icon={faLock}
+                    size={14}
+                    color={CRAYON.blue.base}
+                    secondaryColor={CRAYON.blue.light}
+                    secondaryOpacity={1}
+                  />
                 </Animated.View>
                 <Animated.View
                   entering={FadeInDown.delay(600).duration(400)}
                   style={styles.safeBadge}
                 >
-                  <FontAwesomeIcon icon={faStar} size={14} color="#6B7280" />
+                  <FontAwesomeIcon
+                    icon={faStar}
+                    size={14}
+                    color={CRAYON.yellow.dark}
+                    secondaryColor={CRAYON.yellow.base}
+                    secondaryOpacity={1}
+                  />
                 </Animated.View>
               </View>
             </View>
@@ -164,7 +191,13 @@ const OnboardingCarousel = ({ onComplete }: OnboardingCarouselProps) => {
                 entering={ZoomIn.duration(500).springify()}
                 style={styles.coloCircle}
               >
-                <FontAwesomeIcon icon={faPaw} size={48} color="#E46444" />
+                <FontAwesomeIcon
+                  icon={faPaw}
+                  size={48}
+                  color={COLORS.crayonOrange}
+                  secondaryColor={COLORS.secondaryOrange}
+                  secondaryOpacity={1}
+                />
               </Animated.View>
               <View style={styles.stageIndicators}>
                 {[0, 1, 2, 3, 4].map((i) => (
@@ -285,17 +318,35 @@ const FloatingIcons = () => {
       <Animated.View
         style={[styles.floatingIcon, styles.floatingIcon1, paletteStyle]}
       >
-        <FontAwesomeIcon icon={faPalette} size={40} color="#E46444" />
+        <FontAwesomeIcon
+          icon={faPalette}
+          size={40}
+          color={COLORS.crayonOrange}
+          secondaryColor={COLORS.secondaryOrange}
+          secondaryOpacity={1}
+        />
       </Animated.View>
       <Animated.View
         style={[styles.floatingIcon, styles.floatingIcon2, sparklesStyle]}
       >
-        <FontAwesomeIcon icon={faSparkles} size={32} color="#FCD34D" />
+        <FontAwesomeIcon
+          icon={faSparkles}
+          size={32}
+          color={CRAYON.yellow.dark}
+          secondaryColor={CRAYON.yellow.base}
+          secondaryOpacity={1}
+        />
       </Animated.View>
       <Animated.View
         style={[styles.floatingIcon, styles.floatingIcon3, starStyle]}
       >
-        <FontAwesomeIcon icon={faStar} size={28} color="#F1AE7E" />
+        <FontAwesomeIcon
+          icon={faStar}
+          size={28}
+          color={CRAYON.pink.base}
+          secondaryColor={CRAYON.pink.light}
+          secondaryOpacity={1}
+        />
       </Animated.View>
     </View>
   );

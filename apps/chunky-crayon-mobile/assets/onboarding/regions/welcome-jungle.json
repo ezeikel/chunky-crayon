@@ -1,0 +1,3090 @@
+{
+  "regionMapWidth": 1024,
+  "regionMapHeight": 1024,
+  "regionsJson": {
+    "sceneDescription": "A cheerful jungle scene featuring a large, anthropomorphic crayon character waving. A 'WELCOME' banner hangs above. To the left is a treehouse with a monkey, and to the right is a parrot on a branch. The ground is covered with various jungle leaves and flowers.",
+    "sourceWidth": 1024,
+    "sourceHeight": 1024,
+    "regionPixelCount": 903630,
+    "regions": [
+      {
+        "id": 1,
+        "bounds": { "x": 0, "y": 0, "width": 71, "height": 252 },
+        "centroid": { "x": 26, "y": 113 },
+        "pixelCount": 11842,
+        "label": "sky/jungle air",
+        "objectGroup": "background",
+        "palettes": {
+          "realistic": { "hex": "#40ADDD", "colorName": "Turquoise" }
+        }
+      },
+      {
+        "id": 2,
+        "bounds": { "x": 74, "y": 0, "width": 67, "height": 47 },
+        "centroid": { "x": 106, "y": 25 },
+        "pixelCount": 536,
+        "label": "sky/jungle air",
+        "objectGroup": "background",
+        "palettes": { "realistic": { "hex": "#6D8447", "colorName": "Moss" } }
+      },
+      {
+        "id": 3,
+        "bounds": { "x": 86, "y": 0, "width": 61, "height": 36 },
+        "centroid": { "x": 121, "y": 13 },
+        "pixelCount": 1351,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": {
+          "realistic": { "hex": "#43ADDC", "colorName": "Turquoise" }
+        }
+      },
+      {
+        "id": 4,
+        "bounds": { "x": 143, "y": 0, "width": 21, "height": 31 },
+        "centroid": { "x": 153, "y": 14 },
+        "pixelCount": 442,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 5,
+        "bounds": { "x": 163, "y": 0, "width": 41, "height": 32 },
+        "centroid": { "x": 180, "y": 13 },
+        "pixelCount": 888,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": {
+          "realistic": { "hex": "#40ADDC", "colorName": "Turquoise" }
+        }
+      },
+      {
+        "id": 6,
+        "bounds": { "x": 177, "y": 0, "width": 55, "height": 47 },
+        "centroid": { "x": 202, "y": 25 },
+        "pixelCount": 1066,
+        "label": "sky/jungle air",
+        "objectGroup": "background",
+        "palettes": { "realistic": { "hex": "#72502C", "colorName": "Dark" } }
+      },
+      {
+        "id": 7,
+        "bounds": { "x": 218, "y": 0, "width": 34, "height": 20 },
+        "centroid": { "x": 232, "y": 8 },
+        "pixelCount": 402,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": {
+          "realistic": { "hex": "#47ADDA", "colorName": "Turquoise" }
+        }
+      },
+      {
+        "id": 8,
+        "bounds": { "x": 201, "y": 0, "width": 136, "height": 71 },
+        "centroid": { "x": 282, "y": 33 },
+        "pixelCount": 6149,
+        "label": "sky/jungle air",
+        "objectGroup": "background",
+        "palettes": {
+          "realistic": { "hex": "#40ADDD", "colorName": "Turquoise" }
+        }
+      },
+      {
+        "id": 9,
+        "bounds": { "x": 334, "y": 0, "width": 39, "height": 31 },
+        "centroid": { "x": 351, "y": 12 },
+        "pixelCount": 789,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 10,
+        "bounds": { "x": 371, "y": 0, "width": 16, "height": 19 },
+        "centroid": { "x": 379, "y": 7 },
+        "pixelCount": 231,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 11,
+        "bounds": { "x": 350, "y": 0, "width": 46, "height": 77 },
+        "centroid": { "x": 379, "y": 41 },
+        "pixelCount": 597,
+        "label": "vine",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 12,
+        "bounds": { "x": 392, "y": 0, "width": 293, "height": 90 },
+        "centroid": { "x": 533, "y": 44 },
+        "pixelCount": 20894,
+        "label": "sky/jungle air",
+        "objectGroup": "background",
+        "palettes": {
+          "realistic": { "hex": "#40ADDD", "colorName": "Turquoise" }
+        }
+      },
+      {
+        "id": 13,
+        "bounds": { "x": 687, "y": 0, "width": 33, "height": 77 },
+        "centroid": { "x": 697, "y": 39 },
+        "pixelCount": 589,
+        "label": "vine",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 14,
+        "bounds": { "x": 697, "y": 0, "width": 157, "height": 76 },
+        "centroid": { "x": 774, "y": 34 },
+        "pixelCount": 7938,
+        "label": "sky/jungle air",
+        "objectGroup": "background",
+        "palettes": {
+          "realistic": { "hex": "#40ADDD", "colorName": "Turquoise" }
+        }
+      },
+      {
+        "id": 15,
+        "bounds": { "x": 828, "y": 0, "width": 42, "height": 48 },
+        "centroid": { "x": 849, "y": 24 },
+        "pixelCount": 660,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 16,
+        "bounds": { "x": 843, "y": 0, "width": 94, "height": 40 },
+        "centroid": { "x": 886, "y": 14 },
+        "pixelCount": 2230,
+        "label": "sky/jungle air",
+        "objectGroup": "background",
+        "palettes": {
+          "realistic": { "hex": "#40ADDD", "colorName": "Turquoise" }
+        }
+      },
+      {
+        "id": 17,
+        "bounds": { "x": 903, "y": 0, "width": 48, "height": 37 },
+        "centroid": { "x": 926, "y": 18 },
+        "pixelCount": 431,
+        "label": "sky/jungle air",
+        "objectGroup": "background",
+        "palettes": { "realistic": { "hex": "#698346", "colorName": "Moss" } }
+      },
+      {
+        "id": 18,
+        "bounds": { "x": 908, "y": 0, "width": 70, "height": 117 },
+        "centroid": { "x": 951, "y": 60 },
+        "pixelCount": 4032,
+        "label": "sky/jungle air",
+        "objectGroup": "background",
+        "palettes": {
+          "realistic": { "hex": "#40ADDD", "colorName": "Turquoise" }
+        }
+      },
+      {
+        "id": 19,
+        "bounds": { "x": 967, "y": 0, "width": 43, "height": 484 },
+        "centroid": { "x": 1000, "y": 248 },
+        "pixelCount": 4283,
+        "label": "sky/jungle air",
+        "objectGroup": "background",
+        "palettes": { "realistic": { "hex": "#6C8548", "colorName": "Moss" } }
+      },
+      {
+        "id": 20,
+        "bounds": { "x": 985, "y": 0, "width": 39, "height": 204 },
+        "centroid": { "x": 1009, "y": 96 },
+        "pixelCount": 5293,
+        "label": "sky/jungle air",
+        "objectGroup": "background",
+        "palettes": {
+          "realistic": { "hex": "#40ADDD", "colorName": "Turquoise" }
+        }
+      },
+      {
+        "id": 21,
+        "bounds": { "x": 45, "y": 9, "width": 37, "height": 37 },
+        "centroid": { "x": 62, "y": 29 },
+        "pixelCount": 917,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 22,
+        "bounds": { "x": 397, "y": 13, "width": 43, "height": 27 },
+        "centroid": { "x": 417, "y": 26 },
+        "pixelCount": 847,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 23,
+        "bounds": { "x": 638, "y": 13, "width": 44, "height": 25 },
+        "centroid": { "x": 660, "y": 25 },
+        "pixelCount": 788,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 24,
+        "bounds": { "x": 703, "y": 13, "width": 41, "height": 36 },
+        "centroid": { "x": 724, "y": 30 },
+        "pixelCount": 829,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 25,
+        "bounds": { "x": 58, "y": 20, "width": 52, "height": 75 },
+        "centroid": { "x": 80, "y": 52 },
+        "pixelCount": 1384,
+        "label": "monkey head",
+        "objectGroup": "monkey",
+        "palettes": { "realistic": { "hex": "#815731", "colorName": "Dark" } }
+      },
+      {
+        "id": 26,
+        "bounds": { "x": 935, "y": 16, "width": 32, "height": 40 },
+        "centroid": { "x": 951, "y": 36 },
+        "pixelCount": 837,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 27,
+        "bounds": { "x": 342, "y": 21, "width": 27, "height": 14 },
+        "centroid": { "x": 355, "y": 27 },
+        "pixelCount": 219,
+        "label": "vine",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 28,
+        "bounds": { "x": 318, "y": 22, "width": 65, "height": 53 },
+        "centroid": { "x": 350, "y": 51 },
+        "pixelCount": 1615,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 29,
+        "bounds": { "x": 145, "y": 28, "width": 30, "height": 26 },
+        "centroid": { "x": 155, "y": 36 },
+        "pixelCount": 369,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 30,
+        "bounds": { "x": 882, "y": 34, "width": 24, "height": 26 },
+        "centroid": { "x": 893, "y": 48 },
+        "pixelCount": 365,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 31,
+        "bounds": { "x": 993, "y": 35, "width": 14, "height": 26 },
+        "centroid": { "x": 999, "y": 48 },
+        "pixelCount": 252,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 32,
+        "bounds": { "x": 628, "y": 40, "width": 48, "height": 26 },
+        "centroid": { "x": 652, "y": 53 },
+        "pixelCount": 758,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 33,
+        "bounds": { "x": 72, "y": 42, "width": 77, "height": 80 },
+        "centroid": { "x": 101, "y": 82 },
+        "pixelCount": 3316,
+        "label": "monkey ear",
+        "objectGroup": "monkey",
+        "palettes": { "realistic": { "hex": "#E9799F", "colorName": "Rose" } }
+      },
+      {
+        "id": 34,
+        "bounds": { "x": 165, "y": 44, "width": 48, "height": 15 },
+        "centroid": { "x": 189, "y": 51 },
+        "pixelCount": 298,
+        "label": "vine",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 35,
+        "bounds": { "x": 380, "y": 45, "width": 27, "height": 39 },
+        "centroid": { "x": 394, "y": 65 },
+        "pixelCount": 732,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 36,
+        "bounds": { "x": 668, "y": 44, "width": 26, "height": 39 },
+        "centroid": { "x": 680, "y": 63 },
+        "pixelCount": 705,
+        "label": "vine",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 37,
+        "bounds": { "x": 208, "y": 46, "width": 15, "height": 23 },
+        "centroid": { "x": 216, "y": 57 },
+        "pixelCount": 208,
+        "label": "vine",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 38,
+        "bounds": { "x": 841, "y": 46, "width": 35, "height": 16 },
+        "centroid": { "x": 858, "y": 54 },
+        "pixelCount": 195,
+        "label": "vine",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 39,
+        "bounds": { "x": 132, "y": 51, "width": 39, "height": 67 },
+        "centroid": { "x": 152, "y": 81 },
+        "pixelCount": 1213,
+        "label": "monkey ear",
+        "objectGroup": "monkey",
+        "palettes": { "realistic": { "hex": "#815731", "colorName": "Dark" } }
+      },
+      {
+        "id": 40,
+        "bounds": { "x": 167, "y": 54, "width": 19, "height": 47 },
+        "centroid": { "x": 178, "y": 76 },
+        "pixelCount": 316,
+        "label": "monkey face",
+        "objectGroup": "monkey",
+        "palettes": { "realistic": { "hex": "#815731", "colorName": "Dark" } }
+      },
+      {
+        "id": 41,
+        "bounds": { "x": 830, "y": 51, "width": 20, "height": 22 },
+        "centroid": { "x": 837, "y": 63 },
+        "pixelCount": 242,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 42,
+        "bounds": { "x": 862, "y": 54, "width": 16, "height": 30 },
+        "centroid": { "x": 869, "y": 67 },
+        "pixelCount": 317,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 43,
+        "bounds": { "x": 874, "y": 55, "width": 14, "height": 63 },
+        "centroid": { "x": 880, "y": 87 },
+        "pixelCount": 523,
+        "label": "vine",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 44,
+        "bounds": { "x": 182, "y": 58, "width": 13, "height": 67 },
+        "centroid": { "x": 190, "y": 87 },
+        "pixelCount": 487,
+        "label": "vine",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 45,
+        "bounds": { "x": 197, "y": 57, "width": 669, "height": 173 },
+        "centroid": { "x": 527, "y": 149 },
+        "pixelCount": 44678,
+        "label": "welcome banner",
+        "objectGroup": "welcome banner",
+        "palettes": { "realistic": { "hex": "#DBAF6B", "colorName": "Medium" } }
+      },
+      {
+        "id": 46,
+        "bounds": { "x": 196, "y": 63, "width": 15, "height": 67 },
+        "centroid": { "x": 203, "y": 96 },
+        "pixelCount": 841,
+        "label": "vine",
+        "objectGroup": "jungle foliage",
+        "palettes": {
+          "realistic": { "hex": "#47ACD8", "colorName": "Turquoise" }
+        }
+      },
+      {
+        "id": 47,
+        "bounds": { "x": 362, "y": 65, "width": 22, "height": 17 },
+        "centroid": { "x": 373, "y": 74 },
+        "pixelCount": 240,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": {
+          "realistic": { "hex": "#47A9D3", "colorName": "Turquoise" }
+        }
+      },
+      {
+        "id": 48,
+        "bounds": { "x": 688, "y": 64, "width": 22, "height": 18 },
+        "centroid": { "x": 699, "y": 74 },
+        "pixelCount": 246,
+        "label": "vine",
+        "objectGroup": "jungle foliage",
+        "palettes": {
+          "realistic": { "hex": "#47A8D2", "colorName": "Turquoise" }
+        }
+      },
+      {
+        "id": 49,
+        "bounds": { "x": 886, "y": 62, "width": 69, "height": 82 },
+        "centroid": { "x": 916, "y": 106 },
+        "pixelCount": 2573,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 50,
+        "bounds": { "x": 908, "y": 61, "width": 25, "height": 33 },
+        "centroid": { "x": 920, "y": 77 },
+        "pixelCount": 484,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 51,
+        "bounds": { "x": 849, "y": 66, "width": 23, "height": 52 },
+        "centroid": { "x": 858, "y": 93 },
+        "pixelCount": 857,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": {
+          "realistic": { "hex": "#46ADD9", "colorName": "Turquoise" }
+        }
+      },
+      {
+        "id": 52,
+        "bounds": { "x": 104, "y": 74, "width": 15, "height": 15 },
+        "centroid": { "x": 111, "y": 81 },
+        "pixelCount": 186,
+        "label": "flower center",
+        "objectGroup": "flower",
+        "palettes": {
+          "realistic": { "hex": "#43ADDC", "colorName": "Turquoise" }
+        }
+      },
+      {
+        "id": 53,
+        "bounds": { "x": 116, "y": 81, "width": 67, "height": 120 },
+        "centroid": { "x": 148, "y": 146 },
+        "pixelCount": 3223,
+        "label": "flower petal",
+        "objectGroup": "flower",
+        "palettes": {
+          "realistic": { "hex": "#43ADDC", "colorName": "Turquoise" }
+        }
+      },
+      {
+        "id": 54,
+        "bounds": { "x": 244, "y": 83, "width": 104, "height": 110 },
+        "centroid": { "x": 291, "y": 140 },
+        "pixelCount": 6775,
+        "label": "letter W",
+        "objectGroup": "welcome banner",
+        "palettes": { "realistic": { "hex": "#DBAF6B", "colorName": "Medium" } }
+      },
+      {
+        "id": 55,
+        "bounds": { "x": 761, "y": 86, "width": 69, "height": 100 },
+        "centroid": { "x": 789, "y": 137 },
+        "pixelCount": 4059,
+        "label": "letter E",
+        "objectGroup": "welcome banner",
+        "palettes": { "realistic": { "hex": "#DBAF6B", "colorName": "Medium" } }
+      },
+      {
+        "id": 56,
+        "bounds": { "x": 59, "y": 95, "width": 12, "height": 47 },
+        "centroid": { "x": 64, "y": 117 },
+        "pixelCount": 384,
+        "label": "monkey body",
+        "objectGroup": "monkey",
+        "palettes": { "realistic": { "hex": "#815731", "colorName": "Dark" } }
+      },
+      {
+        "id": 57,
+        "bounds": { "x": 663, "y": 99, "width": 94, "height": 103 },
+        "centroid": { "x": 707, "y": 148 },
+        "pixelCount": 6246,
+        "label": "letter M",
+        "objectGroup": "welcome banner",
+        "palettes": { "realistic": { "hex": "#DBAF6B", "colorName": "Medium" } }
+      },
+      {
+        "id": 58,
+        "bounds": { "x": 352, "y": 102, "width": 65, "height": 100 },
+        "centroid": { "x": 380, "y": 151 },
+        "pixelCount": 4305,
+        "label": "letter E",
+        "objectGroup": "welcome banner",
+        "palettes": { "realistic": { "hex": "#DBAF6B", "colorName": "Medium" } }
+      },
+      {
+        "id": 59,
+        "bounds": { "x": 951, "y": 101, "width": 17, "height": 42 },
+        "centroid": { "x": 959, "y": 121 },
+        "pixelCount": 533,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 60,
+        "bounds": { "x": 69, "y": 109, "width": 58, "height": 31 },
+        "centroid": { "x": 94, "y": 125 },
+        "pixelCount": 1119,
+        "label": "monkey body",
+        "objectGroup": "monkey",
+        "palettes": { "realistic": { "hex": "#815731", "colorName": "Dark" } }
+      },
+      {
+        "id": 61,
+        "bounds": { "x": 427, "y": 108, "width": 59, "height": 100 },
+        "centroid": { "x": 447, "y": 166 },
+        "pixelCount": 3153,
+        "label": "letter L",
+        "objectGroup": "welcome banner",
+        "palettes": { "realistic": { "hex": "#DBAF6B", "colorName": "Medium" } }
+      },
+      {
+        "id": 62,
+        "bounds": { "x": 572, "y": 110, "width": 79, "height": 98 },
+        "centroid": { "x": 594, "y": 159 },
+        "pixelCount": 4825,
+        "label": "letter O",
+        "objectGroup": "welcome banner",
+        "palettes": { "realistic": { "hex": "#DBAF6B", "colorName": "Medium" } }
+      },
+      {
+        "id": 63,
+        "bounds": { "x": 888, "y": 109, "width": 40, "height": 55 },
+        "centroid": { "x": 905, "y": 138 },
+        "pixelCount": 1217,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": {
+          "realistic": { "hex": "#44ACDA", "colorName": "Turquoise" }
+        }
+      },
+      {
+        "id": 64,
+        "bounds": { "x": 494, "y": 113, "width": 70, "height": 96 },
+        "centroid": { "x": 516, "y": 161 },
+        "pixelCount": 3829,
+        "label": "letter C",
+        "objectGroup": "welcome banner",
+        "palettes": { "realistic": { "hex": "#DBAF6B", "colorName": "Medium" } }
+      },
+      {
+        "id": 65,
+        "bounds": { "x": 850, "y": 113, "width": 30, "height": 33 },
+        "centroid": { "x": 863, "y": 129 },
+        "pixelCount": 648,
+        "label": "sky/jungle air",
+        "objectGroup": "background",
+        "palettes": { "realistic": { "hex": "#689248", "colorName": "Moss" } }
+      },
+      {
+        "id": 66,
+        "bounds": { "x": 988, "y": 125, "width": 21, "height": 46 },
+        "centroid": { "x": 999, "y": 146 },
+        "pixelCount": 589,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 67,
+        "bounds": { "x": 151, "y": 126, "width": 27, "height": 42 },
+        "centroid": { "x": 163, "y": 146 },
+        "pixelCount": 819,
+        "label": "sky/jungle air",
+        "objectGroup": "background",
+        "palettes": { "realistic": { "hex": "#2D7640", "colorName": "Forest" } }
+      },
+      {
+        "id": 68,
+        "bounds": { "x": 186, "y": 128, "width": 27, "height": 33 },
+        "centroid": { "x": 200, "y": 144 },
+        "pixelCount": 618,
+        "label": "vine",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 69,
+        "bounds": { "x": 754, "y": 128, "width": 133, "height": 119 },
+        "centroid": { "x": 851, "y": 214 },
+        "pixelCount": 1570,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 70,
+        "bounds": { "x": 50, "y": 138, "width": 68, "height": 70 },
+        "centroid": { "x": 73, "y": 160 },
+        "pixelCount": 1693,
+        "label": "monkey leg",
+        "objectGroup": "monkey",
+        "palettes": { "realistic": { "hex": "#815731", "colorName": "Dark" } }
+      },
+      {
+        "id": 71,
+        "bounds": { "x": 598, "y": 136, "width": 28, "height": 46 },
+        "centroid": { "x": 612, "y": 159 },
+        "pixelCount": 1070,
+        "label": "sky/jungle air",
+        "objectGroup": "background",
+        "palettes": { "realistic": { "hex": "#DCAF6C", "colorName": "Medium" } }
+      },
+      {
+        "id": 72,
+        "bounds": { "x": 859, "y": 141, "width": 17, "height": 29 },
+        "centroid": { "x": 868, "y": 154 },
+        "pixelCount": 350,
+        "label": "vine",
+        "objectGroup": "jungle foliage",
+        "palettes": {
+          "realistic": { "hex": "#4AABD6", "colorName": "Turquoise" }
+        }
+      },
+      {
+        "id": 73,
+        "bounds": { "x": 923, "y": 144, "width": 44, "height": 25 },
+        "centroid": { "x": 943, "y": 157 },
+        "pixelCount": 768,
+        "label": "sky/jungle air",
+        "objectGroup": "background",
+        "palettes": { "realistic": { "hex": "#689746", "colorName": "Moss" } }
+      },
+      {
+        "id": 74,
+        "bounds": { "x": 887, "y": 154, "width": 29, "height": 40 },
+        "centroid": { "x": 902, "y": 174 },
+        "pixelCount": 842,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 75,
+        "bounds": { "x": 66, "y": 157, "width": 61, "height": 56 },
+        "centroid": { "x": 97, "y": 186 },
+        "pixelCount": 2435,
+        "label": "monkey arm",
+        "objectGroup": "monkey",
+        "palettes": { "realistic": { "hex": "#815731", "colorName": "Dark" } }
+      },
+      {
+        "id": 76,
+        "bounds": { "x": 183, "y": 156, "width": 62, "height": 66 },
+        "centroid": { "x": 207, "y": 193 },
+        "pixelCount": 563,
+        "label": "vine",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 77,
+        "bounds": { "x": 953, "y": 162, "width": 40, "height": 47 },
+        "centroid": { "x": 970, "y": 188 },
+        "pixelCount": 1061,
+        "label": "sky/jungle air",
+        "objectGroup": "background",
+        "palettes": { "realistic": { "hex": "#76522C", "colorName": "Dark" } }
+      },
+      {
+        "id": 78,
+        "bounds": { "x": 27, "y": 169, "width": 20, "height": 29 },
+        "centroid": { "x": 33, "y": 182 },
+        "pixelCount": 326,
+        "label": "monkey tail",
+        "objectGroup": "monkey",
+        "palettes": { "realistic": { "hex": "#815731", "colorName": "Dark" } }
+      },
+      {
+        "id": 79,
+        "bounds": { "x": 322, "y": 168, "width": 651, "height": 734 },
+        "centroid": { "x": 703, "y": 463 },
+        "pixelCount": 126472,
+        "label": "sky/jungle air",
+        "objectGroup": "background",
+        "palettes": {
+          "realistic": { "hex": "#40ADDD", "colorName": "Turquoise" }
+        }
+      },
+      {
+        "id": 80,
+        "bounds": { "x": 37, "y": 179, "width": 10, "height": 12 },
+        "centroid": { "x": 42, "y": 184 },
+        "pixelCount": 107,
+        "label": "monkey foot",
+        "objectGroup": "monkey",
+        "palettes": { "realistic": { "hex": "#815731", "colorName": "Dark" } }
+      },
+      {
+        "id": 81,
+        "bounds": { "x": 119, "y": 177, "width": 69, "height": 90 },
+        "centroid": { "x": 149, "y": 219 },
+        "pixelCount": 1144,
+        "label": "vine",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 82,
+        "bounds": { "x": 207, "y": 184, "width": 30, "height": 22 },
+        "centroid": { "x": 222, "y": 195 },
+        "pixelCount": 299,
+        "label": "vine",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 83,
+        "bounds": { "x": 764, "y": 181, "width": 104, "height": 56 },
+        "centroid": { "x": 817, "y": 210 },
+        "pixelCount": 2025,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": {
+          "realistic": { "hex": "#45ABD9", "colorName": "Turquoise" }
+        }
+      },
+      {
+        "id": 84,
+        "bounds": { "x": 185, "y": 190, "width": 23, "height": 34 },
+        "centroid": { "x": 194, "y": 207 },
+        "pixelCount": 530,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 85,
+        "bounds": { "x": 115, "y": 200, "width": 90, "height": 95 },
+        "centroid": { "x": 161, "y": 243 },
+        "pixelCount": 2938,
+        "label": "treehouse roof",
+        "objectGroup": "treehouse",
+        "palettes": {
+          "realistic": { "hex": "#44ACDB", "colorName": "Turquoise" }
+        }
+      },
+      {
+        "id": 86,
+        "bounds": { "x": 236, "y": 200, "width": 56, "height": 20 },
+        "centroid": { "x": 261, "y": 211 },
+        "pixelCount": 667,
+        "label": "vine",
+        "objectGroup": "jungle foliage",
+        "palettes": {
+          "realistic": { "hex": "#48A9D4", "colorName": "Turquoise" }
+        }
+      },
+      {
+        "id": 87,
+        "bounds": { "x": 114, "y": 202, "width": 17, "height": 17 },
+        "centroid": { "x": 123, "y": 211 },
+        "pixelCount": 183,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 88,
+        "bounds": { "x": 997, "y": 204, "width": 27, "height": 92 },
+        "centroid": { "x": 1014, "y": 256 },
+        "pixelCount": 1468,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 89,
+        "bounds": { "x": 946, "y": 209, "width": 50, "height": 32 },
+        "centroid": { "x": 971, "y": 225 },
+        "pixelCount": 994,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 90,
+        "bounds": { "x": 15, "y": 211, "width": 34, "height": 51 },
+        "centroid": { "x": 22, "y": 235 },
+        "pixelCount": 663,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 91,
+        "bounds": { "x": 51, "y": 214, "width": 78, "height": 76 },
+        "centroid": { "x": 83, "y": 243 },
+        "pixelCount": 2450,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 92,
+        "bounds": { "x": 875, "y": 211, "width": 36, "height": 15 },
+        "centroid": { "x": 891, "y": 219 },
+        "pixelCount": 333,
+        "label": "parrot head",
+        "objectGroup": "parrot",
+        "palettes": {
+          "realistic": { "hex": "#DB322D", "colorName": "Cherry Red" }
+        }
+      },
+      {
+        "id": 93,
+        "bounds": { "x": 207, "y": 219, "width": 8, "height": 20 },
+        "centroid": { "x": 210, "y": 229 },
+        "pixelCount": 113,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 94,
+        "bounds": { "x": 216, "y": 219, "width": 25, "height": 25 },
+        "centroid": { "x": 228, "y": 230 },
+        "pixelCount": 405,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": {
+          "realistic": { "hex": "#48ABD6", "colorName": "Turquoise" }
+        }
+      },
+      {
+        "id": 95,
+        "bounds": { "x": 800, "y": 219, "width": 33, "height": 18 },
+        "centroid": { "x": 815, "y": 228 },
+        "pixelCount": 385,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 96,
+        "bounds": { "x": 263, "y": 224, "width": 104, "height": 97 },
+        "centroid": { "x": 316, "y": 273 },
+        "pixelCount": 3053,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": {
+          "realistic": { "hex": "#47ABD8", "colorName": "Turquoise" }
+        }
+      },
+      {
+        "id": 97,
+        "bounds": { "x": 313, "y": 221, "width": 62, "height": 116 },
+        "centroid": { "x": 358, "y": 265 },
+        "pixelCount": 938,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 98,
+        "bounds": { "x": 722, "y": 222, "width": 29, "height": 30 },
+        "centroid": { "x": 735, "y": 236 },
+        "pixelCount": 583,
+        "label": "sky/jungle air",
+        "objectGroup": "background",
+        "palettes": { "realistic": { "hex": "#327A41", "colorName": "Forest" } }
+      },
+      {
+        "id": 99,
+        "bounds": { "x": 234, "y": 229, "width": 31, "height": 31 },
+        "centroid": { "x": 248, "y": 243 },
+        "pixelCount": 657,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 100,
+        "bounds": { "x": 870, "y": 226, "width": 86, "height": 120 },
+        "centroid": { "x": 909, "y": 286 },
+        "pixelCount": 5301,
+        "label": "parrot body",
+        "objectGroup": "parrot",
+        "palettes": {
+          "realistic": { "hex": "#DB322D", "colorName": "Cherry Red" }
+        }
+      },
+      {
+        "id": 101,
+        "bounds": { "x": 967, "y": 226, "width": 34, "height": 161 },
+        "centroid": { "x": 982, "y": 300 },
+        "pixelCount": 2476,
+        "label": "vine",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 102,
+        "bounds": { "x": 283, "y": 231, "width": 23, "height": 40 },
+        "centroid": { "x": 294, "y": 250 },
+        "pixelCount": 649,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 103,
+        "bounds": { "x": 109, "y": 238, "width": 13, "height": 21 },
+        "centroid": { "x": 115, "y": 247 },
+        "pixelCount": 203,
+        "label": "vine",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 104,
+        "bounds": { "x": 147, "y": 239, "width": 61, "height": 41 },
+        "centroid": { "x": 177, "y": 261 },
+        "pixelCount": 681,
+        "label": "treehouse roof",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 105,
+        "bounds": { "x": 91, "y": 244, "width": 288, "height": 148 },
+        "centroid": { "x": 221, "y": 322 },
+        "pixelCount": 15709,
+        "label": "treehouse roof",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 106,
+        "bounds": { "x": 364, "y": 241, "width": 42, "height": 25 },
+        "centroid": { "x": 384, "y": 253 },
+        "pixelCount": 776,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 107,
+        "bounds": { "x": 856, "y": 243, "width": 25, "height": 30 },
+        "centroid": { "x": 867, "y": 256 },
+        "pixelCount": 505,
+        "label": "parrot beak",
+        "objectGroup": "parrot",
+        "palettes": {
+          "realistic": { "hex": "#DB322D", "colorName": "Cherry Red" }
+        }
+      },
+      {
+        "id": 108,
+        "bounds": { "x": 218, "y": 247, "width": 13, "height": 16 },
+        "centroid": { "x": 224, "y": 254 },
+        "pixelCount": 153,
+        "label": "vine",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 109,
+        "bounds": { "x": 267, "y": 246, "width": 533, "height": 676 },
+        "centroid": { "x": 503, "y": 703 },
+        "pixelCount": 51185,
+        "label": "crayon body",
+        "objectGroup": "crayon character",
+        "palettes": {
+          "realistic": { "hex": "#FDD835", "colorName": "Sunshine Yellow" }
+        }
+      },
+      {
+        "id": 110,
+        "bounds": { "x": 823, "y": 247, "width": 18, "height": 25 },
+        "centroid": { "x": 833, "y": 259 },
+        "pixelCount": 316,
+        "label": "parrot chest",
+        "objectGroup": "parrot",
+        "palettes": { "realistic": { "hex": "#5A8D47", "colorName": "Moss" } }
+      },
+      {
+        "id": 111,
+        "bounds": { "x": 0, "y": 252, "width": 63, "height": 31 },
+        "centroid": { "x": 27, "y": 270 },
+        "pixelCount": 1168,
+        "label": "sky/jungle air",
+        "objectGroup": "background",
+        "palettes": { "realistic": { "hex": "#698443", "colorName": "Moss" } }
+      },
+      {
+        "id": 112,
+        "bounds": { "x": 251, "y": 253, "width": 21, "height": 14 },
+        "centroid": { "x": 261, "y": 260 },
+        "pixelCount": 192,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 113,
+        "bounds": { "x": 773, "y": 252, "width": 26, "height": 35 },
+        "centroid": { "x": 785, "y": 269 },
+        "pixelCount": 657,
+        "label": "sky/jungle air",
+        "objectGroup": "background",
+        "palettes": { "realistic": { "hex": "#357B40", "colorName": "Forest" } }
+      },
+      {
+        "id": 114,
+        "bounds": { "x": 318, "y": 257, "width": 29, "height": 37 },
+        "centroid": { "x": 331, "y": 274 },
+        "pixelCount": 712,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 115,
+        "bounds": { "x": 871, "y": 260, "width": 15, "height": 13 },
+        "centroid": { "x": 879, "y": 267 },
+        "pixelCount": 136,
+        "label": "parrot beak",
+        "objectGroup": "parrot",
+        "palettes": {
+          "realistic": { "hex": "#DB322D", "colorName": "Cherry Red" }
+        }
+      },
+      {
+        "id": 116,
+        "bounds": { "x": 232, "y": 261, "width": 72, "height": 33 },
+        "centroid": { "x": 266, "y": 278 },
+        "pixelCount": 1070,
+        "label": "treehouse roof",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 117,
+        "bounds": { "x": 478, "y": 263, "width": 139, "height": 108 },
+        "centroid": { "x": 547, "y": 329 },
+        "pixelCount": 8738,
+        "label": "crayon cap tip",
+        "objectGroup": "crayon character",
+        "palettes": {
+          "realistic": { "hex": "#E02927", "colorName": "Cherry Red" }
+        }
+      },
+      {
+        "id": 118,
+        "bounds": { "x": 21, "y": 268, "width": 58, "height": 405 },
+        "centroid": { "x": 60, "y": 472 },
+        "pixelCount": 3092,
+        "label": "vine",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 119,
+        "bounds": { "x": 51, "y": 275, "width": 69, "height": 63 },
+        "centroid": { "x": 83, "y": 302 },
+        "pixelCount": 1654,
+        "label": "sky/jungle air",
+        "objectGroup": "background",
+        "palettes": { "realistic": { "hex": "#2F793F", "colorName": "Forest" } }
+      },
+      {
+        "id": 120,
+        "bounds": { "x": 713, "y": 272, "width": 24, "height": 46 },
+        "centroid": { "x": 725, "y": 295 },
+        "pixelCount": 799,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 121,
+        "bounds": { "x": 0, "y": 277, "width": 47, "height": 284 },
+        "centroid": { "x": 18, "y": 416 },
+        "pixelCount": 8502,
+        "label": "vine",
+        "objectGroup": "jungle foliage",
+        "palettes": {
+          "realistic": { "hex": "#41AEDD", "colorName": "Turquoise" }
+        }
+      },
+      {
+        "id": 122,
+        "bounds": { "x": 997, "y": 295, "width": 27, "height": 24 },
+        "centroid": { "x": 1012, "y": 306 },
+        "pixelCount": 500,
+        "label": "vine",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 123,
+        "bounds": { "x": 343, "y": 300, "width": 24, "height": 42 },
+        "centroid": { "x": 354, "y": 321 },
+        "pixelCount": 704,
+        "label": "treehouse roof",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 124,
+        "bounds": { "x": 665, "y": 298, "width": 50, "height": 19 },
+        "centroid": { "x": 690, "y": 307 },
+        "pixelCount": 712,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 125,
+        "bounds": { "x": 751, "y": 299, "width": 20, "height": 42 },
+        "centroid": { "x": 761, "y": 320 },
+        "pixelCount": 677,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 126,
+        "bounds": { "x": 378, "y": 305, "width": 24, "height": 33 },
+        "centroid": { "x": 390, "y": 321 },
+        "pixelCount": 531,
+        "label": "treehouse roof",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 127,
+        "bounds": { "x": 787, "y": 314, "width": 39, "height": 26 },
+        "centroid": { "x": 805, "y": 326 },
+        "pixelCount": 641,
+        "label": "sky/jungle air",
+        "objectGroup": "background",
+        "palettes": { "realistic": { "hex": "#699749", "colorName": "Moss" } }
+      },
+      {
+        "id": 128,
+        "bounds": { "x": 50, "y": 316, "width": 37, "height": 28 },
+        "centroid": { "x": 69, "y": 330 },
+        "pixelCount": 698,
+        "label": "treehouse roof",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 129,
+        "bounds": { "x": 168, "y": 317, "width": 96, "height": 44 },
+        "centroid": { "x": 215, "y": 346 },
+        "pixelCount": 2295,
+        "label": "treehouse roof",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 130,
+        "bounds": { "x": 682, "y": 317, "width": 46, "height": 15 },
+        "centroid": { "x": 704, "y": 323 },
+        "pixelCount": 415,
+        "label": "sky/jungle air",
+        "objectGroup": "background",
+        "palettes": {
+          "realistic": { "hex": "#715130", "colorName": "Chocolate Brown" }
+        }
+      },
+      {
+        "id": 131,
+        "bounds": { "x": 999, "y": 317, "width": 25, "height": 84 },
+        "centroid": { "x": 1015, "y": 354 },
+        "pixelCount": 1285,
+        "label": "vine",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 132,
+        "bounds": { "x": 937, "y": 325, "width": 20, "height": 17 },
+        "centroid": { "x": 947, "y": 333 },
+        "pixelCount": 172,
+        "label": "parrot wing",
+        "objectGroup": "parrot",
+        "palettes": { "realistic": { "hex": "#365EA0", "colorName": "Navy" } }
+      },
+      {
+        "id": 133,
+        "bounds": { "x": 9, "y": 329, "width": 30, "height": 47 },
+        "centroid": { "x": 22, "y": 352 },
+        "pixelCount": 944,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 134,
+        "bounds": { "x": 735, "y": 326, "width": 148, "height": 35 },
+        "centroid": { "x": 811, "y": 348 },
+        "pixelCount": 1968,
+        "label": "tree branch",
+        "objectGroup": "branch",
+        "palettes": { "realistic": { "hex": "#75522E", "colorName": "Dark" } }
+      },
+      {
+        "id": 135,
+        "bounds": { "x": 50, "y": 338, "width": 40, "height": 57 },
+        "centroid": { "x": 72, "y": 362 },
+        "pixelCount": 1168,
+        "label": "treehouse roof",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 136,
+        "bounds": { "x": 140, "y": 343, "width": 15, "height": 18 },
+        "centroid": { "x": 148, "y": 353 },
+        "pixelCount": 198,
+        "label": "treehouse roof",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 137,
+        "bounds": { "x": 120, "y": 345, "width": 205, "height": 40 },
+        "centroid": { "x": 221, "y": 372 },
+        "pixelCount": 3917,
+        "label": "treehouse roof",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 138,
+        "bounds": { "x": 708, "y": 347, "width": 36, "height": 32 },
+        "centroid": { "x": 724, "y": 362 },
+        "pixelCount": 657,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 139,
+        "bounds": { "x": 888, "y": 350, "width": 15, "height": 10 },
+        "centroid": { "x": 896, "y": 355 },
+        "pixelCount": 107,
+        "label": "tree branch",
+        "objectGroup": "branch",
+        "palettes": { "realistic": { "hex": "#75522E", "colorName": "Dark" } }
+      },
+      {
+        "id": 140,
+        "bounds": { "x": 904, "y": 348, "width": 90, "height": 70 },
+        "centroid": { "x": 957, "y": 377 },
+        "pixelCount": 2270,
+        "label": "parrot foot",
+        "objectGroup": "parrot",
+        "palettes": {
+          "realistic": { "hex": "#DB322D", "colorName": "Cherry Red" }
+        }
+      },
+      {
+        "id": 141,
+        "bounds": { "x": 370, "y": 351, "width": 20, "height": 28 },
+        "centroid": { "x": 381, "y": 363 },
+        "pixelCount": 364,
+        "label": "treehouse roof",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 142,
+        "bounds": { "x": 37, "y": 359, "width": 14, "height": 45 },
+        "centroid": { "x": 44, "y": 381 },
+        "pixelCount": 381,
+        "label": "treehouse wall",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 143,
+        "bounds": { "x": 809, "y": 359, "width": 28, "height": 55 },
+        "centroid": { "x": 822, "y": 386 },
+        "pixelCount": 1059,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 144,
+        "bounds": { "x": 750, "y": 362, "width": 34, "height": 45 },
+        "centroid": { "x": 765, "y": 382 },
+        "pixelCount": 1071,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 145,
+        "bounds": { "x": 785, "y": 368, "width": 11, "height": 131 },
+        "centroid": { "x": 789, "y": 428 },
+        "pixelCount": 798,
+        "label": "sky/jungle air",
+        "objectGroup": "background",
+        "palettes": { "realistic": { "hex": "#6B8D4D", "colorName": "Moss" } }
+      },
+      {
+        "id": 146,
+        "bounds": { "x": 912, "y": 369, "width": 27, "height": 34 },
+        "centroid": { "x": 924, "y": 382 },
+        "pixelCount": 448,
+        "label": "parrot tail feather",
+        "objectGroup": "parrot",
+        "palettes": {
+          "realistic": { "hex": "#DB322D", "colorName": "Cherry Red" }
+        }
+      },
+      {
+        "id": 147,
+        "bounds": { "x": 340, "y": 377, "width": 22, "height": 35 },
+        "centroid": { "x": 352, "y": 395 },
+        "pixelCount": 514,
+        "label": "treehouse roof",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 148,
+        "bounds": { "x": 52, "y": 381, "width": 14, "height": 21 },
+        "centroid": { "x": 58, "y": 393 },
+        "pixelCount": 202,
+        "label": "sky/jungle air",
+        "objectGroup": "background",
+        "palettes": { "realistic": { "hex": "#33753F", "colorName": "Forest" } }
+      },
+      {
+        "id": 149,
+        "bounds": { "x": 110, "y": 385, "width": 126, "height": 99 },
+        "centroid": { "x": 179, "y": 399 },
+        "pixelCount": 3538,
+        "label": "treehouse wall",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 150,
+        "bounds": { "x": 283, "y": 385, "width": 42, "height": 38 },
+        "centroid": { "x": 309, "y": 401 },
+        "pixelCount": 1103,
+        "label": "treehouse wall",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 151,
+        "bounds": { "x": 324, "y": 384, "width": 14, "height": 95 },
+        "centroid": { "x": 330, "y": 430 },
+        "pixelCount": 853,
+        "label": "treehouse wall",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 152,
+        "bounds": { "x": 943, "y": 384, "width": 9, "height": 20 },
+        "centroid": { "x": 947, "y": 393 },
+        "pixelCount": 124,
+        "label": "parrot tail feather",
+        "objectGroup": "parrot",
+        "palettes": {
+          "realistic": { "hex": "#3A6BA0", "colorName": "Steel Blue" }
+        }
+      },
+      {
+        "id": 153,
+        "bounds": { "x": 98, "y": 386, "width": 13, "height": 90 },
+        "centroid": { "x": 103, "y": 432 },
+        "pixelCount": 843,
+        "label": "sky/jungle air",
+        "objectGroup": "background",
+        "palettes": { "realistic": { "hex": "#9F774E", "colorName": "Sienna" } }
+      },
+      {
+        "id": 154,
+        "bounds": { "x": 210, "y": 387, "width": 92, "height": 99 },
+        "centroid": { "x": 258, "y": 396 },
+        "pixelCount": 2203,
+        "label": "treehouse wall",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 155,
+        "bounds": { "x": 426, "y": 387, "width": 240, "height": 49 },
+        "centroid": { "x": 545, "y": 408 },
+        "pixelCount": 8874,
+        "label": "crayon cap stripe",
+        "objectGroup": "crayon character",
+        "palettes": {
+          "realistic": { "hex": "#EA5D55", "colorName": "Cherry Red" }
+        }
+      },
+      {
+        "id": 156,
+        "bounds": { "x": 921, "y": 393, "width": 76, "height": 289 },
+        "centroid": { "x": 958, "y": 548 },
+        "pixelCount": 9208,
+        "label": "flower center",
+        "objectGroup": "flower",
+        "palettes": {
+          "realistic": { "hex": "#43ADDC", "colorName": "Turquoise" }
+        }
+      },
+      {
+        "id": 157,
+        "bounds": { "x": 71, "y": 397, "width": 26, "height": 87 },
+        "centroid": { "x": 86, "y": 445 },
+        "pixelCount": 1444,
+        "label": "treehouse wall",
+        "objectGroup": "treehouse",
+        "palettes": {
+          "realistic": { "hex": "#46ADDB", "colorName": "Turquoise" }
+        }
+      },
+      {
+        "id": 158,
+        "bounds": { "x": 249, "y": 399, "width": 23, "height": 124 },
+        "centroid": { "x": 260, "y": 462 },
+        "pixelCount": 2422,
+        "label": "treehouse wall",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 159,
+        "bounds": { "x": 931, "y": 400, "width": 10, "height": 46 },
+        "centroid": { "x": 936, "y": 423 },
+        "pixelCount": 312,
+        "label": "vine",
+        "objectGroup": "jungle foliage",
+        "palettes": {
+          "realistic": { "hex": "#D23A39", "colorName": "Cherry Red" }
+        }
+      },
+      {
+        "id": 160,
+        "bounds": { "x": 939, "y": 396, "width": 8, "height": 26 },
+        "centroid": { "x": 943, "y": 409 },
+        "pixelCount": 141,
+        "label": "parrot tail feather",
+        "objectGroup": "parrot",
+        "palettes": {
+          "realistic": { "hex": "#DB322D", "colorName": "Cherry Red" }
+        }
+      },
+      {
+        "id": 161,
+        "bounds": { "x": 31, "y": 405, "width": 38, "height": 37 },
+        "centroid": { "x": 48, "y": 423 },
+        "pixelCount": 903,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 162,
+        "bounds": { "x": 135, "y": 403, "width": 57, "height": 64 },
+        "centroid": { "x": 141, "y": 435 },
+        "pixelCount": 1468,
+        "label": "window frame",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 163,
+        "bounds": { "x": 230, "y": 402, "width": 19, "height": 83 },
+        "centroid": { "x": 240, "y": 441 },
+        "pixelCount": 1253,
+        "label": "treehouse wall",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 164,
+        "bounds": { "x": 272, "y": 404, "width": 18, "height": 49 },
+        "centroid": { "x": 280, "y": 429 },
+        "pixelCount": 690,
+        "label": "treehouse wall",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 165,
+        "bounds": { "x": 918, "y": 404, "width": 14, "height": 44 },
+        "centroid": { "x": 925, "y": 425 },
+        "pixelCount": 376,
+        "label": "vine",
+        "objectGroup": "jungle foliage",
+        "palettes": {
+          "realistic": { "hex": "#D83B38", "colorName": "Cherry Red" }
+        }
+      },
+      {
+        "id": 166,
+        "bounds": { "x": 1007, "y": 401, "width": 17, "height": 25 },
+        "centroid": { "x": 1016, "y": 413 },
+        "pixelCount": 315,
+        "label": "sky/jungle air",
+        "objectGroup": "background",
+        "palettes": { "realistic": { "hex": "#6D9949", "colorName": "Moss" } }
+      },
+      {
+        "id": 167,
+        "bounds": { "x": 143, "y": 413, "width": 16, "height": 17 },
+        "centroid": { "x": 151, "y": 421 },
+        "pixelCount": 242,
+        "label": "window pane",
+        "objectGroup": "treehouse",
+        "palettes": {
+          "realistic": { "hex": "#4FBDE6", "colorName": "Turquoise" }
+        }
+      },
+      {
+        "id": 168,
+        "bounds": { "x": 146, "y": 412, "width": 38, "height": 44 },
+        "centroid": { "x": 164, "y": 434 },
+        "pixelCount": 421,
+        "label": "window frame",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 169,
+        "bounds": { "x": 168, "y": 412, "width": 16, "height": 17 },
+        "centroid": { "x": 175, "y": 420 },
+        "pixelCount": 254,
+        "label": "window pane",
+        "objectGroup": "treehouse",
+        "palettes": {
+          "realistic": { "hex": "#49BEE9", "colorName": "Turquoise" }
+        }
+      },
+      {
+        "id": 170,
+        "bounds": { "x": 111, "y": 417, "width": 21, "height": 27 },
+        "centroid": { "x": 121, "y": 430 },
+        "pixelCount": 567,
+        "label": "treehouse wall",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 171,
+        "bounds": { "x": 1000, "y": 416, "width": 24, "height": 326 },
+        "centroid": { "x": 1016, "y": 586 },
+        "pixelCount": 4637,
+        "label": "window frame",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 172,
+        "bounds": { "x": 304, "y": 425, "width": 19, "height": 27 },
+        "centroid": { "x": 313, "y": 438 },
+        "pixelCount": 501,
+        "label": "door",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 173,
+        "bounds": { "x": 57, "y": 430, "width": 12, "height": 27 },
+        "centroid": { "x": 63, "y": 442 },
+        "pixelCount": 240,
+        "label": "treehouse wall",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 174,
+        "bounds": { "x": 221, "y": 426, "width": 8, "height": 45 },
+        "centroid": { "x": 225, "y": 449 },
+        "pixelCount": 266,
+        "label": "window frame",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 175,
+        "bounds": { "x": 990, "y": 427, "width": 10, "height": 16 },
+        "centroid": { "x": 994, "y": 434 },
+        "pixelCount": 121,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 176,
+        "bounds": { "x": 144, "y": 440, "width": 15, "height": 16 },
+        "centroid": { "x": 151, "y": 448 },
+        "pixelCount": 240,
+        "label": "window pane",
+        "objectGroup": "treehouse",
+        "palettes": {
+          "realistic": { "hex": "#4FBFE2", "colorName": "Turquoise" }
+        }
+      },
+      {
+        "id": 177,
+        "bounds": { "x": 168, "y": 439, "width": 16, "height": 17 },
+        "centroid": { "x": 175, "y": 447 },
+        "pixelCount": 262,
+        "label": "window frame",
+        "objectGroup": "treehouse",
+        "palettes": {
+          "realistic": { "hex": "#49BCE6", "colorName": "Turquoise" }
+        }
+      },
+      {
+        "id": 178,
+        "bounds": { "x": 747, "y": 439, "width": 32, "height": 32 },
+        "centroid": { "x": 761, "y": 454 },
+        "pixelCount": 629,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 179,
+        "bounds": { "x": 794, "y": 436, "width": 32, "height": 24 },
+        "centroid": { "x": 810, "y": 448 },
+        "pixelCount": 496,
+        "label": "sky/jungle air",
+        "objectGroup": "background",
+        "palettes": { "realistic": { "hex": "#6C9B49", "colorName": "Moss" } }
+      },
+      {
+        "id": 180,
+        "bounds": { "x": 969, "y": 440, "width": 44, "height": 308 },
+        "centroid": { "x": 1005, "y": 612 },
+        "pixelCount": 3036,
+        "label": "sky/jungle air",
+        "objectGroup": "background",
+        "palettes": { "realistic": { "hex": "#6A8446", "colorName": "Moss" } }
+      },
+      {
+        "id": 181,
+        "bounds": { "x": 46, "y": 443, "width": 13, "height": 42 },
+        "centroid": { "x": 52, "y": 464 },
+        "pixelCount": 366,
+        "label": "sky/jungle air",
+        "objectGroup": "background",
+        "palettes": { "realistic": { "hex": "#588246", "colorName": "Moss" } }
+      },
+      {
+        "id": 182,
+        "bounds": { "x": 425, "y": 444, "width": 244, "height": 36 },
+        "centroid": { "x": 547, "y": 460 },
+        "pixelCount": 6321,
+        "label": "crayon cap stripe",
+        "objectGroup": "crayon character",
+        "palettes": {
+          "realistic": { "hex": "#FDD835", "colorName": "Sunshine Yellow" }
+        }
+      },
+      {
+        "id": 183,
+        "bounds": { "x": 979, "y": 444, "width": 12, "height": 23 },
+        "centroid": { "x": 984, "y": 455 },
+        "pixelCount": 184,
+        "label": "vine",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 184,
+        "bounds": { "x": 112, "y": 446, "width": 73, "height": 39 },
+        "centroid": { "x": 139, "y": 469 },
+        "pixelCount": 1338,
+        "label": "treehouse wall",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 185,
+        "bounds": { "x": 304, "y": 454, "width": 18, "height": 24 },
+        "centroid": { "x": 312, "y": 465 },
+        "pixelCount": 414,
+        "label": "treehouse wall",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 186,
+        "bounds": { "x": 273, "y": 460, "width": 18, "height": 35 },
+        "centroid": { "x": 281, "y": 477 },
+        "pixelCount": 533,
+        "label": "door knob",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 187,
+        "bounds": { "x": 996, "y": 456, "width": 14, "height": 64 },
+        "centroid": { "x": 1003, "y": 484 },
+        "pixelCount": 581,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 188,
+        "bounds": { "x": 90, "y": 475, "width": 16, "height": 14 },
+        "centroid": { "x": 98, "y": 482 },
+        "pixelCount": 189,
+        "label": "treehouse railing",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 189,
+        "bounds": { "x": 223, "y": 472, "width": 16, "height": 15 },
+        "centroid": { "x": 231, "y": 479 },
+        "pixelCount": 202,
+        "label": "sky/jungle air",
+        "objectGroup": "background",
+        "palettes": { "realistic": { "hex": "#A1794E", "colorName": "Sienna" } }
+      },
+      {
+        "id": 190,
+        "bounds": { "x": 348, "y": 475, "width": 14, "height": 12 },
+        "centroid": { "x": 355, "y": 480 },
+        "pixelCount": 158,
+        "label": "treehouse railing",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 191,
+        "bounds": { "x": 146, "y": 476, "width": 15, "height": 13 },
+        "centroid": { "x": 153, "y": 482 },
+        "pixelCount": 165,
+        "label": "treehouse railing",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 192,
+        "bounds": { "x": 303, "y": 479, "width": 17, "height": 9 },
+        "centroid": { "x": 312, "y": 483 },
+        "pixelCount": 124,
+        "label": "treehouse railing",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 193,
+        "bounds": { "x": 379, "y": 477, "width": 16, "height": 13 },
+        "centroid": { "x": 386, "y": 483 },
+        "pixelCount": 176,
+        "label": "treehouse railing",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 194,
+        "bounds": { "x": 985, "y": 480, "width": 13, "height": 33 },
+        "centroid": { "x": 991, "y": 495 },
+        "pixelCount": 278,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": {
+          "realistic": { "hex": "#47ABD3", "colorName": "Turquoise" }
+        }
+      },
+      {
+        "id": 195,
+        "bounds": { "x": 166, "y": 485, "width": 53, "height": 11 },
+        "centroid": { "x": 191, "y": 490 },
+        "pixelCount": 507,
+        "label": "treehouse railing",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 196,
+        "bounds": { "x": 323, "y": 481, "width": 22, "height": 10 },
+        "centroid": { "x": 333, "y": 485 },
+        "pixelCount": 205,
+        "label": "treehouse railing",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 197,
+        "bounds": { "x": 420, "y": 483, "width": 253, "height": 232 },
+        "centroid": { "x": 543, "y": 607 },
+        "pixelCount": 46861,
+        "label": "crayon face",
+        "objectGroup": "crayon character",
+        "palettes": {
+          "realistic": { "hex": "#FDD835", "colorName": "Sunshine Yellow" }
+        }
+      },
+      {
+        "id": 198,
+        "bounds": { "x": 802, "y": 482, "width": 36, "height": 22 },
+        "centroid": { "x": 819, "y": 493 },
+        "pixelCount": 549,
+        "label": "sky/jungle air",
+        "objectGroup": "background",
+        "palettes": { "realistic": { "hex": "#6C9948", "colorName": "Moss" } }
+      },
+      {
+        "id": 199,
+        "bounds": { "x": 111, "y": 487, "width": 31, "height": 11 },
+        "centroid": { "x": 126, "y": 492 },
+        "pixelCount": 336,
+        "label": "treehouse railing",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 200,
+        "bounds": { "x": 241, "y": 491, "width": 7, "height": 32 },
+        "centroid": { "x": 244, "y": 506 },
+        "pixelCount": 198,
+        "label": "treehouse railing",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 201,
+        "bounds": { "x": 863, "y": 492, "width": 74, "height": 76 },
+        "centroid": { "x": 905, "y": 538 },
+        "pixelCount": 3274,
+        "label": "flower petal",
+        "objectGroup": "flower",
+        "palettes": { "realistic": { "hex": "#EC7A9D", "colorName": "Rose" } }
+      },
+      {
+        "id": 202,
+        "bounds": { "x": 54, "y": 500, "width": 8, "height": 25 },
+        "centroid": { "x": 58, "y": 512 },
+        "pixelCount": 167,
+        "label": "treehouse railing",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 203,
+        "bounds": { "x": 78, "y": 499, "width": 11, "height": 26 },
+        "centroid": { "x": 83, "y": 511 },
+        "pixelCount": 266,
+        "label": "treehouse railing",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 204,
+        "bounds": { "x": 114, "y": 500, "width": 30, "height": 13 },
+        "centroid": { "x": 129, "y": 506 },
+        "pixelCount": 390,
+        "label": "treehouse railing",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 205,
+        "bounds": { "x": 163, "y": 498, "width": 23, "height": 27 },
+        "centroid": { "x": 174, "y": 511 },
+        "pixelCount": 607,
+        "label": "treehouse railing",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 206,
+        "bounds": { "x": 188, "y": 498, "width": 20, "height": 27 },
+        "centroid": { "x": 197, "y": 511 },
+        "pixelCount": 532,
+        "label": "vine",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 207,
+        "bounds": { "x": 210, "y": 496, "width": 10, "height": 28 },
+        "centroid": { "x": 215, "y": 510 },
+        "pixelCount": 272,
+        "label": "treehouse railing",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 208,
+        "bounds": { "x": 226, "y": 500, "width": 12, "height": 27 },
+        "centroid": { "x": 231, "y": 512 },
+        "pixelCount": 303,
+        "label": "treehouse railing",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 209,
+        "bounds": { "x": 363, "y": 498, "width": 16, "height": 25 },
+        "centroid": { "x": 370, "y": 510 },
+        "pixelCount": 350,
+        "label": "treehouse railing",
+        "objectGroup": "treehouse",
+        "palettes": {
+          "realistic": { "hex": "#49ACD9", "colorName": "Turquoise" }
+        }
+      },
+      {
+        "id": 210,
+        "bounds": { "x": 65, "y": 504, "width": 11, "height": 20 },
+        "centroid": { "x": 70, "y": 513 },
+        "pixelCount": 213,
+        "label": "treehouse railing",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 211,
+        "bounds": { "x": 91, "y": 501, "width": 14, "height": 28 },
+        "centroid": { "x": 97, "y": 515 },
+        "pixelCount": 371,
+        "label": "treehouse railing",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 212,
+        "bounds": { "x": 146, "y": 501, "width": 15, "height": 26 },
+        "centroid": { "x": 153, "y": 513 },
+        "pixelCount": 350,
+        "label": "treehouse railing",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 213,
+        "bounds": { "x": 279, "y": 503, "width": 69, "height": 67 },
+        "centroid": { "x": 311, "y": 537 },
+        "pixelCount": 3321,
+        "label": "crayon hand",
+        "objectGroup": "crayon character",
+        "palettes": {
+          "realistic": { "hex": "#FDD835", "colorName": "Sunshine Yellow" }
+        }
+      },
+      {
+        "id": 214,
+        "bounds": { "x": 381, "y": 501, "width": 13, "height": 24 },
+        "centroid": { "x": 387, "y": 512 },
+        "pixelCount": 284,
+        "label": "treehouse railing",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 215,
+        "bounds": { "x": 979, "y": 501, "width": 30, "height": 72 },
+        "centroid": { "x": 995, "y": 535 },
+        "pixelCount": 771,
+        "label": "treehouse floor",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 216,
+        "bounds": { "x": 44, "y": 506, "width": 9, "height": 20 },
+        "centroid": { "x": 48, "y": 516 },
+        "pixelCount": 141,
+        "label": "treehouse railing",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 217,
+        "bounds": { "x": 114, "y": 515, "width": 30, "height": 10 },
+        "centroid": { "x": 129, "y": 520 },
+        "pixelCount": 291,
+        "label": "treehouse railing",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 218,
+        "bounds": { "x": 770, "y": 513, "width": 22, "height": 33 },
+        "centroid": { "x": 779, "y": 528 },
+        "pixelCount": 490,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 219,
+        "bounds": { "x": 161, "y": 525, "width": 103, "height": 15 },
+        "centroid": { "x": 209, "y": 532 },
+        "pixelCount": 987,
+        "label": "treehouse floor",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 220,
+        "bounds": { "x": 365, "y": 525, "width": 14, "height": 8 },
+        "centroid": { "x": 371, "y": 529 },
+        "pixelCount": 107,
+        "label": "treehouse railing",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 221,
+        "bounds": { "x": 891, "y": 522, "width": 16, "height": 16 },
+        "centroid": { "x": 899, "y": 529 },
+        "pixelCount": 204,
+        "label": "treehouse floor",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 222,
+        "bounds": { "x": 32, "y": 527, "width": 10, "height": 15 },
+        "centroid": { "x": 37, "y": 535 },
+        "pixelCount": 117,
+        "label": "vine",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 223,
+        "bounds": { "x": 44, "y": 527, "width": 45, "height": 15 },
+        "centroid": { "x": 64, "y": 534 },
+        "pixelCount": 497,
+        "label": "sky/jungle air",
+        "objectGroup": "background",
+        "palettes": { "realistic": { "hex": "#846039", "colorName": "Dark" } }
+      },
+      {
+        "id": 224,
+        "bounds": { "x": 108, "y": 527, "width": 37, "height": 14 },
+        "centroid": { "x": 126, "y": 534 },
+        "pixelCount": 439,
+        "label": "treehouse support",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 225,
+        "bounds": { "x": 980, "y": 529, "width": 14, "height": 23 },
+        "centroid": { "x": 986, "y": 540 },
+        "pixelCount": 161,
+        "label": "vine",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 226,
+        "bounds": { "x": 363, "y": 535, "width": 33, "height": 13 },
+        "centroid": { "x": 379, "y": 541 },
+        "pixelCount": 419,
+        "label": "treehouse railing",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 227,
+        "bounds": { "x": 217, "y": 539, "width": 33, "height": 12 },
+        "centroid": { "x": 233, "y": 545 },
+        "pixelCount": 338,
+        "label": "ladder rung",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 228,
+        "bounds": { "x": 30, "y": 544, "width": 32, "height": 29 },
+        "centroid": { "x": 46, "y": 558 },
+        "pixelCount": 683,
+        "label": "treehouse support",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 229,
+        "bounds": { "x": 55, "y": 543, "width": 35, "height": 55 },
+        "centroid": { "x": 72, "y": 568 },
+        "pixelCount": 1035,
+        "label": "vine",
+        "objectGroup": "jungle foliage",
+        "palettes": {
+          "realistic": { "hex": "#46ADD9", "colorName": "Turquoise" }
+        }
+      },
+      {
+        "id": 230,
+        "bounds": { "x": 73, "y": 542, "width": 129, "height": 13 },
+        "centroid": { "x": 138, "y": 547 },
+        "pixelCount": 1508,
+        "label": "treehouse support",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 231,
+        "bounds": { "x": 3, "y": 550, "width": 21, "height": 49 },
+        "centroid": { "x": 12, "y": 576 },
+        "pixelCount": 680,
+        "label": "sky/jungle air",
+        "objectGroup": "background",
+        "palettes": { "realistic": { "hex": "#317843", "colorName": "Forest" } }
+      },
+      {
+        "id": 232,
+        "bounds": { "x": 353, "y": 550, "width": 22, "height": 27 },
+        "centroid": { "x": 363, "y": 562 },
+        "pixelCount": 377,
+        "label": "treehouse floor",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 233,
+        "bounds": { "x": 364, "y": 550, "width": 29, "height": 39 },
+        "centroid": { "x": 377, "y": 568 },
+        "pixelCount": 525,
+        "label": "treehouse railing",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 234,
+        "bounds": { "x": 941, "y": 549, "width": 43, "height": 35 },
+        "centroid": { "x": 960, "y": 566 },
+        "pixelCount": 978,
+        "label": "flower petal",
+        "objectGroup": "flower",
+        "palettes": { "realistic": { "hex": "#689544", "colorName": "Moss" } }
+      },
+      {
+        "id": 235,
+        "bounds": { "x": 181, "y": 554, "width": 22, "height": 25 },
+        "centroid": { "x": 192, "y": 566 },
+        "pixelCount": 270,
+        "label": "ladder rope",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 236,
+        "bounds": { "x": 213, "y": 552, "width": 39, "height": 21 },
+        "centroid": { "x": 232, "y": 562 },
+        "pixelCount": 745,
+        "label": "ladder rope",
+        "objectGroup": "treehouse",
+        "palettes": {
+          "realistic": { "hex": "#46ACDA", "colorName": "Turquoise" }
+        }
+      },
+      {
+        "id": 237,
+        "bounds": { "x": 263, "y": 552, "width": 202, "height": 343 },
+        "centroid": { "x": 349, "y": 720 },
+        "pixelCount": 26529,
+        "label": "sky/jungle air",
+        "objectGroup": "background",
+        "palettes": {
+          "realistic": { "hex": "#40ADDD", "colorName": "Turquoise" }
+        }
+      },
+      {
+        "id": 238,
+        "bounds": { "x": 80, "y": 556, "width": 24, "height": 52 },
+        "centroid": { "x": 93, "y": 582 },
+        "pixelCount": 848,
+        "label": "tree trunk",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 239,
+        "bounds": { "x": 87, "y": 556, "width": 101, "height": 112 },
+        "centroid": { "x": 126, "y": 602 },
+        "pixelCount": 4521,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 240,
+        "bounds": { "x": 136, "y": 558, "width": 22, "height": 25 },
+        "centroid": { "x": 145, "y": 568 },
+        "pixelCount": 384,
+        "label": "vine",
+        "objectGroup": "jungle foliage",
+        "palettes": {
+          "realistic": { "hex": "#47ABD9", "colorName": "Turquoise" }
+        }
+      },
+      {
+        "id": 241,
+        "bounds": { "x": 908, "y": 565, "width": 11, "height": 27 },
+        "centroid": { "x": 914, "y": 577 },
+        "pixelCount": 228,
+        "label": "flower petal",
+        "objectGroup": "flower",
+        "palettes": {
+          "realistic": { "hex": "#43ADDC", "colorName": "Turquoise" }
+        }
+      },
+      {
+        "id": 242,
+        "bounds": { "x": 437, "y": 568, "width": 40, "height": 40 },
+        "centroid": { "x": 457, "y": 588 },
+        "pixelCount": 1341,
+        "label": "crayon cheek",
+        "objectGroup": "crayon character",
+        "palettes": {
+          "realistic": { "hex": "#F1677C", "colorName": "Bubblegum Pink" }
+        }
+      },
+      {
+        "id": 243,
+        "bounds": { "x": 613, "y": 568, "width": 39, "height": 40 },
+        "centroid": { "x": 632, "y": 588 },
+        "pixelCount": 1290,
+        "label": "crayon cheek",
+        "objectGroup": "crayon character",
+        "palettes": {
+          "realistic": { "hex": "#F1677C", "colorName": "Bubblegum Pink" }
+        }
+      },
+      {
+        "id": 244,
+        "bounds": { "x": 38, "y": 574, "width": 37, "height": 64 },
+        "centroid": { "x": 59, "y": 601 },
+        "pixelCount": 876,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 245,
+        "bounds": { "x": 215, "y": 575, "width": 40, "height": 10 },
+        "centroid": { "x": 234, "y": 579 },
+        "pixelCount": 364,
+        "label": "ladder rung",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 246,
+        "bounds": { "x": 150, "y": 577, "width": 47, "height": 36 },
+        "centroid": { "x": 173, "y": 594 },
+        "pixelCount": 557,
+        "label": "tree trunk",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 247,
+        "bounds": { "x": 520, "y": 580, "width": 53, "height": 25 },
+        "centroid": { "x": 546, "y": 594 },
+        "pixelCount": 658,
+        "label": "crayon mouth",
+        "objectGroup": "crayon character",
+        "palettes": {
+          "realistic": { "hex": "#97443B", "colorName": "Crimson" }
+        }
+      },
+      {
+        "id": 248,
+        "bounds": { "x": 331, "y": 583, "width": 73, "height": 53 },
+        "centroid": { "x": 366, "y": 613 },
+        "pixelCount": 834,
+        "label": "crayon arm",
+        "objectGroup": "crayon character",
+        "palettes": {
+          "realistic": { "hex": "#FDD835", "colorName": "Sunshine Yellow" }
+        }
+      },
+      {
+        "id": 249,
+        "bounds": { "x": 847, "y": 582, "width": 87, "height": 140 },
+        "centroid": { "x": 885, "y": 650 },
+        "pixelCount": 6922,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 250,
+        "bounds": { "x": 0, "y": 586, "width": 47, "height": 145 },
+        "centroid": { "x": 11, "y": 655 },
+        "pixelCount": 3837,
+        "label": "sky/jungle air",
+        "objectGroup": "background",
+        "palettes": { "realistic": { "hex": "#12683A", "colorName": "Forest" } }
+      },
+      {
+        "id": 251,
+        "bounds": { "x": 113, "y": 588, "width": 92, "height": 206 },
+        "centroid": { "x": 175, "y": 674 },
+        "pixelCount": 7748,
+        "label": "ladder rung",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 252,
+        "bounds": { "x": 214, "y": 587, "width": 40, "height": 30 },
+        "centroid": { "x": 233, "y": 601 },
+        "pixelCount": 1147,
+        "label": "ladder rope",
+        "objectGroup": "treehouse",
+        "palettes": {
+          "realistic": { "hex": "#44ADDC", "colorName": "Turquoise" }
+        }
+      },
+      {
+        "id": 253,
+        "bounds": { "x": 72, "y": 600, "width": 20, "height": 65 },
+        "centroid": { "x": 82, "y": 625 },
+        "pixelCount": 710,
+        "label": "tree trunk",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 254,
+        "bounds": { "x": 925, "y": 601, "width": 29, "height": 33 },
+        "centroid": { "x": 936, "y": 614 },
+        "pixelCount": 415,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 255,
+        "bounds": { "x": 689, "y": 615, "width": 51, "height": 53 },
+        "centroid": { "x": 714, "y": 639 },
+        "pixelCount": 696,
+        "label": "crayon arm",
+        "objectGroup": "crayon character",
+        "palettes": {
+          "realistic": { "hex": "#FDD835", "colorName": "Sunshine Yellow" }
+        }
+      },
+      {
+        "id": 256,
+        "bounds": { "x": 215, "y": 619, "width": 40, "height": 11 },
+        "centroid": { "x": 234, "y": 623 },
+        "pixelCount": 391,
+        "label": "ladder rope",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 257,
+        "bounds": { "x": 14, "y": 623, "width": 35, "height": 41 },
+        "centroid": { "x": 30, "y": 643 },
+        "pixelCount": 971,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 258,
+        "bounds": { "x": 940, "y": 624, "width": 46, "height": 16 },
+        "centroid": { "x": 962, "y": 631 },
+        "pixelCount": 509,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 259,
+        "bounds": { "x": 56, "y": 634, "width": 22, "height": 42 },
+        "centroid": { "x": 66, "y": 657 },
+        "pixelCount": 605,
+        "label": "sky/jungle air",
+        "objectGroup": "background",
+        "palettes": { "realistic": { "hex": "#3D8346", "colorName": "Forest" } }
+      },
+      {
+        "id": 260,
+        "bounds": { "x": 214, "y": 631, "width": 40, "height": 30 },
+        "centroid": { "x": 234, "y": 646 },
+        "pixelCount": 1168,
+        "label": "ladder rope",
+        "objectGroup": "treehouse",
+        "palettes": {
+          "realistic": { "hex": "#44ACDA", "colorName": "Turquoise" }
+        }
+      },
+      {
+        "id": 261,
+        "bounds": { "x": 99, "y": 641, "width": 42, "height": 28 },
+        "centroid": { "x": 120, "y": 654 },
+        "pixelCount": 700,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 262,
+        "bounds": { "x": 910, "y": 655, "width": 75, "height": 140 },
+        "centroid": { "x": 947, "y": 720 },
+        "pixelCount": 6290,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 263,
+        "bounds": { "x": 118, "y": 664, "width": 39, "height": 21 },
+        "centroid": { "x": 138, "y": 673 },
+        "pixelCount": 498,
+        "label": "ladder rung",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 264,
+        "bounds": { "x": 215, "y": 663, "width": 40, "height": 11 },
+        "centroid": { "x": 234, "y": 668 },
+        "pixelCount": 392,
+        "label": "ladder rope",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 265,
+        "bounds": { "x": 40, "y": 671, "width": 24, "height": 61 },
+        "centroid": { "x": 49, "y": 698 },
+        "pixelCount": 625,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 266,
+        "bounds": { "x": 65, "y": 671, "width": 68, "height": 32 },
+        "centroid": { "x": 101, "y": 686 },
+        "pixelCount": 1582,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 267,
+        "bounds": { "x": 214, "y": 676, "width": 41, "height": 30 },
+        "centroid": { "x": 234, "y": 690 },
+        "pixelCount": 1186,
+        "label": "ladder rope",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 268,
+        "bounds": { "x": 730, "y": 679, "width": 55, "height": 59 },
+        "centroid": { "x": 758, "y": 708 },
+        "pixelCount": 2410,
+        "label": "crayon hand",
+        "objectGroup": "crayon character",
+        "palettes": {
+          "realistic": { "hex": "#FDD835", "colorName": "Sunshine Yellow" }
+        }
+      },
+      {
+        "id": 269,
+        "bounds": { "x": 47, "y": 691, "width": 40, "height": 82 },
+        "centroid": { "x": 63, "y": 726 },
+        "pixelCount": 1869,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 270,
+        "bounds": { "x": 74, "y": 703, "width": 22, "height": 45 },
+        "centroid": { "x": 85, "y": 725 },
+        "pixelCount": 546,
+        "label": "sky/jungle air",
+        "objectGroup": "background",
+        "palettes": { "realistic": { "hex": "#73522D", "colorName": "Dark" } }
+      },
+      {
+        "id": 271,
+        "bounds": { "x": 10, "y": 705, "width": 170, "height": 254 },
+        "centroid": { "x": 90, "y": 820 },
+        "pixelCount": 18866,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 272,
+        "bounds": { "x": 94, "y": 706, "width": 17, "height": 26 },
+        "centroid": { "x": 103, "y": 718 },
+        "pixelCount": 322,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 273,
+        "bounds": { "x": 214, "y": 708, "width": 41, "height": 11 },
+        "centroid": { "x": 233, "y": 713 },
+        "pixelCount": 409,
+        "label": "ladder rung",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 274,
+        "bounds": { "x": 820, "y": 710, "width": 102, "height": 163 },
+        "centroid": { "x": 874, "y": 781 },
+        "pixelCount": 8648,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 275,
+        "bounds": { "x": 261, "y": 714, "width": 110, "height": 158 },
+        "centroid": { "x": 311, "y": 795 },
+        "pixelCount": 8321,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 276,
+        "bounds": { "x": 0, "y": 716, "width": 802, "height": 308 },
+        "centroid": { "x": 363, "y": 949 },
+        "pixelCount": 83220,
+        "label": "ground",
+        "objectGroup": "ground",
+        "palettes": { "realistic": { "hex": "#D4A06F", "colorName": "Medium" } }
+      },
+      {
+        "id": 277,
+        "bounds": { "x": 214, "y": 720, "width": 42, "height": 32 },
+        "centroid": { "x": 234, "y": 735 },
+        "pixelCount": 1252,
+        "label": "ladder rope",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 278,
+        "bounds": { "x": 420, "y": 716, "width": 252, "height": 39 },
+        "centroid": { "x": 546, "y": 735 },
+        "pixelCount": 7020,
+        "label": "crayon wrapper stripe",
+        "objectGroup": "crayon character",
+        "palettes": {
+          "realistic": { "hex": "#FDD835", "colorName": "Sunshine Yellow" }
+        }
+      },
+      {
+        "id": 279,
+        "bounds": { "x": 83, "y": 739, "width": 22, "height": 37 },
+        "centroid": { "x": 94, "y": 757 },
+        "pixelCount": 578,
+        "label": "sky/jungle air",
+        "objectGroup": "background",
+        "palettes": { "realistic": { "hex": "#75522C", "colorName": "Dark" } }
+      },
+      {
+        "id": 280,
+        "bounds": { "x": 921, "y": 743, "width": 103, "height": 103 },
+        "centroid": { "x": 974, "y": 789 },
+        "pixelCount": 5228,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 281,
+        "bounds": { "x": 215, "y": 754, "width": 42, "height": 11 },
+        "centroid": { "x": 235, "y": 759 },
+        "pixelCount": 434,
+        "label": "ladder rope",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 282,
+        "bounds": { "x": 422, "y": 760, "width": 248, "height": 53 },
+        "centroid": { "x": 546, "y": 788 },
+        "pixelCount": 9505,
+        "label": "crayon wrapper base",
+        "objectGroup": "crayon character",
+        "palettes": {
+          "realistic": { "hex": "#FDD835", "colorName": "Sunshine Yellow" }
+        }
+      },
+      {
+        "id": 283,
+        "bounds": { "x": 787, "y": 762, "width": 20, "height": 37 },
+        "centroid": { "x": 797, "y": 778 },
+        "pixelCount": 498,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 284,
+        "bounds": { "x": 111, "y": 767, "width": 82, "height": 98 },
+        "centroid": { "x": 161, "y": 813 },
+        "pixelCount": 2487,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 285,
+        "bounds": { "x": 214, "y": 767, "width": 42, "height": 64 },
+        "centroid": { "x": 237, "y": 789 },
+        "pixelCount": 1491,
+        "label": "ladder rung",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 286,
+        "bounds": { "x": 810, "y": 766, "width": 12, "height": 35 },
+        "centroid": { "x": 816, "y": 783 },
+        "pixelCount": 335,
+        "label": "sky/jungle air",
+        "objectGroup": "background",
+        "palettes": { "realistic": { "hex": "#79AD4C", "colorName": "Lime" } }
+      },
+      {
+        "id": 287,
+        "bounds": { "x": 821, "y": 773, "width": 42, "height": 41 },
+        "centroid": { "x": 837, "y": 795 },
+        "pixelCount": 814,
+        "label": "sky/jungle air",
+        "objectGroup": "background",
+        "palettes": { "realistic": { "hex": "#19693B", "colorName": "Forest" } }
+      },
+      {
+        "id": 288,
+        "bounds": { "x": 988, "y": 773, "width": 36, "height": 90 },
+        "centroid": { "x": 1013, "y": 818 },
+        "pixelCount": 1524,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 289,
+        "bounds": { "x": 195, "y": 779, "width": 25, "height": 64 },
+        "centroid": { "x": 207, "y": 810 },
+        "pixelCount": 1190,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 290,
+        "bounds": { "x": 760, "y": 776, "width": 40, "height": 29 },
+        "centroid": { "x": 779, "y": 789 },
+        "pixelCount": 652,
+        "label": "sky/jungle air",
+        "objectGroup": "background",
+        "palettes": {
+          "realistic": { "hex": "#63A449", "colorName": "Grass Green" }
+        }
+      },
+      {
+        "id": 291,
+        "bounds": { "x": 250, "y": 793, "width": 17, "height": 39 },
+        "centroid": { "x": 256, "y": 815 },
+        "pixelCount": 434,
+        "label": "ladder rope",
+        "objectGroup": "treehouse",
+        "palettes": { "realistic": { "hex": "#A2784C", "colorName": "Sienna" } }
+      },
+      {
+        "id": 292,
+        "bounds": { "x": 807, "y": 798, "width": 10, "height": 16 },
+        "centroid": { "x": 811, "y": 806 },
+        "pixelCount": 124,
+        "label": "sky/jungle air",
+        "objectGroup": "background",
+        "palettes": { "realistic": { "hex": "#1D643A", "colorName": "Forest" } }
+      },
+      {
+        "id": 293,
+        "bounds": { "x": 751, "y": 801, "width": 47, "height": 25 },
+        "centroid": { "x": 771, "y": 813 },
+        "pixelCount": 743,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 294,
+        "bounds": { "x": 215, "y": 806, "width": 24, "height": 29 },
+        "centroid": { "x": 228, "y": 821 },
+        "pixelCount": 386,
+        "label": "sky/jungle air",
+        "objectGroup": "background",
+        "palettes": {
+          "realistic": { "hex": "#40ADDD", "colorName": "Turquoise" }
+        }
+      },
+      {
+        "id": 295,
+        "bounds": { "x": 179, "y": 813, "width": 17, "height": 34 },
+        "centroid": { "x": 186, "y": 831 },
+        "pixelCount": 434,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 296,
+        "bounds": { "x": 722, "y": 813, "width": 178, "height": 104 },
+        "centroid": { "x": 803, "y": 860 },
+        "pixelCount": 7890,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 297,
+        "bounds": { "x": 315, "y": 819, "width": 76, "height": 82 },
+        "centroid": { "x": 356, "y": 858 },
+        "pixelCount": 3234,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 298,
+        "bounds": { "x": 483, "y": 830, "width": 9, "height": 27 },
+        "centroid": { "x": 487, "y": 843 },
+        "pixelCount": 222,
+        "label": "crayon leg",
+        "objectGroup": "crayon character",
+        "palettes": {
+          "realistic": { "hex": "#FDD835", "colorName": "Sunshine Yellow" }
+        }
+      },
+      {
+        "id": 299,
+        "bounds": { "x": 602, "y": 830, "width": 10, "height": 27 },
+        "centroid": { "x": 606, "y": 843 },
+        "pixelCount": 263,
+        "label": "crayon leg",
+        "objectGroup": "crayon character",
+        "palettes": {
+          "realistic": { "hex": "#FDD835", "colorName": "Sunshine Yellow" }
+        }
+      },
+      {
+        "id": 300,
+        "bounds": { "x": 906, "y": 827, "width": 107, "height": 76 },
+        "centroid": { "x": 957, "y": 857 },
+        "pixelCount": 4318,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 301,
+        "bounds": { "x": 508, "y": 832, "width": 77, "height": 54 },
+        "centroid": { "x": 546, "y": 858 },
+        "pixelCount": 3937,
+        "label": "ground",
+        "objectGroup": "ground",
+        "palettes": { "realistic": { "hex": "#0F683B", "colorName": "Forest" } }
+      },
+      {
+        "id": 302,
+        "bounds": { "x": 183, "y": 847, "width": 19, "height": 49 },
+        "centroid": { "x": 191, "y": 868 },
+        "pixelCount": 618,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 303,
+        "bounds": { "x": 69, "y": 856, "width": 76, "height": 118 },
+        "centroid": { "x": 96, "y": 908 },
+        "pixelCount": 3188,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 304,
+        "bounds": { "x": 287, "y": 857, "width": 17, "height": 19 },
+        "centroid": { "x": 296, "y": 865 },
+        "pixelCount": 205,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 305,
+        "bounds": { "x": 304, "y": 859, "width": 51, "height": 28 },
+        "centroid": { "x": 327, "y": 870 },
+        "pixelCount": 761,
+        "label": "sky/jungle air",
+        "objectGroup": "background",
+        "palettes": { "realistic": { "hex": "#3A8546", "colorName": "Forest" } }
+      },
+      {
+        "id": 306,
+        "bounds": { "x": 819, "y": 859, "width": 95, "height": 94 },
+        "centroid": { "x": 867, "y": 916 },
+        "pixelCount": 5388,
+        "label": "flower center",
+        "objectGroup": "flower",
+        "palettes": { "realistic": { "hex": "#EA7CA1", "colorName": "Rose" } }
+      },
+      {
+        "id": 307,
+        "bounds": { "x": 876, "y": 859, "width": 148, "height": 165 },
+        "centroid": { "x": 981, "y": 980 },
+        "pixelCount": 6850,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 308,
+        "bounds": { "x": 267, "y": 874, "width": 32, "height": 30 },
+        "centroid": { "x": 280, "y": 885 },
+        "pixelCount": 514,
+        "label": "sky/jungle air",
+        "objectGroup": "background",
+        "palettes": { "realistic": { "hex": "#3A8446", "colorName": "Forest" } }
+      },
+      {
+        "id": 309,
+        "bounds": { "x": 435, "y": 873, "width": 60, "height": 33 },
+        "centroid": { "x": 466, "y": 890 },
+        "pixelCount": 1670,
+        "label": "crayon foot",
+        "objectGroup": "crayon character",
+        "palettes": {
+          "realistic": { "hex": "#FDD835", "colorName": "Sunshine Yellow" }
+        }
+      },
+      {
+        "id": 310,
+        "bounds": { "x": 597, "y": 873, "width": 62, "height": 33 },
+        "centroid": { "x": 626, "y": 890 },
+        "pixelCount": 1741,
+        "label": "crayon foot",
+        "objectGroup": "crayon character",
+        "palettes": {
+          "realistic": { "hex": "#FDD835", "colorName": "Sunshine Yellow" }
+        }
+      },
+      {
+        "id": 311,
+        "bounds": { "x": 141, "y": 882, "width": 7, "height": 28 },
+        "centroid": { "x": 144, "y": 895 },
+        "pixelCount": 172,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 312,
+        "bounds": { "x": 902, "y": 884, "width": 108, "height": 73 },
+        "centroid": { "x": 953, "y": 913 },
+        "pixelCount": 3936,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 313,
+        "bounds": { "x": 270, "y": 889, "width": 30, "height": 33 },
+        "centroid": { "x": 284, "y": 904 },
+        "pixelCount": 536,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 314,
+        "bounds": { "x": 300, "y": 891, "width": 44, "height": 18 },
+        "centroid": { "x": 322, "y": 899 },
+        "pixelCount": 590,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 315,
+        "bounds": { "x": 691, "y": 898, "width": 135, "height": 85 },
+        "centroid": { "x": 762, "y": 942 },
+        "pixelCount": 5697,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 316,
+        "bounds": { "x": 856, "y": 897, "width": 17, "height": 17 },
+        "centroid": { "x": 864, "y": 905 },
+        "pixelCount": 240,
+        "label": "flower petal",
+        "objectGroup": "flower",
+        "palettes": {
+          "realistic": { "hex": "#43ADDC", "colorName": "Turquoise" }
+        }
+      },
+      {
+        "id": 317,
+        "bounds": { "x": 891, "y": 920, "width": 17, "height": 48 },
+        "centroid": { "x": 898, "y": 941 },
+        "pixelCount": 366,
+        "label": "flower petal",
+        "objectGroup": "flower",
+        "palettes": { "realistic": { "hex": "#22673B", "colorName": "Forest" } }
+      },
+      {
+        "id": 318,
+        "bounds": { "x": 46, "y": 929, "width": 23, "height": 51 },
+        "centroid": { "x": 56, "y": 954 },
+        "pixelCount": 634,
+        "label": "sky/jungle air",
+        "objectGroup": "background",
+        "palettes": { "realistic": { "hex": "#87B94C", "colorName": "Lime" } }
+      },
+      {
+        "id": 319,
+        "bounds": { "x": 244, "y": 932, "width": 81, "height": 39 },
+        "centroid": { "x": 286, "y": 950 },
+        "pixelCount": 1905,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 320,
+        "bounds": { "x": 889, "y": 939, "width": 128, "height": 59 },
+        "centroid": { "x": 957, "y": 961 },
+        "pixelCount": 3285,
+        "label": "flower petal",
+        "objectGroup": "flower",
+        "palettes": { "realistic": { "hex": "#338444", "colorName": "Forest" } }
+      },
+      {
+        "id": 321,
+        "bounds": { "x": 836, "y": 944, "width": 45, "height": 48 },
+        "centroid": { "x": 860, "y": 964 },
+        "pixelCount": 784,
+        "label": "flower petal",
+        "objectGroup": "flower",
+        "palettes": { "realistic": { "hex": "#1C693C", "colorName": "Forest" } }
+      },
+      {
+        "id": 322,
+        "bounds": { "x": 753, "y": 955, "width": 120, "height": 52 },
+        "centroid": { "x": 804, "y": 981 },
+        "pixelCount": 3543,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 323,
+        "bounds": { "x": 870, "y": 954, "width": 22, "height": 38 },
+        "centroid": { "x": 883, "y": 969 },
+        "pixelCount": 494,
+        "label": "flower petal",
+        "objectGroup": "flower",
+        "palettes": { "realistic": { "hex": "#1E6A3C", "colorName": "Forest" } }
+      },
+      {
+        "id": 324,
+        "bounds": { "x": 214, "y": 967, "width": 103, "height": 36 },
+        "centroid": { "x": 268, "y": 987 },
+        "pixelCount": 2408,
+        "label": "leaf",
+        "objectGroup": "jungle foliage",
+        "palettes": { "realistic": { "hex": "#348544", "colorName": "Forest" } }
+      },
+      {
+        "id": 325,
+        "bounds": { "x": 902, "y": 975, "width": 85, "height": 32 },
+        "centroid": { "x": 948, "y": 989 },
+        "pixelCount": 1666,
+        "label": "flower petal",
+        "objectGroup": "flower",
+        "palettes": { "realistic": { "hex": "#17673A", "colorName": "Forest" } }
+      },
+      {
+        "id": 326,
+        "bounds": { "x": 799, "y": 990, "width": 80, "height": 34 },
+        "centroid": { "x": 840, "y": 1009 },
+        "pixelCount": 2038,
+        "label": "sky/jungle air",
+        "objectGroup": "background",
+        "palettes": { "realistic": { "hex": "#338645", "colorName": "Forest" } }
+      }
+    ]
+  }
+}

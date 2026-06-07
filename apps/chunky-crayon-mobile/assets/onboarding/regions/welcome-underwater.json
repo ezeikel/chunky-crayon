@@ -1,0 +1,1285 @@
+{
+  "regionMapWidth": 1024,
+  "regionMapHeight": 1024,
+  "regionsJson": {
+    "sceneDescription": "A friendly underwater scene featuring a large anthropomorphic crayon, a treasure chest, two fish, seaweed, coral, rocks, and a 'WELCOME' banner.",
+    "sourceWidth": 1024,
+    "sourceHeight": 1024,
+    "regionPixelCount": 957858,
+    "regions": [
+      {
+        "id": 1,
+        "bounds": { "x": 0, "y": 0, "width": 1024, "height": 916 },
+        "centroid": { "x": 411, "y": 302 },
+        "pixelCount": 369319,
+        "label": "water",
+        "objectGroup": "water",
+        "palettes": {
+          "realistic": { "hex": "#62B0DB", "colorName": "Dusty Blue" }
+        }
+      },
+      {
+        "id": 2,
+        "bounds": { "x": 907, "y": 35, "width": 43, "height": 44 },
+        "centroid": { "x": 931, "y": 58 },
+        "pixelCount": 1129,
+        "label": "bubble",
+        "objectGroup": "bubbles",
+        "palettes": {
+          "realistic": { "hex": "#5EC1F2", "colorName": "Dusty Blue" }
+        }
+      },
+      {
+        "id": 3,
+        "bounds": { "x": 66, "y": 41, "width": 32, "height": 33 },
+        "centroid": { "x": 82, "y": 56 },
+        "pixelCount": 781,
+        "label": "bubble",
+        "objectGroup": "bubbles",
+        "palettes": {
+          "realistic": { "hex": "#5EC1F2", "colorName": "Dusty Blue" }
+        }
+      },
+      {
+        "id": 4,
+        "bounds": { "x": 179, "y": 42, "width": 670, "height": 179 },
+        "centroid": { "x": 512, "y": 120 },
+        "pixelCount": 50658,
+        "label": "letter C",
+        "objectGroup": "welcome text",
+        "palettes": { "realistic": { "hex": "#F9E7B8", "colorName": "Light" } }
+      },
+      {
+        "id": 5,
+        "bounds": { "x": 913, "y": 45, "width": 14, "height": 15 },
+        "centroid": { "x": 920, "y": 52 },
+        "pixelCount": 178,
+        "label": "bubble",
+        "objectGroup": "bubbles",
+        "palettes": {
+          "realistic": { "hex": "#5EC1F2", "colorName": "Dusty Blue" }
+        }
+      },
+      {
+        "id": 6,
+        "bounds": { "x": 142, "y": 54, "width": 17, "height": 18 },
+        "centroid": { "x": 150, "y": 62 },
+        "pixelCount": 260,
+        "label": "bubble",
+        "objectGroup": "bubbles",
+        "palettes": {
+          "realistic": { "hex": "#5EC1F2", "colorName": "Dusty Blue" }
+        }
+      },
+      {
+        "id": 7,
+        "bounds": { "x": 424, "y": 65, "width": 56, "height": 87 },
+        "centroid": { "x": 443, "y": 117 },
+        "pixelCount": 2354,
+        "label": "letter L",
+        "objectGroup": "welcome text",
+        "palettes": {
+          "realistic": { "hex": "#4984BC", "colorName": "Sky Blue" }
+        }
+      },
+      {
+        "id": 8,
+        "bounds": { "x": 487, "y": 63, "width": 63, "height": 88 },
+        "centroid": { "x": 507, "y": 103 },
+        "pixelCount": 3024,
+        "label": "bubble",
+        "objectGroup": "bubbles",
+        "palettes": {
+          "realistic": { "hex": "#5EC1F2", "colorName": "Dusty Blue" }
+        }
+      },
+      {
+        "id": 9,
+        "bounds": { "x": 353, "y": 68, "width": 60, "height": 90 },
+        "centroid": { "x": 378, "y": 113 },
+        "pixelCount": 3492,
+        "label": "letter E",
+        "objectGroup": "welcome text",
+        "palettes": {
+          "realistic": { "hex": "#4883BA", "colorName": "Sky Blue" }
+        }
+      },
+      {
+        "id": 10,
+        "bounds": { "x": 561, "y": 70, "width": 73, "height": 85 },
+        "centroid": { "x": 580, "y": 107 },
+        "pixelCount": 3737,
+        "label": "letter O",
+        "objectGroup": "welcome text",
+        "palettes": {
+          "realistic": { "hex": "#4883BB", "colorName": "Sky Blue" }
+        }
+      },
+      {
+        "id": 11,
+        "bounds": { "x": 232, "y": 77, "width": 105, "height": 99 },
+        "centroid": { "x": 290, "y": 127 },
+        "pixelCount": 5914,
+        "label": "letter W",
+        "objectGroup": "welcome text",
+        "palettes": {
+          "realistic": { "hex": "#4884BD", "colorName": "Sky Blue" }
+        }
+      },
+      {
+        "id": 12,
+        "bounds": { "x": 642, "y": 78, "width": 84, "height": 93 },
+        "centroid": { "x": 687, "y": 122 },
+        "pixelCount": 4808,
+        "label": "letter M",
+        "objectGroup": "welcome text",
+        "palettes": {
+          "realistic": { "hex": "#4784BE", "colorName": "Sky Blue" }
+        }
+      },
+      {
+        "id": 13,
+        "bounds": { "x": 74, "y": 93, "width": 38, "height": 38 },
+        "centroid": { "x": 90, "y": 113 },
+        "pixelCount": 877,
+        "label": "bubble",
+        "objectGroup": "bubbles",
+        "palettes": {
+          "realistic": { "hex": "#5EC1F2", "colorName": "Dusty Blue" }
+        }
+      },
+      {
+        "id": 14,
+        "bounds": { "x": 583, "y": 93, "width": 30, "height": 39 },
+        "centroid": { "x": 597, "y": 112 },
+        "pixelCount": 968,
+        "label": "letter O inner",
+        "objectGroup": "welcome text",
+        "palettes": { "realistic": { "hex": "#F9E7B8", "colorName": "Light" } }
+      },
+      {
+        "id": 15,
+        "bounds": { "x": 739, "y": 92, "width": 65, "height": 92 },
+        "centroid": { "x": 767, "y": 137 },
+        "pixelCount": 3499,
+        "label": "letter E",
+        "objectGroup": "welcome text",
+        "palettes": {
+          "realistic": { "hex": "#4883BC", "colorName": "Sky Blue" }
+        }
+      },
+      {
+        "id": 16,
+        "bounds": { "x": 95, "y": 101, "width": 10, "height": 12 },
+        "centroid": { "x": 99, "y": 107 },
+        "pixelCount": 101,
+        "label": "bubble",
+        "objectGroup": "bubbles",
+        "palettes": {
+          "realistic": { "hex": "#5EC1F2", "colorName": "Dusty Blue" }
+        }
+      },
+      {
+        "id": 17,
+        "bounds": { "x": 897, "y": 101, "width": 14, "height": 13 },
+        "centroid": { "x": 903, "y": 107 },
+        "pixelCount": 158,
+        "label": "bubble",
+        "objectGroup": "bubbles",
+        "palettes": {
+          "realistic": { "hex": "#5EC1F2", "colorName": "Dusty Blue" }
+        }
+      },
+      {
+        "id": 18,
+        "bounds": { "x": 941, "y": 121, "width": 21, "height": 21 },
+        "centroid": { "x": 952, "y": 130 },
+        "pixelCount": 314,
+        "label": "bubble",
+        "objectGroup": "bubbles",
+        "palettes": {
+          "realistic": { "hex": "#5EC1F2", "colorName": "Dusty Blue" }
+        }
+      },
+      {
+        "id": 19,
+        "bounds": { "x": 83, "y": 131, "width": 185, "height": 141 },
+        "centroid": { "x": 157, "y": 197 },
+        "pixelCount": 10276,
+        "label": "banner ribbon left",
+        "objectGroup": "welcome banner",
+        "palettes": {
+          "realistic": { "hex": "#F3CE82", "colorName": "Skin Tone" }
+        }
+      },
+      {
+        "id": 20,
+        "bounds": { "x": 764, "y": 137, "width": 178, "height": 135 },
+        "centroid": { "x": 871, "y": 201 },
+        "pixelCount": 9447,
+        "label": "banner ribbon right",
+        "objectGroup": "welcome banner",
+        "palettes": {
+          "realistic": { "hex": "#F3CE82", "colorName": "Skin Tone" }
+        }
+      },
+      {
+        "id": 21,
+        "bounds": { "x": 223, "y": 187, "width": 530, "height": 674 },
+        "centroid": { "x": 463, "y": 645 },
+        "pixelCount": 51638,
+        "label": "crayon body",
+        "objectGroup": "crayon character",
+        "palettes": { "realistic": { "hex": "#ECC339", "colorName": "Gold" } }
+      },
+      {
+        "id": 22,
+        "bounds": { "x": 212, "y": 201, "width": 58, "height": 26 },
+        "centroid": { "x": 246, "y": 215 },
+        "pixelCount": 908,
+        "label": "banner ribbon main",
+        "objectGroup": "welcome banner",
+        "palettes": {
+          "realistic": { "hex": "#F3CE82", "colorName": "Skin Tone" }
+        }
+      },
+      {
+        "id": 23,
+        "bounds": { "x": 427, "y": 202, "width": 141, "height": 114 },
+        "centroid": { "x": 497, "y": 272 },
+        "pixelCount": 9368,
+        "label": "crayon tip",
+        "objectGroup": "crayon character",
+        "palettes": { "realistic": { "hex": "#ECC339", "colorName": "Gold" } }
+      },
+      {
+        "id": 24,
+        "bounds": { "x": 762, "y": 206, "width": 56, "height": 22 },
+        "centroid": { "x": 783, "y": 218 },
+        "pixelCount": 722,
+        "label": "banner ribbon right fold",
+        "objectGroup": "welcome banner",
+        "palettes": {
+          "realistic": { "hex": "#F3CE82", "colorName": "Skin Tone" }
+        }
+      },
+      {
+        "id": 25,
+        "bounds": { "x": 57, "y": 218, "width": 22, "height": 24 },
+        "centroid": { "x": 66, "y": 228 },
+        "pixelCount": 387,
+        "label": "bubble",
+        "objectGroup": "bubbles",
+        "palettes": {
+          "realistic": { "hex": "#5EC1F2", "colorName": "Dusty Blue" }
+        }
+      },
+      {
+        "id": 26,
+        "bounds": { "x": 318, "y": 220, "width": 29, "height": 29 },
+        "centroid": { "x": 333, "y": 233 },
+        "pixelCount": 637,
+        "label": "bubble",
+        "objectGroup": "bubbles",
+        "palettes": {
+          "realistic": { "hex": "#5EC1F2", "colorName": "Dusty Blue" }
+        }
+      },
+      {
+        "id": 27,
+        "bounds": { "x": 641, "y": 219, "width": 26, "height": 29 },
+        "centroid": { "x": 655, "y": 234 },
+        "pixelCount": 499,
+        "label": "bubble",
+        "objectGroup": "bubbles",
+        "palettes": {
+          "realistic": { "hex": "#5EC1F2", "colorName": "Dusty Blue" }
+        }
+      },
+      {
+        "id": 28,
+        "bounds": { "x": 282, "y": 270, "width": 20, "height": 20 },
+        "centroid": { "x": 291, "y": 279 },
+        "pixelCount": 346,
+        "label": "bubble",
+        "objectGroup": "bubbles",
+        "palettes": {
+          "realistic": { "hex": "#5EC1F2", "colorName": "Dusty Blue" }
+        }
+      },
+      {
+        "id": 29,
+        "bounds": { "x": 325, "y": 284, "width": 23, "height": 24 },
+        "centroid": { "x": 336, "y": 295 },
+        "pixelCount": 414,
+        "label": "bubble",
+        "objectGroup": "bubbles",
+        "palettes": {
+          "realistic": { "hex": "#5EC1F2", "colorName": "Dusty Blue" }
+        }
+      },
+      {
+        "id": 30,
+        "bounds": { "x": 837, "y": 281, "width": 12, "height": 12 },
+        "centroid": { "x": 842, "y": 287 },
+        "pixelCount": 127,
+        "label": "bubble",
+        "objectGroup": "bubbles",
+        "palettes": {
+          "realistic": { "hex": "#5EC1F2", "colorName": "Dusty Blue" }
+        }
+      },
+      {
+        "id": 31,
+        "bounds": { "x": 740, "y": 289, "width": 29, "height": 28 },
+        "centroid": { "x": 755, "y": 301 },
+        "pixelCount": 617,
+        "label": "bubble",
+        "objectGroup": "bubbles",
+        "palettes": {
+          "realistic": { "hex": "#5EC1F2", "colorName": "Dusty Blue" }
+        }
+      },
+      {
+        "id": 32,
+        "bounds": { "x": 849, "y": 286, "width": 70, "height": 364 },
+        "centroid": { "x": 885, "y": 489 },
+        "pixelCount": 12966,
+        "label": "seaweed stalk",
+        "objectGroup": "seaweed",
+        "palettes": { "realistic": { "hex": "#94BE56", "colorName": "Lime" } }
+      },
+      {
+        "id": 33,
+        "bounds": { "x": 115, "y": 292, "width": 43, "height": 25 },
+        "centroid": { "x": 133, "y": 302 },
+        "pixelCount": 540,
+        "label": "fish tail",
+        "objectGroup": "left fish",
+        "palettes": {
+          "realistic": { "hex": "#F18C2E", "colorName": "Sunset Orange" }
+        }
+      },
+      {
+        "id": 34,
+        "bounds": { "x": 140, "y": 305, "width": 18, "height": 56 },
+        "centroid": { "x": 147, "y": 334 },
+        "pixelCount": 656,
+        "label": "fish stripe",
+        "objectGroup": "left fish",
+        "palettes": {
+          "realistic": { "hex": "#F18C2E", "colorName": "Sunset Orange" }
+        }
+      },
+      {
+        "id": 35,
+        "bounds": { "x": 154, "y": 305, "width": 56, "height": 70 },
+        "centroid": { "x": 175, "y": 341 },
+        "pixelCount": 2546,
+        "label": "fish head",
+        "objectGroup": "left fish",
+        "palettes": {
+          "realistic": { "hex": "#F18C2E", "colorName": "Sunset Orange" }
+        }
+      },
+      {
+        "id": 36,
+        "bounds": { "x": 125, "y": 311, "width": 17, "height": 57 },
+        "centroid": { "x": 133, "y": 339 },
+        "pixelCount": 627,
+        "label": "fish body",
+        "objectGroup": "left fish",
+        "palettes": {
+          "realistic": { "hex": "#F18C2E", "colorName": "Sunset Orange" }
+        }
+      },
+      {
+        "id": 37,
+        "bounds": { "x": 924, "y": 313, "width": 74, "height": 376 },
+        "centroid": { "x": 962, "y": 527 },
+        "pixelCount": 15300,
+        "label": "seaweed stalk",
+        "objectGroup": "seaweed",
+        "palettes": { "realistic": { "hex": "#94BE56", "colorName": "Lime" } }
+      },
+      {
+        "id": 38,
+        "bounds": { "x": 111, "y": 325, "width": 16, "height": 41 },
+        "centroid": { "x": 118, "y": 346 },
+        "pixelCount": 415,
+        "label": "fish stripe",
+        "objectGroup": "left fish",
+        "palettes": {
+          "realistic": { "hex": "#F18C2E", "colorName": "Sunset Orange" }
+        }
+      },
+      {
+        "id": 39,
+        "bounds": { "x": 679, "y": 322, "width": 28, "height": 26 },
+        "centroid": { "x": 693, "y": 335 },
+        "pixelCount": 616,
+        "label": "bubble",
+        "objectGroup": "bubbles",
+        "palettes": {
+          "realistic": { "hex": "#5EC1F2", "colorName": "Dusty Blue" }
+        }
+      },
+      {
+        "id": 40,
+        "bounds": { "x": 87, "y": 327, "width": 24, "height": 48 },
+        "centroid": { "x": 97, "y": 351 },
+        "pixelCount": 715,
+        "label": "fish fin",
+        "objectGroup": "left fish",
+        "palettes": {
+          "realistic": { "hex": "#F18C2E", "colorName": "Sunset Orange" }
+        }
+      },
+      {
+        "id": 41,
+        "bounds": { "x": 379, "y": 333, "width": 239, "height": 51 },
+        "centroid": { "x": 498, "y": 355 },
+        "pixelCount": 8939,
+        "label": "crayon stripe",
+        "objectGroup": "crayon character",
+        "palettes": { "realistic": { "hex": "#ECC339", "colorName": "Gold" } }
+      },
+      {
+        "id": 42,
+        "bounds": { "x": 282, "y": 344, "width": 19, "height": 20 },
+        "centroid": { "x": 291, "y": 353 },
+        "pixelCount": 282,
+        "label": "bubble",
+        "objectGroup": "bubbles",
+        "palettes": {
+          "realistic": { "hex": "#5EC1F2", "colorName": "Dusty Blue" }
+        }
+      },
+      {
+        "id": 43,
+        "bounds": { "x": 781, "y": 350, "width": 78, "height": 334 },
+        "centroid": { "x": 819, "y": 526 },
+        "pixelCount": 10246,
+        "label": "coral branch",
+        "objectGroup": "coral",
+        "palettes": { "realistic": { "hex": "#EE8199", "colorName": "Rose" } }
+      },
+      {
+        "id": 44,
+        "bounds": { "x": 143, "y": 364, "width": 16, "height": 24 },
+        "centroid": { "x": 151, "y": 373 },
+        "pixelCount": 204,
+        "label": "fish fin",
+        "objectGroup": "left fish",
+        "palettes": {
+          "realistic": { "hex": "#F18C2E", "colorName": "Sunset Orange" }
+        }
+      },
+      {
+        "id": 45,
+        "bounds": { "x": 132, "y": 373, "width": 15, "height": 15 },
+        "centroid": { "x": 138, "y": 380 },
+        "pixelCount": 137,
+        "label": "fish fin",
+        "objectGroup": "left fish",
+        "palettes": {
+          "realistic": { "hex": "#F18C2E", "colorName": "Sunset Orange" }
+        }
+      },
+      {
+        "id": 46,
+        "bounds": { "x": 57, "y": 384, "width": 74, "height": 347 },
+        "centroid": { "x": 91, "y": 585 },
+        "pixelCount": 11471,
+        "label": "seaweed stalk",
+        "objectGroup": "seaweed",
+        "palettes": { "realistic": { "hex": "#94BE56", "colorName": "Lime" } }
+      },
+      {
+        "id": 47,
+        "bounds": { "x": 706, "y": 382, "width": 31, "height": 18 },
+        "centroid": { "x": 723, "y": 389 },
+        "pixelCount": 272,
+        "label": "fish fin",
+        "objectGroup": "right fish",
+        "palettes": {
+          "realistic": { "hex": "#F08D34", "colorName": "Sunset Orange" }
+        }
+      },
+      {
+        "id": 48,
+        "bounds": { "x": 377, "y": 390, "width": 244, "height": 37 },
+        "centroid": { "x": 500, "y": 406 },
+        "pixelCount": 6384,
+        "label": "crayon stripe",
+        "objectGroup": "crayon character",
+        "palettes": {
+          "realistic": { "hex": "#E24D48", "colorName": "Cherry Red" }
+        }
+      },
+      {
+        "id": 49,
+        "bounds": { "x": 666, "y": 390, "width": 39, "height": 51 },
+        "centroid": { "x": 690, "y": 416 },
+        "pixelCount": 1249,
+        "label": "fish tail",
+        "objectGroup": "right fish",
+        "palettes": {
+          "realistic": { "hex": "#F08D34", "colorName": "Sunset Orange" }
+        }
+      },
+      {
+        "id": 50,
+        "bounds": { "x": 705, "y": 391, "width": 11, "height": 40 },
+        "centroid": { "x": 710, "y": 411 },
+        "pixelCount": 352,
+        "label": "fish stripe",
+        "objectGroup": "right fish",
+        "palettes": {
+          "realistic": { "hex": "#F08D34", "colorName": "Sunset Orange" }
+        }
+      },
+      {
+        "id": 51,
+        "bounds": { "x": 716, "y": 396, "width": 11, "height": 40 },
+        "centroid": { "x": 721, "y": 416 },
+        "pixelCount": 333,
+        "label": "fish body",
+        "objectGroup": "right fish",
+        "palettes": {
+          "realistic": { "hex": "#F08D34", "colorName": "Sunset Orange" }
+        }
+      },
+      {
+        "id": 52,
+        "bounds": { "x": 726, "y": 408, "width": 12, "height": 27 },
+        "centroid": { "x": 732, "y": 422 },
+        "pixelCount": 217,
+        "label": "fish stripe",
+        "objectGroup": "right fish",
+        "palettes": {
+          "realistic": { "hex": "#F08D34", "colorName": "Sunset Orange" }
+        }
+      },
+      {
+        "id": 53,
+        "bounds": { "x": 738, "y": 410, "width": 18, "height": 34 },
+        "centroid": { "x": 748, "y": 427 },
+        "pixelCount": 318,
+        "label": "fish head",
+        "objectGroup": "right fish",
+        "palettes": {
+          "realistic": { "hex": "#F08D34", "colorName": "Sunset Orange" }
+        }
+      },
+      {
+        "id": 54,
+        "bounds": { "x": 155, "y": 430, "width": 55, "height": 334 },
+        "centroid": { "x": 182, "y": 617 },
+        "pixelCount": 9195,
+        "label": "seaweed stalk",
+        "objectGroup": "seaweed",
+        "palettes": { "realistic": { "hex": "#94BE56", "colorName": "Lime" } }
+      },
+      {
+        "id": 55,
+        "bounds": { "x": 375, "y": 430, "width": 255, "height": 224 },
+        "centroid": { "x": 501, "y": 543 },
+        "pixelCount": 45942,
+        "label": "crayon mouth",
+        "objectGroup": "crayon character",
+        "palettes": { "realistic": { "hex": "#ECC339", "colorName": "Gold" } }
+      },
+      {
+        "id": 56,
+        "bounds": { "x": 237, "y": 437, "width": 71, "height": 69 },
+        "centroid": { "x": 270, "y": 472 },
+        "pixelCount": 3555,
+        "label": "crayon left hand",
+        "objectGroup": "crayon character",
+        "palettes": { "realistic": { "hex": "#ECC339", "colorName": "Gold" } }
+      },
+      {
+        "id": 57,
+        "bounds": { "x": 123, "y": 474, "width": 46, "height": 298 },
+        "centroid": { "x": 144, "y": 626 },
+        "pixelCount": 5554,
+        "label": "seaweed stalk",
+        "objectGroup": "seaweed",
+        "palettes": { "realistic": { "hex": "#94BE56", "colorName": "Lime" } }
+      },
+      {
+        "id": 58,
+        "bounds": { "x": 393, "y": 511, "width": 34, "height": 34 },
+        "centroid": { "x": 409, "y": 528 },
+        "pixelCount": 942,
+        "label": "crayon cheek",
+        "objectGroup": "crayon character",
+        "palettes": { "realistic": { "hex": "#EC7191", "colorName": "Rose" } }
+      },
+      {
+        "id": 59,
+        "bounds": { "x": 574, "y": 512, "width": 34, "height": 33 },
+        "centroid": { "x": 590, "y": 528 },
+        "pixelCount": 946,
+        "label": "crayon cheek",
+        "objectGroup": "crayon character",
+        "palettes": { "realistic": { "hex": "#EC728F", "colorName": "Rose" } }
+      },
+      {
+        "id": 60,
+        "bounds": { "x": 292, "y": 520, "width": 66, "height": 53 },
+        "centroid": { "x": 323, "y": 549 },
+        "pixelCount": 745,
+        "label": "crayon left arm",
+        "objectGroup": "crayon character",
+        "palettes": { "realistic": { "hex": "#ECC339", "colorName": "Gold" } }
+      },
+      {
+        "id": 61,
+        "bounds": { "x": 476, "y": 516, "width": 52, "height": 24 },
+        "centroid": { "x": 502, "y": 531 },
+        "pixelCount": 575,
+        "label": "crayon tongue",
+        "objectGroup": "crayon character",
+        "palettes": {
+          "realistic": { "hex": "#E66985", "colorName": "Bubblegum Pink" }
+        }
+      },
+      {
+        "id": 62,
+        "bounds": { "x": 645, "y": 548, "width": 51, "height": 54 },
+        "centroid": { "x": 670, "y": 572 },
+        "pixelCount": 685,
+        "label": "crayon right arm",
+        "objectGroup": "crayon character",
+        "palettes": { "realistic": { "hex": "#ECC339", "colorName": "Gold" } }
+      },
+      {
+        "id": 63,
+        "bounds": { "x": 736, "y": 546, "width": 95, "height": 155 },
+        "centroid": { "x": 783, "y": 622 },
+        "pixelCount": 4357,
+        "label": "coral branch",
+        "objectGroup": "coral",
+        "palettes": { "realistic": { "hex": "#538B4C", "colorName": "Moss" } }
+      },
+      {
+        "id": 64,
+        "bounds": { "x": 29, "y": 583, "width": 57, "height": 224 },
+        "centroid": { "x": 54, "y": 693 },
+        "pixelCount": 4713,
+        "label": "seaweed stalk",
+        "objectGroup": "seaweed",
+        "palettes": { "realistic": { "hex": "#94BE56", "colorName": "Lime" } }
+      },
+      {
+        "id": 65,
+        "bounds": { "x": 200, "y": 609, "width": 156, "height": 227 },
+        "centroid": { "x": 269, "y": 739 },
+        "pixelCount": 12162,
+        "label": "coral base",
+        "objectGroup": "coral",
+        "palettes": { "realistic": { "hex": "#EE8199", "colorName": "Rose" } }
+      },
+      {
+        "id": 66,
+        "bounds": { "x": 686, "y": 616, "width": 54, "height": 57 },
+        "centroid": { "x": 714, "y": 644 },
+        "pixelCount": 2296,
+        "label": "crayon right hand",
+        "objectGroup": "crayon character",
+        "palettes": { "realistic": { "hex": "#ECC339", "colorName": "Gold" } }
+      },
+      {
+        "id": 67,
+        "bounds": { "x": 114, "y": 637, "width": 35, "height": 104 },
+        "centroid": { "x": 132, "y": 691 },
+        "pixelCount": 1678,
+        "label": "seaweed stalk",
+        "objectGroup": "seaweed",
+        "palettes": {
+          "realistic": { "hex": "#68B0D7", "colorName": "Dusty Blue" }
+        }
+      },
+      {
+        "id": 68,
+        "bounds": { "x": 808, "y": 643, "width": 192, "height": 118 },
+        "centroid": { "x": 910, "y": 691 },
+        "pixelCount": 8515,
+        "label": "coral base",
+        "objectGroup": "coral",
+        "palettes": { "realistic": { "hex": "#EE8199", "colorName": "Rose" } }
+      },
+      {
+        "id": 69,
+        "bounds": { "x": 377, "y": 653, "width": 253, "height": 40 },
+        "centroid": { "x": 503, "y": 674 },
+        "pixelCount": 6969,
+        "label": "crayon stripe",
+        "objectGroup": "crayon character",
+        "palettes": {
+          "realistic": { "hex": "#E34D48", "colorName": "Cherry Red" }
+        }
+      },
+      {
+        "id": 70,
+        "bounds": { "x": 378, "y": 697, "width": 250, "height": 54 },
+        "centroid": { "x": 503, "y": 727 },
+        "pixelCount": 9352,
+        "label": "crayon stripe",
+        "objectGroup": "crayon character",
+        "palettes": { "realistic": { "hex": "#ECC339", "colorName": "Gold" } }
+      },
+      {
+        "id": 71,
+        "bounds": { "x": 679, "y": 696, "width": 77, "height": 76 },
+        "centroid": { "x": 707, "y": 729 },
+        "pixelCount": 1427,
+        "label": "chest lid trim",
+        "objectGroup": "treasure chest",
+        "palettes": { "realistic": { "hex": "#9C6E45", "colorName": "Sienna" } }
+      },
+      {
+        "id": 72,
+        "bounds": { "x": 743, "y": 702, "width": 138, "height": 29 },
+        "centroid": { "x": 815, "y": 714 },
+        "pixelCount": 1978,
+        "label": "chest lid top",
+        "objectGroup": "treasure chest",
+        "palettes": { "realistic": { "hex": "#9C6E45", "colorName": "Sienna" } }
+      },
+      {
+        "id": 73,
+        "bounds": { "x": 931, "y": 708, "width": 33, "height": 30 },
+        "centroid": { "x": 950, "y": 720 },
+        "pixelCount": 629,
+        "label": "coral piece",
+        "objectGroup": "coral",
+        "palettes": { "realistic": { "hex": "#EE8199", "colorName": "Rose" } }
+      },
+      {
+        "id": 74,
+        "bounds": { "x": 712, "y": 713, "width": 149, "height": 46 },
+        "centroid": { "x": 787, "y": 735 },
+        "pixelCount": 3886,
+        "label": "chest lid slat",
+        "objectGroup": "treasure chest",
+        "palettes": { "realistic": { "hex": "#9C6E45", "colorName": "Sienna" } }
+      },
+      {
+        "id": 75,
+        "bounds": { "x": 842, "y": 718, "width": 65, "height": 84 },
+        "centroid": { "x": 865, "y": 756 },
+        "pixelCount": 1498,
+        "label": "chest lid trim",
+        "objectGroup": "treasure chest",
+        "palettes": { "realistic": { "hex": "#9C6E45", "colorName": "Sienna" } }
+      },
+      {
+        "id": 76,
+        "bounds": { "x": 859, "y": 723, "width": 105, "height": 80 },
+        "centroid": { "x": 901, "y": 740 },
+        "pixelCount": 2068,
+        "label": "chest lid slat",
+        "objectGroup": "treasure chest",
+        "palettes": { "realistic": { "hex": "#9C6E45", "colorName": "Sienna" } }
+      },
+      {
+        "id": 77,
+        "bounds": { "x": 68, "y": 732, "width": 74, "height": 39 },
+        "centroid": { "x": 105, "y": 738 },
+        "pixelCount": 1198,
+        "label": "coral tube top",
+        "objectGroup": "coral",
+        "palettes": { "realistic": { "hex": "#EE8199", "colorName": "Rose" } }
+      },
+      {
+        "id": 78,
+        "bounds": { "x": 697, "y": 740, "width": 147, "height": 58 },
+        "centroid": { "x": 772, "y": 766 },
+        "pixelCount": 4665,
+        "label": "chest lid slat",
+        "objectGroup": "treasure chest",
+        "palettes": { "realistic": { "hex": "#9C6E45", "colorName": "Sienna" } }
+      },
+      {
+        "id": 79,
+        "bounds": { "x": 881, "y": 737, "width": 61, "height": 36 },
+        "centroid": { "x": 911, "y": 753 },
+        "pixelCount": 1239,
+        "label": "chest lid trim",
+        "objectGroup": "treasure chest",
+        "palettes": { "realistic": { "hex": "#9C6E45", "colorName": "Sienna" } }
+      },
+      {
+        "id": 80,
+        "bounds": { "x": 81, "y": 742, "width": 48, "height": 19 },
+        "centroid": { "x": 105, "y": 751 },
+        "pixelCount": 752,
+        "label": "coral tube body",
+        "objectGroup": "coral",
+        "palettes": { "realistic": { "hex": "#EE8199", "colorName": "Rose" } }
+      },
+      {
+        "id": 81,
+        "bounds": { "x": 962, "y": 746, "width": 44, "height": 86 },
+        "centroid": { "x": 981, "y": 784 },
+        "pixelCount": 2105,
+        "label": "coral piece",
+        "objectGroup": "coral",
+        "palettes": { "realistic": { "hex": "#EE8199", "colorName": "Rose" } }
+      },
+      {
+        "id": 82,
+        "bounds": { "x": 873, "y": 759, "width": 75, "height": 41 },
+        "centroid": { "x": 912, "y": 779 },
+        "pixelCount": 1759,
+        "label": "chest body slat",
+        "objectGroup": "treasure chest",
+        "palettes": { "realistic": { "hex": "#9C6E45", "colorName": "Sienna" } }
+      },
+      {
+        "id": 83,
+        "bounds": { "x": 70, "y": 761, "width": 73, "height": 105 },
+        "centroid": { "x": 111, "y": 808 },
+        "pixelCount": 5038,
+        "label": "coral piece",
+        "objectGroup": "coral",
+        "palettes": { "realistic": { "hex": "#EE8199", "colorName": "Rose" } }
+      },
+      {
+        "id": 84,
+        "bounds": { "x": 153, "y": 764, "width": 59, "height": 32 },
+        "centroid": { "x": 182, "y": 770 },
+        "pixelCount": 747,
+        "label": "coral tube top",
+        "objectGroup": "coral",
+        "palettes": { "realistic": { "hex": "#EE8199", "colorName": "Rose" } }
+      },
+      {
+        "id": 85,
+        "bounds": { "x": 208, "y": 769, "width": 31, "height": 39 },
+        "centroid": { "x": 224, "y": 789 },
+        "pixelCount": 790,
+        "label": "coral tube body",
+        "objectGroup": "coral",
+        "palettes": {
+          "realistic": { "hex": "#67AFD7", "colorName": "Dusty Blue" }
+        }
+      },
+      {
+        "id": 86,
+        "bounds": { "x": 442, "y": 768, "width": 8, "height": 27 },
+        "centroid": { "x": 445, "y": 781 },
+        "pixelCount": 205,
+        "label": "crayon left leg",
+        "objectGroup": "crayon character",
+        "palettes": { "realistic": { "hex": "#ECC339", "colorName": "Gold" } }
+      },
+      {
+        "id": 87,
+        "bounds": { "x": 561, "y": 767, "width": 10, "height": 27 },
+        "centroid": { "x": 565, "y": 780 },
+        "pixelCount": 267,
+        "label": "crayon right leg",
+        "objectGroup": "crayon character",
+        "palettes": { "realistic": { "hex": "#ECC339", "colorName": "Gold" } }
+      },
+      {
+        "id": 88,
+        "bounds": { "x": 165, "y": 773, "width": 35, "height": 16 },
+        "centroid": { "x": 182, "y": 780 },
+        "pixelCount": 436,
+        "label": "coral tube inner",
+        "objectGroup": "coral",
+        "palettes": { "realistic": { "hex": "#EE8199", "colorName": "Rose" } }
+      },
+      {
+        "id": 89,
+        "bounds": { "x": 467, "y": 771, "width": 77, "height": 53 },
+        "centroid": { "x": 505, "y": 796 },
+        "pixelCount": 3743,
+        "label": "crayon base",
+        "objectGroup": "crayon character",
+        "palettes": {
+          "realistic": { "hex": "#63B0DB", "colorName": "Dusty Blue" }
+        }
+      },
+      {
+        "id": 90,
+        "bounds": { "x": 676, "y": 773, "width": 61, "height": 34 },
+        "centroid": { "x": 706, "y": 789 },
+        "pixelCount": 1454,
+        "label": "chest corner",
+        "objectGroup": "treasure chest",
+        "palettes": { "realistic": { "hex": "#9C6E45", "colorName": "Sienna" } }
+      },
+      {
+        "id": 91,
+        "bounds": { "x": 750, "y": 774, "width": 37, "height": 57 },
+        "centroid": { "x": 778, "y": 793 },
+        "pixelCount": 504,
+        "label": "keyhole plate",
+        "objectGroup": "treasure chest",
+        "palettes": { "realistic": { "hex": "#9C6E45", "colorName": "Sienna" } }
+      },
+      {
+        "id": 92,
+        "bounds": { "x": 738, "y": 781, "width": 39, "height": 54 },
+        "centroid": { "x": 764, "y": 809 },
+        "pixelCount": 1265,
+        "label": "keyhole",
+        "objectGroup": "treasure chest",
+        "palettes": { "realistic": { "hex": "#9C6E45", "colorName": "Sienna" } }
+      },
+      {
+        "id": 93,
+        "bounds": { "x": 861, "y": 783, "width": 106, "height": 45 },
+        "centroid": { "x": 912, "y": 804 },
+        "pixelCount": 2268,
+        "label": "chest body slat",
+        "objectGroup": "treasure chest",
+        "palettes": { "realistic": { "hex": "#9C6E45", "colorName": "Sienna" } }
+      },
+      {
+        "id": 94,
+        "bounds": { "x": 138, "y": 786, "width": 71, "height": 78 },
+        "centroid": { "x": 171, "y": 825 },
+        "pixelCount": 3690,
+        "label": "rock",
+        "objectGroup": "seabed",
+        "palettes": {
+          "realistic": { "hex": "#C25CCF", "colorName": "Lavender" }
+        }
+      },
+      {
+        "id": 95,
+        "bounds": { "x": 751, "y": 794, "width": 14, "height": 31 },
+        "centroid": { "x": 757, "y": 807 },
+        "pixelCount": 313,
+        "label": "chest body slat",
+        "objectGroup": "treasure chest",
+        "palettes": { "realistic": { "hex": "#9C6E45", "colorName": "Sienna" } }
+      },
+      {
+        "id": 96,
+        "bounds": { "x": 789, "y": 793, "width": 70, "height": 36 },
+        "centroid": { "x": 823, "y": 810 },
+        "pixelCount": 1679,
+        "label": "chest body slat",
+        "objectGroup": "treasure chest",
+        "palettes": { "realistic": { "hex": "#9C6E45", "colorName": "Sienna" } }
+      },
+      {
+        "id": 97,
+        "bounds": { "x": 681, "y": 800, "width": 19, "height": 82 },
+        "centroid": { "x": 690, "y": 839 },
+        "pixelCount": 1152,
+        "label": "chest corner",
+        "objectGroup": "treasure chest",
+        "palettes": { "realistic": { "hex": "#9C6E45", "colorName": "Sienna" } }
+      },
+      {
+        "id": 98,
+        "bounds": { "x": 699, "y": 804, "width": 139, "height": 53 },
+        "centroid": { "x": 770, "y": 839 },
+        "pixelCount": 3132,
+        "label": "chest body slat",
+        "objectGroup": "treasure chest",
+        "palettes": { "realistic": { "hex": "#9C6E45", "colorName": "Sienna" } }
+      },
+      {
+        "id": 99,
+        "bounds": { "x": 32, "y": 810, "width": 53, "height": 32 },
+        "centroid": { "x": 56, "y": 816 },
+        "pixelCount": 505,
+        "label": "coral tube top",
+        "objectGroup": "coral",
+        "palettes": { "realistic": { "hex": "#EE8199", "colorName": "Rose" } }
+      },
+      {
+        "id": 100,
+        "bounds": { "x": 207, "y": 807, "width": 70, "height": 37 },
+        "centroid": { "x": 243, "y": 824 },
+        "pixelCount": 1441,
+        "label": "rock",
+        "objectGroup": "seabed",
+        "palettes": { "realistic": { "hex": "#EC7E97", "colorName": "Rose" } }
+      },
+      {
+        "id": 101,
+        "bounds": { "x": 857, "y": 807, "width": 106, "height": 148 },
+        "centroid": { "x": 912, "y": 911 },
+        "pixelCount": 4211,
+        "label": "chest corner",
+        "objectGroup": "treasure chest",
+        "palettes": { "realistic": { "hex": "#9C6E45", "colorName": "Sienna" } }
+      },
+      {
+        "id": 102,
+        "bounds": { "x": 976, "y": 809, "width": 31, "height": 31 },
+        "centroid": { "x": 993, "y": 823 },
+        "pixelCount": 616,
+        "label": "coral piece",
+        "objectGroup": "coral",
+        "palettes": { "realistic": { "hex": "#EE8199", "colorName": "Rose" } }
+      },
+      {
+        "id": 103,
+        "bounds": { "x": 392, "y": 813, "width": 62, "height": 31 },
+        "centroid": { "x": 425, "y": 829 },
+        "pixelCount": 1611,
+        "label": "crayon left foot",
+        "objectGroup": "crayon character",
+        "palettes": { "realistic": { "hex": "#ECC339", "colorName": "Gold" } }
+      },
+      {
+        "id": 104,
+        "bounds": { "x": 557, "y": 812, "width": 61, "height": 31 },
+        "centroid": { "x": 584, "y": 828 },
+        "pixelCount": 1589,
+        "label": "crayon right foot",
+        "objectGroup": "crayon character",
+        "palettes": { "realistic": { "hex": "#ECC339", "colorName": "Gold" } }
+      },
+      {
+        "id": 105,
+        "bounds": { "x": 874, "y": 811, "width": 73, "height": 43 },
+        "centroid": { "x": 909, "y": 832 },
+        "pixelCount": 1868,
+        "label": "chest body slat",
+        "objectGroup": "treasure chest",
+        "palettes": { "realistic": { "hex": "#9C6E45", "colorName": "Sienna" } }
+      },
+      {
+        "id": 106,
+        "bounds": { "x": 42, "y": 818, "width": 32, "height": 17 },
+        "centroid": { "x": 58, "y": 826 },
+        "pixelCount": 388,
+        "label": "coral tube body",
+        "objectGroup": "coral",
+        "palettes": { "realistic": { "hex": "#EE8199", "colorName": "Rose" } }
+      },
+      {
+        "id": 107,
+        "bounds": { "x": 196, "y": 825, "width": 34, "height": 28 },
+        "centroid": { "x": 213, "y": 838 },
+        "pixelCount": 680,
+        "label": "rock",
+        "objectGroup": "seabed",
+        "palettes": {
+          "realistic": { "hex": "#68AFD7", "colorName": "Dusty Blue" }
+        }
+      },
+      {
+        "id": 108,
+        "bounds": { "x": 0, "y": 824, "width": 1024, "height": 200 },
+        "centroid": { "x": 487, "y": 949 },
+        "pixelCount": 124533,
+        "label": "sand",
+        "objectGroup": "seabed",
+        "palettes": {
+          "realistic": { "hex": "#EAC377", "colorName": "Skin Tone" }
+        }
+      },
+      {
+        "id": 109,
+        "bounds": { "x": 35, "y": 830, "width": 63, "height": 57 },
+        "centroid": { "x": 70, "y": 861 },
+        "pixelCount": 2350,
+        "label": "rock",
+        "objectGroup": "seabed",
+        "palettes": {
+          "realistic": { "hex": "#C05CCE", "colorName": "Lavender" }
+        }
+      },
+      {
+        "id": 110,
+        "bounds": { "x": 700, "y": 830, "width": 157, "height": 127 },
+        "centroid": { "x": 805, "y": 924 },
+        "pixelCount": 4434,
+        "label": "chest corner",
+        "objectGroup": "treasure chest",
+        "palettes": { "realistic": { "hex": "#9C6E45", "colorName": "Sienna" } }
+      },
+      {
+        "id": 111,
+        "bounds": { "x": 962, "y": 833, "width": 41, "height": 46 },
+        "centroid": { "x": 980, "y": 856 },
+        "pixelCount": 1387,
+        "label": "coral piece",
+        "objectGroup": "coral",
+        "palettes": { "realistic": { "hex": "#EE8199", "colorName": "Rose" } }
+      },
+      {
+        "id": 112,
+        "bounds": { "x": 700, "y": 836, "width": 137, "height": 57 },
+        "centroid": { "x": 770, "y": 864 },
+        "pixelCount": 4280,
+        "label": "chest body slat",
+        "objectGroup": "treasure chest",
+        "palettes": { "realistic": { "hex": "#9C6E45", "colorName": "Sienna" } }
+      },
+      {
+        "id": 113,
+        "bounds": { "x": 872, "y": 838, "width": 73, "height": 50 },
+        "centroid": { "x": 908, "y": 862 },
+        "pixelCount": 2134,
+        "label": "chest body slat",
+        "objectGroup": "treasure chest",
+        "palettes": { "realistic": { "hex": "#9C6E45", "colorName": "Sienna" } }
+      },
+      {
+        "id": 114,
+        "bounds": { "x": 96, "y": 856, "width": 80, "height": 52 },
+        "centroid": { "x": 136, "y": 882 },
+        "pixelCount": 3142,
+        "label": "rock",
+        "objectGroup": "seabed",
+        "palettes": {
+          "realistic": { "hex": "#EAC377", "colorName": "Skin Tone" }
+        }
+      },
+      {
+        "id": 115,
+        "bounds": { "x": 252, "y": 858, "width": 49, "height": 26 },
+        "centroid": { "x": 276, "y": 871 },
+        "pixelCount": 1000,
+        "label": "rock",
+        "objectGroup": "seabed",
+        "palettes": {
+          "realistic": { "hex": "#EAC377", "colorName": "Skin Tone" }
+        }
+      },
+      {
+        "id": 116,
+        "bounds": { "x": 703, "y": 868, "width": 133, "height": 61 },
+        "centroid": { "x": 772, "y": 897 },
+        "pixelCount": 3809,
+        "label": "chest body slat",
+        "objectGroup": "treasure chest",
+        "palettes": { "realistic": { "hex": "#9C6E45", "colorName": "Sienna" } }
+      },
+      {
+        "id": 117,
+        "bounds": { "x": 871, "y": 869, "width": 72, "height": 55 },
+        "centroid": { "x": 906, "y": 896 },
+        "pixelCount": 2175,
+        "label": "chest corner",
+        "objectGroup": "treasure chest",
+        "palettes": { "realistic": { "hex": "#9C6E45", "colorName": "Sienna" } }
+      },
+      {
+        "id": 118,
+        "bounds": { "x": 621, "y": 881, "width": 115, "height": 101 },
+        "centroid": { "x": 675, "y": 932 },
+        "pixelCount": 5655,
+        "label": "starfish",
+        "objectGroup": "starfish",
+        "palettes": {
+          "realistic": { "hex": "#F08735", "colorName": "Sunset Orange" }
+        }
+      },
+      {
+        "id": 119,
+        "bounds": { "x": 45, "y": 888, "width": 66, "height": 30 },
+        "centroid": { "x": 77, "y": 903 },
+        "pixelCount": 1615,
+        "label": "rock",
+        "objectGroup": "seabed",
+        "palettes": {
+          "realistic": { "hex": "#EAC377", "colorName": "Skin Tone" }
+        }
+      },
+      {
+        "id": 120,
+        "bounds": { "x": 165, "y": 890, "width": 33, "height": 22 },
+        "centroid": { "x": 181, "y": 901 },
+        "pixelCount": 593,
+        "label": "rock",
+        "objectGroup": "seabed",
+        "palettes": {
+          "realistic": { "hex": "#EAC377", "colorName": "Skin Tone" }
+        }
+      },
+      {
+        "id": 121,
+        "bounds": { "x": 272, "y": 905, "width": 61, "height": 33 },
+        "centroid": { "x": 301, "y": 921 },
+        "pixelCount": 1533,
+        "label": "rock",
+        "objectGroup": "seabed",
+        "palettes": {
+          "realistic": { "hex": "#EAC377", "colorName": "Skin Tone" }
+        }
+      },
+      {
+        "id": 122,
+        "bounds": { "x": 314, "y": 929, "width": 50, "height": 24 },
+        "centroid": { "x": 338, "y": 941 },
+        "pixelCount": 1001,
+        "label": "rock",
+        "objectGroup": "seabed",
+        "palettes": {
+          "realistic": { "hex": "#EAC377", "colorName": "Skin Tone" }
+        }
+      },
+      {
+        "id": 123,
+        "bounds": { "x": 75, "y": 940, "width": 80, "height": 36 },
+        "centroid": { "x": 114, "y": 957 },
+        "pixelCount": 2204,
+        "label": "rock",
+        "objectGroup": "seabed",
+        "palettes": {
+          "realistic": { "hex": "#EAC377", "colorName": "Skin Tone" }
+        }
+      },
+      {
+        "id": 124,
+        "bounds": { "x": 504, "y": 941, "width": 38, "height": 19 },
+        "centroid": { "x": 523, "y": 950 },
+        "pixelCount": 607,
+        "label": "pebble",
+        "objectGroup": "seabed",
+        "palettes": {
+          "realistic": { "hex": "#EAC377", "colorName": "Skin Tone" }
+        }
+      },
+      {
+        "id": 125,
+        "bounds": { "x": 928, "y": 944, "width": 59, "height": 32 },
+        "centroid": { "x": 957, "y": 961 },
+        "pixelCount": 1505,
+        "label": "rock",
+        "objectGroup": "seabed",
+        "palettes": {
+          "realistic": { "hex": "#EAC377", "colorName": "Skin Tone" }
+        }
+      },
+      {
+        "id": 126,
+        "bounds": { "x": 142, "y": 959, "width": 33, "height": 18 },
+        "centroid": { "x": 159, "y": 968 },
+        "pixelCount": 501,
+        "label": "rock",
+        "objectGroup": "seabed",
+        "palettes": {
+          "realistic": { "hex": "#EAC377", "colorName": "Skin Tone" }
+        }
+      },
+      {
+        "id": 127,
+        "bounds": { "x": 247, "y": 965, "width": 17, "height": 9 },
+        "centroid": { "x": 255, "y": 969 },
+        "pixelCount": 128,
+        "label": "pebble",
+        "objectGroup": "seabed",
+        "palettes": {
+          "realistic": { "hex": "#EAC377", "colorName": "Skin Tone" }
+        }
+      }
+    ]
+  }
+}

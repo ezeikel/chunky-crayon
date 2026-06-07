@@ -1,0 +1,1200 @@
+{
+  "regionMapWidth": 1024,
+  "regionMapHeight": 1024,
+  "regionsJson": {
+    "sceneDescription": "A cheerful party scene featuring a large smiling crayon character, a chick, and a bunny, all surrounded by balloons, a 'WELCOME' banner, flags, and confetti.",
+    "sourceWidth": 1024,
+    "sourceHeight": 1024,
+    "regionPixelCount": 979900,
+    "regions": [
+      {
+        "id": 1,
+        "bounds": { "x": 0, "y": 0, "width": 1024, "height": 223 },
+        "centroid": { "x": 514, "y": 77 },
+        "pixelCount": 108065,
+        "label": "banner main area",
+        "objectGroup": "banner",
+        "palettes": {
+          "realistic": { "hex": "#80DAF5", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 2,
+        "bounds": { "x": 137, "y": 15, "width": 16, "height": 13 },
+        "centroid": { "x": 145, "y": 21 },
+        "pixelCount": 169,
+        "label": "circular confetti",
+        "objectGroup": "confetti",
+        "palettes": {
+          "realistic": { "hex": "#7FDAF5", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 3,
+        "bounds": { "x": 109, "y": 18, "width": 20, "height": 15 },
+        "centroid": { "x": 118, "y": 25 },
+        "pixelCount": 221,
+        "label": "circular confetti",
+        "objectGroup": "confetti",
+        "palettes": {
+          "realistic": { "hex": "#7FDAF5", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 4,
+        "bounds": { "x": 867, "y": 18, "width": 15, "height": 12 },
+        "centroid": { "x": 874, "y": 24 },
+        "pixelCount": 147,
+        "label": "circular confetti",
+        "objectGroup": "confetti",
+        "palettes": {
+          "realistic": { "hex": "#7FDAF5", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 5,
+        "bounds": { "x": 892, "y": 23, "width": 20, "height": 13 },
+        "centroid": { "x": 902, "y": 29 },
+        "pixelCount": 201,
+        "label": "circular confetti",
+        "objectGroup": "confetti",
+        "palettes": {
+          "realistic": { "hex": "#7FDAF5", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 6,
+        "bounds": { "x": 412, "y": 30, "width": 13, "height": 13 },
+        "centroid": { "x": 418, "y": 36 },
+        "pixelCount": 129,
+        "label": "square confetti",
+        "objectGroup": "confetti",
+        "palettes": {
+          "realistic": { "hex": "#7FDAF5", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 7,
+        "bounds": { "x": 139, "y": 38, "width": 44, "height": 120 },
+        "centroid": { "x": 161, "y": 94 },
+        "pixelCount": 2602,
+        "label": "left banner end",
+        "objectGroup": "banner",
+        "palettes": {
+          "realistic": { "hex": "#80DAF5", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 8,
+        "bounds": { "x": 164, "y": 40, "width": 702, "height": 175 },
+        "centroid": { "x": 512, "y": 136 },
+        "pixelCount": 54534,
+        "label": "banner outline",
+        "objectGroup": "banner",
+        "palettes": {
+          "realistic": { "hex": "#80DAF5", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 9,
+        "bounds": { "x": 838, "y": 40, "width": 47, "height": 118 },
+        "centroid": { "x": 861, "y": 94 },
+        "pixelCount": 2461,
+        "label": "right banner end",
+        "objectGroup": "banner",
+        "palettes": {
+          "realistic": { "hex": "#80DAF5", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 10,
+        "bounds": { "x": 955, "y": 62, "width": 13, "height": 14 },
+        "centroid": { "x": 961, "y": 69 },
+        "pixelCount": 145,
+        "label": "background",
+        "objectGroup": "background",
+        "palettes": {
+          "realistic": { "hex": "#81DBF6", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 11,
+        "bounds": { "x": 215, "y": 77, "width": 97, "height": 100 },
+        "centroid": { "x": 257, "y": 132 },
+        "pixelCount": 4716,
+        "label": "banner letter W",
+        "objectGroup": "banner text",
+        "palettes": {
+          "realistic": { "hex": "#7FDAF5", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 12,
+        "bounds": { "x": 750, "y": 78, "width": 65, "height": 89 },
+        "centroid": { "x": 777, "y": 123 },
+        "pixelCount": 2902,
+        "label": "banner letter E",
+        "objectGroup": "banner text",
+        "palettes": {
+          "realistic": { "hex": "#7FDAF5", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 13,
+        "bounds": { "x": 654, "y": 90, "width": 89, "height": 97 },
+        "centroid": { "x": 694, "y": 134 },
+        "pixelCount": 4624,
+        "label": "banner letter M",
+        "objectGroup": "banner text",
+        "palettes": {
+          "realistic": { "hex": "#7FDAF5", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 14,
+        "bounds": { "x": 327, "y": 99, "width": 57, "height": 88 },
+        "centroid": { "x": 350, "y": 142 },
+        "pixelCount": 3068,
+        "label": "banner letter E",
+        "objectGroup": "banner text",
+        "palettes": {
+          "realistic": { "hex": "#7FDAF5", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 15,
+        "bounds": { "x": 404, "y": 103, "width": 53, "height": 89 },
+        "centroid": { "x": 421, "y": 156 },
+        "pixelCount": 2209,
+        "label": "banner letter L",
+        "objectGroup": "banner text",
+        "palettes": {
+          "realistic": { "hex": "#7FDAF5", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 16,
+        "bounds": { "x": 556, "y": 105, "width": 82, "height": 87 },
+        "centroid": { "x": 576, "y": 143 },
+        "pixelCount": 4068,
+        "label": "banner letter O",
+        "objectGroup": "banner text",
+        "palettes": {
+          "realistic": { "hex": "#7FDAF5", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 17,
+        "bounds": { "x": 471, "y": 109, "width": 72, "height": 85 },
+        "centroid": { "x": 489, "y": 152 },
+        "pixelCount": 3057,
+        "label": "banner letter C",
+        "objectGroup": "banner text",
+        "palettes": {
+          "realistic": { "hex": "#7FDAF5", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 18,
+        "bounds": { "x": 579, "y": 128, "width": 36, "height": 41 },
+        "centroid": { "x": 597, "y": 148 },
+        "pixelCount": 1222,
+        "label": "banner letter E",
+        "objectGroup": "banner text",
+        "palettes": {
+          "realistic": { "hex": "#7FDAF5", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 19,
+        "bounds": { "x": 72, "y": 134, "width": 18, "height": 15 },
+        "centroid": { "x": 81, "y": 142 },
+        "pixelCount": 159,
+        "label": "curly confetti",
+        "objectGroup": "confetti",
+        "palettes": {
+          "realistic": { "hex": "#7FDAF5", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 20,
+        "bounds": { "x": 0, "y": 140, "width": 1024, "height": 884 },
+        "centroid": { "x": 367, "y": 642 },
+        "pixelCount": 514220,
+        "label": "crayon left arm",
+        "objectGroup": "crayon",
+        "palettes": {
+          "realistic": { "hex": "#80DAF5", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 21,
+        "bounds": { "x": 39, "y": 167, "width": 55, "height": 70 },
+        "centroid": { "x": 59, "y": 200 },
+        "pixelCount": 2124,
+        "label": "left flag",
+        "objectGroup": "flags",
+        "palettes": {
+          "realistic": { "hex": "#7ED9F4", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 22,
+        "bounds": { "x": 930, "y": 172, "width": 54, "height": 68 },
+        "centroid": { "x": 964, "y": 203 },
+        "pixelCount": 2059,
+        "label": "right flag",
+        "objectGroup": "flags",
+        "palettes": {
+          "realistic": { "hex": "#7ED9F4", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 23,
+        "bounds": { "x": 123, "y": 206, "width": 58, "height": 65 },
+        "centroid": { "x": 147, "y": 233 },
+        "pixelCount": 2046,
+        "label": "left flag",
+        "objectGroup": "flags",
+        "palettes": {
+          "realistic": { "hex": "#7ED9F4", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 24,
+        "bounds": { "x": 840, "y": 208, "width": 58, "height": 68 },
+        "centroid": { "x": 873, "y": 236 },
+        "pixelCount": 2143,
+        "label": "right flag",
+        "objectGroup": "flags",
+        "palettes": {
+          "realistic": { "hex": "#7ED9F4", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 25,
+        "bounds": { "x": 214, "y": 223, "width": 62, "height": 62 },
+        "centroid": { "x": 245, "y": 245 },
+        "pixelCount": 2173,
+        "label": "left flag",
+        "objectGroup": "flags",
+        "palettes": {
+          "realistic": { "hex": "#7ED9F4", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 26,
+        "bounds": { "x": 743, "y": 225, "width": 62, "height": 64 },
+        "centroid": { "x": 774, "y": 248 },
+        "pixelCount": 2228,
+        "label": "right flag",
+        "objectGroup": "flags",
+        "palettes": {
+          "realistic": { "hex": "#7ED9F4", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 27,
+        "bounds": { "x": 242, "y": 226, "width": 521, "height": 674 },
+        "centroid": { "x": 470, "y": 686 },
+        "pixelCount": 47935,
+        "label": "crayon lower wavy band",
+        "objectGroup": "crayon",
+        "palettes": {
+          "realistic": { "hex": "#80DAF5", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 28,
+        "bounds": { "x": 438, "y": 242, "width": 145, "height": 112 },
+        "centroid": { "x": 510, "y": 311 },
+        "pixelCount": 9488,
+        "label": "crayon top cone",
+        "objectGroup": "crayon",
+        "palettes": {
+          "realistic": { "hex": "#80DAF5", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 29,
+        "bounds": { "x": 609, "y": 244, "width": 14, "height": 12 },
+        "centroid": { "x": 616, "y": 250 },
+        "pixelCount": 142,
+        "label": "square confetti",
+        "objectGroup": "confetti",
+        "palettes": {
+          "realistic": { "hex": "#7FDAF5", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 30,
+        "bounds": { "x": 316, "y": 275, "width": 16, "height": 15 },
+        "centroid": { "x": 323, "y": 282 },
+        "pixelCount": 189,
+        "label": "square confetti",
+        "objectGroup": "confetti",
+        "palettes": {
+          "realistic": { "hex": "#7FDAF5", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 31,
+        "bounds": { "x": 55, "y": 279, "width": 12, "height": 13 },
+        "centroid": { "x": 61, "y": 285 },
+        "pixelCount": 132,
+        "label": "circular confetti",
+        "objectGroup": "confetti",
+        "palettes": {
+          "realistic": { "hex": "#7FDAF5", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 32,
+        "bounds": { "x": 687, "y": 281, "width": 16, "height": 17 },
+        "centroid": { "x": 695, "y": 289 },
+        "pixelCount": 206,
+        "label": "square confetti",
+        "objectGroup": "confetti",
+        "palettes": {
+          "realistic": { "hex": "#7FDAF5", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 33,
+        "bounds": { "x": 952, "y": 291, "width": 13, "height": 14 },
+        "centroid": { "x": 958, "y": 297 },
+        "pixelCount": 151,
+        "label": "square confetti",
+        "objectGroup": "confetti",
+        "palettes": {
+          "realistic": { "hex": "#7FDAF5", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 34,
+        "bounds": { "x": 809, "y": 310, "width": 105, "height": 134 },
+        "centroid": { "x": 861, "y": 374 },
+        "pixelCount": 10928,
+        "label": "right top balloon",
+        "objectGroup": "right balloons",
+        "palettes": {
+          "realistic": { "hex": "#F79027", "colorName": "Sunset Orange" }
+        }
+      },
+      {
+        "id": 35,
+        "bounds": { "x": 89, "y": 313, "width": 103, "height": 129 },
+        "centroid": { "x": 139, "y": 371 },
+        "pixelCount": 9624,
+        "label": "left top balloon",
+        "objectGroup": "left balloons",
+        "palettes": {
+          "realistic": { "hex": "#FDD835", "colorName": "Sunshine Yellow" }
+        }
+      },
+      {
+        "id": 36,
+        "bounds": { "x": 256, "y": 334, "width": 11, "height": 17 },
+        "centroid": { "x": 261, "y": 341 },
+        "pixelCount": 149,
+        "label": "curly confetti",
+        "objectGroup": "confetti",
+        "palettes": {
+          "realistic": { "hex": "#7FDAF5", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 37,
+        "bounds": { "x": 726, "y": 339, "width": 14, "height": 13 },
+        "centroid": { "x": 732, "y": 345 },
+        "pixelCount": 141,
+        "label": "curly confetti",
+        "objectGroup": "confetti",
+        "palettes": {
+          "realistic": { "hex": "#7FDAF5", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 38,
+        "bounds": { "x": 250, "y": 355, "width": 17, "height": 14 },
+        "centroid": { "x": 258, "y": 362 },
+        "pixelCount": 152,
+        "label": "curly confetti",
+        "objectGroup": "confetti",
+        "palettes": {
+          "realistic": { "hex": "#7FDAF5", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 39,
+        "bounds": { "x": 717, "y": 360, "width": 24, "height": 27 },
+        "centroid": { "x": 730, "y": 374 },
+        "pixelCount": 236,
+        "label": "curly confetti",
+        "objectGroup": "confetti",
+        "palettes": {
+          "realistic": { "hex": "#7FDAF5", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 40,
+        "bounds": { "x": 389, "y": 372, "width": 243, "height": 49 },
+        "centroid": { "x": 510, "y": 394 },
+        "pixelCount": 9504,
+        "label": "crayon upper wavy band",
+        "objectGroup": "crayon",
+        "palettes": {
+          "realistic": { "hex": "#80DAF5", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 41,
+        "bounds": { "x": 25, "y": 379, "width": 105, "height": 125 },
+        "centroid": { "x": 76, "y": 443 },
+        "pixelCount": 9222,
+        "label": "left left balloon",
+        "objectGroup": "left balloons",
+        "palettes": {
+          "realistic": { "hex": "#FDD835", "colorName": "Sunshine Yellow" }
+        }
+      },
+      {
+        "id": 42,
+        "bounds": { "x": 886, "y": 376, "width": 105, "height": 126 },
+        "centroid": { "x": 939, "y": 438 },
+        "pixelCount": 9604,
+        "label": "right right balloon",
+        "objectGroup": "right balloons",
+        "palettes": {
+          "realistic": { "hex": "#F79027", "colorName": "Sunset Orange" }
+        }
+      },
+      {
+        "id": 43,
+        "bounds": { "x": 752, "y": 398, "width": 100, "height": 124 },
+        "centroid": { "x": 801, "y": 461 },
+        "pixelCount": 8997,
+        "label": "right left balloon",
+        "objectGroup": "right balloons",
+        "palettes": {
+          "realistic": { "hex": "#F79027", "colorName": "Sunset Orange" }
+        }
+      },
+      {
+        "id": 44,
+        "bounds": { "x": 149, "y": 401, "width": 94, "height": 117 },
+        "centroid": { "x": 195, "y": 457 },
+        "pixelCount": 8604,
+        "label": "left right balloon",
+        "objectGroup": "left balloons",
+        "palettes": {
+          "realistic": { "hex": "#FDD835", "colorName": "Sunshine Yellow" }
+        }
+      },
+      {
+        "id": 45,
+        "bounds": { "x": 299, "y": 412, "width": 12, "height": 11 },
+        "centroid": { "x": 304, "y": 417 },
+        "pixelCount": 108,
+        "label": "circular confetti",
+        "objectGroup": "confetti",
+        "palettes": {
+          "realistic": { "hex": "#7FDAF5", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 46,
+        "bounds": { "x": 388, "y": 429, "width": 245, "height": 36 },
+        "centroid": { "x": 511, "y": 445 },
+        "pixelCount": 6435,
+        "label": "crayon middle wavy band",
+        "objectGroup": "crayon",
+        "palettes": {
+          "realistic": { "hex": "#80DAF5", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 47,
+        "bounds": { "x": 861, "y": 442, "width": 57, "height": 219 },
+        "centroid": { "x": 885, "y": 540 },
+        "pixelCount": 5485,
+        "label": "right balloons string",
+        "objectGroup": "right balloons",
+        "palettes": {
+          "realistic": { "hex": "#F79027", "colorName": "Sunset Orange" }
+        }
+      },
+      {
+        "id": 48,
+        "bounds": { "x": 690, "y": 446, "width": 13, "height": 13 },
+        "centroid": { "x": 696, "y": 452 },
+        "pixelCount": 137,
+        "label": "circular confetti",
+        "objectGroup": "confetti",
+        "palettes": {
+          "realistic": { "hex": "#7FDAF5", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 49,
+        "bounds": { "x": 110, "y": 456, "width": 43, "height": 185 },
+        "centroid": { "x": 131, "y": 539 },
+        "pixelCount": 3053,
+        "label": "left balloons string",
+        "objectGroup": "left balloons",
+        "palettes": {
+          "realistic": { "hex": "#FDD835", "colorName": "Sunshine Yellow" }
+        }
+      },
+      {
+        "id": 50,
+        "bounds": { "x": 831, "y": 459, "width": 38, "height": 198 },
+        "centroid": { "x": 853, "y": 549 },
+        "pixelCount": 4406,
+        "label": "right balloons string",
+        "objectGroup": "right balloons",
+        "palettes": {
+          "realistic": { "hex": "#F79027", "colorName": "Sunset Orange" }
+        }
+      },
+      {
+        "id": 51,
+        "bounds": { "x": 384, "y": 468, "width": 253, "height": 228 },
+        "centroid": { "x": 507, "y": 584 },
+        "pixelCount": 46857,
+        "label": "crayon face area",
+        "objectGroup": "crayon",
+        "palettes": {
+          "realistic": { "hex": "#80DAF5", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 52,
+        "bounds": { "x": 141, "y": 472, "width": 40, "height": 185 },
+        "centroid": { "x": 158, "y": 556 },
+        "pixelCount": 4118,
+        "label": "left balloons string",
+        "objectGroup": "left balloons",
+        "palettes": {
+          "realistic": { "hex": "#FDD835", "colorName": "Sunshine Yellow" }
+        }
+      },
+      {
+        "id": 53,
+        "bounds": { "x": 253, "y": 493, "width": 66, "height": 60 },
+        "centroid": { "x": 284, "y": 523 },
+        "pixelCount": 2868,
+        "label": "crayon left hand",
+        "objectGroup": "crayon",
+        "palettes": {
+          "realistic": { "hex": "#80DAF5", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 54,
+        "bounds": { "x": 179, "y": 521, "width": 13, "height": 9 },
+        "centroid": { "x": 185, "y": 525 },
+        "pixelCount": 102,
+        "label": "left balloons string",
+        "objectGroup": "left balloons",
+        "palettes": {
+          "realistic": { "hex": "#FDD835", "colorName": "Sunshine Yellow" }
+        }
+      },
+      {
+        "id": 55,
+        "bounds": { "x": 954, "y": 544, "width": 11, "height": 15 },
+        "centroid": { "x": 959, "y": 550 },
+        "pixelCount": 127,
+        "label": "circular confetti",
+        "objectGroup": "confetti",
+        "palettes": {
+          "realistic": { "hex": "#7FDAF5", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 56,
+        "bounds": { "x": 404, "y": 551, "width": 35, "height": 35 },
+        "centroid": { "x": 421, "y": 568 },
+        "pixelCount": 1018,
+        "label": "crayon left cheek",
+        "objectGroup": "crayon",
+        "palettes": {
+          "realistic": { "hex": "#80DAF5", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 57,
+        "bounds": { "x": 580, "y": 551, "width": 35, "height": 36 },
+        "centroid": { "x": 597, "y": 568 },
+        "pixelCount": 1040,
+        "label": "crayon right cheek",
+        "objectGroup": "crayon",
+        "palettes": {
+          "realistic": { "hex": "#80DAF5", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 58,
+        "bounds": { "x": 485, "y": 559, "width": 52, "height": 22 },
+        "centroid": { "x": 510, "y": 572 },
+        "pixelCount": 581,
+        "label": "crayon smile",
+        "objectGroup": "crayon",
+        "palettes": {
+          "realistic": { "hex": "#80DAF5", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 59,
+        "bounds": { "x": 305, "y": 568, "width": 64, "height": 45 },
+        "centroid": { "x": 336, "y": 594 },
+        "pixelCount": 471,
+        "label": "crayon left arm line",
+        "objectGroup": "crayon",
+        "palettes": {
+          "realistic": { "hex": "#80DAF5", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 60,
+        "bounds": { "x": 961, "y": 566, "width": 12, "height": 13 },
+        "centroid": { "x": 967, "y": 572 },
+        "pixelCount": 104,
+        "label": "curly confetti",
+        "objectGroup": "confetti",
+        "palettes": {
+          "realistic": { "hex": "#7FDAF5", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 61,
+        "bounds": { "x": 46, "y": 572, "width": 14, "height": 12 },
+        "centroid": { "x": 53, "y": 577 },
+        "pixelCount": 136,
+        "label": "circular confetti",
+        "objectGroup": "confetti",
+        "palettes": {
+          "realistic": { "hex": "#7FDAF5", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 62,
+        "bounds": { "x": 654, "y": 597, "width": 49, "height": 47 },
+        "centroid": { "x": 679, "y": 618 },
+        "pixelCount": 613,
+        "label": "crayon right arm",
+        "objectGroup": "crayon",
+        "palettes": {
+          "realistic": { "hex": "#80DAF5", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 63,
+        "bounds": { "x": 237, "y": 633, "width": 13, "height": 14 },
+        "centroid": { "x": 243, "y": 639 },
+        "pixelCount": 144,
+        "label": "square confetti",
+        "objectGroup": "confetti",
+        "palettes": {
+          "realistic": { "hex": "#7FDAF5", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 64,
+        "bounds": { "x": 68, "y": 637, "width": 11, "height": 14 },
+        "centroid": { "x": 73, "y": 643 },
+        "pixelCount": 125,
+        "label": "curly confetti",
+        "objectGroup": "confetti",
+        "palettes": {
+          "realistic": { "hex": "#7FDAF5", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 65,
+        "bounds": { "x": 696, "y": 653, "width": 54, "height": 57 },
+        "centroid": { "x": 724, "y": 680 },
+        "pixelCount": 2284,
+        "label": "crayon right hand",
+        "objectGroup": "crayon",
+        "palettes": {
+          "realistic": { "hex": "#80DAF5", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 66,
+        "bounds": { "x": 940, "y": 654, "width": 12, "height": 14 },
+        "centroid": { "x": 946, "y": 660 },
+        "pixelCount": 149,
+        "label": "square confetti",
+        "objectGroup": "confetti",
+        "palettes": {
+          "realistic": { "hex": "#7FDAF5", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 67,
+        "bounds": { "x": 135, "y": 669, "width": 18, "height": 15 },
+        "centroid": { "x": 143, "y": 677 },
+        "pixelCount": 220,
+        "label": "left balloons bow",
+        "objectGroup": "left balloons",
+        "palettes": {
+          "realistic": { "hex": "#7FDAF5", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 68,
+        "bounds": { "x": 163, "y": 669, "width": 19, "height": 15 },
+        "centroid": { "x": 173, "y": 677 },
+        "pixelCount": 224,
+        "label": "left balloons bow",
+        "objectGroup": "left balloons",
+        "palettes": {
+          "realistic": { "hex": "#7FDAF4", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 69,
+        "bounds": { "x": 830, "y": 674, "width": 21, "height": 16 },
+        "centroid": { "x": 840, "y": 682 },
+        "pixelCount": 259,
+        "label": "right balloons bow",
+        "objectGroup": "right balloons",
+        "palettes": {
+          "realistic": { "hex": "#80DAF5", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 70,
+        "bounds": { "x": 860, "y": 674, "width": 20, "height": 16 },
+        "centroid": { "x": 870, "y": 682 },
+        "pixelCount": 263,
+        "label": "right balloons bow",
+        "objectGroup": "right balloons",
+        "palettes": {
+          "realistic": { "hex": "#F79027", "colorName": "Sunset Orange" }
+        }
+      },
+      {
+        "id": 71,
+        "bounds": { "x": 385, "y": 697, "width": 252, "height": 38 },
+        "centroid": { "x": 510, "y": 716 },
+        "pixelCount": 6695,
+        "label": "crayon bottom wavy band",
+        "objectGroup": "crayon",
+        "palettes": {
+          "realistic": { "hex": "#80DAF5", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 72,
+        "bounds": { "x": 782, "y": 700, "width": 30, "height": 54 },
+        "centroid": { "x": 801, "y": 722 },
+        "pixelCount": 741,
+        "label": "bunny left ear",
+        "objectGroup": "bunny",
+        "palettes": {
+          "realistic": { "hex": "#80DAF6", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 73,
+        "bounds": { "x": 731, "y": 715, "width": 153, "height": 222 },
+        "centroid": { "x": 814, "y": 836 },
+        "pixelCount": 14530,
+        "label": "bunny body",
+        "objectGroup": "bunny",
+        "palettes": {
+          "realistic": { "hex": "#80DAF6", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 74,
+        "bounds": { "x": 789, "y": 719, "width": 12, "height": 48 },
+        "centroid": { "x": 794, "y": 742 },
+        "pixelCount": 464,
+        "label": "bunny left inner ear",
+        "objectGroup": "bunny",
+        "palettes": {
+          "realistic": { "hex": "#80DAF6", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 75,
+        "bounds": { "x": 827, "y": 726, "width": 12, "height": 11 },
+        "centroid": { "x": 832, "y": 731 },
+        "pixelCount": 109,
+        "label": "bunny right inner ear",
+        "objectGroup": "bunny",
+        "palettes": {
+          "realistic": { "hex": "#80DAF6", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 76,
+        "bounds": { "x": 968, "y": 726, "width": 12, "height": 12 },
+        "centroid": { "x": 973, "y": 732 },
+        "pixelCount": 129,
+        "label": "bunny right ear",
+        "objectGroup": "bunny",
+        "palettes": {
+          "realistic": { "hex": "#80DAF6", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 77,
+        "bounds": { "x": 192, "y": 734, "width": 15, "height": 13 },
+        "centroid": { "x": 199, "y": 740 },
+        "pixelCount": 173,
+        "label": "chick party hat cone",
+        "objectGroup": "chick",
+        "palettes": {
+          "realistic": { "hex": "#7FDAF5", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 78,
+        "bounds": { "x": 387, "y": 740, "width": 249, "height": 52 },
+        "centroid": { "x": 511, "y": 768 },
+        "pixelCount": 9026,
+        "label": "crayon very bottom band",
+        "objectGroup": "crayon",
+        "palettes": {
+          "realistic": { "hex": "#80DAF5", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 79,
+        "bounds": { "x": 196, "y": 749, "width": 32, "height": 37 },
+        "centroid": { "x": 210, "y": 769 },
+        "pixelCount": 463,
+        "label": "chick party hat rim",
+        "objectGroup": "chick",
+        "palettes": {
+          "realistic": { "hex": "#7FDAF5", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 80,
+        "bounds": { "x": 814, "y": 746, "width": 18, "height": 9 },
+        "centroid": { "x": 823, "y": 750 },
+        "pixelCount": 139,
+        "label": "bunny party hat cone",
+        "objectGroup": "bunny",
+        "palettes": {
+          "realistic": { "hex": "#80DAF6", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 81,
+        "bounds": { "x": 52, "y": 755, "width": 14, "height": 14 },
+        "centroid": { "x": 58, "y": 762 },
+        "pixelCount": 157,
+        "label": "square confetti",
+        "objectGroup": "confetti",
+        "palettes": {
+          "realistic": { "hex": "#7FDAF5", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 82,
+        "bounds": { "x": 805, "y": 757, "width": 29, "height": 10 },
+        "centroid": { "x": 819, "y": 761 },
+        "pixelCount": 264,
+        "label": "bunny party hat rim",
+        "objectGroup": "bunny",
+        "palettes": {
+          "realistic": { "hex": "#80DAF6", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 83,
+        "bounds": { "x": 797, "y": 767, "width": 37, "height": 13 },
+        "centroid": { "x": 815, "y": 773 },
+        "pixelCount": 364,
+        "label": "bunny party hat pom-pom",
+        "objectGroup": "bunny",
+        "palettes": {
+          "realistic": { "hex": "#80DAF6", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 84,
+        "bounds": { "x": 150, "y": 787, "width": 127, "height": 103 },
+        "centroid": { "x": 220, "y": 839 },
+        "pixelCount": 8756,
+        "label": "chick body",
+        "objectGroup": "chick",
+        "palettes": {
+          "realistic": { "hex": "#7FDAF5", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 85,
+        "bounds": { "x": 940, "y": 801, "width": 11, "height": 12 },
+        "centroid": { "x": 945, "y": 807 },
+        "pixelCount": 113,
+        "label": "circular confetti",
+        "objectGroup": "confetti",
+        "palettes": {
+          "realistic": { "hex": "#7FDAF5", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 86,
+        "bounds": { "x": 447, "y": 808, "width": 12, "height": 30 },
+        "centroid": { "x": 453, "y": 822 },
+        "pixelCount": 328,
+        "label": "crayon left leg",
+        "objectGroup": "crayon",
+        "palettes": {
+          "realistic": { "hex": "#80DAF5", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 87,
+        "bounds": { "x": 564, "y": 809, "width": 11, "height": 30 },
+        "centroid": { "x": 569, "y": 823 },
+        "pixelCount": 324,
+        "label": "crayon right leg",
+        "objectGroup": "crayon",
+        "palettes": {
+          "realistic": { "hex": "#80DAF5", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 88,
+        "bounds": { "x": 278, "y": 814, "width": 17, "height": 31 },
+        "centroid": { "x": 286, "y": 828 },
+        "pixelCount": 380,
+        "label": "chick right wing",
+        "objectGroup": "chick",
+        "palettes": {
+          "realistic": { "hex": "#FADB21", "colorName": "Sunshine Yellow" }
+        }
+      },
+      {
+        "id": 89,
+        "bounds": { "x": 757, "y": 820, "width": 10, "height": 12 },
+        "centroid": { "x": 762, "y": 826 },
+        "pixelCount": 109,
+        "label": "circular confetti",
+        "objectGroup": "confetti",
+        "palettes": {
+          "realistic": { "hex": "#7FDAF5", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 90,
+        "bounds": { "x": 80, "y": 831, "width": 12, "height": 15 },
+        "centroid": { "x": 85, "y": 838 },
+        "pixelCount": 150,
+        "label": "circular confetti",
+        "objectGroup": "confetti",
+        "palettes": {
+          "realistic": { "hex": "#7FDAF5", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 91,
+        "bounds": { "x": 823, "y": 836, "width": 14, "height": 14 },
+        "centroid": { "x": 830, "y": 843 },
+        "pixelCount": 171,
+        "label": "bunny right foot",
+        "objectGroup": "bunny",
+        "palettes": {
+          "realistic": { "hex": "#80DAF6", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 92,
+        "bounds": { "x": 401, "y": 852, "width": 61, "height": 32 },
+        "centroid": { "x": 433, "y": 868 },
+        "pixelCount": 1629,
+        "label": "crayon left foot",
+        "objectGroup": "crayon",
+        "palettes": {
+          "realistic": { "hex": "#80DAF5", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 93,
+        "bounds": { "x": 561, "y": 853, "width": 59, "height": 32 },
+        "centroid": { "x": 588, "y": 869 },
+        "pixelCount": 1579,
+        "label": "crayon right foot",
+        "objectGroup": "crayon",
+        "palettes": {
+          "realistic": { "hex": "#80DAF5", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 94,
+        "bounds": { "x": 678, "y": 866, "width": 14, "height": 10 },
+        "centroid": { "x": 685, "y": 870 },
+        "pixelCount": 118,
+        "label": "square confetti",
+        "objectGroup": "confetti",
+        "palettes": {
+          "realistic": { "hex": "#FA6579", "colorName": "Bubblegum Pink" }
+        }
+      },
+      {
+        "id": 95,
+        "bounds": { "x": 169, "y": 872, "width": 15, "height": 13 },
+        "centroid": { "x": 176, "y": 878 },
+        "pixelCount": 104,
+        "label": "chick left wing",
+        "objectGroup": "chick",
+        "palettes": {
+          "realistic": { "hex": "#7FDAF5", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 96,
+        "bounds": { "x": 851, "y": 881, "width": 18, "height": 26 },
+        "centroid": { "x": 859, "y": 894 },
+        "pixelCount": 338,
+        "label": "bunny tail",
+        "objectGroup": "bunny",
+        "palettes": {
+          "realistic": { "hex": "#80DAF6", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 97,
+        "bounds": { "x": 763, "y": 911, "width": 28, "height": 20 },
+        "centroid": { "x": 775, "y": 921 },
+        "pixelCount": 391,
+        "label": "bunny left foot",
+        "objectGroup": "bunny",
+        "palettes": {
+          "realistic": { "hex": "#80DAF6", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 98,
+        "bounds": { "x": 945, "y": 912, "width": 19, "height": 16 },
+        "centroid": { "x": 954, "y": 920 },
+        "pixelCount": 228,
+        "label": "square confetti",
+        "objectGroup": "confetti",
+        "palettes": {
+          "realistic": { "hex": "#7FDAF5", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 99,
+        "bounds": { "x": 501, "y": 916, "width": 17, "height": 12 },
+        "centroid": { "x": 509, "y": 922 },
+        "pixelCount": 156,
+        "label": "circular confetti",
+        "objectGroup": "confetti",
+        "palettes": {
+          "realistic": { "hex": "#7FDAF5", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 100,
+        "bounds": { "x": 150, "y": 924, "width": 23, "height": 19 },
+        "centroid": { "x": 161, "y": 933 },
+        "pixelCount": 309,
+        "label": "square confetti",
+        "objectGroup": "confetti",
+        "palettes": {
+          "realistic": { "hex": "#7FDAF5", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 101,
+        "bounds": { "x": 307, "y": 929, "width": 16, "height": 12 },
+        "centroid": { "x": 315, "y": 935 },
+        "pixelCount": 152,
+        "label": "square confetti",
+        "objectGroup": "confetti",
+        "palettes": {
+          "realistic": { "hex": "#7FDAF5", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 102,
+        "bounds": { "x": 369, "y": 948, "width": 28, "height": 36 },
+        "centroid": { "x": 385, "y": 966 },
+        "pixelCount": 350,
+        "label": "curly confetti",
+        "objectGroup": "confetti",
+        "palettes": {
+          "realistic": { "hex": "#7FDAF5", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 103,
+        "bounds": { "x": 626, "y": 946, "width": 16, "height": 14 },
+        "centroid": { "x": 634, "y": 953 },
+        "pixelCount": 175,
+        "label": "circular confetti",
+        "objectGroup": "confetti",
+        "palettes": {
+          "realistic": { "hex": "#7FDAF5", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 104,
+        "bounds": { "x": 89, "y": 956, "width": 15, "height": 13 },
+        "centroid": { "x": 96, "y": 962 },
+        "pixelCount": 141,
+        "label": "square confetti",
+        "objectGroup": "confetti",
+        "palettes": {
+          "realistic": { "hex": "#7FDAF5", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 105,
+        "bounds": { "x": 240, "y": 956, "width": 10, "height": 11 },
+        "centroid": { "x": 244, "y": 961 },
+        "pixelCount": 100,
+        "label": "circular confetti",
+        "objectGroup": "confetti",
+        "palettes": {
+          "realistic": { "hex": "#7FDAF5", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 106,
+        "bounds": { "x": 871, "y": 956, "width": 19, "height": 13 },
+        "centroid": { "x": 880, "y": 962 },
+        "pixelCount": 183,
+        "label": "square confetti",
+        "objectGroup": "confetti",
+        "palettes": {
+          "realistic": { "hex": "#7FDAF5", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 107,
+        "bounds": { "x": 457, "y": 969, "width": 13, "height": 11 },
+        "centroid": { "x": 463, "y": 974 },
+        "pixelCount": 119,
+        "label": "circular confetti",
+        "objectGroup": "confetti",
+        "palettes": {
+          "realistic": { "hex": "#7FDAF5", "colorName": "Pale Sky" }
+        }
+      },
+      {
+        "id": 108,
+        "bounds": { "x": 721, "y": 974, "width": 16, "height": 12 },
+        "centroid": { "x": 728, "y": 979 },
+        "pixelCount": 148,
+        "label": "curly confetti",
+        "objectGroup": "confetti",
+        "palettes": {
+          "realistic": { "hex": "#7FDAF5", "colorName": "Pale Sky" }
+        }
+      }
+    ]
+  }
+}

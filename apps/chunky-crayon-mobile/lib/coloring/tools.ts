@@ -9,6 +9,7 @@ import {
   faEraser,
   faStar,
   faBrush,
+  faWandMagicSparkles,
 } from "@fortawesome/pro-duotone-svg-icons";
 import type { Tool, BrushType, MagicMode } from "@/stores/canvasStore";
 
@@ -90,7 +91,9 @@ export const COLORING_TOOLS: ColoringToolConfig[] = [
     tool: "magic",
     magicMode: "auto",
     label: "Auto Color",
-    icon: faFillDrip,
+    // Wand (not paint-bucket) — Auto Color is a one-click "magic" fill, so the
+    // wand reads better than faFillDrip (which we keep for the manual Fill tool).
+    icon: faWandMagicSparkles,
     isMagic: true,
   },
 ];

@@ -40,6 +40,14 @@ config.resolver.resolveRequest = (context, moduleName, platform) => {
   return next(context, moduleName, platform);
 };
 
+// Bundle `.bin` files as assets (the onboarding welcome-scene region maps —
+// gzipped pixel→region-id lookups loaded by useRegionStore via a file:// URI).
+// Not in Metro's default assetExts, so require('...region.bin') would otherwise
+// be treated as a source module and fail.
+if (!config.resolver.assetExts.includes("bin")) {
+  config.resolver.assetExts.push("bin");
+}
+
 const withTailwind = withNativeWind(config, { input: "./global.css" });
 
 // withStorybook is a no-op (returns the config unchanged) unless

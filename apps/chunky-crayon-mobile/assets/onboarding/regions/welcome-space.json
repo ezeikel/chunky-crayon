@@ -1,0 +1,918 @@
+{
+  "regionMapWidth": 1024,
+  "regionMapHeight": 1024,
+  "regionsJson": {
+    "sceneDescription": "A space-themed welcome scene featuring a friendly crayon character, a rocket ship, an astronaut, a planet, stars, and a 'WELCOME' banner, all on a moon-like surface.",
+    "sourceWidth": 1024,
+    "sourceHeight": 1024,
+    "regionPixelCount": 975894,
+    "regions": [
+      {
+        "id": 1,
+        "bounds": { "x": 0, "y": 0, "width": 1024, "height": 812 },
+        "centroid": { "x": 431, "y": 281 },
+        "pixelCount": 397394,
+        "label": "space background",
+        "objectGroup": "background",
+        "palettes": { "realistic": { "hex": "#355285", "colorName": "Navy" } }
+      },
+      {
+        "id": 2,
+        "bounds": { "x": 165, "y": 26, "width": 690, "height": 184 },
+        "centroid": { "x": 507, "y": 104 },
+        "pixelCount": 49781,
+        "label": "banner scroll",
+        "objectGroup": "banner",
+        "palettes": { "realistic": { "hex": "#F5EDD9", "colorName": "Cream" } }
+      },
+      {
+        "id": 3,
+        "bounds": { "x": 54, "y": 49, "width": 40, "height": 40 },
+        "centroid": { "x": 72, "y": 69 },
+        "pixelCount": 918,
+        "label": "star",
+        "objectGroup": "star",
+        "palettes": {
+          "realistic": { "hex": "#F9E245", "colorName": "Sunshine Yellow" }
+        }
+      },
+      {
+        "id": 4,
+        "bounds": { "x": 476, "y": 47, "width": 64, "height": 83 },
+        "centroid": { "x": 495, "y": 88 },
+        "pixelCount": 2851,
+        "label": "letter C",
+        "objectGroup": "banner text",
+        "palettes": {
+          "realistic": { "hex": "#B1895E", "colorName": "Mushroom" }
+        }
+      },
+      {
+        "id": 5,
+        "bounds": { "x": 551, "y": 50, "width": 80, "height": 84 },
+        "centroid": { "x": 610, "y": 98 },
+        "pixelCount": 4028,
+        "label": "letter O",
+        "objectGroup": "banner text",
+        "palettes": {
+          "realistic": { "hex": "#B1895E", "colorName": "Mushroom" }
+        }
+      },
+      {
+        "id": 6,
+        "bounds": { "x": 413, "y": 51, "width": 58, "height": 82 },
+        "centroid": { "x": 433, "y": 99 },
+        "pixelCount": 2202,
+        "label": "letter L",
+        "objectGroup": "banner text",
+        "palettes": {
+          "realistic": { "hex": "#B1895E", "colorName": "Mushroom" }
+        }
+      },
+      {
+        "id": 7,
+        "bounds": { "x": 934, "y": 53, "width": 38, "height": 39 },
+        "centroid": { "x": 954, "y": 73 },
+        "pixelCount": 834,
+        "label": "star",
+        "objectGroup": "star",
+        "palettes": {
+          "realistic": { "hex": "#F9E245", "colorName": "Sunshine Yellow" }
+        }
+      },
+      {
+        "id": 8,
+        "bounds": { "x": 340, "y": 56, "width": 65, "height": 87 },
+        "centroid": { "x": 367, "y": 100 },
+        "pixelCount": 3257,
+        "label": "letter E",
+        "objectGroup": "banner text",
+        "palettes": {
+          "realistic": { "hex": "#B1895E", "colorName": "Mushroom" }
+        }
+      },
+      {
+        "id": 9,
+        "bounds": { "x": 641, "y": 59, "width": 93, "height": 95 },
+        "centroid": { "x": 688, "y": 103 },
+        "pixelCount": 4865,
+        "label": "letter M",
+        "objectGroup": "banner text",
+        "palettes": {
+          "realistic": { "hex": "#B1895E", "colorName": "Mushroom" }
+        }
+      },
+      {
+        "id": 10,
+        "bounds": { "x": 218, "y": 68, "width": 107, "height": 99 },
+        "centroid": { "x": 279, "y": 120 },
+        "pixelCount": 5366,
+        "label": "letter W",
+        "objectGroup": "banner text",
+        "palettes": {
+          "realistic": { "hex": "#B1895E", "colorName": "Mushroom" }
+        }
+      },
+      {
+        "id": 11,
+        "bounds": { "x": 575, "y": 74, "width": 33, "height": 38 },
+        "centroid": { "x": 591, "y": 92 },
+        "pixelCount": 1064,
+        "label": "letter O inner",
+        "objectGroup": "banner text",
+        "palettes": {
+          "realistic": { "hex": "#B1895E", "colorName": "Mushroom" }
+        }
+      },
+      {
+        "id": 12,
+        "bounds": { "x": 738, "y": 83, "width": 69, "height": 89 },
+        "centroid": { "x": 767, "y": 125 },
+        "pixelCount": 3218,
+        "label": "letter E",
+        "objectGroup": "banner text",
+        "palettes": {
+          "realistic": { "hex": "#B1895E", "colorName": "Mushroom" }
+        }
+      },
+      {
+        "id": 13,
+        "bounds": { "x": 95, "y": 128, "width": 134, "height": 135 },
+        "centroid": { "x": 159, "y": 191 },
+        "pixelCount": 7383,
+        "label": "banner ribbon left",
+        "objectGroup": "banner",
+        "palettes": { "realistic": { "hex": "#F5EDD9", "colorName": "Cream" } }
+      },
+      {
+        "id": 14,
+        "bounds": { "x": 791, "y": 127, "width": 133, "height": 136 },
+        "centroid": { "x": 860, "y": 192 },
+        "pixelCount": 7419,
+        "label": "banner ribbon right",
+        "objectGroup": "banner",
+        "palettes": { "realistic": { "hex": "#F5EDD9", "colorName": "Cream" } }
+      },
+      {
+        "id": 15,
+        "bounds": { "x": 220, "y": 170, "width": 579, "height": 726 },
+        "centroid": { "x": 481, "y": 664 },
+        "pixelCount": 59863,
+        "label": "crayon body",
+        "objectGroup": "crayon character",
+        "palettes": {
+          "realistic": { "hex": "#EB7A27", "colorName": "Sunset Orange" }
+        }
+      },
+      {
+        "id": 16,
+        "bounds": { "x": 444, "y": 188, "width": 157, "height": 122 },
+        "centroid": { "x": 522, "y": 264 },
+        "pixelCount": 11036,
+        "label": "crayon tip",
+        "objectGroup": "crayon character",
+        "palettes": {
+          "realistic": { "hex": "#EB7A27", "colorName": "Sunset Orange" }
+        }
+      },
+      {
+        "id": 17,
+        "bounds": { "x": 214, "y": 203, "width": 26, "height": 16 },
+        "centroid": { "x": 228, "y": 211 },
+        "pixelCount": 288,
+        "label": "banner ribbon fold left",
+        "objectGroup": "banner",
+        "palettes": { "realistic": { "hex": "#F5EDD9", "colorName": "Cream" } }
+      },
+      {
+        "id": 18,
+        "bounds": { "x": 780, "y": 203, "width": 26, "height": 16 },
+        "centroid": { "x": 791, "y": 211 },
+        "pixelCount": 284,
+        "label": "banner ribbon fold right",
+        "objectGroup": "banner",
+        "palettes": { "realistic": { "hex": "#F5EDD9", "colorName": "Cream" } }
+      },
+      {
+        "id": 19,
+        "bounds": { "x": 646, "y": 209, "width": 49, "height": 48 },
+        "centroid": { "x": 670, "y": 234 },
+        "pixelCount": 1294,
+        "label": "star",
+        "objectGroup": "star",
+        "palettes": {
+          "realistic": { "hex": "#F9E245", "colorName": "Sunshine Yellow" }
+        }
+      },
+      {
+        "id": 20,
+        "bounds": { "x": 288, "y": 251, "width": 54, "height": 55 },
+        "centroid": { "x": 316, "y": 279 },
+        "pixelCount": 1525,
+        "label": "star",
+        "objectGroup": "star",
+        "palettes": {
+          "realistic": { "hex": "#F9E245", "colorName": "Sunshine Yellow" }
+        }
+      },
+      {
+        "id": 21,
+        "bounds": { "x": 799, "y": 302, "width": 135, "height": 105 },
+        "centroid": { "x": 859, "y": 351 },
+        "pixelCount": 9568,
+        "label": "planet top half",
+        "objectGroup": "planet",
+        "palettes": { "realistic": { "hex": "#D8B073", "colorName": "Medium" } }
+      },
+      {
+        "id": 22,
+        "bounds": { "x": 53, "y": 325, "width": 54, "height": 57 },
+        "centroid": { "x": 82, "y": 353 },
+        "pixelCount": 1596,
+        "label": "star",
+        "objectGroup": "star",
+        "palettes": {
+          "realistic": { "hex": "#F9E245", "colorName": "Sunshine Yellow" }
+        }
+      },
+      {
+        "id": 23,
+        "bounds": { "x": 751, "y": 322, "width": 236, "height": 109 },
+        "centroid": { "x": 873, "y": 389 },
+        "pixelCount": 5112,
+        "label": "planet ring front",
+        "objectGroup": "planet",
+        "palettes": { "realistic": { "hex": "#D8B073", "colorName": "Medium" } }
+      },
+      {
+        "id": 24,
+        "bounds": { "x": 390, "y": 328, "width": 265, "height": 55 },
+        "centroid": { "x": 522, "y": 353 },
+        "pixelCount": 11274,
+        "label": "crayon wrapper band top",
+        "objectGroup": "crayon character",
+        "palettes": {
+          "realistic": { "hex": "#EB7A27", "colorName": "Sunset Orange" }
+        }
+      },
+      {
+        "id": 25,
+        "bounds": { "x": 932, "y": 335, "width": 26, "height": 19 },
+        "centroid": { "x": 944, "y": 342 },
+        "pixelCount": 350,
+        "label": "planet ring right",
+        "objectGroup": "planet",
+        "palettes": { "realistic": { "hex": "#3A5281", "colorName": "Navy" } }
+      },
+      {
+        "id": 26,
+        "bounds": { "x": 827, "y": 384, "width": 109, "height": 60 },
+        "centroid": { "x": 886, "y": 419 },
+        "pixelCount": 2968,
+        "label": "planet bottom half",
+        "objectGroup": "planet",
+        "palettes": { "realistic": { "hex": "#D8B073", "colorName": "Medium" } }
+      },
+      {
+        "id": 27,
+        "bounds": { "x": 387, "y": 391, "width": 269, "height": 40 },
+        "centroid": { "x": 522, "y": 409 },
+        "pixelCount": 7721,
+        "label": "crayon wrapper band wavy top",
+        "objectGroup": "crayon character",
+        "palettes": {
+          "realistic": { "hex": "#EB7A27", "colorName": "Sunset Orange" }
+        }
+      },
+      {
+        "id": 28,
+        "bounds": { "x": 778, "y": 392, "width": 25, "height": 19 },
+        "centroid": { "x": 791, "y": 403 },
+        "pixelCount": 342,
+        "label": "planet ring left",
+        "objectGroup": "planet",
+        "palettes": { "realistic": { "hex": "#384F7C", "colorName": "Navy" } }
+      },
+      {
+        "id": 29,
+        "bounds": { "x": 99, "y": 430, "width": 83, "height": 71 },
+        "centroid": { "x": 139, "y": 472 },
+        "pixelCount": 3685,
+        "label": "rocket nose cone",
+        "objectGroup": "rocket",
+        "palettes": {
+          "realistic": { "hex": "#DC3F39", "colorName": "Cherry Red" }
+        }
+      },
+      {
+        "id": 30,
+        "bounds": { "x": 384, "y": 433, "width": 276, "height": 241 },
+        "centroid": { "x": 521, "y": 555 },
+        "pixelCount": 53264,
+        "label": "crayon mouth",
+        "objectGroup": "crayon character",
+        "palettes": {
+          "realistic": { "hex": "#EB7A27", "colorName": "Sunset Orange" }
+        }
+      },
+      {
+        "id": 31,
+        "bounds": { "x": 234, "y": 442, "width": 76, "height": 72 },
+        "centroid": { "x": 270, "y": 478 },
+        "pixelCount": 3974,
+        "label": "crayon hand left",
+        "objectGroup": "crayon character",
+        "palettes": {
+          "realistic": { "hex": "#EB7A27", "colorName": "Sunset Orange" }
+        }
+      },
+      {
+        "id": 32,
+        "bounds": { "x": 924, "y": 472, "width": 54, "height": 55 },
+        "centroid": { "x": 952, "y": 500 },
+        "pixelCount": 1536,
+        "label": "star",
+        "objectGroup": "star",
+        "palettes": {
+          "realistic": { "hex": "#F9E245", "colorName": "Sunshine Yellow" }
+        }
+      },
+      {
+        "id": 33,
+        "bounds": { "x": 737, "y": 488, "width": 29, "height": 30 },
+        "centroid": { "x": 751, "y": 503 },
+        "pixelCount": 527,
+        "label": "star",
+        "objectGroup": "star",
+        "palettes": {
+          "realistic": { "hex": "#F9E245", "colorName": "Sunshine Yellow" }
+        }
+      },
+      {
+        "id": 34,
+        "bounds": { "x": 84, "y": 493, "width": 127, "height": 242 },
+        "centroid": { "x": 148, "y": 609 },
+        "pixelCount": 18484,
+        "label": "rocket fuselage",
+        "objectGroup": "rocket",
+        "palettes": {
+          "realistic": { "hex": "#EEEFF3", "colorName": "Pale Ice" }
+        }
+      },
+      {
+        "id": 35,
+        "bounds": { "x": 405, "y": 515, "width": 42, "height": 42 },
+        "centroid": { "x": 426, "y": 536 },
+        "pixelCount": 1453,
+        "label": "crayon cheek blush left",
+        "objectGroup": "crayon character",
+        "palettes": {
+          "realistic": { "hex": "#EB7A27", "colorName": "Sunset Orange" }
+        }
+      },
+      {
+        "id": 36,
+        "bounds": { "x": 595, "y": 516, "width": 42, "height": 43 },
+        "centroid": { "x": 616, "y": 537 },
+        "pixelCount": 1424,
+        "label": "crayon cheek blush right",
+        "objectGroup": "crayon character",
+        "palettes": {
+          "realistic": { "hex": "#EB7A27", "colorName": "Sunset Orange" }
+        }
+      },
+      {
+        "id": 37,
+        "bounds": { "x": 846, "y": 524, "width": 11, "height": 11 },
+        "centroid": { "x": 851, "y": 529 },
+        "pixelCount": 101,
+        "label": "star",
+        "objectGroup": "star",
+        "palettes": {
+          "realistic": { "hex": "#F9E245", "colorName": "Sunshine Yellow" }
+        }
+      },
+      {
+        "id": 38,
+        "bounds": { "x": 112, "y": 529, "width": 64, "height": 69 },
+        "centroid": { "x": 118, "y": 557 },
+        "pixelCount": 1315,
+        "label": "rocket window frame",
+        "objectGroup": "rocket",
+        "palettes": {
+          "realistic": { "hex": "#EEEFF3", "colorName": "Pale Ice" }
+        }
+      },
+      {
+        "id": 39,
+        "bounds": { "x": 294, "y": 527, "width": 71, "height": 55 },
+        "centroid": { "x": 328, "y": 558 },
+        "pixelCount": 959,
+        "label": "crayon arm left",
+        "objectGroup": "crayon character",
+        "palettes": { "realistic": { "hex": "#38507E", "colorName": "Navy" } }
+      },
+      {
+        "id": 40,
+        "bounds": { "x": 494, "y": 526, "width": 58, "height": 25 },
+        "centroid": { "x": 523, "y": 540 },
+        "pixelCount": 718,
+        "label": "crayon eye left",
+        "objectGroup": "crayon character",
+        "palettes": {
+          "realistic": { "hex": "#EB7A27", "colorName": "Sunset Orange" }
+        }
+      },
+      {
+        "id": 41,
+        "bounds": { "x": 121, "y": 539, "width": 46, "height": 50 },
+        "centroid": { "x": 143, "y": 563 },
+        "pixelCount": 1847,
+        "label": "rocket window glass",
+        "objectGroup": "rocket",
+        "palettes": {
+          "realistic": { "hex": "#EEEFF3", "colorName": "Pale Ice" }
+        }
+      },
+      {
+        "id": 42,
+        "bounds": { "x": 679, "y": 561, "width": 56, "height": 62 },
+        "centroid": { "x": 707, "y": 590 },
+        "pixelCount": 864,
+        "label": "crayon arm right",
+        "objectGroup": "crayon character",
+        "palettes": { "realistic": { "hex": "#3A517E", "colorName": "Navy" } }
+      },
+      {
+        "id": 43,
+        "bounds": { "x": 839, "y": 591, "width": 79, "height": 41 },
+        "centroid": { "x": 885, "y": 602 },
+        "pixelCount": 969,
+        "label": "astronaut helmet rim",
+        "objectGroup": "astronaut",
+        "palettes": {
+          "realistic": { "hex": "#EEEDF2", "colorName": "Pale Ice" }
+        }
+      },
+      {
+        "id": 44,
+        "bounds": { "x": 843, "y": 609, "width": 58, "height": 46 },
+        "centroid": { "x": 872, "y": 631 },
+        "pixelCount": 2152,
+        "label": "astronaut visor",
+        "objectGroup": "astronaut",
+        "palettes": { "realistic": { "hex": "#646566", "colorName": "Slate" } }
+      },
+      {
+        "id": 45,
+        "bounds": { "x": 926, "y": 626, "width": 23, "height": 21 },
+        "centroid": { "x": 938, "y": 636 },
+        "pixelCount": 326,
+        "label": "astronaut hand right",
+        "objectGroup": "astronaut",
+        "palettes": {
+          "realistic": { "hex": "#EEEDF2", "colorName": "Pale Ice" }
+        }
+      },
+      {
+        "id": 46,
+        "bounds": { "x": 724, "y": 635, "width": 61, "height": 66 },
+        "centroid": { "x": 755, "y": 667 },
+        "pixelCount": 2990,
+        "label": "crayon hand right",
+        "objectGroup": "crayon character",
+        "palettes": {
+          "realistic": { "hex": "#EB7A27", "colorName": "Sunset Orange" }
+        }
+      },
+      {
+        "id": 47,
+        "bounds": { "x": 208, "y": 643, "width": 47, "height": 113 },
+        "centroid": { "x": 232, "y": 698 },
+        "pixelCount": 3281,
+        "label": "rocket fin right",
+        "objectGroup": "rocket",
+        "palettes": {
+          "realistic": { "hex": "#DD3F39", "colorName": "Cherry Red" }
+        }
+      },
+      {
+        "id": 48,
+        "bounds": { "x": 893, "y": 644, "width": 19, "height": 18 },
+        "centroid": { "x": 903, "y": 653 },
+        "pixelCount": 148,
+        "label": "astronaut arm right",
+        "objectGroup": "astronaut",
+        "palettes": {
+          "realistic": { "hex": "#EEEDF2", "colorName": "Pale Ice" }
+        }
+      },
+      {
+        "id": 49,
+        "bounds": { "x": 901, "y": 651, "width": 34, "height": 29 },
+        "centroid": { "x": 917, "y": 665 },
+        "pixelCount": 610,
+        "label": "astronaut torso right",
+        "objectGroup": "astronaut",
+        "palettes": {
+          "realistic": { "hex": "#EEEDF2", "colorName": "Pale Ice" }
+        }
+      },
+      {
+        "id": 50,
+        "bounds": { "x": 65, "y": 656, "width": 40, "height": 118 },
+        "centroid": { "x": 82, "y": 713 },
+        "pixelCount": 2947,
+        "label": "rocket fin left",
+        "objectGroup": "rocket",
+        "palettes": {
+          "realistic": { "hex": "#DB3F39", "colorName": "Cherry Red" }
+        }
+      },
+      {
+        "id": 51,
+        "bounds": { "x": 818, "y": 662, "width": 24, "height": 35 },
+        "centroid": { "x": 829, "y": 681 },
+        "pixelCount": 470,
+        "label": "astronaut arm left",
+        "objectGroup": "astronaut",
+        "palettes": {
+          "realistic": { "hex": "#EEEDF2", "colorName": "Pale Ice" }
+        }
+      },
+      {
+        "id": 52,
+        "bounds": { "x": 837, "y": 664, "width": 67, "height": 48 },
+        "centroid": { "x": 870, "y": 700 },
+        "pixelCount": 1802,
+        "label": "astronaut control panel",
+        "objectGroup": "astronaut",
+        "palettes": {
+          "realistic": { "hex": "#EEEDF2", "colorName": "Pale Ice" }
+        }
+      },
+      {
+        "id": 53,
+        "bounds": { "x": 144, "y": 666, "width": 33, "height": 69 },
+        "centroid": { "x": 159, "y": 701 },
+        "pixelCount": 1799,
+        "label": "rocket hatch",
+        "objectGroup": "rocket",
+        "palettes": {
+          "realistic": { "hex": "#DC3F39", "colorName": "Cherry Red" }
+        }
+      },
+      {
+        "id": 54,
+        "bounds": { "x": 384, "y": 674, "width": 276, "height": 43 },
+        "centroid": { "x": 522, "y": 696 },
+        "pixelCount": 8295,
+        "label": "crayon wrapper band wavy bottom",
+        "objectGroup": "crayon character",
+        "palettes": {
+          "realistic": { "hex": "#EB7A27", "colorName": "Sunset Orange" }
+        }
+      },
+      {
+        "id": 55,
+        "bounds": { "x": 137, "y": 687, "width": 6, "height": 20 },
+        "centroid": { "x": 139, "y": 697 },
+        "pixelCount": 100,
+        "label": "rocket hatch handle",
+        "objectGroup": "rocket",
+        "palettes": {
+          "realistic": { "hex": "#EEEFF3", "colorName": "Pale Ice" }
+        }
+      },
+      {
+        "id": 56,
+        "bounds": { "x": 862, "y": 690, "width": 18, "height": 8 },
+        "centroid": { "x": 871, "y": 694 },
+        "pixelCount": 113,
+        "label": "astronaut control panel buttons",
+        "objectGroup": "astronaut",
+        "palettes": {
+          "realistic": { "hex": "#EEEDF2", "colorName": "Pale Ice" }
+        }
+      },
+      {
+        "id": 57,
+        "bounds": { "x": 836, "y": 703, "width": 19, "height": 24 },
+        "centroid": { "x": 843, "y": 716 },
+        "pixelCount": 309,
+        "label": "astronaut suit torso",
+        "objectGroup": "astronaut",
+        "palettes": {
+          "realistic": { "hex": "#EEEDF2", "colorName": "Pale Ice" }
+        }
+      },
+      {
+        "id": 58,
+        "bounds": { "x": 861, "y": 710, "width": 40, "height": 26 },
+        "centroid": { "x": 885, "y": 723 },
+        "pixelCount": 627,
+        "label": "astronaut leg right",
+        "objectGroup": "astronaut",
+        "palettes": {
+          "realistic": { "hex": "#EEEDF2", "colorName": "Pale Ice" }
+        }
+      },
+      {
+        "id": 59,
+        "bounds": { "x": 197, "y": 712, "width": 36, "height": 44 },
+        "centroid": { "x": 214, "y": 737 },
+        "pixelCount": 941,
+        "label": "rocket engine base",
+        "objectGroup": "rocket",
+        "palettes": { "realistic": { "hex": "#375182", "colorName": "Navy" } }
+      },
+      {
+        "id": 60,
+        "bounds": { "x": 88, "y": 722, "width": 42, "height": 55 },
+        "centroid": { "x": 106, "y": 753 },
+        "pixelCount": 1326,
+        "label": "small star",
+        "objectGroup": "star",
+        "palettes": { "realistic": { "hex": "#375283", "colorName": "Navy" } }
+      },
+      {
+        "id": 61,
+        "bounds": { "x": 386, "y": 721, "width": 272, "height": 57 },
+        "centroid": { "x": 522, "y": 752 },
+        "pixelCount": 11156,
+        "label": "crayon wrapper band bottom",
+        "objectGroup": "crayon character",
+        "palettes": {
+          "realistic": { "hex": "#EB7A27", "colorName": "Sunset Orange" }
+        }
+      },
+      {
+        "id": 62,
+        "bounds": { "x": 854, "y": 722, "width": 18, "height": 26 },
+        "centroid": { "x": 863, "y": 734 },
+        "pixelCount": 384,
+        "label": "astronaut leg left",
+        "objectGroup": "astronaut",
+        "palettes": { "realistic": { "hex": "#3C5685", "colorName": "Navy" } }
+      },
+      {
+        "id": 63,
+        "bounds": { "x": 118, "y": 730, "width": 84, "height": 23 },
+        "centroid": { "x": 160, "y": 742 },
+        "pixelCount": 1197,
+        "label": "rocket engine nozzle",
+        "objectGroup": "rocket",
+        "palettes": {
+          "realistic": { "hex": "#EEEFF3", "colorName": "Pale Ice" }
+        }
+      },
+      {
+        "id": 64,
+        "bounds": { "x": 828, "y": 727, "width": 25, "height": 17 },
+        "centroid": { "x": 840, "y": 736 },
+        "pixelCount": 340,
+        "label": "astronaut suit waist",
+        "objectGroup": "astronaut",
+        "palettes": {
+          "realistic": { "hex": "#EEEDF2", "colorName": "Pale Ice" }
+        }
+      },
+      {
+        "id": 65,
+        "bounds": { "x": 0, "y": 734, "width": 1024, "height": 290 },
+        "centroid": { "x": 510, "y": 902 },
+        "pixelCount": 223412,
+        "label": "moon surface",
+        "objectGroup": "ground",
+        "palettes": { "realistic": { "hex": "#9BA3A6", "colorName": "Gray" } }
+      },
+      {
+        "id": 66,
+        "bounds": { "x": 872, "y": 738, "width": 27, "height": 18 },
+        "centroid": { "x": 886, "y": 746 },
+        "pixelCount": 383,
+        "label": "astronaut boot right",
+        "objectGroup": "astronaut",
+        "palettes": {
+          "realistic": { "hex": "#EEEDF2", "colorName": "Pale Ice" }
+        }
+      },
+      {
+        "id": 67,
+        "bounds": { "x": 183, "y": 750, "width": 18, "height": 21 },
+        "centroid": { "x": 191, "y": 760 },
+        "pixelCount": 268,
+        "label": "rocket nozzle rim",
+        "objectGroup": "rocket",
+        "palettes": {
+          "realistic": { "hex": "#EEEFF3", "colorName": "Pale Ice" }
+        }
+      },
+      {
+        "id": 68,
+        "bounds": { "x": 831, "y": 748, "width": 73, "height": 21 },
+        "centroid": { "x": 868, "y": 757 },
+        "pixelCount": 606,
+        "label": "astronaut boot left",
+        "objectGroup": "astronaut",
+        "palettes": {
+          "realistic": { "hex": "#EEEDF2", "colorName": "Pale Ice" }
+        }
+      },
+      {
+        "id": 69,
+        "bounds": { "x": 128, "y": 755, "width": 15, "height": 22 },
+        "centroid": { "x": 136, "y": 766 },
+        "pixelCount": 257,
+        "label": "rocket flame left",
+        "objectGroup": "rocket",
+        "palettes": {
+          "realistic": { "hex": "#EEEFF3", "colorName": "Pale Ice" }
+        }
+      },
+      {
+        "id": 70,
+        "bounds": { "x": 145, "y": 753, "width": 39, "height": 24 },
+        "centroid": { "x": 163, "y": 765 },
+        "pixelCount": 761,
+        "label": "rocket flame middle",
+        "objectGroup": "rocket",
+        "palettes": {
+          "realistic": { "hex": "#EEEFF3", "colorName": "Pale Ice" }
+        }
+      },
+      {
+        "id": 71,
+        "bounds": { "x": 303, "y": 764, "width": 19, "height": 8 },
+        "centroid": { "x": 312, "y": 768 },
+        "pixelCount": 140,
+        "label": "moon crater",
+        "objectGroup": "ground",
+        "palettes": { "realistic": { "hex": "#9BA3A6", "colorName": "Gray" } }
+      },
+      {
+        "id": 72,
+        "bounds": { "x": 135, "y": 774, "width": 56, "height": 10 },
+        "centroid": { "x": 162, "y": 779 },
+        "pixelCount": 277,
+        "label": "rocket flame right",
+        "objectGroup": "rocket",
+        "palettes": {
+          "realistic": { "hex": "#EEEFF3", "colorName": "Pale Ice" }
+        }
+      },
+      {
+        "id": 73,
+        "bounds": { "x": 748, "y": 776, "width": 19, "height": 8 },
+        "centroid": { "x": 757, "y": 780 },
+        "pixelCount": 138,
+        "label": "moon pebble",
+        "objectGroup": "ground",
+        "palettes": { "realistic": { "hex": "#9BA3A6", "colorName": "Gray" } }
+      },
+      {
+        "id": 74,
+        "bounds": { "x": 249, "y": 800, "width": 28, "height": 11 },
+        "centroid": { "x": 262, "y": 805 },
+        "pixelCount": 270,
+        "label": "moon crater",
+        "objectGroup": "ground",
+        "palettes": { "realistic": { "hex": "#9BA3A6", "colorName": "Gray" } }
+      },
+      {
+        "id": 75,
+        "bounds": { "x": 452, "y": 796, "width": 10, "height": 30 },
+        "centroid": { "x": 456, "y": 811 },
+        "pixelCount": 296,
+        "label": "crayon leg left",
+        "objectGroup": "crayon character",
+        "palettes": {
+          "realistic": { "hex": "#EB7A27", "colorName": "Sunset Orange" }
+        }
+      },
+      {
+        "id": 76,
+        "bounds": { "x": 582, "y": 796, "width": 12, "height": 31 },
+        "centroid": { "x": 588, "y": 811 },
+        "pixelCount": 328,
+        "label": "crayon leg right",
+        "objectGroup": "crayon character",
+        "palettes": {
+          "realistic": { "hex": "#EB7A27", "colorName": "Sunset Orange" }
+        }
+      },
+      {
+        "id": 77,
+        "bounds": { "x": 783, "y": 812, "width": 70, "height": 33 },
+        "centroid": { "x": 818, "y": 828 },
+        "pixelCount": 1776,
+        "label": "moon crater",
+        "objectGroup": "ground",
+        "palettes": { "realistic": { "hex": "#9BA3A6", "colorName": "Gray" } }
+      },
+      {
+        "id": 78,
+        "bounds": { "x": 66, "y": 821, "width": 63, "height": 40 },
+        "centroid": { "x": 97, "y": 840 },
+        "pixelCount": 1604,
+        "label": "moon crater",
+        "objectGroup": "ground",
+        "palettes": { "realistic": { "hex": "#9BA3A6", "colorName": "Gray" } }
+      },
+      {
+        "id": 79,
+        "bounds": { "x": 401, "y": 844, "width": 67, "height": 34 },
+        "centroid": { "x": 436, "y": 861 },
+        "pixelCount": 1896,
+        "label": "crayon foot left",
+        "objectGroup": "crayon character",
+        "palettes": {
+          "realistic": { "hex": "#EB7A27", "colorName": "Sunset Orange" }
+        }
+      },
+      {
+        "id": 80,
+        "bounds": { "x": 578, "y": 844, "width": 66, "height": 35 },
+        "centroid": { "x": 608, "y": 862 },
+        "pixelCount": 1900,
+        "label": "crayon foot right",
+        "objectGroup": "crayon character",
+        "palettes": {
+          "realistic": { "hex": "#EB7A27", "colorName": "Sunset Orange" }
+        }
+      },
+      {
+        "id": 81,
+        "bounds": { "x": 264, "y": 903, "width": 21, "height": 11 },
+        "centroid": { "x": 274, "y": 908 },
+        "pixelCount": 189,
+        "label": "moon pebble",
+        "objectGroup": "ground",
+        "palettes": { "realistic": { "hex": "#9BA3A6", "colorName": "Gray" } }
+      },
+      {
+        "id": 82,
+        "bounds": { "x": 896, "y": 904, "width": 73, "height": 38 },
+        "centroid": { "x": 932, "y": 922 },
+        "pixelCount": 1926,
+        "label": "moon crater",
+        "objectGroup": "ground",
+        "palettes": { "realistic": { "hex": "#9BA3A6", "colorName": "Gray" } }
+      },
+      {
+        "id": 83,
+        "bounds": { "x": 114, "y": 919, "width": 33, "height": 14 },
+        "centroid": { "x": 130, "y": 926 },
+        "pixelCount": 379,
+        "label": "moon crater",
+        "objectGroup": "ground",
+        "palettes": { "realistic": { "hex": "#9BA3A6", "colorName": "Gray" } }
+      },
+      {
+        "id": 84,
+        "bounds": { "x": 726, "y": 925, "width": 31, "height": 14 },
+        "centroid": { "x": 741, "y": 932 },
+        "pixelCount": 359,
+        "label": "moon pebble",
+        "objectGroup": "ground",
+        "palettes": { "realistic": { "hex": "#9BA3A6", "colorName": "Gray" } }
+      },
+      {
+        "id": 85,
+        "bounds": { "x": 486, "y": 958, "width": 43, "height": 15 },
+        "centroid": { "x": 507, "y": 965 },
+        "pixelCount": 553,
+        "label": "moon crater rim",
+        "objectGroup": "ground",
+        "palettes": { "realistic": { "hex": "#9BA3A6", "colorName": "Gray" } }
+      },
+      {
+        "id": 86,
+        "bounds": { "x": 322, "y": 965, "width": 15, "height": 9 },
+        "centroid": { "x": 329, "y": 969 },
+        "pixelCount": 116,
+        "label": "moon pebble",
+        "objectGroup": "ground",
+        "palettes": { "realistic": { "hex": "#9BA3A6", "colorName": "Gray" } }
+      },
+      {
+        "id": 87,
+        "bounds": { "x": 498, "y": 975, "width": 24, "height": 6 },
+        "centroid": { "x": 509, "y": 978 },
+        "pixelCount": 119,
+        "label": "moon crater bottom",
+        "objectGroup": "ground",
+        "palettes": { "realistic": { "hex": "#9BA3A6", "colorName": "Gray" } }
+      },
+      {
+        "id": 88,
+        "bounds": { "x": 592, "y": 975, "width": 15, "height": 8 },
+        "centroid": { "x": 599, "y": 978 },
+        "pixelCount": 113,
+        "label": "moon pebble",
+        "objectGroup": "ground",
+        "palettes": { "realistic": { "hex": "#9BA3A6", "colorName": "Gray" } }
+      }
+    ]
+  }
+}

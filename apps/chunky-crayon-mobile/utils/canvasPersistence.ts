@@ -19,6 +19,13 @@ import {
 // result locally + mark pending — never blind-clobber.
 const MAX_MERGE_RETRIES = 2;
 
+// Local-only canvases have no server DB row, so any /canvas/progress GET or POST
+// against them 404s (and the POST surfaces a red error toast). The onboarding
+// welcome scenes ("onboarding-*") are synthetic, bundled, single-session images
+// — they must never touch the server sync layer. Both load + sync no-op for them.
+export const isLocalOnlyImage = (imageId: string): boolean =>
+  imageId.startsWith("onboarding-");
+
 // Per-image in-flight sync coalescing. Autosave fires 1s after each stroke; on
 // a fast device a burst of strokes (or a rotation / auto-color) can fire
 // several autosaves whose POSTs overlap. Each carries the same version, so all
@@ -285,6 +292,10 @@ export const syncCanvasToServer = async (
   previewDataUrl?: string,
   snapshotDataUrl?: string,
 ): Promise<{ success: boolean; version?: number; error?: string }> => {
+  // Local-only images (onboarding) have no DB row — never POST to the server.
+  if (isLocalOnlyImage(imageId)) {
+    return { success: true, version };
+  }
   if (_syncInFlight.has(imageId)) {
     // Another sync is running for this image — don't race it. Mark that the
     // latest state still needs flushing; the in-flight sync re-fires once.
@@ -1059,6 +1070,17 @@ export const loadCanvasState = async (
 ): Promise<LoadCanvasResult | null> => {
   console.log(`[CANVAS_PERSIST] LOAD START - Image: ${imageId}`);
 
+  // Local-only images (onboarding) have no DB row. Skip the server GET (which
+  // would 404 and then wipe local storage). Onboarding resets its canvas on
+  // mount, so there's no saved state to restore — return null and let it start
+  // clean. (If a local-only image ever needs persistence, read MMKV here.)
+  if (isLocalOnlyImage(imageId)) {
+    console.log(
+      `[CANVAS_PERSIST] Local-only image ${imageId} — no server load`,
+    );
+    return null;
+  }
+
   // First, try to load from server (most recent cross-platform data)
   try {
     const serverData = await loadCanvasFromServer(imageId);
@@ -1224,16 +1246,18 @@ export const deleteCanvasState = async (imageId: string): Promise<boolean> => {
     // Also delete the SERVER progress row so Start Over doesn't resurrect it on
     // the next load (and doesn't sync back to the other device). Fire-and-
     // forget; the route is idempotent. profileId resolved server-side from the
-    // mobile token.
-    try {
-      const apiUrl = getApiUrl();
-      const authHeader = await getAuthHeader();
-      await fetch(
-        `${apiUrl}/canvas/progress?imageId=${encodeURIComponent(imageId)}`,
-        { method: "DELETE", headers: { ...authHeader } },
-      );
-    } catch (err) {
-      console.warn("[CANVAS_PERSIST] Failed to delete server progress:", err);
+    // mobile token. Skipped for local-only images (onboarding) — no DB row.
+    if (!isLocalOnlyImage(imageId)) {
+      try {
+        const apiUrl = getApiUrl();
+        const authHeader = await getAuthHeader();
+        await fetch(
+          `${apiUrl}/canvas/progress?imageId=${encodeURIComponent(imageId)}`,
+          { method: "DELETE", headers: { ...authHeader } },
+        );
+      } catch (err) {
+        console.warn("[CANVAS_PERSIST] Failed to delete server progress:", err);
+      }
     }
 
     return true;
