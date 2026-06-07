@@ -66,12 +66,16 @@ export const useUpsideDownHint = (): boolean => {
       // Only care about portrait-ish holds (y axis dominant). In landscape the
       // x axis dominates — ignore it so we never show the hint mid-landscape.
       const portraitDominant = Math.abs(y) > Math.abs(x);
-      // Upright portrait reads y ≈ +1g; fully inverted reads y ≈ −1g.
+      // iOS accelerometer sign (Apple CoreMotion, which expo-sensors wraps):
+      // held UPRIGHT in portrait (bottom edge down) reads y ≈ −1g; held
+      // UPSIDE-DOWN reads y ≈ +1g. (The original code had this inverted, which
+      // fired the hint whenever the phone was held normally — see the upside-down
+      // "Turn me around!" screenshot bug.)
       // Hysteresis so the hint doesn't flicker when the phone is near flat:
-      //   enter "upside-down" only past −0.65g, exit once back above −0.35g.
+      //   enter "upside-down" only past +0.65g, exit once back below +0.35g.
       const next = isUpsideDownRef.current
-        ? portraitDominant && y < -0.35
-        : portraitDominant && y < -0.65;
+        ? portraitDominant && y > 0.35
+        : portraitDominant && y > 0.65;
       if (next !== isUpsideDownRef.current) {
         isUpsideDownRef.current = next;
         setIsUpsideDown(next);

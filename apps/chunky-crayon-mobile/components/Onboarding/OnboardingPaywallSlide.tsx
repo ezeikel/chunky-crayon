@@ -314,9 +314,31 @@ const OnboardingPaywallSlide = ({
 
   // ── Shared action block: price anchor → primary CTA → secondary links →
   //    fine print. Phone pins this in the footer; iPad puts it in actionColumn.
+  // Fetched but no package available (expected when RevenueCat has no offering
+  // for the running bundle — e.g. the `.internal`/`.dev` preview/dev variants,
+  // which aren't registered RC apps; only the prod bundle is. Resolves normally
+  // on a real TestFlight/App Store build). Show a friendly note + a way past the
+  // paywall rather than a dead, permanently-disabled "Start My Free Week".
+  const offeringsUnavailable = !isLoadingOfferings && !targetPackage;
+
   const actionBlock = isLoadingOfferings ? (
     <View style={styles.loadingContainer}>
       <Spinner size={24} color="#E46444" />
+    </View>
+  ) : offeringsUnavailable ? (
+    <View style={styles.loadingContainer}>
+      <Text style={styles.unavailableText}>
+        Plans aren&apos;t available right now. You can start coloring and
+        upgrade later.
+      </Text>
+      <Pressable
+        onPress={onComplete}
+        accessibilityRole="button"
+        accessibilityLabel="Continue to the app"
+        style={styles.unavailableContinue}
+      >
+        <Text style={styles.unavailableContinueText}>Continue</Text>
+      </Pressable>
     </View>
   ) : (
     <>
@@ -665,6 +687,25 @@ const styles = StyleSheet.create({
   loadingContainer: {
     paddingVertical: 20,
     alignItems: "center",
+  },
+  unavailableText: {
+    fontFamily: "TondoTrial-Regular",
+    fontSize: 15,
+    color: "#7A6F66",
+    textAlign: "center",
+    lineHeight: 21,
+    marginBottom: 14,
+  },
+  unavailableContinue: {
+    paddingVertical: 14,
+    paddingHorizontal: 32,
+    borderRadius: 16,
+    backgroundColor: "#E46444",
+  },
+  unavailableContinueText: {
+    fontFamily: "TondoTrial-Bold",
+    fontSize: 16,
+    color: "#FFFFFF",
   },
   trialButton: {
     backgroundColor: "#E46444",

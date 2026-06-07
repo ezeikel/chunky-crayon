@@ -89,7 +89,7 @@ const SubscriptionPaywallModal = ({
   source,
 }: SubscriptionPaywallModalProps) => {
   const insets = useSafeAreaInsets();
-  const { data: offering } = useOfferings();
+  const { data: offering, isPending: isLoadingOfferings } = useOfferings();
   const purchaseMutation = usePurchase();
   const restoreMutation = useRestorePurchases();
 
@@ -145,13 +145,23 @@ const SubscriptionPaywallModal = ({
   const selectedPkg =
     cycle === "annual" ? selectedPlans?.annual : selectedPlans?.monthly;
 
-  // Whether any plan has a package for the current cycle — drives the
-  // loader-vs-rows branch so an errored/empty offering shows the loader,
-  // never a blank gap.
+  // Whether any plan has a package for the current cycle.
   const hasPlans = PLAN_DISPLAY_ORDER.some((planKey) => {
     const plans = plansByName[planKey];
     return cycle === "annual" ? plans?.annual : plans?.monthly;
   });
+
+  // Three distinct states, so we never hang on an infinite "Loading plans…":
+  //   - still fetching          → spinner
+  //   - fetched, plans present  → the plan rows
+  //   - fetched, NO plans       → friendly "unavailable" fallback.
+  // The last case is expected when RevenueCat has no offering for the running
+  // bundle id (e.g. the `.internal`/`.dev` preview/dev variants, which aren't
+  // registered as RC apps — only the prod `com.chewybytes.chunkycrayon.app`
+  // bundle has a configured App Store app). On a real TestFlight/App Store
+  // build offerings resolve normally. (PTP handles the same way: terminate the
+  // loading state and degrade, rather than register every variant bundle.)
+  const offeringsUnavailable = !isLoadingOfferings && !hasPlans;
 
   // The actual buy — runs only after the parental gate clears (or immediately
   // when a gate already fired upstream, e.g. from the gated Settings area).
@@ -305,10 +315,10 @@ const SubscriptionPaywallModal = ({
                 })}
               </View>
 
-              {/* Compact selectable plan rows. Show the loader whenever
-                there are no plans to render yet — loading OR an
-                errored/empty offering — so we never leave a blank gap
-                (RevenueCat can resolve to error with no data). */}
+              {/* Compact selectable plan rows. Three states (see
+                offeringsUnavailable above): loading → spinner, plans → rows,
+                fetched-but-empty → friendly fallback (never an infinite
+                spinner). */}
               {hasPlans ? (
                 <View style={styles.plans}>
                   {PLAN_DISPLAY_ORDER.map((planKey: PlanKey) => {
@@ -329,6 +339,18 @@ const SubscriptionPaywallModal = ({
                       />
                     );
                   })}
+                </View>
+              ) : offeringsUnavailable ? (
+                <View style={styles.loadingContainer}>
+                  <FontAwesomeIcon
+                    icon={faShieldCheck}
+                    size={28}
+                    color="#C9BEB4"
+                  />
+                  <Text style={styles.loadingText}>
+                    Plans aren&apos;t available right now. Please try again
+                    later.
+                  </Text>
                 </View>
               ) : (
                 <View style={styles.loadingContainer}>
