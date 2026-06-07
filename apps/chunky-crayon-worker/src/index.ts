@@ -2874,6 +2874,7 @@ app.post("/jobs/coloring-image/start", async (c) => {
     size: body.size,
     quality: body.quality,
     partialImages: body.partialImages,
+    clientDistinctId: body.clientDistinctId,
   };
 
   console.log(

@@ -8,7 +8,7 @@ import { type ImageQuality } from '@one-colored-pixel/coloring-core/image-qualit
 import { type SceneSelection } from '@one-colored-pixel/coloring-ui';
 import { DEFAULT_CURRENCY, type Currency } from '@/lib/currency';
 import cn from '@/utils/cn';
-import { trackEvent } from '@/utils/analytics-client';
+import { trackEvent, getPosthogDistinctId } from '@/utils/analytics-client';
 import { TRACKING_EVENTS } from '@/constants';
 import { trackLead } from '@/utils/pixels';
 import useUser from '@/hooks/useUser';
@@ -342,6 +342,11 @@ const MultiModeForm = ({
           isSubscriber,
         });
 
+        // Forward the browser's PostHog distinct_id so the worker can
+        // attribute the resulting image_generation_completed/failed event
+        // to this person (the worker has no session; guests have no DB id).
+        const clientDistinctId = getPosthogDistinctId();
+
         const result =
           inputType === 'image' && imageBase64
             ? await createPendingColoringImage({
@@ -349,6 +354,7 @@ const MultiModeForm = ({
                 photoBase64: imageBase64,
                 locale,
                 quality,
+                clientDistinctId,
                 // characterId intentionally NOT passed: photo mode already
                 // uses the user's photo as its reference image. Mixing in
                 // a character portrait would muddy the output.
@@ -358,6 +364,7 @@ const MultiModeForm = ({
                 description: desc,
                 locale,
                 quality,
+                clientDistinctId,
                 // Scene mode can feature up to MAX_SUBJECTS of the kid's
                 // characters (the friends row); text mode uses the single
                 // CharacterPicker selection.
@@ -465,6 +472,7 @@ const MultiModeForm = ({
               locale,
               quality,
               characterIds: characterId ? [characterId] : [],
+              clientDistinctId: getPosthogDistinctId(),
             });
 
             if (!result.ok) {

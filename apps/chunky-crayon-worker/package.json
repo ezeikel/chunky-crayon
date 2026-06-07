@@ -45,6 +45,7 @@
     "oslllo-potrace": "^4.0.0",
     "pg": "^8.20.0",
     "playwright": "^1.59.0",
+    "posthog-node": "^5.17.4",
     "qrcode": "^1.5.3",
     "remotion": "^4.0.457",
     "resend": "^4.5.1",

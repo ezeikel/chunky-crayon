@@ -121,14 +121,24 @@ export const useAnalytics = () => {
  * ```
  */
 export const posthogDistinctIdHeader = (): Record<string, string> => {
+  const id = getPosthogDistinctId();
+  return id ? { [POSTHOG_DISTINCT_ID_HEADER]: id } : {};
+};
+
+/**
+ * The raw browser PostHog distinct_id, or undefined if PostHog hasn't
+ * initialised. Use when you need to pass the id as a value (e.g. into a
+ * server-action argument or a JSON dispatch payload) rather than as a
+ * header. Same source as `posthogDistinctIdHeader`.
+ */
+export const getPosthogDistinctId = (): string | undefined => {
   if (typeof window === 'undefined' || !posthog?.get_distinct_id) {
-    return {};
+    return undefined;
   }
   try {
-    const id = posthog.get_distinct_id();
-    return id ? { [POSTHOG_DISTINCT_ID_HEADER]: id } : {};
+    return posthog.get_distinct_id() || undefined;
   } catch {
-    return {};
+    return undefined;
   }
 };
 

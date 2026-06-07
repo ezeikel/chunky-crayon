@@ -87,6 +87,13 @@ export type CreatePendingArgs = (
    *  resolves to a tier-appropriate default. */
   quality?: ImageQuality;
   /**
+   * The browser's PostHog distinct_id (posthog.get_distinct_id()), passed
+   * so the worker can attribute the eventual image_generation_completed/
+   * failed event to the right person — especially guests, who have no
+   * DB userId. Rides in the dispatch payload to the worker; not persisted.
+   */
+  clientDistinctId?: string;
+  /**
    * Optional recurring character(s) to feature in the generated page (up to
    * MAX_CHARACTERS_PER_PAGE, any mix of the kid's saved characters). When set,
    * we swap the standard prompt for `buildCharacterAwareColoringPrompt`,
@@ -470,6 +477,7 @@ export const createPendingColoringImage = async (
         size: '1024x1024',
         quality: resolvedQuality,
         partialImages: 3,
+        clientDistinctId: args.clientDistinctId,
       };
     } else {
       // Text + voice modes share the same prompt-build path: optional
@@ -494,6 +502,7 @@ export const createPendingColoringImage = async (
                 portraitLineArtUrl: c.portraitLineArtUrl,
               }))
             : undefined,
+        clientDistinctId: args.clientDistinctId,
       });
     }
 

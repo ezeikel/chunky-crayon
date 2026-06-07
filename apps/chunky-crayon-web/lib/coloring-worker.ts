@@ -41,6 +41,13 @@ export type WorkerBody = {
   size: '1024x1024';
   quality: ImageQuality;
   partialImages: 3;
+  /**
+   * Browser PostHog distinct_id, forwarded so the worker can attribute
+   * image_generation_completed/failed to the right person (guests have
+   * no DB userId). Absent for comment-request flows (anonymous IG/FB
+   * commenters with no browser session).
+   */
+  clientDistinctId?: string;
 };
 
 /**
@@ -98,6 +105,9 @@ type BuildTextModeBodyArgs = {
    *  incorporates difficulty internally). Each portrait is prepended to
    *  referenceImageUrls in this order. */
   characters?: CharacterInPrompt[];
+  /** Browser PostHog distinct_id, forwarded to the worker for generation
+   *  event attribution. Undefined for comment-request flows. */
+  clientDistinctId?: string;
 };
 
 /**
@@ -121,6 +131,7 @@ export function buildTextModeWorkerBody({
   creditCost,
   difficulty,
   characters,
+  clientDistinctId,
 }: BuildTextModeBodyArgs): WorkerBody {
   let corePrompt: string;
   let referenceImageUrls: string[];
@@ -167,5 +178,6 @@ export function buildTextModeWorkerBody({
     size: '1024x1024',
     quality,
     partialImages: 3,
+    clientDistinctId,
   };
 }

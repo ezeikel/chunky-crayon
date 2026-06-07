@@ -33,6 +33,7 @@ import { put } from "@one-colored-pixel/storage";
 import { db, CreditTransactionType } from "@one-colored-pixel/db";
 import { persistGeneratedColoringImage } from "./persist";
 import { revalidateVercelCache } from "./revalidate";
+import { captureGenerationEvent, GENERATION_EVENTS } from "../lib/analytics";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -60,6 +61,11 @@ export type StartJobInput = {
    *  for backwards-compat with cron-driven jobs that don't pass it. */
   quality?: "low" | "medium" | "high";
   partialImages?: 0 | 1 | 2 | 3;
+  /** Browser PostHog distinct_id forwarded by Vercel, used to attribute
+   *  the image_generation_completed/failed event to the right person
+   *  (guests have no userId on the row). Absent for cron / comment-request
+   *  jobs, in which case the event falls back to the row's userId. */
+  clientDistinctId?: string;
 };
 
 type JobState = {
@@ -213,6 +219,97 @@ const requestDerivedPipeline = (coloringImageId: string): void => {
 };
 
 // ---------------------------------------------------------------------------
+// Generation analytics — fire image_generation_completed/failed so the
+// activation funnel (generation_started -> completed) has an end and
+// failures are visible. The web app's create action can't do this: it
+// dispatches the job and returns before the outcome is known. See
+// ../lib/analytics for the attribution rules (userId, else threaded
+// clientDistinctId).
+// ---------------------------------------------------------------------------
+
+// Generation mode for event properties, inferred from the dispatch
+// payload the same way the pipeline does (photo = inline image present).
+// Voice vs text aren't distinguished at the worker — both arrive as
+// reference-image jobs — so this reports 'text' for both, matching the
+// data the worker actually has.
+const inferMode = (input: StartJobInput): "photo" | "text" =>
+  input.imagesInline && input.imagesInline.length > 0 ? "photo" : "text";
+
+// userId lives on the DB row, not the dispatch payload, so look it up.
+// Null for guests (expected) — attribution then falls back to the
+// threaded clientDistinctId inside captureGenerationEvent.
+const getRowUserId = async (
+  coloringImageId: string,
+): Promise<string | null> => {
+  try {
+    const row = await db.coloringImage.findUnique({
+      where: { id: coloringImageId },
+      select: { userId: true },
+    });
+    return row?.userId ?? null;
+  } catch {
+    return null;
+  }
+};
+
+const fireGenerationCompleted = async (
+  input: StartJobInput,
+  durationMs: number,
+): Promise<void> => {
+  const userId = await getRowUserId(input.coloringImageId);
+  await captureGenerationEvent(GENERATION_EVENTS.IMAGE_GENERATION_COMPLETED, {
+    userId,
+    clientDistinctId: input.clientDistinctId,
+    properties: {
+      coloringImageId: input.coloringImageId,
+      mode: inferMode(input),
+      quality: input.quality ?? "high",
+      brand: input.brand,
+      durationMs,
+      success: true,
+    },
+  });
+};
+
+const fireGenerationFailed = async (
+  input: StartJobInput,
+  reason: string,
+  durationMs: number,
+): Promise<void> => {
+  const userId = await getRowUserId(input.coloringImageId);
+  await captureGenerationEvent(GENERATION_EVENTS.IMAGE_GENERATION_FAILED, {
+    userId,
+    clientDistinctId: input.clientDistinctId,
+    properties: {
+      coloringImageId: input.coloringImageId,
+      mode: inferMode(input),
+      quality: input.quality ?? "high",
+      brand: input.brand,
+      durationMs,
+      success: false,
+      error: reason.slice(0, 500),
+    },
+  });
+};
+
+/**
+ * Fail a job from within runJob: flip the row to FAILED + refund (via
+ * markFailed), then fire image_generation_failed. A thin wrapper over
+ * markFailed so every in-pipeline failure both refunds AND reports,
+ * without changing markFailed's well-tested signature (it's also called
+ * from the outer unexpected-error catch, which has no timing context).
+ * Analytics is best-effort and never blocks the failure handling.
+ */
+const failJob = async (
+  input: StartJobInput,
+  reason: string,
+  startedAt: number,
+): Promise<void> => {
+  await markFailed(input.coloringImageId, reason, input.creditCost);
+  await fireGenerationFailed(input, reason, Date.now() - startedAt);
+};
+
+// ---------------------------------------------------------------------------
 // Failure path — UPDATE row + refund credits + notify.
 // ---------------------------------------------------------------------------
 
@@ -291,13 +388,12 @@ const markFailed = async (
 
 const runJob = async (input: StartJobInput): Promise<void> => {
   const { coloringImageId } = input;
+  // Wall-clock start for the generation timing reported on the
+  // completed/failed events (pairs with the client's generation_started).
+  const startedAt = Date.now();
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
-    await markFailed(
-      coloringImageId,
-      "OPENAI_API_KEY not set on worker",
-      input.creditCost,
-    );
+    await failJob(input, "OPENAI_API_KEY not set on worker", startedAt);
     return;
   }
 
@@ -314,20 +410,16 @@ const runJob = async (input: StartJobInput): Promise<void> => {
     ) {
       imageFiles = await fetchReferenceFiles(input.referenceImageUrls);
     } else {
-      await markFailed(
-        coloringImageId,
+      await failJob(
+        input,
         "neither imagesInline nor referenceImageUrls provided",
-        input.creditCost,
+        startedAt,
       );
       return;
     }
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
-    await markFailed(
-      coloringImageId,
-      `input image resolution: ${message}`,
-      input.creditCost,
-    );
+    await failJob(input, `input image resolution: ${message}`, startedAt);
     return;
   }
 
@@ -352,11 +444,7 @@ const runJob = async (input: StartJobInput): Promise<void> => {
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
-    await markFailed(
-      coloringImageId,
-      `images.edit open: ${message}`,
-      input.creditCost,
-    );
+    await failJob(input, `images.edit open: ${message}`, startedAt);
     return;
   }
 
@@ -414,15 +502,15 @@ const runJob = async (input: StartJobInput): Promise<void> => {
     }
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
-    await markFailed(coloringImageId, `stream: ${message}`, input.creditCost);
+    await failJob(input, `stream: ${message}`, startedAt);
     return;
   }
 
   if (!completedB64) {
-    await markFailed(
-      coloringImageId,
+    await failJob(
+      input,
       "OpenAI stream ended without image_completed",
-      input.creditCost,
+      startedAt,
     );
     return;
   }
@@ -438,7 +526,7 @@ const runJob = async (input: StartJobInput): Promise<void> => {
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
-    await markFailed(coloringImageId, `persist: ${message}`, input.creditCost);
+    await failJob(input, `persist: ${message}`, startedAt);
     return;
   }
 
@@ -450,6 +538,12 @@ const runJob = async (input: StartJobInput): Promise<void> => {
   // the cache and the row in sync from the client's POV.
   await revalidateVercelCache(coloringImageId, "jobs");
   await notifyRowUpdate(coloringImageId);
+
+  // The page is READY and the client has been notified — this is the true
+  // "user got a finished coloring page" moment. Fire it here (not before
+  // persist) so the event means delivered, not merely generated. Pairs
+  // with the client's generation_started to close the activation funnel.
+  await fireGenerationCompleted(input, Date.now() - startedAt);
 
   // Kick off derived-asset pipeline. Doesn't block READY — the row already
   // has line art + svg, so the canvas page can render immediately. Region
