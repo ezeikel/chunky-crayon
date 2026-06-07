@@ -64,6 +64,13 @@ jobs:
               cp apps/chunky-crayon-worker/src/scripts/pdf-to-png.mjs /opt/pdf-tools/pdf-to-png.mjs
 
               echo "Building shared packages..."
+              # canvas-sync MUST build before db: db's canvas-types.ts
+              # re-exports @one-colored-pixel/canvas-sync, so db's dist
+              # resolves it at runtime. Without this, the worker crash-loops
+              # on "Cannot find module '@one-colored-pixel/canvas-sync'"
+              # (canvas-sync ships no dist/ until built). It's a newer
+              # package that wasn't in this list when db started importing it.
+              /root/.local/share/pnpm/pnpm --filter @one-colored-pixel/canvas-sync build
               /root/.local/share/pnpm/pnpm --filter @one-colored-pixel/db build
               /root/.local/share/pnpm/pnpm --filter @one-colored-pixel/storage build
               /root/.local/share/pnpm/pnpm --filter @one-colored-pixel/canvas build
