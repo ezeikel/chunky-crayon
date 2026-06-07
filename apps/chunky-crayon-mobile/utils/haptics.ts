@@ -2,49 +2,87 @@ import * as Haptics from "expo-haptics";
 import type { BrushType } from "@/stores/canvasStore";
 
 /**
- * Haptic feedback utilities for kid-friendly tactile responses
+ * Haptic feedback utilities for kid-friendly tactile responses.
+ *
+ * Every helper is a fire-and-forget no-op when haptics are DISABLED (the
+ * Vibration toggle in Settings, persisted in settingsStore) — so the ~170 call
+ * sites across the app respect the preference without per-site plumbing. Call
+ * `setHapticsEnabled()` once on app start (after the store rehydrates) and on
+ * every toggle; it gates these helpers AND the continuous BrushHapticController.
+ *
+ * Calls are wrapped in try/catch: expo-haptics throws on platforms/devices
+ * without a haptic engine, and a missing buzz must never crash a kid's tap.
  */
+
+// Module-level gate. Defaults ON; settingsStore overrides it on rehydrate.
+let hapticsEnabled = true;
+
+/**
+ * Enable/disable ALL haptics app-wide. Drives both the one-shot helpers below
+ * and the continuous brush controller. Wired to the Settings Vibration toggle.
+ */
+export const setHapticsEnabled = (enabled: boolean): void => {
+  hapticsEnabled = enabled;
+  brushHaptics.setEnabled(enabled);
+};
+
+/** Whether haptics are currently enabled (Settings Vibration toggle). */
+export const areHapticsEnabled = (): boolean => hapticsEnabled;
+
+// Run a haptic only when enabled, swallowing any platform error.
+const safe = (fn: () => void) => {
+  if (!hapticsEnabled) return;
+  try {
+    fn();
+  } catch {
+    // No haptic engine on this device/platform — non-fatal.
+  }
+};
 
 /**
  * Light tap - for color/tool selection
  */
 export const tapLight = () => {
-  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+  safe(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light));
 };
 
 /**
  * Medium tap - for brush type selection, undo/redo
  */
 export const tapMedium = () => {
-  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+  safe(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium));
 };
 
 /**
  * Heavy tap - for fill action, stamp placement
  */
 export const tapHeavy = () => {
-  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+  safe(() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy));
 };
 
 /**
  * Success feedback - for completing actions
  */
 export const notifySuccess = () => {
-  Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+  safe(() =>
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success),
+  );
 };
 
 /**
  * Warning feedback - for undo limit reached
  */
 export const notifyWarning = () => {
-  Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+  safe(() =>
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning),
+  );
 };
 
 /**
  * Selection changed feedback
  */
 export const selectionChanged = () => {
-  Haptics.selectionAsync();
+  safe(() => Haptics.selectionAsync());
 };
 
 /**

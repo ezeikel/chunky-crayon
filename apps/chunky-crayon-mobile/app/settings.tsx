@@ -22,6 +22,7 @@ import {
   faGlobe,
   faVolumeHigh,
   faMusic,
+  faMobileVibrate,
   faCircleQuestion,
   faEnvelope,
   faChevronRight,
@@ -61,7 +62,12 @@ import {
   type PlanKey,
 } from "@/lib/paywall/plans";
 import { COLORS, CRAYON, SHADOWS } from "@/lib/design";
-import { tapMedium } from "@/utils/haptics";
+import {
+  tapMedium,
+  selectionChanged,
+  setHapticsEnabled,
+} from "@/utils/haptics";
+import { useSettingsStore } from "@/stores/settingsStore";
 import { useAuth } from "@/contexts";
 import { useOnboardingStore } from "@/stores/onboardingStore";
 
@@ -252,6 +258,11 @@ const SettingsScreen = () => {
   // Audio preference states
   const [soundEffectsEnabled, setSoundEffectsEnabled] = useState(true);
   const [backgroundMusicEnabled, setBackgroundMusicEnabled] = useState(true);
+
+  // Vibration (haptics) preference — persisted; mirrored into the haptics
+  // module on change (see _layout) so every buzz across the app respects it.
+  const hapticsEnabled = useSettingsStore((s) => s.hapticsEnabled);
+  const setHapticsPref = useSettingsStore((s) => s.setHapticsEnabled);
 
   // Sign-in modal state
   const [signInModalVisible, setSignInModalVisible] = useState(false);
@@ -576,7 +587,10 @@ const SettingsScreen = () => {
                 title="Sound Effects"
                 subtitle="Button taps and actions"
                 value={soundEffectsEnabled}
-                onValueChange={setSoundEffectsEnabled}
+                onValueChange={(next) => {
+                  selectionChanged(); // toggle switch = selection-style haptic
+                  setSoundEffectsEnabled(next);
+                }}
               />
               <SettingsToggle
                 icon={faMusic}
@@ -585,7 +599,27 @@ const SettingsScreen = () => {
                 title="Background Music"
                 subtitle="Ambient sounds while coloring"
                 value={backgroundMusicEnabled}
-                onValueChange={setBackgroundMusicEnabled}
+                onValueChange={(next) => {
+                  selectionChanged(); // toggle switch = selection-style haptic
+                  setBackgroundMusicEnabled(next);
+                }}
+              />
+              <SettingsToggle
+                icon={faMobileVibrate}
+                iconColor={CRAYON.blue.dark}
+                iconSecondaryColor={CRAYON.blue.base}
+                title="Vibration"
+                subtitle="Gentle buzz on taps and rewards"
+                value={hapticsEnabled}
+                onValueChange={(next) => {
+                  // Flip the module gate synchronously (the _layout effect also
+                  // mirrors it, but that's next-render) so the confirming buzz
+                  // fires immediately when turning ON. When turning OFF the buzz
+                  // is gated away, as intended.
+                  setHapticsEnabled(next);
+                  setHapticsPref(next);
+                  if (next) selectionChanged();
+                }}
               />
             </View>
           </View>

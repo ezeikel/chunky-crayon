@@ -23,6 +23,7 @@ import { useFeed } from "@/hooks/api";
 import { useMergedArtworks } from "@/hooks/useMergedArtworks";
 import { useT } from "@/lib/i18n/useT";
 import { COLORS, FONTS } from "@/lib/design";
+import { tapLight } from "@/utils/haptics";
 
 const GRID_PADDING = 16;
 const GRID_GAP = 12;
@@ -48,6 +49,8 @@ const MyArtworkScreen = () => {
   const inProgress = feed?.inProgressWork ?? [];
 
   const handleArtworkPress = (coloringImageId: string) => {
+    // light tap: opening an artwork card from the grid is a light selection
+    tapLight();
     router.push(`/coloring-image/${coloringImageId}`);
   };
 

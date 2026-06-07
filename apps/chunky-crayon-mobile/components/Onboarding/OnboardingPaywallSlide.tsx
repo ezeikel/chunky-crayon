@@ -38,6 +38,7 @@ import {
   formatPackagePrice,
 } from "@/hooks/usePaywall";
 import { PAYWALL_TRUST } from "@/lib/paywall/plans";
+import { tapMedium, notifySuccess } from "@/utils/haptics";
 import { COLORS, CRAYON } from "@/lib/design";
 import type { PurchasesPackage } from "react-native-purchases";
 import ParentalGate from "../ParentalGate";
@@ -143,9 +144,10 @@ const OnboardingPaywallSlide = ({
     async (pkg: PurchasesPackage) => {
       try {
         await purchaseMutation.mutateAsync(pkg);
+        notifySuccess(); // celebrate the conversion before advancing
         onComplete();
       } catch {
-        // Error handled in mutation
+        // Error handled in mutation (the error toast also buzzes)
       }
     },
     [purchaseMutation, onComplete],
@@ -153,6 +155,7 @@ const OnboardingPaywallSlide = ({
 
   const handleStartTrial = useCallback(() => {
     if (!targetPackage) return;
+    tapMedium(); // reward the primary CTA tap
     setShowParentalGate(true);
   }, [targetPackage]);
 

@@ -28,6 +28,7 @@ import SectionHeader, {
   type SectionTint,
 } from "@/components/SectionHeader/SectionHeader";
 import { COLORS } from "@/lib/design";
+import { tapLight } from "@/utils/haptics";
 import { perfect } from "@/styles";
 import type {
   FeedColoringImage,
@@ -58,7 +59,10 @@ const ColoringCard = memo(
   }) => (
     <Pressable
       style={[styles.card, { width: size, height: size }]}
-      onPress={onPress}
+      onPress={() => {
+        tapLight(); // light tap: navigation into a coloring page
+        onPress();
+      }}
     >
       <View style={styles.cardInner}>
         {item.previewUrl ? (
@@ -112,7 +116,10 @@ const ArtworkCard = memo(
   }) => (
     <Pressable
       style={[styles.card, { width: size, height: size }]}
-      onPress={onPress}
+      onPress={() => {
+        tapLight(); // light tap: navigation into a coloring page
+        onPress();
+      }}
     >
       <View style={styles.cardInner}>
         {item.thumbnailUrl || item.imageUrl ? (
@@ -151,7 +158,10 @@ const InProgressCard = memo(
   }) => (
     <Pressable
       style={[styles.card, { width: size, height: size }]}
-      onPress={onPress}
+      onPress={() => {
+        tapLight(); // light tap: navigation into a coloring page
+        onPress();
+      }}
     >
       <View style={styles.cardInner}>
         {item.previewUrl ? (

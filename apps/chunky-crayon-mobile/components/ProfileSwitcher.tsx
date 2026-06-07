@@ -31,6 +31,7 @@ import {
   useDeleteProfile,
 } from "@/hooks/api/useProfiles";
 import { SHEET_HANDLE } from "@/lib/design";
+import { tapMedium, tapLight } from "@/utils/haptics";
 import type { Profile } from "@/api";
 
 type ProfileSwitcherProps = {
@@ -81,6 +82,9 @@ const ProfileSwitcher = ({ isOpen, onClose }: ProfileSwitcherProps) => {
 
   const handleSelectProfile = async (profile: Profile) => {
     if (profile.id === activeProfile?.id) return;
+
+    // Profile switch is a navigation-level / significant action.
+    tapMedium();
 
     try {
       await setActiveProfile.mutateAsync(profile.id);
@@ -304,7 +308,11 @@ const ProfileSwitcher = ({ isOpen, onClose }: ProfileSwitcherProps) => {
                 ) : canAddProfile ? (
                   <Pressable
                     style={styles.addProfileButton}
-                    onPress={() => setIsCreating(true)}
+                    onPress={() => {
+                      // Light tap to open the create-profile card.
+                      tapLight();
+                      setIsCreating(true);
+                    }}
                   >
                     <View style={styles.avatarContainerNew}>
                       <FontAwesomeIcon

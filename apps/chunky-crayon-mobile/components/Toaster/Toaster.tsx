@@ -1,6 +1,7 @@
 import { Toaster as SonnerToaster, toast as sonnerToast } from "sonner-native";
 import type { ComponentProps } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import { notifySuccess, notifyWarning } from "@/utils/haptics";
 import {
   faCircleCheck,
   faCircleExclamation,
@@ -196,12 +197,38 @@ const Toaster = (props: ToasterProps) => (
   />
 );
 
+// Haptic-aware toast: success buzzes notifySuccess, error/warning buzz
+// notifyWarning, BEFORE the toast renders. Every `toast.*` call site app-wide
+// (we re-export this as `toast`) gets feedback for free — the one place worth
+// centralising it. Other methods (info/loading/message/dismiss/promise/custom)
+// proxy straight through unchanged. Both helpers no-op when the Vibration
+// setting is off, so this is safe to fire unconditionally.
+const toast = Object.assign(
+  // Calling `toast(...)` directly (sonner's default message toast) — no haptic.
+  (...args: Parameters<typeof sonnerToast>) => sonnerToast(...args),
+  sonnerToast,
+  {
+    success: ((...args: Parameters<typeof sonnerToast.success>) => {
+      notifySuccess();
+      return sonnerToast.success(...args);
+    }) as typeof sonnerToast.success,
+    error: ((...args: Parameters<typeof sonnerToast.error>) => {
+      notifyWarning();
+      return sonnerToast.error(...args);
+    }) as typeof sonnerToast.error,
+    warning: ((...args: Parameters<typeof sonnerToast.warning>) => {
+      notifyWarning();
+      return sonnerToast.warning(...args);
+    }) as typeof sonnerToast.warning,
+  },
+);
+
 // Dev-only handle so we can fire styled toasts from the debugger /
 // Metro to verify visuals in-place when navigation is blocked.
 if (__DEV__) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (globalThis as any).__ccToast = sonnerToast;
+  (globalThis as any).__ccToast = toast;
 }
 
-export { Toaster, sonnerToast as toast };
+export { Toaster, toast };
 export default Toaster;

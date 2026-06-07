@@ -16,6 +16,7 @@ import {
   useClaimChallengeReward,
 } from "@/hooks/api/useChallenges";
 import SectionHeader from "@/components/SectionHeader/SectionHeader";
+import { tapMedium } from "@/utils/haptics";
 import { COLORS } from "@/lib/design";
 import type { ChallengeWithProgress } from "@/api";
 
@@ -253,6 +254,9 @@ const ChallengesScreen = () => {
 
   const handleClaimReward = async () => {
     if (!currentChallenge) return;
+
+    // tapMedium: claiming a reward is a significant, intentional action
+    tapMedium();
 
     try {
       const result = await claimReward.mutateAsync(

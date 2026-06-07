@@ -7,6 +7,8 @@ import * as ScreenOrientation from "expo-screen-orientation";
 import * as Sentry from "@sentry/react-native";
 import Providers from "@/providers";
 import { useOnboardingStore } from "@/stores/onboardingStore";
+import { useSettingsStore } from "@/stores/settingsStore";
+import { setHapticsEnabled } from "@/utils/haptics";
 
 Sentry.init({
   dsn: "https://3ced8899cf0a5a8dd3b15c539379d654:590a9050ad3be778d873c840cb48012c@o358156.ingest.us.sentry.io/4507397854330880",
@@ -35,6 +37,14 @@ const RootLayout = () => {
 
   const hasCompleted = useOnboardingStore((s) => s.hasCompleted);
   const [hydrated, setHydrated] = useState(false);
+
+  // Mirror the persisted Vibration preference into the haptics module so every
+  // helper + the continuous brush controller respect it. Reactive: fires on
+  // rehydrate AND on every Settings toggle.
+  const hapticsEnabled = useSettingsStore((s) => s.hapticsEnabled);
+  useEffect(() => {
+    setHapticsEnabled(hapticsEnabled);
+  }, [hapticsEnabled]);
 
   useEffect(() => {
     // Wait for Zustand persist to rehydrate from AsyncStorage

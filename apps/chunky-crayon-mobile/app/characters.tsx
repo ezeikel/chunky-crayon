@@ -22,6 +22,7 @@ import {
 import type { Character } from "@/api";
 import { useT } from "@/lib/i18n/useT";
 import { COLORS, FONTS, SHEET_HANDLE } from "@/lib/design";
+import { tapMedium, tapHeavy } from "@/utils/haptics";
 
 const MAX_PER_PROFILE = 8;
 
@@ -105,7 +106,10 @@ const CharactersScreen = () => {
             <Text style={styles.emptyTitle}>{t("emptyTitle")}</Text>
             <Text style={styles.emptySubtitle}>{t("emptySubtitle")}</Text>
             <Pressable
-              onPress={() => setBuilderOpen(true)}
+              onPress={() => {
+                tapMedium(); // creating a new character — significant nav action
+                setBuilderOpen(true);
+              }}
               accessibilityRole="button"
               accessibilityLabel={t("makeFriend")}
               style={({ pressed }) => [
@@ -136,14 +140,22 @@ const CharactersScreen = () => {
                 <View key={c.id} style={styles.gridCell}>
                   <CharacterTile
                     character={c}
-                    onPress={() => setDeleteTarget(c)}
+                    onPress={() => {
+                      tapHeavy(); // tile tap opens the delete parental gate — destructive confirm
+                      setDeleteTarget(c);
+                    }}
                     onRetry={() => retryCharacter.mutate(c.id)}
                   />
                 </View>
               ))}
               {!atCap && (
                 <View style={styles.gridCell}>
-                  <AddCharacterTile onPress={() => setBuilderOpen(true)} />
+                  <AddCharacterTile
+                    onPress={() => {
+                      tapMedium(); // add-new tile — creating a new character
+                      setBuilderOpen(true);
+                    }}
+                  />
                 </View>
               )}
             </View>

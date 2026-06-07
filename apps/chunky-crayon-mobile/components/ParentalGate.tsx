@@ -10,6 +10,7 @@ import Animated, {
   Easing,
 } from "react-native-reanimated";
 import { FONTS, COLORS } from "@/lib/design";
+import { notifySuccess, notifyWarning } from "@/utils/haptics";
 
 /**
  * Mobile port of apps/chunky-crayon-web/components/ParentalGate/ParentalGateModal.tsx.
@@ -148,10 +149,14 @@ const ParentalGate = ({
   }, [visible, waveRotation]);
 
   const handleCorrect = useCallback(() => {
+    notifySuccess();
     onSuccess();
   }, [onSuccess]);
 
   const handleWrong = useCallback(() => {
+    // Warning buzz pairs with the visual shake so a wrong tap is felt, not just
+    // seen (the gate has no "you failed" copy by design).
+    notifyWarning();
     const next = wrongCount + 1;
     setWrongCount(next);
     triggerShake();
