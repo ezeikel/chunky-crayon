@@ -40,11 +40,15 @@ import type {
 
 const outerPadding = 20;
 const gridGap = 12;
+const TABLET_BREAKPOINT = 768;
 
-// Card size for horizontal lists
+// Card size for the horizontal feed lists. Device-aware so cards stay
+// proportional to the category tiles (which also scale) — on a phone ~2.3
+// across (a peek of the next), on iPad ~4.6 across so a Today/Continue card
+// isn't half the screen.
 const getCardSize = (screenWidth: number) => {
-  // Show ~2.5 cards so user knows to scroll
-  return (screenWidth - outerPadding * 2 - gridGap) / 2.3;
+  const across = screenWidth >= TABLET_BREAKPOINT ? 4.6 : 2.3;
+  return (screenWidth - outerPadding * 2 - gridGap * (across - 1)) / across;
 };
 
 // Memoized coloring image card - shows preview if user has progress

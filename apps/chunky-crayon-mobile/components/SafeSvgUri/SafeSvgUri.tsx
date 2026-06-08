@@ -63,6 +63,10 @@ type SafeSvgUriProps = {
   width?: number | string;
   height?: number | string;
   viewBox?: string;
+  // How the 1:1 viewBox maps into a non-square container. Default "xMidYMid meet"
+  // = CONTAIN (whole page visible, letterboxed) so a coloring page is never
+  // cropped — matches the detail view. Pass "xMidYMid slice" for cover/crop.
+  preserveAspectRatio?: string;
 };
 
 const SafeSvgUri = ({
@@ -70,6 +74,7 @@ const SafeSvgUri = ({
   width = "100%",
   height = "100%",
   viewBox = "0 0 1024 1024",
+  preserveAspectRatio = "xMidYMid meet",
 }: SafeSvgUriProps) => {
   const [xml, setXml] = useState<string | null>(null);
 
@@ -106,7 +111,13 @@ const SafeSvgUri = ({
 
   return (
     <SvgErrorBoundary resetKey={uri ?? ""} fallback={fallback}>
-      <SvgXml xml={xml} width={width} height={height} viewBox={viewBox} />
+      <SvgXml
+        xml={xml}
+        width={width}
+        height={height}
+        viewBox={viewBox}
+        preserveAspectRatio={preserveAspectRatio}
+      />
     </SvgErrorBoundary>
   );
 };
