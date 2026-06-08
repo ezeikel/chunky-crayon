@@ -79,12 +79,12 @@ const CategoryGrid = () => {
                 />
               </View>
             )}
-            {/* Brand-orange gradient strip (see CategoryRow) — a thin readable
-                shelf (locations keep the top third clear) so white text reads
-                over the B&W line art without an opaque drawer. */}
+            {/* Brand-orange strip (see CategoryRow) — near-solid quickly for
+                readable white text, only the top edge tails off so it blends
+                into the line art rather than a hard line. */}
             <LinearGradient
-              colors={["rgba(228,100,68,0)", "rgba(228,100,68,0.9)"]}
-              locations={[0.35, 1]}
+              colors={["rgba(228,100,68,0)", "rgba(228,100,68,1)"]}
+              locations={[0, 0.45]}
               style={styles.nameStrip}
             >
               <View style={styles.chip}>
