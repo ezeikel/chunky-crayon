@@ -105,6 +105,19 @@ export const clearLinkedUserId = async (): Promise<void> => {
 };
 
 /**
+ * Wipe ALL auth/identity keys from secure storage (device id, session token,
+ * linked user id). Used by the dev "reset local device data" tool — after this
+ * the next launch re-registers a fresh anonymous device.
+ */
+export const clearAllAuth = async (): Promise<void> => {
+  await Promise.all([
+    storage.deleteItem(DEVICE_ID_KEY),
+    storage.deleteItem(SESSION_TOKEN_KEY),
+    storage.deleteItem(USER_ID_KEY),
+  ]);
+};
+
+/**
  * Get the auth header for API requests
  * Returns the session token if available, otherwise the device ID
  */

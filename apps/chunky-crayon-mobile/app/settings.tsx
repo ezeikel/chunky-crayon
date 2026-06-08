@@ -11,10 +11,12 @@ import {
   Switch,
   TextInput,
   Modal,
+  Alert,
 } from "react-native";
 import Spinner from "@/components/Spinner/Spinner";
 import { toast } from "@/components/Toaster";
 import ConfirmSheet from "@/components/ConfirmSheet";
+import { resetLocalDeviceData } from "@/lib/dev/resetLocalData";
 import { LinearGradient } from "expo-linear-gradient";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import {
@@ -36,6 +38,7 @@ import {
   faInfoCircle,
   faBookOpen,
   faPlus,
+  faTrashCan,
 } from "@fortawesome/pro-duotone-svg-icons";
 import { faHeart } from "@fortawesome/pro-regular-svg-icons";
 import {
@@ -281,6 +284,8 @@ const SettingsScreen = () => {
 
   // Sign-out confirm sheet
   const [signOutConfirmOpen, setSignOutConfirmOpen] = useState(false);
+  // DEV-only: reset-local-data confirm sheet.
+  const [resetConfirmOpen, setResetConfirmOpen] = useState(false);
 
   const handleManageProfiles = () => {
     setProfileSwitcherOpen(true);
@@ -346,6 +351,21 @@ const SettingsScreen = () => {
   const confirmSignOut = async () => {
     await signOut();
     toast.success("You're signed out. Your artwork stays on this device.");
+  };
+
+  // DEV-only: wipe ALL local device data (MMKV + AsyncStorage + auth +
+  // on-disk artwork), then prompt to restart so the cleared stores rehydrate
+  // empty. Guarded by __DEV__ so it never ships in a release build.
+  const confirmResetLocalData = async () => {
+    try {
+      await resetLocalDeviceData();
+      Alert.alert(
+        "Local data cleared",
+        "All on-device data was reset. Please fully close and reopen the app.",
+      );
+    } catch {
+      toast.error("Couldn't reset local data. Check the logs.");
+    }
   };
 
   const handleGoogleSignIn = async () => {
@@ -728,6 +748,23 @@ const SettingsScreen = () => {
             </View>
           </View>
 
+          {/* Developer tools — DEV builds only (never ships in release). */}
+          {__DEV__ && (
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Developer</Text>
+              <View style={styles.sectionContent}>
+                <SettingsItem
+                  icon={faTrashCan}
+                  iconColor={COLORS.error}
+                  iconSecondaryColor="#FCA5A5"
+                  title="Reset local data"
+                  subtitle="Wipe all on-device data (artwork, settings, sign-in)"
+                  onPress={() => setResetConfirmOpen(true)}
+                />
+              </View>
+            </View>
+          )}
+
           {/* Made with love footer */}
           <View style={styles.footerContainer}>
             <View style={styles.madeWithRow}>
@@ -902,6 +939,19 @@ const SettingsScreen = () => {
         onConfirm={confirmSignOut}
         tone="destructive"
       />
+
+      {__DEV__ && (
+        <ConfirmSheet
+          isOpen={resetConfirmOpen}
+          onClose={() => setResetConfirmOpen(false)}
+          title="Reset local data?"
+          description="Wipes ALL on-device data — saved artwork, settings, onboarding, and sign-in. This can't be undone. You'll need to restart the app."
+          icon={faTrashCan}
+          confirmLabel="Reset"
+          onConfirm={confirmResetLocalData}
+          tone="destructive"
+        />
+      )}
     </View>
   );
 };

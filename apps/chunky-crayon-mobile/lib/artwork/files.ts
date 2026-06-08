@@ -49,3 +49,15 @@ export const deleteArtworkFile = async (fileUri: string): Promise<void> => {
     // Missing/already-gone file is fine; the store record is the source of truth.
   }
 };
+
+/**
+ * Delete the WHOLE on-disk artwork directory (every saved PNG). Used by the dev
+ * "reset local device data" tool. Best-effort — idempotent, never throws.
+ */
+export const clearAllArtworkFiles = async (): Promise<void> => {
+  try {
+    await deleteAsync(ARTWORK_DIR, { idempotent: true });
+  } catch {
+    // Already gone / never created — fine.
+  }
+};
