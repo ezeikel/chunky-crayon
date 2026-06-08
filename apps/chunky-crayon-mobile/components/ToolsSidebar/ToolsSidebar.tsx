@@ -246,11 +246,13 @@ const ToolsSidebar = ({
         style={[
           styles.rail,
           scrollable && styles.railScrollable,
-          // Hug content width on a short window so no empty space inside. Use the
-          // SHARED rightCardWidth (content box + padding + border) from
-          // getLandscapeRailFit — same value the column split reserves — so the
-          // inner content box == gridWidth exactly (no 4px border clip, no drift).
-          isShort ? { width: rightCardWidth } : null,
+          // ALWAYS pin the card to the SHARED rightCardWidth (content box +
+          // padding + border) — the same value the column split reserves — so
+          // the inner content box == gridWidth exactly. Leaving it to content-hug
+          // on iPad let the inner ScrollView stretch the card wider than the
+          // column, and alignSelf:flex-end then pushed the LEFT column of tiles
+          // off the card's left edge (clipped). Pinning the width fixes it.
+          { width: rightCardWidth },
         ]}
       >
         <RailBody {...railBodyProps}>

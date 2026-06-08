@@ -58,12 +58,14 @@ const ColorPaletteSidebar = ({
   // Height-adaptive fit comes from the SHARED helper so the rail card width and
   // the column-split width (getLandscapeSidebarWidths) agree exactly. On a tall
   // window (availableHeight undefined/large) it resolves to the iPad CEIL sizes.
-  const isShort = availableHeight !== undefined && availableHeight < 560;
   const { swatchSize, pillHeight, leftCardWidth } =
     getLandscapeRailFit(availableHeight);
-  // Hug the card to its content width only on a short window; on a tall window
-  // let it size to content as before (iPad unchanged).
-  const cardWidth = isShort ? leftCardWidth : undefined;
+  // ALWAYS pin the card to the SHARED leftCardWidth (3-swatch grid + padding +
+  // border). Leaving it to content-hug on iPad (tall window) let the inner
+  // grid/ScrollView stretch the card and the RIGHT column of swatches overflowed
+  // past the card edge (clipped) — the same bug the tools rail had. Pinning the
+  // width so the inner box == gridWidth exactly fixes it. Same fix as ToolsSidebar.
+  const cardWidth = leftCardWidth;
   // Narrow per-slice selectors instead of a whole-store subscription. The old
   // `useCanvasStore()` (no selector) re-rendered this rail on EVERY store change
   // — including every stroke's addAction (history change) — which the profiler
