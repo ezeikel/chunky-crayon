@@ -70,12 +70,13 @@ const CategoryRow = () => {
                 />
               </View>
             )}
-            {/* Name on a BRAND-ORANGE strip that reaches near-solid quickly so
-                white text always reads clearly over the B&W line art — only the
-                top edge tails off into transparency so it blends into the art
-                rather than a hard line. White chip carries the category icon. */}
+            {/* Name on a LIGHT crayon-orange strip (crayonOrangeLight #F2A18C)
+                that reaches near-solid quickly so white text reads clearly over
+                the B&W line art — only the top edge tails off into transparency
+                so it blends into the art rather than a hard line. White chip
+                carries the category icon. */}
             <LinearGradient
-              colors={["rgba(228,100,68,0)", "rgba(228,100,68,1)"]}
+              colors={["rgba(242,161,140,0)", "rgba(242,161,140,1)"]}
               locations={[0, 0.45]}
               style={styles.nameStrip}
             >

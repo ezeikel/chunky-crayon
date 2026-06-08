@@ -79,11 +79,11 @@ const CategoryGrid = () => {
                 />
               </View>
             )}
-            {/* Brand-orange strip (see CategoryRow) — near-solid quickly for
-                readable white text, only the top edge tails off so it blends
-                into the line art rather than a hard line. */}
+            {/* Light crayon-orange strip (#F2A18C, see CategoryRow) — near-solid
+                quickly for readable white text, only the top edge tails off so
+                it blends into the line art rather than a hard line. */}
             <LinearGradient
-              colors={["rgba(228,100,68,0)", "rgba(228,100,68,1)"]}
+              colors={["rgba(242,161,140,0)", "rgba(242,161,140,1)"]}
               locations={[0, 0.45]}
               style={styles.nameStrip}
             >
