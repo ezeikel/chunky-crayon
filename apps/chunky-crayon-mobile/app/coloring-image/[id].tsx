@@ -324,7 +324,11 @@ const ColoringImage = () => {
     }
   }, [id, activeProfile?.id, data?.coloringImage?.title]);
 
-  // Print — build a PDF (line art + QR) and open the system print/share sheet.
+  // Print — open the system print dialog. Prints the COLORED artwork (canvas
+  // snapshot) when the kid has coloured, falling back to the blank line art if
+  // not — mirroring web (ColoringPageDocument: coloredImageDataUrl ?? svgUrl).
+  // Printing a finished page is the "show grandma" moment, so the coloured
+  // result is what we want on paper.
   const handlePrint = useCallback(async () => {
     track(ANALYTICS_EVENTS.PRINT_CLICKED, {
       coloringImageId: id as string,
@@ -337,11 +341,17 @@ const ColoringImage = () => {
     tapLight();
     setIsPrinting(true);
     try {
+      // Prefer the coloured canvas; fall back to the blank line art when the
+      // page is untouched (or capture isn't ready). Read captureCanvas
+      // non-reactively, same as handleSaveToPhotos.
+      const captureCanvas = useCanvasStore.getState().captureCanvas;
+      const coloredDataUrl = captureCanvas?.() || null;
+      const printSrc = coloredDataUrl ?? image.svgUrl;
       const html = `
         <html>
           <head><meta charset="utf-8" /></head>
           <body style="margin:0;padding:24px;">
-            <img src="${image.svgUrl}" style="width:100%;height:auto;" />
+            <img src="${printSrc}" style="width:100%;height:auto;" />
             ${
               image.qrCodeUrl
                 ? `<div style="margin-top:16px;text-align:center;"><img src="${image.qrCodeUrl}" width="120" height="120" /></div>`
