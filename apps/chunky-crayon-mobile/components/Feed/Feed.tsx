@@ -1,4 +1,4 @@
-import { memo, useCallback } from "react";
+import { memo, useCallback, type ReactNode } from "react";
 import {
   Text,
   View,
@@ -27,6 +27,7 @@ import Loading from "@/components/Loading/Loading";
 import SectionHeader, {
   type SectionTint,
 } from "@/components/SectionHeader/SectionHeader";
+import SeeAllButton from "@/components/SeeAllButton/SeeAllButton";
 import { COLORS } from "@/lib/design";
 import { tapLight } from "@/utils/haptics";
 import { perfect } from "@/styles";
@@ -204,15 +205,20 @@ const FeedSectionHeader = ({
   title,
   icon,
   tint,
+  right,
 }: {
   title: string;
   icon: IconDefinition;
   tint?: SectionTint;
+  // Optional "see all" affordance (the circular arrow) — only sections with a
+  // deeper destination pass one; single-item sections (Today) leave it out.
+  right?: ReactNode;
 }) => (
   <SectionHeader
     title={title}
     icon={icon}
     tint={tint}
+    right={right}
     style={styles.sectionHeader}
   />
 );
@@ -224,12 +230,17 @@ const HorizontalSection = ({
   items,
   cardSize,
   tint,
+  onSeeAll,
+  seeAllLabel,
 }: {
   title: string;
   icon: IconDefinition;
   items: FeedColoringImage[];
   cardSize: number;
   tint?: SectionTint;
+  // When present, the header shows the circular "see all" arrow → onSeeAll.
+  onSeeAll?: () => void;
+  seeAllLabel?: string;
 }) => {
   const router = useRouter();
 
@@ -250,7 +261,16 @@ const HorizontalSection = ({
 
   return (
     <View style={styles.section}>
-      <FeedSectionHeader title={title} icon={icon} tint={tint} />
+      <FeedSectionHeader
+        title={title}
+        icon={icon}
+        tint={tint}
+        right={
+          onSeeAll ? (
+            <SeeAllButton onPress={onSeeAll} accessibilityLabel={seeAllLabel} />
+          ) : undefined
+        }
+      />
       <View style={{ height: cardSize, width: "100%" }}>
         <FlatList
           data={items}
@@ -298,6 +318,12 @@ const InProgressSection = ({
         title="Continue Coloring"
         icon={faPaintBrush}
         tint="pink"
+        right={
+          <SeeAllButton
+            onPress={() => router.push("/my-artwork")}
+            accessibilityLabel="See all your coloring"
+          />
+        }
       />
       <View style={{ height: cardSize, width: "100%" }}>
         <FlatList
@@ -342,7 +368,17 @@ const RecentArtSection = ({
 
   return (
     <View style={styles.section}>
-      <FeedSectionHeader title="Your Art" icon={faPalette} tint="purple" />
+      <FeedSectionHeader
+        title="Your Art"
+        icon={faPalette}
+        tint="purple"
+        right={
+          <SeeAllButton
+            onPress={() => router.push("/my-artwork")}
+            accessibilityLabel="See all your art"
+          />
+        }
+      />
       <View style={{ height: cardSize, width: "100%" }}>
         <FlatList
           data={artworks}
@@ -405,6 +441,7 @@ const Feed = () => {
   // useWindowDimensions so the card grid re-flows on iPad rotation.
   const { width: screenWidth } = useWindowDimensions();
   const cardSize = getCardSize(screenWidth);
+  const router = useRouter();
 
   const { data, isLoading, isError, refetch } = useFeed();
 
@@ -475,22 +512,26 @@ const Feed = () => {
       {/* User's saved artworks */}
       <RecentArtSection artworks={recentArt} cardSize={cardSize} />
 
-      {/* User's generated coloring pages */}
+      {/* User's generated coloring pages — see all → My Art (their collection) */}
       <HorizontalSection
         title="Your Creations"
         icon={faWandMagicSparkles}
         items={myCreations}
         cardSize={cardSize}
         tint="teal"
+        onSeeAll={() => router.push("/my-artwork")}
+        seeAllLabel="See all your creations"
       />
 
-      {/* More to Color - Past daily images */}
+      {/* More to Color - Past daily images — see all → the full library */}
       <HorizontalSection
         title="More to Color"
         icon={faCalendarWeek}
         items={moreToColor}
         cardSize={cardSize}
         tint="pink"
+        onSeeAll={() => router.push("/category/all")}
+        seeAllLabel="Discover more pages"
       />
     </View>
   );

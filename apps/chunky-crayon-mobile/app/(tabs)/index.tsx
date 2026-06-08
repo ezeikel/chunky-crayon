@@ -17,6 +17,7 @@ import {
   faPalette,
   faStar,
   faShapes,
+  faImages,
 } from "@fortawesome/pro-duotone-svg-icons";
 import Animated, {
   useSharedValue,
@@ -38,8 +39,11 @@ import SeeAllButton from "@/components/SeeAllButton/SeeAllButton";
 import { useColoContext } from "@/contexts";
 import useHeaderData from "@/hooks/useHeaderData";
 import { tapMedium } from "@/utils/haptics";
+import { track } from "@/utils/analytics";
+import { ANALYTICS_EVENTS } from "@/constants/analytics";
 import { useT } from "@/lib/i18n/useT";
-import { COLORS } from "@/lib/design";
+import { COLORS, FONTS } from "@/lib/design";
+import { perfect } from "@/styles";
 
 const padding = 20;
 
@@ -179,7 +183,7 @@ const HomeScreen = () => {
               needed. The create form above stays the co-equal hero; this is
               the lower-effort alternative, surfaced prominently. */}
           <SectionHeader
-            title="Color a picture"
+            title="What do you like?"
             icon={faShapes}
             tint="purple"
             style={styles.librarySectionHeader}
@@ -191,6 +195,30 @@ const HomeScreen = () => {
             }
           />
           <CategoryRow />
+
+          {/* "Discover more" — the whole-library door (pages the kid hasn't
+              seen yet). The header arrow opens the category grid; this opens
+              everything. Surfacing it on Home makes the big premade library the
+              easy start. */}
+          <Pressable
+            style={styles.discoverMore}
+            onPress={() => {
+              tapMedium();
+              track(ANALYTICS_EVENTS.BROWSE_ALL_OPENED);
+              router.push("/category/all");
+            }}
+            accessibilityRole="button"
+            accessibilityLabel="Discover more coloring pages"
+          >
+            <FontAwesomeIcon
+              icon={faImages}
+              size={18}
+              color={COLORS.crayonOrange}
+              secondaryColor={COLORS.secondaryOrange}
+              secondaryOpacity={1}
+            />
+            <Text style={styles.discoverMoreText}>Discover more</Text>
+          </Pressable>
 
           {/* The kid's own pages, below the ready-made library. */}
           <MyRecentCreations />
@@ -291,6 +319,25 @@ const styles = StyleSheet.create({
     paddingHorizontal: padding,
     marginTop: 20,
     marginBottom: 4,
+  },
+  // "Discover more" whole-library door under the category row (mirrors the
+  // Gallery tab's button so the affordance is identical across surfaces).
+  discoverMore: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    marginHorizontal: padding,
+    marginTop: 12,
+    paddingVertical: 12,
+    borderRadius: 14,
+    backgroundColor: COLORS.white,
+    ...perfect.boxShadow,
+  },
+  discoverMoreText: {
+    fontFamily: FONTS.bold,
+    fontSize: 15,
+    color: COLORS.textPrimary,
   },
   // Challenges + My Characters: a side-by-side pair of compact, icon-led tiles
   // (big icon + ≤2-word label, no adult subtitle) — kid-light, consistent with

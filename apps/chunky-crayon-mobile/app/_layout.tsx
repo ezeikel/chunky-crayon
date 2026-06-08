@@ -201,7 +201,7 @@ const RootLayout = () => {
           name="categories"
           options={{
             headerShown: true,
-            headerTitle: "Browse by category",
+            headerTitle: "What do you like?",
             headerBackTitle: "Back",
             headerStyle: { backgroundColor: "#FDFAF5" },
             headerShadowVisible: false,

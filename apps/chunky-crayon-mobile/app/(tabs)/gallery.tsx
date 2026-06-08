@@ -52,11 +52,11 @@ const GalleryScreen = () => {
             <Text style={styles.headerSubtitle}>{t("subtitle")}</Text>
           </View>
 
-          {/* Library: browse by category (pills) — top of the surface, the
-              Coupang/Prime-kids pattern. "See all" → the full category grid;
-              "Browse all pages" → the full library grid. */}
+          {/* Library: category row — top of the surface, the Coupang/Prime-kids
+              pattern. The header arrow → the full category grid; "Discover more"
+              → the whole library (pages the kid hasn't seen yet). */}
           <SectionHeader
-            title="Browse by category"
+            title="What do you like?"
             icon={faShapes}
             tint="purple"
             style={styles.sectionHeader}
@@ -86,7 +86,7 @@ const GalleryScreen = () => {
               secondaryColor={COLORS.secondaryOrange}
               secondaryOpacity={1}
             />
-            <Text style={styles.browseAllText}>Browse all pages</Text>
+            <Text style={styles.browseAllText}>Discover more</Text>
           </Pressable>
 
           <Feed />
