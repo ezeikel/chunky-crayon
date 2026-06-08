@@ -69,25 +69,29 @@ const GalleryScreen = () => {
           />
           <CategoryRow />
 
-          <Pressable
-            style={styles.browseAll}
-            onPress={() => {
-              tapMedium();
-              track(ANALYTICS_EVENTS.BROWSE_ALL_OPENED);
-              router.push("/category/all");
-            }}
-            accessibilityRole="button"
-            accessibilityLabel="Browse all coloring pages"
-          >
-            <FontAwesomeIcon
-              icon={faImages}
-              size={18}
-              color={COLORS.crayonOrange}
-              secondaryColor={COLORS.secondaryOrange}
-              secondaryOpacity={1}
-            />
-            <Text style={styles.browseAllText}>Discover more</Text>
-          </Pressable>
+          {/* Wrapper holds the phone gutter; the button caps to a centered pill
+              on iPad rather than stretching the full width. */}
+          <View style={styles.browseAllWrap}>
+            <Pressable
+              style={styles.browseAll}
+              onPress={() => {
+                tapMedium();
+                track(ANALYTICS_EVENTS.BROWSE_ALL_OPENED);
+                router.push("/category/all");
+              }}
+              accessibilityRole="button"
+              accessibilityLabel="Browse all coloring pages"
+            >
+              <FontAwesomeIcon
+                icon={faImages}
+                size={18}
+                color={COLORS.crayonOrange}
+                secondaryColor={COLORS.secondaryOrange}
+                secondaryOpacity={1}
+              />
+              <Text style={styles.browseAllText}>Discover more</Text>
+            </Pressable>
+          </View>
 
           <Feed />
         </ScrollView>
@@ -141,17 +145,23 @@ const styles = StyleSheet.create({
     marginTop: 12,
     marginBottom: 4,
   },
+  browseAllWrap: {
+    paddingHorizontal: 20,
+  },
   browseAll: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     gap: 8,
-    marginHorizontal: 20,
     marginTop: 12,
     paddingVertical: 12,
     borderRadius: 14,
     backgroundColor: COLORS.white,
     ...perfect.boxShadow,
+    // Full-width on phone, centered capped pill on iPad (echoes the tab bar).
+    width: "100%",
+    maxWidth: 480,
+    alignSelf: "center",
   },
   browseAllText: {
     fontFamily: FONTS.bold,

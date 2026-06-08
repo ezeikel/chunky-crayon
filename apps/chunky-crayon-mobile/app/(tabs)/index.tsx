@@ -199,26 +199,29 @@ const HomeScreen = () => {
           {/* "Discover more" — the whole-library door (pages the kid hasn't
               seen yet). The header arrow opens the category grid; this opens
               everything. Surfacing it on Home makes the big premade library the
-              easy start. */}
-          <Pressable
-            style={styles.discoverMore}
-            onPress={() => {
-              tapMedium();
-              track(ANALYTICS_EVENTS.BROWSE_ALL_OPENED);
-              router.push("/category/all");
-            }}
-            accessibilityRole="button"
-            accessibilityLabel="Discover more coloring pages"
-          >
-            <FontAwesomeIcon
-              icon={faImages}
-              size={18}
-              color={COLORS.crayonOrange}
-              secondaryColor={COLORS.secondaryOrange}
-              secondaryOpacity={1}
-            />
-            <Text style={styles.discoverMoreText}>Discover more</Text>
-          </Pressable>
+              easy start. Wrapper holds the phone gutter; the button caps to a
+              centered pill on iPad. */}
+          <View style={styles.discoverMoreWrap}>
+            <Pressable
+              style={styles.discoverMore}
+              onPress={() => {
+                tapMedium();
+                track(ANALYTICS_EVENTS.BROWSE_ALL_OPENED);
+                router.push("/category/all");
+              }}
+              accessibilityRole="button"
+              accessibilityLabel="Discover more coloring pages"
+            >
+              <FontAwesomeIcon
+                icon={faImages}
+                size={18}
+                color={COLORS.crayonOrange}
+                secondaryColor={COLORS.secondaryOrange}
+                secondaryOpacity={1}
+              />
+              <Text style={styles.discoverMoreText}>Discover more</Text>
+            </Pressable>
+          </View>
 
           {/* The kid's own pages, below the ready-made library. */}
           <MyRecentCreations />
@@ -322,17 +325,25 @@ const styles = StyleSheet.create({
   },
   // "Discover more" whole-library door under the category row (mirrors the
   // Gallery tab's button so the affordance is identical across surfaces).
+  // Wrapper gives the phone-edge gutter (paddingHorizontal) so the button
+  // itself can use width:100% + maxWidth + alignSelf:center to be full-width on
+  // phone yet a centered capped pill on iPad (echoes the centered tab bar).
+  discoverMoreWrap: {
+    paddingHorizontal: padding,
+  },
   discoverMore: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     gap: 8,
-    marginHorizontal: padding,
     marginTop: 12,
     paddingVertical: 12,
     borderRadius: 14,
     backgroundColor: COLORS.white,
     ...perfect.boxShadow,
+    width: "100%",
+    maxWidth: 480,
+    alignSelf: "center",
   },
   discoverMoreText: {
     fontFamily: FONTS.bold,
