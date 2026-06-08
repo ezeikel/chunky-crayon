@@ -115,6 +115,7 @@ import {
   getSuggestedColor,
   isValidColorMap,
 } from "@/utils/magicColorUtils";
+import { checkRegionStoreReady, requestRegionStoreRegeneration } from "@/api";
 import {
   PressureSmoother,
   getPressureFromEvent,
@@ -645,6 +646,8 @@ const ImageCanvas = ({
     advanceRainbowHue,
     setCaptureCanvas,
     setMagicReady,
+    setMagicStatus,
+    setOnMagicRetry,
     reset,
   } = useCanvasStore();
 
@@ -656,16 +659,106 @@ const ImageCanvas = ({
   // variant they were made under. Built off the region store.
   const preColored = usePreColoredImage(regionStore, paletteVariant);
 
+  // Bumping this nonce restarts the region-store poll effect below — the
+  // tap-to-retry on a 'timeout' tile. The handler re-kicks the worker, flips
+  // status to 'retrying', then bumps the nonce to resume polling.
+  const [magicRetryNonce, setMagicRetryNonce] = useState(0);
+  const handleMagicRetry = useCallback(async () => {
+    setMagicStatus("retrying");
+    try {
+      const { ok } = await requestRegionStoreRegeneration(coloringImage.id);
+      if (!ok) {
+        setMagicStatus("timeout");
+        return;
+      }
+    } catch {
+      setMagicStatus("timeout");
+      return;
+    }
+    setMagicRetryNonce((n) => n + 1); // resume the 3s/90-attempt poll
+  }, [coloringImage.id, setMagicStatus]);
+
+  // Expose the retry handler to the (sibling) ToolsSidebar via the store, the
+  // way web's coloring-context does with onMagicRetry. Cleared on unmount.
+  useEffect(() => {
+    setOnMagicRetry(handleMagicRetry);
+    return () => setOnMagicRetry(null);
+  }, [handleMagicRetry, setOnMagicRetry]);
+
   // Magic tools enable as soon as EITHER the region store is ready OR legacy
   // colour data exists. Region store is the modern path; fillPoints/colorMap
-  // the fallback for un-backfilled images. Until one is present the toolbars
-  // disable + spin the magic buttons (loading={!magicReady}).
+  // the fallback for un-backfilled images.
+  //
+  // For an image with NONE of those, web's ColoringArea runs a bounded
+  // waiting→timeout→retry machine instead of spinning forever: it polls the
+  // worker (which builds the store post-create) every 3s up to ~4.5min, then
+  // drops to 'timeout' (a tap-to-retry rotate arrow). Mobile mirrors that here
+  // so the magic tiles never spin indefinitely on a page that has no store.
+  const hasLegacyMagic =
+    (!!fillPoints && fillPoints.points.length > 0) ||
+    (!!colorMap && isValidColorMap(colorMap));
+
   useEffect(() => {
-    const hasRegionStore = regionStore.state.isReady;
-    const hasFillPoints = !!fillPoints && fillPoints.points.length > 0;
-    const hasColorMap = !!colorMap && isValidColorMap(colorMap);
-    setMagicReady(hasRegionStore || hasFillPoints || hasColorMap);
-  }, [regionStore.state.isReady, fillPoints, colorMap, setMagicReady]);
+    // Ready as soon as the region store loads or legacy data is present.
+    if (regionStore.state.isReady || hasLegacyMagic) {
+      setMagicReady(true);
+      setMagicStatus("ready");
+      return;
+    }
+    // No usable data yet. If the row already carries a regionMapUrl the store
+    // hook will load it (isReady flips above) — nothing to poll. Otherwise the
+    // store is genuinely absent: poll the worker pipeline, then time out.
+    setMagicReady(false);
+    if (coloringImage.regionMapUrl) {
+      // Has a URL but not decoded yet → treat as waiting (spinner), no poll.
+      setMagicStatus("waiting");
+      return;
+    }
+    setMagicStatus("waiting");
+
+    let attempts = 0;
+    let cancelled = false;
+    let timer: ReturnType<typeof setTimeout>;
+    const POLL_MS = 3000;
+    const MAX_ATTEMPTS = 90; // ~4.5 min, matches web
+
+    const tick = async () => {
+      if (cancelled) return;
+      attempts += 1;
+      try {
+        const { ready } = await checkRegionStoreReady(coloringImage.id);
+        if (cancelled) return;
+        if (ready) {
+          setMagicReady(true);
+          setMagicStatus("ready");
+          return;
+        }
+      } catch {
+        // transient — keep polling within the budget
+      }
+      if (attempts >= MAX_ATTEMPTS) {
+        setMagicStatus("timeout");
+        return;
+      }
+      timer = setTimeout(tick, POLL_MS);
+    };
+    timer = setTimeout(tick, POLL_MS);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+    // coloringImage.id/regionMapUrl identify the image; hasLegacyMagic +
+    // isReady gate the early-out. magicRetryNonce lets the retry button
+    // restart this whole effect (re-kick + fresh poll).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    coloringImage.id,
+    coloringImage.regionMapUrl,
+    regionStore.state.isReady,
+    hasLegacyMagic,
+    magicRetryNonce,
+  ]);
 
   // Sync haptics enabled state with mute setting
   useEffect(() => {

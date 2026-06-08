@@ -62,6 +62,9 @@ export type PatternType =
   | "confetti";
 export type MagicMode = "suggest" | "auto"; // suggest = tap for color hint, auto = fill entire image
 
+// Region-store lifecycle the magic tiles render (mirrors web coloring-context).
+export type MagicStatus = "ready" | "waiting" | "timeout" | "retrying";
+
 // Canvas sticker tool now uses the shared PNG catalog (lib/canvasStickers) —
 // `selectedSticker` holds a catalog ID (e.g. "star-classic"), not an emoji
 // glyph. StickerCategory + the per-category sticker lists come from there.
@@ -207,6 +210,25 @@ export type CanvasState = {
    * Defaults true so images without a region store aren't blocked.
    */
   magicReady: boolean;
+  /**
+   * Finer-grained region-store lifecycle the magic tiles render (mirrors web's
+   * coloring-context `magicStatus`):
+   *   'ready'    — store present, tools usable.
+   *   'waiting'  — no store yet; host is polling the worker pipeline (spinner).
+   *   'retrying' — kid tapped retry, worker re-kicked, polling again (spinner).
+   *   'timeout'  — poll budget exhausted; tile stops spinning and shows a
+   *                tap-to-retry rotate arrow (not a forever spinner).
+   * `magicReady` stays the usable/tap-guard boolean (true only when 'ready' OR
+   * legacy fill/colorMap data is present).
+   */
+  magicStatus: MagicStatus;
+  /**
+   * Retry handler the magic tiles call when magicStatus === 'timeout' — set by
+   * ImageCanvas (which owns the region-store poll), invoked by ToolsSidebar
+   * (a sibling). Mirrors web's coloring-context `onMagicRetry`. Null when no
+   * canvas is mounted.
+   */
+  onMagicRetry: (() => void) | null;
 
   // Rainbow brush hue tracking (0-360)
   rainbowHue: number;
@@ -255,6 +277,8 @@ type CanvasActions = {
   setStickerSize: (size: number) => void;
   setMagicMode: (mode: MagicMode) => void;
   setMagicReady: (ready: boolean) => void;
+  setMagicStatus: (status: MagicStatus) => void;
+  setOnMagicRetry: (fn: (() => void) | null) => void;
   advanceRainbowHue: (amount?: number) => void;
 
   // History actions
@@ -312,6 +336,8 @@ const initialState: CanvasState = {
   stickerSize: 80,
   magicMode: "suggest",
   magicReady: true,
+  magicStatus: "ready",
+  onMagicRetry: null,
   rainbowHue: 0,
 
   history: [],
@@ -353,6 +379,8 @@ export const useCanvasStore = create<CanvasState & CanvasActions>(
       set({ stickerSize: Math.max(20, Math.min(150, size)) }),
     setMagicMode: (mode) => set({ magicMode: mode }),
     setMagicReady: (ready) => set({ magicReady: ready }),
+    setMagicStatus: (status) => set({ magicStatus: status }),
+    setOnMagicRetry: (fn) => set({ onMagicRetry: fn }),
     advanceRainbowHue: (amount = 30) =>
       set((state) => ({ rainbowHue: (state.rainbowHue + amount) % 360 })),
 

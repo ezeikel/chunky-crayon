@@ -317,6 +317,26 @@ export const createColoringImage = async (description: string) => {
 };
 
 /**
+ * Magic-tools region store. Mirrors web's ColoringArea poll+retry:
+ *   - checkRegionStoreReady: fresh DB read of whether the store is written.
+ *   - requestRegionStoreRegeneration: re-kick the Hetzner worker to build it
+ *     (the tap-to-retry on timeout). Worker takes ~60-90s; the poll picks it up.
+ */
+export const checkRegionStoreReady = async (
+  id: string,
+): Promise<{ ready: boolean }> => {
+  const response = await api.get(`/mobile/coloring-images/${id}/region-store`);
+  return response.data;
+};
+
+export const requestRegionStoreRegeneration = async (
+  id: string,
+): Promise<{ ok: boolean; error?: string }> => {
+  const response = await api.post(`/mobile/coloring-images/${id}/region-store`);
+  return response.data;
+};
+
+/**
  * Result of the pending/worker create flow — mirrors web's
  * CreatePendingResult exactly so the form can branch on `ok` / `error`
  * like web's CreateColoringPageForm does.

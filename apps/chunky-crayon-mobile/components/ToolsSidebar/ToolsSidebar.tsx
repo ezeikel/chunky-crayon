@@ -117,6 +117,8 @@ const ToolsSidebar = ({
   const brushSize = useCanvasStore((s) => s.brushSize);
   const magicMode = useCanvasStore((s) => s.magicMode);
   const magicReady = useCanvasStore((s) => s.magicReady);
+  const magicStatus = useCanvasStore((s) => s.magicStatus);
+  const onMagicRetry = useCanvasStore((s) => s.onMagicRetry);
   const selectedColor = useCanvasStore((s) => s.selectedColor);
   // Derived undo/redo enabled state — keeps the greyed/enabled visual live.
   // canRedo depends on BOTH historyIndex AND history.length (addAction
@@ -283,18 +285,29 @@ const ToolsSidebar = ({
               { gap, width: gridWidth, justifyContent: gridJustify },
             ]}
           >
-            {COLORING_MAGIC_TOOLS.map((config) => (
-              <ToolTile
-                key={config.id}
-                icon={config.icon}
-                label={config.label}
-                isMagic
-                selected={isToolActive(config)}
-                loading={!magicReady}
-                size={tileSize}
-                onPress={() => handleToolSelect(config)}
-              />
-            ))}
+            {COLORING_MAGIC_TOOLS.map((config) => {
+              const isTimeout = magicStatus === "timeout";
+              return (
+                <ToolTile
+                  key={config.id}
+                  icon={config.icon}
+                  label={config.label}
+                  isMagic
+                  selected={isToolActive(config)}
+                  // Spinner while waiting/retrying; rotate-arrow on timeout
+                  // (enabled → tap re-kicks generation). Web ToolSelector parity.
+                  loading={
+                    !magicReady &&
+                    (magicStatus === "waiting" || magicStatus === "retrying")
+                  }
+                  timedOut={isTimeout}
+                  size={tileSize}
+                  onPress={() =>
+                    isTimeout ? onMagicRetry?.() : handleToolSelect(config)
+                  }
+                />
+              );
+            })}
           </View>
 
           <View style={styles.divider} />

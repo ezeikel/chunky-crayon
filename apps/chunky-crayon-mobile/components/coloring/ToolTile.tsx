@@ -2,7 +2,7 @@ import { View, StyleSheet, type StyleProp, type ViewStyle } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { LinearGradient } from "expo-linear-gradient";
-import { faSparkles } from "@fortawesome/pro-duotone-svg-icons";
+import { faSparkles, faRotateRight } from "@fortawesome/pro-duotone-svg-icons";
 import SquishyPressable from "@/components/SquishyPressable";
 import Spinner from "@/components/Spinner/Spinner";
 
@@ -39,6 +39,12 @@ type ToolTileProps = {
   isMagic?: boolean;
   /** Magic tools are disabled (with a spinner) until the region store is ready. */
   loading?: boolean;
+  /**
+   * Magic tools whose region store timed out: stop the spinner, show a
+   * tap-to-retry rotate arrow, and stay ENABLED so the tap fires onPress
+   * (which the caller wires to the retry handler). Mirrors web ToolSelector.
+   */
+  timedOut?: boolean;
   disabled?: boolean;
   style?: StyleProp<ViewStyle>;
 };
@@ -51,6 +57,7 @@ const ToolTile = ({
   size = 56,
   isMagic = false,
   loading = false,
+  timedOut = false,
   disabled = false,
   style,
 }: ToolTileProps) => {
@@ -65,14 +72,24 @@ const ToolTile = ({
 
   // ─── Magic tile ───
   if (isMagic) {
+    // Three states: loading (spinner, disabled), timedOut (rotate arrow,
+    // ENABLED so the tap re-kicks generation), ready (tool icon + sparkle).
     const showGradient = selected || loading;
+    // Timed-out + idle-ready both use the light 10%-tint gradient; loading +
+    // selected use the full-strength one.
     return (
       <SquishyPressable
         onPress={onPress}
         disabled={disabled || loading}
         scaleTo={0.95}
         accessibilityRole="button"
-        accessibilityLabel={loading ? `${label} (getting ready)` : label}
+        accessibilityLabel={
+          loading
+            ? `${label} (getting ready)`
+            : timedOut
+              ? `${label} (tap to try again)`
+              : label
+        }
         accessibilityState={{ selected, disabled: disabled || loading }}
         style={[{ width: size, height: size }, style]}
       >
@@ -103,7 +120,19 @@ const ToolTile = ({
             // Sized to the full tool-glyph size (faSpinnerThird read too thin
             // at 0.9× a value that's already small) so it matches the weight
             // of web's size-xl spinner.
-            <Spinner size={iconSize} color="#FFFFFF" />
+            <Spinner
+              size={iconSize}
+              color="#FFFFFF"
+              secondaryColor="#FFFFFF"
+              secondaryOpacity={0.45}
+            />
+          ) : timedOut ? (
+            // Region store stalled — tap-to-retry rotate arrow (web parity).
+            <FontAwesomeIcon
+              icon={faRotateRight}
+              size={iconSize}
+              color={MAGIC_FROM}
+            />
           ) : (
             <FontAwesomeIcon
               icon={icon}
@@ -113,8 +142,9 @@ const ToolTile = ({
           )}
         </View>
         {/* Sparkle badge — rendered OUTSIDE tileBase (which clips) so it can
-            overflow the corner like web's `-top-2 -right-2`. */}
-        {!loading && (
+            overflow the corner like web's `-top-2 -right-2`. Hidden while
+            loading or timed-out (the spinner/retry arrow stands alone). */}
+        {!loading && !timedOut && (
           <FontAwesomeIcon
             icon={faSparkles}
             size={sparkleSize}

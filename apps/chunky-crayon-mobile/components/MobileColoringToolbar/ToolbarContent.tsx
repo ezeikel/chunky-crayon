@@ -79,6 +79,8 @@ const ToolbarContent = () => {
     brushSize,
     magicMode,
     magicReady,
+    magicStatus,
+    onMagicRetry,
     paletteVariant,
     setTool,
     setColor,
@@ -187,9 +189,20 @@ const ToolbarContent = () => {
                     label={config.label}
                     isMagic={config.isMagic}
                     selected={isToolActive(config)}
-                    loading={config.isMagic ? !magicReady : false}
+                    // Magic tiles: spinner while waiting/retrying, rotate-arrow
+                    // retry on timeout (tap re-kicks generation). Web parity.
+                    loading={
+                      config.isMagic &&
+                      !magicReady &&
+                      (magicStatus === "waiting" || magicStatus === "retrying")
+                    }
+                    timedOut={config.isMagic && magicStatus === "timeout"}
                     size={toolTileSize}
-                    onPress={() => handleToolSelect(config)}
+                    onPress={() =>
+                      config.isMagic && magicStatus === "timeout"
+                        ? onMagicRetry?.()
+                        : handleToolSelect(config)
+                    }
                   />
                 </View>
               );
