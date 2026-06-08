@@ -354,7 +354,11 @@ const SubscriptionPaywallModal = ({
                 </View>
               ) : (
                 <View style={styles.loadingContainer}>
-                  <Spinner size={36} color="#E46444" />
+                  {/* No `color` → brand duotone (orange + teal thirds), matching
+                      the app's other full-screen loaders. An explicit colour
+                      forces monotone, collapsing the spinner-thirds to a plain
+                      ring on the cream background. */}
+                  <Spinner size={36} />
                   <Text style={styles.loadingText}>Loading plans…</Text>
                 </View>
               )}

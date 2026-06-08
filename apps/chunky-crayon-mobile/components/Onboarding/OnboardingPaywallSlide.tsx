@@ -323,7 +323,9 @@ const OnboardingPaywallSlide = ({
 
   const actionBlock = isLoadingOfferings ? (
     <View style={styles.loadingContainer}>
-      <Spinner size={24} color="#E46444" />
+      {/* No `color` → brand duotone thirds, matching the app's full-screen
+          loaders (an explicit colour forces a plain monotone ring). */}
+      <Spinner size={24} />
     </View>
   ) : offeringsUnavailable ? (
     <View style={styles.loadingContainer}>

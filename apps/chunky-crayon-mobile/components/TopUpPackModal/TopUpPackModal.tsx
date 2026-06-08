@@ -199,7 +199,8 @@ const TopUpPackModal = ({
 
             {isLoading ? (
               <View style={styles.loadingContainer}>
-                <Spinner size={36} color="#E46444" />
+                {/* No `color` → brand duotone thirds (matches app loaders). */}
+                <Spinner size={36} />
                 <Text style={styles.loadingText}>Loading credit packs…</Text>
               </View>
             ) : packages.length === 0 ? (
