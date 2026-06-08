@@ -12,7 +12,7 @@ import {
   faImage,
   faStar,
   faHeart,
-  faHatWizard,
+  faPartyHorn,
 } from "@fortawesome/duotone-regular-svg-icons";
 import CreateSheet from "@/components/CreateSheet/CreateSheet";
 import { useT } from "@/lib/i18n/useT";
@@ -136,7 +136,7 @@ const CustomTabBar = ({ state, navigation, onCreatePress }: TabBarProps) => {
               accessibilityLabel={tButton("createColoringPage")}
             >
               <FontAwesomeIcon
-                icon={faHatWizard}
+                icon={faPartyHorn}
                 size={26}
                 color="#FFFFFF"
                 secondaryColor="rgba(255,255,255,0.55)"
