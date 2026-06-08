@@ -58,6 +58,40 @@ const isCompleteSvg = (text: string | null): text is string =>
   text.includes("<svg") &&
   text.includes("</svg>");
 
+/**
+ * Normalize the root <svg> so the content SCALES to its container instead of
+ * rendering at intrinsic pixel size and getting clipped.
+ *
+ * Our coloring SVGs ship as `<svg width="1024" height="1024" ...>` with NO
+ * viewBox. With a fixed width/height and no viewBox, react-native-svg renders
+ * the paths at 1024px and a smaller (e.g. square card) container just CLIPS them
+ * — that's why the Today thumbnail showed only the bottom-left of the page while
+ * the same art rendered full elsewhere. preserveAspectRatio can't help because
+ * there's no viewBox to map.
+ *
+ * Fix: if the root <svg> has width/height but no viewBox, synthesize a
+ * `viewBox="0 0 W H"` from them, then strip the fixed width/height so the
+ * SvgXml-supplied width="100%"/height="100%" + preserveAspectRatio take over and
+ * the whole page fits. Already-correct SVGs (viewBox present) pass through
+ * untouched.
+ */
+const normalizeSvgRoot = (xml: string): string => {
+  const open = xml.match(/<svg\b[^>]*>/i);
+  if (!open) return xml;
+  const tag = open[0];
+  if (/\bviewBox\s*=/.test(tag)) return xml; // already scalable
+
+  const w = tag.match(/\bwidth\s*=\s*["']?([\d.]+)/i)?.[1];
+  const h = tag.match(/\bheight\s*=\s*["']?([\d.]+)/i)?.[1];
+  if (!w || !h) return xml; // nothing to derive a viewBox from
+
+  const newTag = tag
+    .replace(/\swidth\s*=\s*["'][^"']*["']/i, "")
+    .replace(/\sheight\s*=\s*["'][^"']*["']/i, "")
+    .replace(/<svg\b/i, `<svg viewBox="0 0 ${w} ${h}"`);
+  return xml.replace(tag, newTag);
+};
+
 type SafeSvgUriProps = {
   uri: string | null | undefined;
   width?: number | string;
@@ -89,7 +123,8 @@ const SafeSvgUri = ({
         const text = await res.text();
         // Only accept a COMPLETE document — a truncated body would crash the
         // native path parser. A partial fetch fails this and renders nothing.
-        if (!cancelled && isCompleteSvg(text)) setXml(text);
+        // normalizeSvgRoot ensures a viewBox so the page scales (not clips).
+        if (!cancelled && isCompleteSvg(text)) setXml(normalizeSvgRoot(text));
       } catch {
         // Network/parse error → leave xml null (blank). Non-fatal.
       }
