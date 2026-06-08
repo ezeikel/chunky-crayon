@@ -699,21 +699,23 @@ const ImageCanvas = ({
     (!!colorMap && isValidColorMap(colorMap));
 
   useEffect(() => {
-    // Ready as soon as the region store loads or legacy data is present.
+    // READY: the region store has decoded, OR legacy fill/colorMap is present.
+    // Only here does magicReady become true — it now reflects ACTUAL usability,
+    // so a store-less image never presents a tappable-but-dead tile.
     if (regionStore.state.isReady || hasLegacyMagic) {
       setMagicReady(true);
       setMagicStatus("ready");
       return;
     }
-    // No usable data yet. If the row already carries a regionMapUrl the store
-    // hook will load it (isReady flips above) — nothing to poll. Otherwise the
-    // store is genuinely absent: poll the worker pipeline, then time out.
+
+    // No usable data yet → tools are NOT ready (spinner), and we poll the worker
+    // pipeline (which builds the store ~1-2min after create). On a fresh image
+    // the row often has NO regionMapUrl when we first open it AND the query was
+    // fetched before the worker finished — so polling readiness isn't enough; we
+    // must REFETCH the coloring image so regionMapUrl/regionsJson populate, which
+    // is what flips useRegionStore.isReady and makes the magic handlers work.
+    // (Web gets this for free via router.refresh on poll-resolve.)
     setMagicReady(false);
-    if (coloringImage.regionMapUrl) {
-      // Has a URL but not decoded yet → treat as waiting (spinner), no poll.
-      setMagicStatus("waiting");
-      return;
-    }
     setMagicStatus("waiting");
 
     let attempts = 0;
@@ -729,8 +731,14 @@ const ImageCanvas = ({
         const { ready } = await checkRegionStoreReady(coloringImage.id);
         if (cancelled) return;
         if (ready) {
-          setMagicReady(true);
-          setMagicStatus("ready");
+          // Pull the now-complete row so regionMapUrl/regionsJson land in the
+          // query → useRegionStore decodes → magicReady flips true on the next
+          // effect run (isReady). Don't flip the flags by hand here; let the
+          // refetched data drive it so the tool is genuinely usable, not just
+          // visually "ready".
+          queryClient.invalidateQueries({
+            queryKey: ["coloringImage", coloringImage.id],
+          });
           return;
         }
       } catch {

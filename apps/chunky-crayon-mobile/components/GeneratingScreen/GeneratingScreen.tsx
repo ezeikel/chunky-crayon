@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
@@ -23,8 +23,34 @@ import { COLORS, FONTS } from "@/lib/design";
  * Kid-friendly: a gently pulsing wand medallion + a reassuring line + spinner,
  * on the app's warm cream gradient. No emoji (FA duotone per the brand).
  */
+// The 8 rotating loading messages, copied from web's `coloLoading.messages`
+// (apps/chunky-crayon-web/messages/en.json). Cycled on a slow 4s beat — gentle
+// for ages 3-8. English-only for now; web keeps them in its messages files
+// under coloLoading.
+// TODO(i18n): fold into the shared translations when the i18n rework lands
+// (the CC/CH shared-translations setup is being reworked, so not promoting now).
+const LOADING_MESSAGES = [
+  "Sharpening the crayons",
+  "Mixing some new colors",
+  "Drawing the outlines",
+  "Sneaking in some sparkles",
+  "Putting on the finishing touches",
+  "Making it just right",
+  "Checking everything looks good",
+  "Trying not to color outside the lines",
+];
+const MESSAGE_INTERVAL_MS = 4000;
+
 const GeneratingScreen = () => {
   const pulse = useSharedValue(1);
+  const [messageIndex, setMessageIndex] = useState(0);
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      setMessageIndex((i) => (i + 1) % LOADING_MESSAGES.length);
+    }, MESSAGE_INTERVAL_MS);
+    return () => clearInterval(id);
+  }, []);
 
   useEffect(() => {
     pulse.value = withRepeat(
@@ -54,10 +80,10 @@ const GeneratingScreen = () => {
           />
         </Animated.View>
         <Text style={styles.title}>Making your coloring page…</Text>
-        <Text style={styles.subtitle}>
-          Hang tight! Your picture is on its way.
-        </Text>
-        <Spinner color={COLORS.crayonOrange} size={28} />
+        <Text style={styles.subtitle}>{LOADING_MESSAGES[messageIndex]}</Text>
+        {/* No color prop → brand duotone faSpinnerThird (orange + teal @ 0.6).
+            Passing an explicit color forced it monotone (the plain ring look). */}
+        <Spinner size={28} />
       </View>
     </LinearGradient>
   );
