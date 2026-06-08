@@ -43,7 +43,7 @@
   "coloringPage": {
     "title": "Page à colorier",
     "relatedPages": "Plus de pages à colorier",
-    "defaultDescription": "Page à colorier gratuite à imprimer de Chunky Crayon",
+    "defaultDescription": "Page à colorier à imprimer gratuitement de Chunky Crayon",
     "progress": {
       "colored": "colorié",
       "percentage": "{percent}%",
@@ -64,7 +64,7 @@
       "actions": "Actions"
     },
     "tools": {
-      "pan": "Déplacer",
+      "pan": "Panoramique",
       "fill": "Remplir",
       "brush": "Pinceau",
       "sticker": "Autocollant",
@@ -76,9 +76,9 @@
       "magic": "Magie"
     },
     "brushTypes": {
-      "crayon": "Crayon",
+      "crayon": "Crayon de cire",
       "marker": "Feutre",
-      "pencil": "Crayon",
+      "pencil": "Crayon de papier",
       "paintbrush": "Pinceau",
       "eraser": "Gomme",
       "glitter": "Paillettes",
