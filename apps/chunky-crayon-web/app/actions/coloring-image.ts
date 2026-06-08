@@ -246,6 +246,7 @@ export const generateColoringImageWithMetadata = async (
   const coloringImage = await db.coloringImage.create({
     data: {
       title: stripEmDashes(imageMetadata.title),
+      displayTitle: stripEmDashes(imageMetadata.displayTitle),
       description: stripEmDashes(imageMetadata.description),
       alt: stripEmDashes(imageMetadata.alt),
       tags: imageMetadata.tags,

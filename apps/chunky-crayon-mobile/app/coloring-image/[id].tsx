@@ -71,6 +71,9 @@ import {
 } from "@/components/FocusMode";
 import { track } from "@/utils/analytics";
 import { ANALYTICS_EVENTS } from "@/constants/analytics";
+// RN-safe subpath — tidies a combo-backfill title that leaked its raw prompt +
+// "(seed NNN)" suffix into the title field, so a kid never sees that artifact.
+import { cleanTitle } from "@one-colored-pixel/coloring-core/copy";
 
 // ── Draw-scroll arbitration, isolated from the route's render ────────────────
 // The canvas toggles page-scroll OFF while you draw (ImageCanvas calls
@@ -308,7 +311,10 @@ const ColoringImage = () => {
         id: artworkId,
         coloringImageId: id as string,
         profileId: activeProfile?.id ?? null,
-        title: data?.coloringImage?.title ?? "My artwork",
+        title:
+          data?.coloringImage?.displayTitle ??
+          cleanTitle(data?.coloringImage?.title) ??
+          "My artwork",
         fileUri,
         createdAt: Date.now(),
       });
@@ -557,7 +563,8 @@ const ColoringImage = () => {
             {!useCompactHeader && (
               <View style={styles.titleContainer}>
                 <Text style={styles.title} numberOfLines={2}>
-                  {coloringImage.title}
+                  {coloringImage.displayTitle ??
+                    cleanTitle(coloringImage.title)}
                 </Text>
               </View>
             )}

@@ -138,7 +138,13 @@ model CreditTransaction {
 
 model ColoringImage {
   id                      String           @id @default(cuid())
+  // `title` is the SEO/long title (web page <title>, OG, JSON-LD, slug source).
+  // `displayTitle` is the short, playful, kid-first name the APPS render (mobile
+  // + the in-app canvas). Nullable: rows created before this column / not yet
+  // backfilled fall back to cleanTitle(title) at display time. Web keeps using
+  // `title` so search ranking is unaffected.
   title                   String
+  displayTitle            String?
   description             String
   alt                     String
   url                     String?

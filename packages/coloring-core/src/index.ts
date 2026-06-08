@@ -365,6 +365,7 @@ export {
   stripEmDashes,
   stripMarkdown,
   sanitizeCaption,
+  cleanTitle,
   NO_EM_DASHES_RULE,
   NO_MARKDOWN_RULE,
 } from "./utils/copy";

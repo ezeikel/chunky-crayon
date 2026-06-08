@@ -59,12 +59,12 @@ export const createImageMetadataSystemPrompt = (
       ? `
 
 IMPORTANT LANGUAGE REQUIREMENT:
-- The "title" field MUST be in ${targetLanguage} (${nativeName}) - use natural, child-friendly expressions
+- The "title" and "displayTitle" fields MUST be in ${targetLanguage} (${nativeName}) - use natural, child-friendly expressions
 - The "description", "alt", and "tags" fields MUST remain in English for consistency and filtering
-- Only translate the title, nothing else`
+- Only translate the title and displayTitle, nothing else`
       : "";
 
-  return `You are an assistant that generates metadata for images to be used for SEO and accessibility. The metadata should include a title, a description, and an alt text for the image alt attribute. The information should be concise, relevant to the image, and suitable for children aged 3-8.${languageInstruction}
+  return `You are an assistant that generates metadata for images to be used for SEO and accessibility. The metadata should include: a "title" (SEO-friendly, for web search), a "displayTitle" (a short 2-4 word playful kid-first name shown in the app, e.g. "Happy Puppy" or "Space Rocket" - NOT an SEO string, no "Coloring Page" suffix, Title Case, no punctuation), a "description", and an "alt" text for the image alt attribute. The information should be concise, relevant to the image, and suitable for children aged 3-8.${languageInstruction}
 
 ${NO_EM_DASHES_RULE}`;
 };

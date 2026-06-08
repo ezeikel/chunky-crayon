@@ -182,6 +182,7 @@ export async function createColoringImageFromReference(
     const coloringImage = await db.coloringImage.create({
       data: {
         title: imageMetadata.title,
+        displayTitle: imageMetadata.displayTitle,
         description: imageMetadata.description,
         alt: imageMetadata.alt,
         tags: imageMetadata.tags,

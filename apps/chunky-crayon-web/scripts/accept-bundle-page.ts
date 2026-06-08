@@ -178,6 +178,7 @@ async function run() {
       where: { id: existing.id },
       data: {
         title: m.title,
+        displayTitle: m.displayTitle,
         description: m.description,
         alt: m.alt,
         tags: m.tags,
@@ -192,6 +193,7 @@ async function run() {
     const created = await db.coloringImage.create({
       data: {
         title: m.title,
+        displayTitle: m.displayTitle,
         description: m.description,
         alt: m.alt,
         tags: m.tags,

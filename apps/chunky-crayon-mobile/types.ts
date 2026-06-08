@@ -67,6 +67,10 @@ export type RegionStoreJson = {
 export type ColoringImage = {
   id: string;
   title: string;
+  // Short kid-friendly name shown in the app (SEO `title` stays for web). May be
+  // null on rows created before displayTitle existed / not yet backfilled — the
+  // app falls back to cleanTitle(title).
+  displayTitle?: string | null;
   description: string;
   alt: string;
   // Generation lifecycle. A freshly-created row (worker/pending flow) starts

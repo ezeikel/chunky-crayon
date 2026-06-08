@@ -73,6 +73,7 @@ export const getColoringImageBase = async (
     select: {
       id: true,
       title: true,
+      displayTitle: true,
       description: true,
       alt: true,
       tags: true,
@@ -123,6 +124,7 @@ export const getColoringImageBySlugSuffix = async (
     select: {
       id: true,
       title: true,
+      displayTitle: true,
       description: true,
       alt: true,
       tags: true,

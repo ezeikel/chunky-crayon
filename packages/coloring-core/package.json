@@ -24,6 +24,11 @@
       "require": "./dist/gallery/index.js",
       "types": "./dist/gallery/index.d.ts"
     },
+    "./copy": {
+      "import": "./dist/copy/index.js",
+      "require": "./dist/copy/index.js",
+      "types": "./dist/copy/index.d.ts"
+    },
     "./characters": {
       "import": "./dist/characters/index.js",
       "require": "./dist/characters/index.js",

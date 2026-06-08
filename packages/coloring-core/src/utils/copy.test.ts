@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  cleanTitle,
   NO_EM_DASHES_RULE,
   NO_MARKDOWN_RULE,
   sanitizeCaption,
@@ -167,5 +168,58 @@ describe("NO_MARKDOWN_RULE", () => {
   it("is a substantive plain-text instruction", () => {
     expect(NO_MARKDOWN_RULE.length).toBeGreaterThan(50);
     expect(NO_MARKDOWN_RULE.toLowerCase()).toContain("plain text");
+  });
+});
+
+/**
+ * A combo-backfill batch leaked raw generation prompts (ending in a
+ * "(seed NNN)" uniqueness suffix) into the title field — those read as an
+ * internal artifact to a 3-8 y/o, not a name. cleanTitle is the display-boundary
+ * guarantee that no prompt-shaped title ever reaches a kid's screen.
+ */
+describe("cleanTitle", () => {
+  it("strips a trailing (seed NNN) suffix", () => {
+    expect(cleanTitle("animal portrait, friendly expression (seed 530)")).toBe(
+      "Animal portrait, friendly expression",
+    );
+  });
+
+  it("strips the seed suffix with no leading space", () => {
+    expect(cleanTitle("happy puppy(seed 12)")).toBe("Happy puppy");
+  });
+
+  it("strips a leading article and capitalises", () => {
+    expect(cleanTitle("a friendly puppy")).toBe("Friendly puppy");
+    expect(cleanTitle("the magic castle")).toBe("Magic castle");
+    expect(cleanTitle("an owl in a tree")).toBe("Owl in a tree");
+  });
+
+  it("strips a trailing period", () => {
+    expect(cleanTitle("a cat playing with yarn.")).toBe(
+      "Cat playing with yarn",
+    );
+  });
+
+  it("strips article + seed + period together", () => {
+    expect(cleanTitle("a rabbit, for toddlers (seed 472).")).toBe(
+      "Rabbit, for toddlers",
+    );
+  });
+
+  it("leaves a clean AI title untouched", () => {
+    expect(cleanTitle("Spring Wildflower Meadow")).toBe(
+      "Spring Wildflower Meadow",
+    );
+  });
+
+  it("never returns empty — falls back when only a seed suffix", () => {
+    expect(cleanTitle("(seed 999)")).toBe("Coloring page");
+    expect(cleanTitle("")).toBe("Coloring page");
+    expect(cleanTitle(null)).toBe("Coloring page");
+    expect(cleanTitle(undefined)).toBe("Coloring page");
+  });
+
+  it("does not strip an inner 'seed' that is not the suffix", () => {
+    expect(cleanTitle("a packet of seeds")).toBe("Packet of seeds");
   });
 });

@@ -37,7 +37,10 @@ import {
   Difficulty as PrismaDifficulty,
   Prisma,
 } from '@one-colored-pixel/db';
-import { generateAndStoreColoringImage } from '@one-colored-pixel/coloring-core';
+import {
+  generateAndStoreColoringImage,
+  cleanTitle,
+} from '@one-colored-pixel/coloring-core';
 import { COMBO_PAGES, type ComboPage } from '@/lib/seo/combo-pages';
 import { GALLERY_CATEGORIES, getCategoryBySlug } from '@/constants';
 import { getAgeBracketBySlug } from '@/lib/seo/age-brackets';
@@ -208,7 +211,11 @@ const backfillOneImage = async (
   // to be a real image — gallery filters exclude non-READY rows.
   const row = await db.coloringImage.create({
     data: {
-      title: description.replace(/^a /i, '').replace(/\.$/, ''),
+      // cleanTitle strips the leading article, trailing period, AND the
+      // "(seed NNN)" uniqueness suffix that buildPrompts appends to the prompt
+      // — that suffix used to leak into the title and read as an artifact to a
+      // kid. The seed still lives in `description`/`sourcePrompt` for uniqueness.
+      title: cleanTitle(description),
       description,
       alt: description,
       tags: tagsForCombo(combo),

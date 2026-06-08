@@ -61,6 +61,7 @@ const getColoringImagesForApi = async ({
       id: true,
       svgUrl: true,
       title: true,
+      displayTitle: true,
       description: true,
     },
     orderBy: {

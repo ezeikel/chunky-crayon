@@ -10,6 +10,7 @@ import ColoringPageContent from '@/components/ColoringPageContent/ColoringPageCo
 import PageWrap from '@/components/PageWrap/PageWrap';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import { getColoringImageUrl } from '@/lib/seo/coloring-image-url';
+import { cleanTitle } from '@one-colored-pixel/coloring-core';
 import type { ColoringImage } from '@one-colored-pixel/db';
 
 // Shared READY-path render for both /coloring-image/[id] and the public
@@ -102,7 +103,11 @@ const ColoringImageDetailView = async ({ coloringImage, locale }: Props) => {
       <ColoringPageContent
         coloringImage={coloringImage}
         isAuthenticated={isAuthenticated}
-        title={coloringImage.title || tColoring('title')}
+        title={
+          coloringImage.displayTitle ||
+          cleanTitle(coloringImage.title) ||
+          tColoring('title')
+        }
       />
 
       {showRegionDebugLink && (

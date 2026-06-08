@@ -100,3 +100,37 @@ export function stripMarkdown(text: string): string {
 export function sanitizeCaption(text: string): string {
   return stripEmDashes(stripMarkdown(text)).trim();
 }
+
+/**
+ * Tidy a coloring-image title for DISPLAY.
+ *
+ * Most titles are clean AI-generated names ("Spring Wildflower Meadow"), but a
+ * combo-backfill batch leaked raw generation prompts into the title field,
+ * including a trailing "(seed 530)" uniqueness suffix the generator appends.
+ * Those read as an internal artifact to a 3-8 y/o, not a name. This is the
+ * display-boundary guarantee (the backfill script + a one-off prod data fix
+ * handle the source), so even a future mistake never shows a prompt-shaped
+ * title to a kid.
+ *
+ * Strips, in order: a trailing "(seed NNN)" (with surrounding space), a
+ * leading article ("a "/"an "/"the "), and a trailing period. Capitalises the
+ * first letter so an article-stripped title still reads as a name. A clean
+ * title passes through unchanged. Never returns empty — a title that is ONLY a
+ * seed suffix falls back to "Coloring page".
+ */
+export function cleanTitle(title: string | null | undefined): string {
+  if (!title) return "Coloring page";
+  const cleaned = title
+    // Trailing sentence period first ("…(seed 472)." → "…(seed 472)") so the
+    // seed-suffix regex below, anchored to end-of-string, still matches.
+    .replace(/\.\s*$/, "")
+    // Trailing "(seed 530)" / " (seed 530)" uniqueness suffix.
+    .replace(/\s*\(seed\s+\d+\)\s*$/i, "")
+    // A period can sit between the text and the seed too — tidy again.
+    .replace(/\.\s*$/, "")
+    // Leading article so "a friendly puppy" → "friendly puppy".
+    .replace(/^(a|an|the)\s+/i, "")
+    .trim();
+  if (!cleaned) return "Coloring page";
+  return cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
+}

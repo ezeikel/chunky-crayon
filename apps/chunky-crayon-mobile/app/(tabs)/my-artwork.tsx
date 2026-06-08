@@ -23,6 +23,7 @@ import ParentalGate from "@/components/ParentalGate";
 import useHeaderData from "@/hooks/useHeaderData";
 import { useFeed } from "@/hooks/api";
 import { useMergedArtworks } from "@/hooks/useMergedArtworks";
+import { cleanTitle } from "@one-colored-pixel/coloring-core/copy";
 import { useT } from "@/lib/i18n/useT";
 import { COLORS, FONTS } from "@/lib/design";
 import { tapLight } from "@/utils/haptics";
@@ -129,7 +130,8 @@ const MyArtworkScreen = () => {
               )}
               <View style={styles.artworkInfo}>
                 <Text style={styles.artworkTitle} numberOfLines={1}>
-                  {item.coloringImage.title}
+                  {item.coloringImage.displayTitle ??
+                    cleanTitle(item.coloringImage.title)}
                 </Text>
                 <Text style={styles.artworkDate}>{t("inProgress")}</Text>
               </View>
@@ -175,7 +177,7 @@ const MyArtworkScreen = () => {
             />
             <View style={styles.artworkInfo}>
               <Text style={styles.artworkTitle} numberOfLines={1}>
-                {artwork.title}
+                {cleanTitle(artwork.title)}
               </Text>
               <Text style={styles.artworkDate}>
                 {new Date(artwork.createdAt).toLocaleDateString()}

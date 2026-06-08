@@ -25,6 +25,11 @@ import { generateFillPointsLocal } from "../record/fill-points.js";
 
 const imageMetadataSchema = z.object({
   title: z.string().describe("SEO-friendly title for the coloring page"),
+  displayTitle: z
+    .string()
+    .describe(
+      'Short, playful, kid-first name shown in the app (2-4 words, e.g. "Happy Puppy", "Space Rocket"). NOT the SEO title. No "Coloring Page" suffix, no punctuation, Title Case.',
+    ),
   description: z
     .string()
     .describe("Brief description of the image for SEO purposes"),
@@ -34,7 +39,7 @@ const imageMetadataSchema = z.object({
     .describe("Relevant tags/keywords for categorization"),
 });
 
-const METADATA_SYSTEM = `You are an assistant that generates metadata for images to be used for SEO and accessibility. The metadata should include a title, a description, and an alt text for the image alt attribute. The information should be concise, relevant to the image, and suitable for children aged 3-8.`;
+const METADATA_SYSTEM = `You are an assistant that generates metadata for images to be used for SEO and accessibility. The metadata should include: a "title" (SEO-friendly, for web search), a "displayTitle" (a short 2-4 word playful kid-first name shown in the app, e.g. "Happy Puppy" - NOT an SEO string, no "Coloring Page" suffix, Title Case, no punctuation), a "description", and an "alt" text for the image alt attribute. The information should be concise, relevant to the image, and suitable for children aged 3-8.`;
 
 const traceImage = async (imageBuffer: Buffer): Promise<string> =>
   new Promise((resolve, reject) => {
@@ -125,6 +130,7 @@ export const persistBundlePage = async ({
     await db.coloringImage.create({
       data: {
         title: imageMetadata.title,
+        displayTitle: imageMetadata.displayTitle,
         description: imageMetadata.description,
         alt: imageMetadata.alt,
         tags: imageMetadata.tags,

@@ -48,6 +48,11 @@ export type SceneDescription = z.infer<typeof sceneDescriptionSchema>;
 
 export const imageMetadataSchema = z.object({
   title: z.string().describe('SEO-friendly title for the coloring page'),
+  displayTitle: z
+    .string()
+    .describe(
+      'Short, playful, kid-first name shown in the app (2-4 words, e.g. "Happy Puppy", "Space Rocket"). NOT the SEO title. No "Coloring Page" suffix, no punctuation, Title Case.',
+    ),
   description: z
     .string()
     .describe('Brief description of the image for SEO purposes'),

@@ -726,6 +726,7 @@ export const claimChallengeReward = async (
 export type FeedColoringImage = {
   id: string;
   title: string;
+  displayTitle?: string | null;
   description: string;
   alt: string;
   url: string | null;
@@ -755,6 +756,7 @@ export type FeedInProgressItem = {
   coloringImage: {
     id: string;
     title: string;
+    displayTitle?: string | null;
     svgUrl: string | null;
   };
   previewUrl: string | null;
