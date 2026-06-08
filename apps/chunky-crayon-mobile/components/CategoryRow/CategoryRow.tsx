@@ -70,12 +70,16 @@ const CategoryRow = () => {
                 />
               </View>
             )}
-            {/* Name on a BRAND-ORANGE gradient strip (transparent → solid
-                crayon-orange) so white text always reads clearly over the B&W
-                line art behind — a grey/black scrim over line art is too low
-                contrast. A small white chip carries the per-category icon. */}
+            {/* Name on a BRAND-ORANGE gradient strip (transparent → crayon
+                orange) so white text always reads clearly over the B&W line art
+                behind — a grey/black scrim over line art is too low contrast.
+                `locations` keeps the top third of the strip fully clear so the
+                art shows through, then ramps the orange in only under the text:
+                a thin readable shelf, not a solid drawer. White chip carries
+                the per-category icon. */}
             <LinearGradient
-              colors={["rgba(228,100,68,0)", "rgba(228,100,68,0.96)"]}
+              colors={["rgba(228,100,68,0)", "rgba(228,100,68,0.9)"]}
+              locations={[0.35, 1]}
               style={styles.nameStrip}
             >
               <View style={styles.chip}>
@@ -133,7 +137,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 8,
     paddingHorizontal: 10,
-    paddingTop: 32,
+    paddingTop: 18,
     paddingBottom: 10,
   },
   // White chip on the orange strip carries the per-category icon for a pop of
