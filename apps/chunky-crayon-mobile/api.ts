@@ -284,8 +284,17 @@ export const verifyMagicLink = async (
 // Coloring Images
 // ============================================================================
 
-export const getColoringImages = async (cursor?: string) => {
-  const params = cursor ? { cursor } : {};
+// Browse the public library. Optional `category` (slug) + `difficulty` filter
+// the grid (the web endpoint tag-matches the category's tag set). No category
+// → the full library, unchanged.
+export const getColoringImages = async (
+  cursor?: string,
+  opts?: { category?: string; difficulty?: string },
+) => {
+  const params: Record<string, string> = {};
+  if (cursor) params.cursor = cursor;
+  if (opts?.category) params.category = opts.category;
+  if (opts?.difficulty) params.difficulty = opts.difficulty;
   const response = await api.get("/coloring-images", { params });
   return response.data;
 };

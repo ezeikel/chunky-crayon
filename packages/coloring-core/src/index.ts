@@ -282,6 +282,18 @@ export type { RandomSceneResult } from "./scene/random-scene";
 export { GATEABLE_MODES, isGateableMode } from "./scene/modes";
 export type { GateableMode } from "./scene/modes";
 
+// Gallery categories (data-only — no FA icons / colours; presentation lives
+// per-app, same as scene-catalog). Drives library browse-by-category on web +
+// mobile; maps to ColoringImage.tags. Mobile imports the RN-safe
+// `@one-colored-pixel/coloring-core/gallery` subpath — this root re-export is
+// for server-side web/worker callers.
+export {
+  GALLERY_CATEGORIES,
+  getCategoryBySlug,
+  getCategoriesForTag,
+} from "./gallery/categories";
+export type { GalleryCategory } from "./gallery/categories";
+
 // Bundles — hero character profiles + page QA gate. Shared between web
 // (admin UI, retry endpoint) and worker (page generation pipeline).
 export {

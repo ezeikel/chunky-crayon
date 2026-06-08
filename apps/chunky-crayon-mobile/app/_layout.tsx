@@ -194,6 +194,34 @@ const RootLayout = () => {
             animation: "slide_from_right",
           }}
         />
+        {/* Library browse-by-category index + per-category grid. Same
+            back-button native-stack header as the other detail routes; the
+            per-category header title is set in the screen from the slug. */}
+        <Stack.Screen
+          name="categories"
+          options={{
+            headerShown: true,
+            headerTitle: "Browse by category",
+            headerBackTitle: "Back",
+            headerStyle: { backgroundColor: "#FDFAF5" },
+            headerShadowVisible: false,
+            headerTintColor: "#E46444",
+            headerTitleStyle: { fontFamily: "TondoTrial-Bold" },
+            animation: "slide_from_right",
+          }}
+        />
+        <Stack.Screen
+          name="category/[slug]"
+          options={{
+            headerShown: true,
+            headerBackTitle: "Back",
+            headerStyle: { backgroundColor: "#FDFAF5" },
+            headerShadowVisible: false,
+            headerTintColor: "#E46444",
+            headerTitleStyle: { fontFamily: "TondoTrial-Bold" },
+            animation: "slide_from_right",
+          }}
+        />
       </Stack>
       {!hasCompleted && <Redirect href="/onboarding" />}
     </Providers>

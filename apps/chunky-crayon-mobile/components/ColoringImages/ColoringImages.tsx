@@ -121,7 +121,14 @@ const outerPadding = 20;
 const innerPadding = 16;
 const gridGap = 16;
 
-const ColoringImages = () => {
+type ColoringImagesProps = {
+  /** Filter the library to a category slug (animals, vehicles, …). */
+  category?: string;
+  /** Filter by difficulty (beginner|intermediate|advanced|expert). */
+  difficulty?: string;
+};
+
+const ColoringImages = ({ category, difficulty }: ColoringImagesProps = {}) => {
   const [screenWidth, setScreenWidth] = useState(
     Dimensions.get("window").width,
   );
@@ -134,7 +141,9 @@ const ColoringImages = () => {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-  } = useColoringImages();
+  } = useColoringImages(
+    category || difficulty ? { category, difficulty } : undefined,
+  );
 
   // Flatten all pages into a single array
   const coloringImages = useMemo(() => {

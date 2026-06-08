@@ -1,4 +1,6 @@
 import { db } from '@one-colored-pixel/db';
+import { Difficulty, type Prisma } from '@one-colored-pixel/db';
+import { getCategoryBySlug } from '@one-colored-pixel/coloring-core/gallery';
 import { BRAND } from '@/lib/db';
 import { createColoringImage } from '@/app/actions/coloring-image';
 import { NextRequest, NextResponse } from 'next/server';
@@ -17,18 +19,44 @@ export async function OPTIONS() {
 
 const IMAGES_PER_PAGE = 12;
 
-// Get public coloring images with cursor-based pagination
-const getColoringImagesForApi = async (
-  cursor?: string,
+// Get public coloring images with cursor-based pagination.
+// Optional `category` (slug) filters by the category's tag set (same tag-match
+// the web gallery uses: tags hasSome category.tags); optional `difficulty`
+// narrows further. No category → the full public library (unchanged).
+const getColoringImagesForApi = async ({
+  cursor,
+  categorySlug,
+  difficulty,
   limit = IMAGES_PER_PAGE,
-) => {
+}: {
+  cursor?: string;
+  categorySlug?: string;
+  difficulty?: Difficulty;
+  limit?: number;
+}) => {
+  const where: Prisma.ColoringImageWhereInput = {
+    brand: BRAND,
+    userId: null, // Only public/community images
+    status: 'READY', // Skip GENERATING / FAILED rows
+  };
+
+  if (categorySlug) {
+    const category = getCategoryBySlug(categorySlug);
+    // Unknown slug → empty result (don't fall back to the whole library, which
+    // would silently show "all" under a bad category link).
+    if (!category) {
+      return { coloringImages: [], nextCursor: null, hasMore: false };
+    }
+    where.tags = { hasSome: category.tags };
+  }
+
+  if (difficulty) {
+    where.difficulty = difficulty;
+  }
+
   // Fetch one extra to determine if there are more pages
   const images = await db.coloringImage.findMany({
-    where: {
-      brand: BRAND,
-      userId: null, // Only public/community images
-      status: 'READY', // Skip GENERATING / FAILED rows
-    },
+    where,
     select: {
       id: true,
       svgUrl: true,
@@ -58,13 +86,25 @@ const getColoringImagesForApi = async (
   };
 };
 
+// Parse the ?difficulty= param into the enum, ignoring junk values.
+const parseDifficulty = (raw: string | null): Difficulty | undefined => {
+  if (!raw) return undefined;
+  const upper = raw.toUpperCase();
+  return (Object.values(Difficulty) as string[]).includes(upper)
+    ? (upper as Difficulty)
+    : undefined;
+};
+
 export const GET = async (request: NextRequest) => {
   const { searchParams } = new URL(request.url);
   const cursor = searchParams.get('cursor') || undefined;
+  const categorySlug = searchParams.get('category') || undefined;
+  const difficulty = parseDifficulty(searchParams.get('difficulty'));
 
-  return Response.json(await getColoringImagesForApi(cursor), {
-    headers: corsHeaders,
-  });
+  return Response.json(
+    await getColoringImagesForApi({ cursor, categorySlug, difficulty }),
+    { headers: corsHeaders },
+  );
 };
 
 export const POST = async (request: Request) => {

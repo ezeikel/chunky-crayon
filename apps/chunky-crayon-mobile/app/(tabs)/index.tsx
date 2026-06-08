@@ -17,6 +17,7 @@ import {
   faUserAstronaut,
   faPalette,
   faStar,
+  faShapes,
 } from "@fortawesome/pro-duotone-svg-icons";
 import Animated, {
   useSharedValue,
@@ -32,10 +33,13 @@ import AppHeader from "@/components/AppHeader";
 import ProfileSwitcher from "@/components/ProfileSwitcher";
 import ColoBottomSheet from "@/components/ColoBottomSheet";
 import ParentalGate from "@/components/ParentalGate";
+import CategoryRow from "@/components/CategoryRow/CategoryRow";
+import SectionHeader from "@/components/SectionHeader/SectionHeader";
 import { useColoContext } from "@/contexts";
 import useHeaderData from "@/hooks/useHeaderData";
+import { tapMedium } from "@/utils/haptics";
 import { useT } from "@/lib/i18n/useT";
-import { COLORS } from "@/lib/design";
+import { COLORS, FONTS } from "@/lib/design";
 
 const padding = 20;
 
@@ -178,6 +182,31 @@ const HomeScreen = () => {
               feed-like content sits on browse routes, not the dashboard. */}
           <MyRecentCreations />
 
+          {/* Library teaser — ready-made pages to jump straight into, the
+              "color what's already here" path (Disney-style library) shown
+              alongside the kid's own recent creations. The create form above
+              stays the co-equal primary action. Full library lives on Gallery. */}
+          <SectionHeader
+            title="Color a ready-made page"
+            icon={faShapes}
+            tint="purple"
+            style={styles.librarySectionHeader}
+            right={
+              <Pressable
+                onPress={() => {
+                  tapMedium();
+                  router.push("/categories");
+                }}
+                hitSlop={8}
+                accessibilityRole="button"
+                accessibilityLabel="See all categories"
+              >
+                <Text style={styles.seeAll}>See all</Text>
+              </Pressable>
+            }
+          />
+          <CategoryRow />
+
           {/* Challenges card — Challenges folds into Home (no longer a
               tab). Taps through to the challenges route. */}
           <Pressable
@@ -287,6 +316,16 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginTop: 8,
     fontFamily: "TondoTrial-Bold",
+  },
+  librarySectionHeader: {
+    paddingHorizontal: padding,
+    marginTop: 20,
+    marginBottom: 4,
+  },
+  seeAll: {
+    fontFamily: FONTS.bold,
+    fontSize: 13,
+    color: COLORS.crayonOrange,
   },
   challengeCard: {
     flexDirection: "row",

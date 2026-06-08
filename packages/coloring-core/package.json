@@ -19,6 +19,11 @@
       "require": "./dist/scene/index.js",
       "types": "./dist/scene/index.d.ts"
     },
+    "./gallery": {
+      "import": "./dist/gallery/index.js",
+      "require": "./dist/gallery/index.js",
+      "types": "./dist/gallery/index.d.ts"
+    },
     "./characters": {
       "import": "./dist/characters/index.js",
       "require": "./dist/characters/index.js",

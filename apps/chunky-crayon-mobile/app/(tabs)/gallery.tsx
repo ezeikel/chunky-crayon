@@ -1,13 +1,21 @@
 import { useState } from "react";
-import { View, Text, StyleSheet, ScrollView } from "react-native";
+import { View, Text, StyleSheet, ScrollView, Pressable } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import { faShapes, faImages } from "@fortawesome/pro-duotone-svg-icons";
 import AppHeader from "@/components/AppHeader";
 import ParentalGate from "@/components/ParentalGate";
 import Feed from "@/components/Feed/Feed";
+import CategoryRow from "@/components/CategoryRow/CategoryRow";
+import SectionHeader from "@/components/SectionHeader/SectionHeader";
 import useHeaderData from "@/hooks/useHeaderData";
+import { tapMedium } from "@/utils/haptics";
+import { track } from "@/utils/analytics";
+import { ANALYTICS_EVENTS } from "@/constants/analytics";
 import { useT } from "@/lib/i18n/useT";
 import { COLORS, FONTS } from "@/lib/design";
+import { perfect } from "@/styles";
 
 /**
  * Gallery tab — the browse surface. Hosts the Feed (today's pick, active
@@ -42,6 +50,51 @@ const GalleryScreen = () => {
             <Text style={styles.headerTitle}>{t("title")}</Text>
             <Text style={styles.headerSubtitle}>{t("subtitle")}</Text>
           </View>
+
+          {/* Library: browse by category (pills) — top of the surface, the
+              Coupang/Prime-kids pattern. "See all" → the full category grid;
+              "Browse all pages" → the full library grid. */}
+          <SectionHeader
+            title="Browse by category"
+            icon={faShapes}
+            tint="purple"
+            style={styles.sectionHeader}
+            right={
+              <Pressable
+                onPress={() => {
+                  tapMedium();
+                  router.push("/categories");
+                }}
+                hitSlop={8}
+                accessibilityRole="button"
+                accessibilityLabel="See all categories"
+              >
+                <Text style={styles.seeAll}>See all</Text>
+              </Pressable>
+            }
+          />
+          <CategoryRow />
+
+          <Pressable
+            style={styles.browseAll}
+            onPress={() => {
+              tapMedium();
+              track(ANALYTICS_EVENTS.BROWSE_ALL_OPENED);
+              router.push("/category/all");
+            }}
+            accessibilityRole="button"
+            accessibilityLabel="Browse all coloring pages"
+          >
+            <FontAwesomeIcon
+              icon={faImages}
+              size={18}
+              color={COLORS.crayonOrange}
+              secondaryColor={COLORS.secondaryOrange}
+              secondaryOpacity={1}
+            />
+            <Text style={styles.browseAllText}>Browse all pages</Text>
+          </Pressable>
+
           <Feed />
         </ScrollView>
       </LinearGradient>
@@ -88,6 +141,33 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: COLORS.textMuted,
     marginTop: 2,
+  },
+  sectionHeader: {
+    paddingHorizontal: 20,
+    marginTop: 12,
+    marginBottom: 4,
+  },
+  seeAll: {
+    fontFamily: FONTS.bold,
+    fontSize: 13,
+    color: COLORS.crayonOrange,
+  },
+  browseAll: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    marginHorizontal: 20,
+    marginTop: 12,
+    paddingVertical: 12,
+    borderRadius: 14,
+    backgroundColor: COLORS.white,
+    ...perfect.boxShadow,
+  },
+  browseAllText: {
+    fontFamily: FONTS.bold,
+    fontSize: 15,
+    color: COLORS.textPrimary,
   },
 });
 

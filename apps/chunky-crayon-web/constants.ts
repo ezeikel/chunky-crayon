@@ -25,6 +25,14 @@ import {
   faPizzaSlice,
 } from '@fortawesome/pro-duotone-svg-icons';
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
+// Import from the /gallery SUBPATH (pure data), NOT the root barrel — the root
+// barrel re-exports the Node-native AI pipeline (resvg, sharp, potrace…), and
+// constants.ts is imported widely on the CLIENT, so the barrel would drag those
+// native bindings into the client bundle and fail the build.
+import {
+  GALLERY_CATEGORIES as CORE_GALLERY_CATEGORIES,
+  type GalleryCategory as CoreGalleryCategory,
+} from '@one-colored-pixel/coloring-core/gallery';
 import type { Currency } from '@/lib/currency';
 
 export const MAX_IMAGE_GENERATION_ATTEMPTS = 3;
@@ -1400,385 +1408,115 @@ export type { BlogCategory, BlogTopic } from '@one-colored-pixel/coloring-core';
 
 // ===== GALLERY CATEGORIES (for SEO landing pages) =====
 
-export type GalleryCategory = {
-  id: string;
-  name: string;
-  slug: string;
-  description: string;
-  keywords: string[]; // SEO keywords this category targets
-  tags: string[]; // Tags from AI-generated metadata that map to this category
+// The category DATA (slug, name, description, keywords, tags) is the shared
+// source of truth in @one-colored-pixel/coloring-core (CORE_GALLERY_CATEGORIES,
+// imported above). Web layers its PRESENTATION (FA icon + Tailwind colours)
+// on top here, keyed by slug — same data-only pattern as the scene catalogue.
+// The exported GalleryCategory shape (with .icon/.color/.bgColor) is unchanged,
+// so every existing gallery route keeps working.
+export type GalleryCategory = CoreGalleryCategory & {
   icon: IconDefinition;
   color: string; // Tailwind text color class for the icon
   bgColor: string; // Tailwind bg color class for the icon container
 };
 
-// SEO-optimized gallery categories targeting popular search terms
-// Maps to tags[] field in ColoringImage model
-export const GALLERY_CATEGORIES: GalleryCategory[] = [
-  {
-    id: 'animals',
-    name: 'Animals',
-    slug: 'animals',
-    description: 'Cute and wild animal coloring pages for kids and adults',
-    keywords: [
-      'animal coloring pages',
-      'zoo animals',
-      'pet coloring',
-      'wildlife coloring',
-    ],
-    tags: [
-      'animal',
-      'animals',
-      'zoo',
-      'pet',
-      'wildlife',
-      'dog',
-      'cat',
-      'lion',
-      'elephant',
-      'bear',
-      'fox',
-      'panda',
-      'penguin',
-      'bird',
-      'fish',
-    ],
+const GALLERY_CATEGORY_PRESENTATION: Record<
+  string,
+  { icon: IconDefinition; color: string; bgColor: string }
+> = {
+  animals: {
     icon: faPaw,
     color: 'text-crayon-orange',
     bgColor: 'bg-crayon-orange/10',
   },
-  {
-    id: 'fantasy',
-    name: 'Fantasy & Magic',
-    slug: 'fantasy',
-    description: 'Magical creatures and fantasy world coloring pages',
-    keywords: [
-      'fantasy coloring pages',
-      'magical coloring',
-      'mythical creatures',
-    ],
-    tags: [
-      'fantasy',
-      'magic',
-      'magical',
-      'mythical',
-      'fairy',
-      'wizard',
-      'witch',
-      'elf',
-      'goblin',
-      'giant',
-      'genie',
-    ],
+  fantasy: {
     icon: faWandMagicSparkles,
     color: 'text-crayon-purple',
     bgColor: 'bg-crayon-purple/10',
   },
-  {
-    id: 'dragons',
-    name: 'Dragons',
-    slug: 'dragons',
-    description: 'Epic dragon coloring pages from cute to fierce',
-    keywords: [
-      'dragon coloring pages',
-      'fire breathing dragon',
-      'baby dragon coloring',
-    ],
-    tags: ['dragon', 'dragons', 'fire-breathing', 'mythical'],
+  dragons: {
     icon: faDragon,
     color: 'text-crayon-green',
     bgColor: 'bg-crayon-green/10',
   },
-  {
-    id: 'unicorns',
-    name: 'Unicorns',
-    slug: 'unicorns',
-    description: 'Beautiful unicorn and rainbow coloring pages',
-    keywords: ['unicorn coloring pages', 'rainbow unicorn', 'magical horse'],
-    // Dropped 'rainbow' here — too aggressive, matches every page with
-    // a rainbow even when there's no unicorn (leprechauns, sprinklers,
-    // elephants under rainbows all leaked into the unicorn gallery).
-    tags: ['unicorn', 'unicorns', 'magical horse', 'pegasus'],
+  unicorns: {
     icon: faHorseHead,
     color: 'text-crayon-pink',
     bgColor: 'bg-crayon-pink/10',
   },
-  {
-    id: 'princesses',
-    name: 'Princesses & Royalty',
-    slug: 'princesses',
-    description: 'Princess, prince, and castle coloring pages',
-    keywords: [
-      'princess coloring pages',
-      'castle coloring',
-      'royalty coloring',
-    ],
-    tags: [
-      'princess',
-      'prince',
-      'queen',
-      'king',
-      'royalty',
-      'castle',
-      'crown',
-      'throne',
-    ],
+  princesses: {
     icon: faCrown,
     color: 'text-crayon-purple',
     bgColor: 'bg-crayon-purple/10',
   },
-  {
-    id: 'superheroes',
-    name: 'Superheroes',
-    slug: 'superheroes',
-    description: 'Action-packed superhero coloring pages',
-    keywords: ['superhero coloring pages', 'hero coloring', 'comic coloring'],
-    tags: [
-      'superhero',
-      'hero',
-      'superheroes',
-      'action',
-      'comic',
-      'cape',
-      'mask',
-    ],
+  superheroes: {
     icon: faMask,
     color: 'text-crayon-yellow',
     bgColor: 'bg-crayon-yellow/10',
   },
-  {
-    id: 'dinosaurs',
-    name: 'Dinosaurs',
-    slug: 'dinosaurs',
-    description: 'Prehistoric dinosaur coloring pages for all ages',
-    keywords: [
-      'dinosaur coloring pages',
-      't-rex coloring',
-      'prehistoric coloring',
-    ],
-    tags: [
-      'dinosaur',
-      'dinosaurs',
-      'prehistoric',
-      't-rex',
-      'trex',
-      'raptor',
-      'brontosaurus',
-      'pterodactyl',
-    ],
+  dinosaurs: {
     icon: faDinosaur,
     color: 'text-crayon-green',
     bgColor: 'bg-crayon-green/10',
   },
-  {
-    id: 'space',
-    name: 'Space & Astronauts',
-    slug: 'space',
-    description: 'Outer space, rockets, and astronaut coloring pages',
-    keywords: [
-      'space coloring pages',
-      'astronaut coloring',
-      'rocket coloring',
-      'planet coloring',
-    ],
-    tags: [
-      'space',
-      'astronaut',
-      'rocket',
-      'planet',
-      'moon',
-      'star',
-      'galaxy',
-      'alien',
-      'spaceship',
-      'ufo',
-    ],
+  space: {
     icon: faRocket,
     color: 'text-crayon-blue',
     bgColor: 'bg-crayon-blue/10',
   },
-  {
-    id: 'underwater',
-    name: 'Underwater & Ocean',
-    slug: 'underwater',
-    description: 'Ocean life and underwater adventure coloring pages',
-    keywords: [
-      'ocean coloring pages',
-      'underwater coloring',
-      'sea creature coloring',
-      'mermaid coloring',
-    ],
-    tags: [
-      'underwater',
-      'ocean',
-      'sea',
-      'mermaid',
-      'fish',
-      'whale',
-      'dolphin',
-      'shark',
-      'coral',
-      'reef',
-    ],
+  underwater: {
     icon: faFishFins,
     color: 'text-crayon-green',
     bgColor: 'bg-crayon-green/10',
   },
-  {
-    id: 'vehicles',
-    name: 'Vehicles & Transport',
-    slug: 'vehicles',
-    description: 'Cars, trucks, planes, and train coloring pages',
-    keywords: [
-      'vehicle coloring pages',
-      'car coloring',
-      'truck coloring',
-      'plane coloring',
-    ],
-    tags: [
-      'vehicle',
-      'car',
-      'truck',
-      'plane',
-      'train',
-      'boat',
-      'ship',
-      'helicopter',
-      'motorcycle',
-      'bus',
-      'transport',
-    ],
+  vehicles: {
     icon: faCar,
     color: 'text-crayon-orange',
     bgColor: 'bg-crayon-orange/10',
   },
-  {
-    id: 'pirates',
-    name: 'Pirates',
-    slug: 'pirates',
-    description: 'Swashbuckling pirate adventure coloring pages',
-    keywords: [
-      'pirate coloring pages',
-      'treasure coloring',
-      'pirate ship coloring',
-    ],
-    tags: [
-      'pirate',
-      'pirates',
-      'treasure',
-      'ship',
-      'island',
-      'parrot',
-      'skull',
-    ],
+  pirates: {
     icon: faSkullCrossbones,
     color: 'text-crayon-purple',
     bgColor: 'bg-crayon-purple/10',
   },
-  {
-    id: 'nature',
-    name: 'Nature & Flowers',
-    slug: 'nature',
-    description: 'Beautiful nature scenes and flower coloring pages',
-    keywords: [
-      'nature coloring pages',
-      'flower coloring',
-      'garden coloring',
-      'tree coloring',
-    ],
-    tags: [
-      'nature',
-      'flower',
-      'flowers',
-      'garden',
-      'tree',
-      'forest',
-      'landscape',
-      'plant',
-      'botanical',
-    ],
+  nature: {
     icon: faFlower,
     color: 'text-crayon-green',
     bgColor: 'bg-crayon-green/10',
   },
-  {
-    id: 'holidays',
-    name: 'Holidays & Seasons',
-    slug: 'holidays',
-    description: 'Christmas, Easter, Halloween and seasonal coloring pages',
-    keywords: [
-      'holiday coloring pages',
-      'christmas coloring',
-      'easter coloring',
-      'halloween coloring',
-    ],
-    tags: [
-      'holiday',
-      'christmas',
-      'easter',
-      'halloween',
-      'thanksgiving',
-      'winter',
-      'summer',
-      'spring',
-      'autumn',
-      'snow',
-      'santa',
-    ],
+  holidays: {
     icon: faTreeChristmas,
     color: 'text-crayon-pink',
     bgColor: 'bg-crayon-pink/10',
   },
-  {
-    id: 'robots',
-    name: 'Robots & Technology',
-    slug: 'robots',
-    description: 'Futuristic robot and technology coloring pages',
-    keywords: [
-      'robot coloring pages',
-      'technology coloring',
-      'futuristic coloring',
-    ],
-    tags: [
-      'robot',
-      'robots',
-      'technology',
-      'machine',
-      'futuristic',
-      'cyborg',
-      'android',
-    ],
+  robots: {
     icon: faRobot,
     color: 'text-crayon-blue',
     bgColor: 'bg-crayon-blue/10',
   },
-  {
-    id: 'food',
-    name: 'Food & Sweets',
-    slug: 'food',
-    description: 'Delicious food, candy, and dessert coloring pages',
-    keywords: [
-      'food coloring pages',
-      'candy coloring',
-      'dessert coloring',
-      'fruit coloring',
-    ],
-    tags: [
-      'food',
-      'candy',
-      'cake',
-      'dessert',
-      'fruit',
-      'ice cream',
-      'pizza',
-      'sweet',
-      'cupcake',
-    ],
+  food: {
     icon: faPizzaSlice,
     color: 'text-crayon-orange',
     bgColor: 'bg-crayon-orange/10',
   },
-];
+};
+
+// Fallback presentation for any future shared category without a web mapping.
+const DEFAULT_CATEGORY_PRESENTATION = {
+  icon: faPaw,
+  color: 'text-crayon-orange',
+  bgColor: 'bg-crayon-orange/10',
+};
+
+// SEO-optimized gallery categories targeting popular search terms.
+// Maps to tags[] field in ColoringImage model. Data from coloring-core; web
+// presentation merged in by slug.
+export const GALLERY_CATEGORIES: GalleryCategory[] =
+  CORE_GALLERY_CATEGORIES.map((cat) => ({
+    ...cat,
+    ...(GALLERY_CATEGORY_PRESENTATION[cat.slug] ??
+      DEFAULT_CATEGORY_PRESENTATION),
+  }));
 
 // Helper to find category by slug
 export const getCategoryBySlug = (slug: string): GalleryCategory | undefined =>

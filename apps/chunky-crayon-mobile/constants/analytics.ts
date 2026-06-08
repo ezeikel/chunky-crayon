@@ -55,6 +55,10 @@ export const ANALYTICS_EVENTS = {
   SAVE_TO_GALLERY_CLICKED: "save_to_gallery_clicked",
   PRINT_CLICKED: "print_clicked",
 
+  // ── Library browse (MOBILE — pre-made coloring-page library) ──
+  CATEGORY_OPENED: "category_opened",
+  BROWSE_ALL_OPENED: "browse_all_opened",
+
   // ── Paywall / purchase (shared with web) ──
   PAYWALL_VIEWED: "paywall_viewed",
   PAYWALL_DISMISSED: "paywall_dismissed",
