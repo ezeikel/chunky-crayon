@@ -347,14 +347,39 @@ const ColoringImage = () => {
       const captureCanvas = useCanvasStore.getState().captureCanvas;
       const coloredDataUrl = captureCanvas?.() || null;
       const printSrc = coloredDataUrl ?? image.svgUrl;
+      // <title> drives the filename iOS gives the print-to-PDF when the user
+      // saves it from the print dialog — match web's `${title}-coloring-page.pdf`.
+      const docTitle = `${(image.title || "chunky-crayon")
+        .toLowerCase()
+        .replace(/\s+/g, "-")}-coloring-page`;
+      // Footer mirrors web's ColoringPageDocument: QR on the LEFT, beside it a
+      // bold "Scan the QR code…" line + the chunkycrayon.com UTM link.
+      const qrCodeUrl = image.qrCodeUrl;
       const html = `
         <html>
-          <head><meta charset="utf-8" /></head>
-          <body style="margin:0;padding:24px;">
-            <img src="${printSrc}" style="width:100%;height:auto;" />
+          <head>
+            <meta charset="utf-8" />
+            <title>${docTitle}</title>
+            <style>
+              body { margin: 0; padding: 24px; font-family: -apple-system, sans-serif; }
+              .art { width: 100%; height: auto; }
+              .footer { display: flex; flex-direction: row; align-items: center; gap: 16px; margin-top: 16px; }
+              .cta { display: flex; flex-direction: column; gap: 4px; max-width: 50%; }
+              .cta-text { font-size: 18px; font-weight: 700; margin: 0; }
+              .cta-link { font-size: 16px; }
+            </style>
+          </head>
+          <body>
+            <img class="art" src="${printSrc}" />
             ${
-              image.qrCodeUrl
-                ? `<div style="margin-top:16px;text-align:center;"><img src="${image.qrCodeUrl}" width="120" height="120" /></div>`
+              qrCodeUrl
+                ? `<div class="footer">
+                     <img src="${qrCodeUrl}" width="120" height="120" />
+                     <div class="cta">
+                       <p class="cta-text">Scan the QR code to discover more coloring pages!</p>
+                       <a class="cta-link" href="https://chunkycrayon.com?utm_source=${id}&utm_medium=pdf-link&utm_campaign=coloring-image-pdf">www.chunkycrayon.com</a>
+                     </div>
+                   </div>`
                 : ""
             }
           </body>
