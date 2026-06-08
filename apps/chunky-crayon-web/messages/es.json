@@ -479,7 +479,7 @@
       "beTheFirst": "¡Sé el primero en crear una página para colorear de {category}!",
       "createAPage": "Crear una página",
       "freeColoringPages": "Páginas para colorear gratis de {category}",
-      "lookingFor": "¿Buscas la página para colorear de {category} perfecta? ¡Estás en el lugar indicado! Nuestra colección tiene un montón de diseños de {category}, ideales para peques y adultos.",
+      "lookingFor": "¿Buscas la página para colorear de {category} perfecta? ¡Estás en el lugar indicado! Nuestra colección tiene una gran variedad de diseños de {category}, ideales para peques y adultos.",
       "eachPageDescription": "Puedes colorear cada página online con nuestras herramientas digitales o descargarla e imprimirla para colorear de forma tradicional con ceras, lápices de colores o rotuladores. Cada diseño tiene líneas limpias y detalles divertidos para que colorear sea entretenido y relajante.",
       "popularThemes": "Temas populares de {category}",
       "includesPopular": "Nuestra categoría de {category} incluye búsquedas populares como:"
@@ -513,8 +513,8 @@
       },
       "toddlers": {
         "pageTitle": "Páginas para colorear para peques",
-        "featuredSection": "Páginas simples para peques",
-        "categoriesSection": "Categorías ideales para peques",
+        "featuredSection": "Páginas para colorear simples para peques",
+        "categoriesSection": "Categorías perfectas para peques",
         "heroDescription": "¡Páginas simples y fáciles de colorear, pensadas para manitas pequeñas! Formas grandes, contornos marcados y objetos conocidos: perfectas para niños de 2 a 4 años. Ideales para desarrollar la motricidad fina.",
         "whyTitle": "Perfectas para pequeños artistas",
         "why1Title": "Líneas grandes y marcadas",
@@ -532,7 +532,7 @@
       },
       "kids": {
         "pageTitle": "Páginas para colorear para niños",
-        "featuredSection": "Páginas populares para niños",
+        "featuredSection": "Páginas para colorear populares para niños",
         "categoriesSection": "Explorar categorías para niños",
         "heroDescription": "¡Páginas divertidas y entretenidas, perfectas para niños de 4 a 12 años! Dinosaurios, unicornios, superhéroes y más. Fáciles de colorear online o imprimir en casa para diversión creativa sin fin.",
         "whyTitle": "Por qué a los niños les encanta Chunky Crayon",
@@ -551,7 +551,7 @@
       },
       "teens": {
         "pageTitle": "Páginas para colorear para adolescentes",
-        "featuredSection": "Páginas populares para adolescentes",
+        "featuredSection": "Páginas para colorear populares para adolescentes",
         "categoriesSection": "Categorías para adolescentes",
         "heroDescription": "¡Páginas geniales y detalladas, hechas para adolescentes! De anime y videojuegos a fantasía y ciencia ficción: expresa tu creatividad con diseños que van con tu estilo. Perfectas para desconectar y crear.",
         "whyTitle": "Hechas para adolescentes creativos",
@@ -570,9 +570,9 @@
       },
       "adults": {
         "pageTitle": "Páginas para colorear para adultos",
-        "featuredSection": "Páginas populares para adultos",
-        "categoriesSection": "Categorías para adultos",
-        "heroDescription": "¡Descubre los beneficios terapéuticos de colorear para adultos! Nuestra colección incluye mandalas intrincados, hermosos paisajes naturales y patrones detallados diseñados para relajarte y encontrar calma. Perfectas para aliviar el estrés tras un día largo.",
+        "featuredSection": "Páginas para colorear populares para adultos",
+        "categoriesSection": "Categorías de adultos",
+        "heroDescription": "¡Descubre los beneficios terapéuticos de colorear para adultos! Nuestra colección incluye mandalas intrincados, hermosos paisajes naturales y patrones detallados diseñados para la relajación y el mindfulness. Perfectas para aliviar el estrés tras un día largo.",
         "whyTitle": "Beneficios de colorear para adultos",
         "why1Title": "Alivio del estrés",
         "why1Description": "Colorear activa la respuesta de relajación, reduce la ansiedad y aporta calma.",
