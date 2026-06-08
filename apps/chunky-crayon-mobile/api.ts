@@ -848,7 +848,11 @@ export type EntitlementsResponse = {
  * Works with both web and mobile auth
  */
 export const getEntitlements = async (): Promise<EntitlementsResponse> => {
-  const response = await api.get("/entitlements");
+  // MUST hit /mobile/* so the proxy injects x-user-id from the device bearer.
+  // The bare /entitlements path isn't proxied → getUserId() found no identity →
+  // 401 → useCredits() fell back to 0 → the create form wrongly showed the
+  // paywall even with credits in the account.
+  const response = await api.get("/mobile/entitlements");
   return response.data;
 };
 
