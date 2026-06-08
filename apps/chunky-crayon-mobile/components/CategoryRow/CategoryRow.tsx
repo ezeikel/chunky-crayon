@@ -119,7 +119,10 @@ const CategoryRow = () => {
   // iPad: full-width wrap grid, no horizontal scroll. All tiles fit, so a
   // scroller would just leave dead space on the right (the left-aligned look).
   if (width >= TABLET_BREAKPOINT) {
-    const tileSize = Math.round(
+    // floor (not round): rounding UP overflows the container by a pixel or two,
+    // which makes flexWrap drop the last tile to the next row — leaving only 3
+    // across with a dead gutter on the right. floor guarantees 4 always fit.
+    const tileSize = Math.floor(
       (width - H_PADDING * 2 - GAP * (TABLET_COLUMNS - 1)) / TABLET_COLUMNS,
     );
     return (

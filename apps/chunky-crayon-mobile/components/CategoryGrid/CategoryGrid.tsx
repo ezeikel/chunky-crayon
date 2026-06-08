@@ -31,8 +31,11 @@ const CategoryGrid = () => {
   const { width } = useWindowDimensions();
   const { coverBySlug } = useCategoryCovers();
   const numColumns = width >= 768 ? 3 : 2;
-  const cardWidth =
-    (width - GRID_PADDING * 2 - GRID_GAP * (numColumns - 1)) / numColumns;
+  // floor so N columns always fit — rounding up overflows and wraps the last
+  // tile, leaving a dead gutter on the right.
+  const cardWidth = Math.floor(
+    (width - GRID_PADDING * 2 - GRID_GAP * (numColumns - 1)) / numColumns,
+  );
 
   return (
     <View style={styles.grid}>
