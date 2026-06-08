@@ -137,7 +137,7 @@ const CustomTabBar = ({ state, navigation, onCreatePress }: TabBarProps) => {
             >
               <FontAwesomeIcon
                 icon={faPartyHorn}
-                size={26}
+                size={30}
                 color="#FFFFFF"
                 secondaryColor="rgba(255,255,255,0.55)"
                 secondaryOpacity={1}
