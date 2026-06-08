@@ -43,7 +43,7 @@
   "coloringPage": {
     "title": "Página para colorear",
     "relatedPages": "Más páginas para colorear",
-    "defaultDescription": "Página para colorear gratuita para imprimir de Chunky Crayon",
+    "defaultDescription": "Página para imprimir y colorear gratuita de Chunky Crayon",
     "progress": {
       "colored": "coloreado",
       "percentage": "{percent}%",
@@ -108,7 +108,7 @@
       "share": "Compartir",
       "print": "Imprimir",
       "preparing": "Preparando...",
-      "doneSharing": "Compartido",
+      "doneSharing": "Listo para compartir",
       "colorAgain": "Colorear de nuevo",
       "startOver": "Empezar de nuevo"
     },
@@ -375,7 +375,7 @@
     "chooseMethod": "Elige tu método de inicio de sesión",
     "orContinueWith": "O continuar con",
     "emailPlaceholder": "nombre@ejemplo.com",
-    "termsAgreement": "Al continuar, aceptas nuestros <terms>Términos del servicio</terms> y la <privacy>Política de privacidad</privacy>.",
+    "termsAgreement": "Al continuar, aceptas nuestros <terms>Términos de Servicio</terms> y la <privacy>Política de Privacidad</privacy>.",
     "verifyRequest": {
       "title": "¡Revisa tu correo!",
       "description": "Te enviamos un enlace mágico para iniciar sesión. Haz clic en el enlace del correo para continuar.",
@@ -406,7 +406,7 @@
     "notFound": "Página no encontrada",
     "sharedArtworkNotFound": {
       "title": "Obra de arte no encontrada",
-      "description": "Este enlace de obra de arte compartida puede haber caducado o haber sido eliminado. ¡Pide al artista un nuevo enlace!",
+      "description": "Este enlace de obra de arte compartida puede haber caducado o sido eliminado. ¡Pide al artista un nuevo enlace!",
       "cta": "Explorar páginas para colorear"
     },
     "unauthorized": "Inicia sesión para continuar",
