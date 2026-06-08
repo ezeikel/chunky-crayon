@@ -144,8 +144,12 @@ export const getLandscapeRailFit = (
       SWATCH_CEIL,
     );
   }
-  // Palette card = 3-swatch grid + padding. (3 × (swatch + gap) + 2× padding.)
-  const leftCardWidth = 3 * (swatchSize + SWATCH_GAP) + 2 * RAIL_PADDING;
+  // Palette card = 3-swatch grid + padding + BORDER. RN is border-box, so the
+  // 2px border on each side eats into the content box; omitting it (as before)
+  // left the card 4px too narrow and clipped the edge swatch circles. Matches
+  // the right rail's border-box accounting (rightCardWidth below).
+  const leftCardWidth =
+    3 * (swatchSize + SWATCH_GAP) + 2 * RAIL_PADDING + 2 * RAIL_BORDER;
 
   // Tools rail shrinks by a factor off the same available height so its tiles
   // track the palette swatches. ~640 ≈ its natural content height.
