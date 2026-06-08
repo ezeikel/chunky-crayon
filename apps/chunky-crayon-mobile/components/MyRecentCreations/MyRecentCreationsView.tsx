@@ -1,4 +1,11 @@
-import { View, Text, Pressable, ScrollView, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  useWindowDimensions,
+} from "react-native";
 import { Image } from "expo-image";
 import SafeSvgUri from "@/components/SafeSvgUri/SafeSvgUri";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
@@ -20,8 +27,13 @@ import { FONTS, COLORS } from "@/lib/design";
  * thumbnail) or `svgUrl` (line-art fallback) + `title`.
  */
 
+// Phone card size; iPad bumps up so the recents strip isn't dwarfed next to the
+// device-scaled category tiles above it (it stays a touch smaller than those —
+// recents are a secondary strip, not the hero browse tiles).
 const CARD_SIZE = 120;
+const CARD_SIZE_TABLET = 180;
 const CARD_GAP = 12;
+const TABLET_BREAKPOINT = 768;
 
 export type MyRecentCreationsItem = {
   id: string;
@@ -46,12 +58,15 @@ const MyRecentCreationsView = ({
   onSeeAllPress,
   isLoading = false,
 }: MyRecentCreationsViewProps) => {
+  const { width } = useWindowDimensions();
+  const cardSize = width >= TABLET_BREAKPOINT ? CARD_SIZE_TABLET : CARD_SIZE;
+
   // Loading + empty get the same compact card shape so the home
   // layout doesn't shift between states.
   if (isLoading) {
     return (
       <View style={styles.section}>
-        <View style={styles.skeletonCard} />
+        <View style={[styles.skeletonCard, { height: cardSize + 60 }]} />
       </View>
     );
   }
@@ -99,7 +114,11 @@ const MyRecentCreationsView = ({
         {items.map((item) => (
           <Pressable
             key={item.id}
-            style={({ pressed }) => [styles.card, pressed && styles.pressed]}
+            style={({ pressed }) => [
+              styles.card,
+              { width: cardSize, height: cardSize },
+              pressed && styles.pressed,
+            ]}
             onPress={() => {
               tapLight();
               onItemPress(item);
@@ -146,10 +165,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     gap: CARD_GAP,
   },
-  card: {
-    width: CARD_SIZE,
-    height: CARD_SIZE,
-  },
+  // width/height set inline (device-aware: CARD_SIZE phone, CARD_SIZE_TABLET iPad).
+  card: {},
   cardInner: {
     flex: 1,
     backgroundColor: "#FFFFFF",
