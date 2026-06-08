@@ -49,7 +49,7 @@
       "percentage": "{percent}%",
       "allDone": "完成！",
       "milestones": {
-        "25": "いいスタート！",
+        "25": "いい始まり！",
         "50": "半分できた！",
         "75": "もうすぐ完成！",
         "100": "すごい！"
@@ -78,7 +78,7 @@
     "brushTypes": {
       "crayon": "クレヨン",
       "marker": "マーカー",
-      "pencil": "えんぴつ",
+      "pencil": "ペンシル",
       "paintbrush": "絵筆",
       "eraser": "消しゴム",
       "glitter": "ラメ",
@@ -134,11 +134,11 @@
     "zoomControls": {
       "zoomLevel": "ズーム: {level}%",
       "zoomOut": "縮小",
-      "zoomOutAria": "縮小 (全体を見る)",
+      "zoomOutAria": "縮小 (より広く見る)",
       "zoomIn": "拡大",
       "zoomInAria": "拡大 (近くを見る)",
       "pan": "移動",
-      "panAria": "絵を動かす",
+      "panAria": "絵の中を移動する",
       "reset": "全体を見る",
       "resetAria": "全体表示に戻る"
     },
@@ -374,7 +374,7 @@
     "sendingLink": "リンクを送信中...",
     "chooseMethod": "ログイン方法を選択してください",
     "orContinueWith": "または次で続行",
-    "emailPlaceholder": "name@example.com",
+    "emailPlaceholder": "taro@example.com",
     "termsAgreement": "続行することで、<terms>利用規約</terms>と<privacy>プライバシーポリシー</privacy>に同意することになります。",
     "verifyRequest": {
       "title": "メールを確認してください！",
