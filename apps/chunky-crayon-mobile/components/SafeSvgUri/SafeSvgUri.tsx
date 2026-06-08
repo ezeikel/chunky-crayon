@@ -96,8 +96,13 @@ type SafeSvgUriProps = {
   uri: string | null | undefined;
   width?: number | string;
   height?: number | string;
+  // Optional viewBox OVERRIDE. Leave undefined (default) so the xml's own
+  // viewBox drives scaling — normalizeSvgRoot guarantees one, derived from the
+  // asset's real width/height, so a NON-square SVG isn't squashed. Passing a
+  // hardcoded "0 0 1024 1024" here would override that and squash non-square
+  // art (the latent bug), so don't unless you truly mean to.
   viewBox?: string;
-  // How the 1:1 viewBox maps into a non-square container. Default "xMidYMid meet"
+  // How the viewBox maps into a non-square container. Default "xMidYMid meet"
   // = CONTAIN (whole page visible, letterboxed) so a coloring page is never
   // cropped — matches the detail view. Pass "xMidYMid slice" for cover/crop.
   preserveAspectRatio?: string;
@@ -107,7 +112,7 @@ const SafeSvgUri = ({
   uri,
   width = "100%",
   height = "100%",
-  viewBox = "0 0 1024 1024",
+  viewBox,
   preserveAspectRatio = "xMidYMid meet",
 }: SafeSvgUriProps) => {
   const [xml, setXml] = useState<string | null>(null);
@@ -146,12 +151,16 @@ const SafeSvgUri = ({
 
   return (
     <SvgErrorBoundary resetKey={uri ?? ""} fallback={fallback}>
+      {/* Only pass viewBox when explicitly overridden — otherwise let the xml's
+          own (normalized, per-asset) viewBox drive scaling. SvgXml spreads xml
+          attrs then props last, so an explicit viewBox={undefined} would clobber
+          the xml's; the conditional spread avoids that. */}
       <SvgXml
         xml={xml}
         width={width}
         height={height}
-        viewBox={viewBox}
         preserveAspectRatio={preserveAspectRatio}
+        {...(viewBox ? { viewBox } : {})}
       />
     </SvgErrorBoundary>
   );

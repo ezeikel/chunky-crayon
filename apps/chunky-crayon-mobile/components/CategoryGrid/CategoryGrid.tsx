@@ -62,12 +62,7 @@ const CategoryGrid = () => {
           >
             {cover ? (
               <View style={styles.art}>
-                <SafeSvgUri
-                  width="100%"
-                  height="100%"
-                  uri={cover}
-                  viewBox="0 0 1024 1024"
-                />
+                <SafeSvgUri width="100%" height="100%" uri={cover} />
               </View>
             ) : (
               <View

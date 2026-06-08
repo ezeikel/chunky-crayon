@@ -97,12 +97,7 @@ const MoreColoringPagesView = ({
             >
               <View style={styles.cardInner}>
                 {item.svgUrl ? (
-                  <SafeSvgUri
-                    width="100%"
-                    height="100%"
-                    uri={item.svgUrl}
-                    viewBox="0 0 1024 1024"
-                  />
+                  <SafeSvgUri width="100%" height="100%" uri={item.svgUrl} />
                 ) : (
                   <FontAwesomeIcon
                     icon={faPalette}

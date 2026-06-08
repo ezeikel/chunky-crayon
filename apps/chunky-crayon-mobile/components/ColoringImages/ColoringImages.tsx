@@ -32,12 +32,7 @@ const Square = memo(
       <Link href={path} asChild>
         <Pressable style={squareStyles.pressable}>
           <View style={squareStyles.container}>
-            <SafeSvgUri
-              width="100%"
-              height="100%"
-              uri={svgUri}
-              viewBox="0 0 1024 1024"
-            />
+            <SafeSvgUri width="100%" height="100%" uri={svgUri} />
           </View>
         </Pressable>
       </Link>
