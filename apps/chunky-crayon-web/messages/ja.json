@@ -379,7 +379,7 @@
     "dailyPage": "今日のデイリーぬりえ",
     "viewAllDaily": "デイリーをすべて見る",
     "communityCreations": "みんなの作品",
-    "viewAllCommunity": "みんなのページをすべて見る",
+    "viewAllCommunity": "もっと見る",
     "startColoring": "ぬりえを始める",
     "stats": {
       "totalPages": "合計",
@@ -603,7 +603,7 @@
       "cta": "Coloring Habitatを見る"
     },
     "ourLatestCount": "{count, plural, =1 {1ページ} other {#ページ}}",
-    "communitySubtitle": "Pages our community of parents and kids created. Browse hundreds more on the dedicated community gallery — it's where the imaginative stuff lives.",
+    "communitySubtitle": "コミュニティのみなさんが作ったぬりえ。毎日新しいアイデアが生まれます。",
     "browseAllCommunity": "コミュニティギャラリーを見る"
   },
   "pricing": {
@@ -685,7 +685,7 @@
       },
       "creditsPerPage": {
         "question": "実際、何ページ作れますか？",
-        "answer": "文字で入力や写真から作るのは5クレジット。Chunky Crayonに話しかけるのは10クレジット（聞いて、文字にして、描くから）。Splashは月に文字入力で約50ページ、Rainbowは約100、Sparkleは約200。自由に組み合わせOK。"
+        "answer": "文字で入力や写真から作るのは5クレジット。Chunky Crayonに話しかけるのは10クレジット（聞いて、文字にして、描くから）。Splashプランなら月に文字入力で約50ページ、Rainbowは約100ページ、Sparkleは約200ページ作れます。自由に組み合わせてお使いください。"
       },
       "audience": {
         "question": "子どもだけのものですか？",
