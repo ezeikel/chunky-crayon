@@ -5,29 +5,31 @@ import {
   StyleSheet,
   useWindowDimensions,
 } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { GALLERY_CATEGORIES } from "@one-colored-pixel/coloring-core/gallery";
+import SafeSvgUri from "@/components/SafeSvgUri/SafeSvgUri";
 import { getCategoryPresentation } from "@/lib/gallery/categoryPresentation";
+import useCategoryCovers from "@/hooks/api/useCategoryCovers";
 import { tapMedium } from "@/utils/haptics";
 import { track } from "@/utils/analytics";
 import { ANALYTICS_EVENTS } from "@/constants/analytics";
 import { COLORS } from "@/lib/design";
+import { perfect } from "@/styles";
 
 /**
- * Rich 2-column grid of large colorful category cards — the Entale/Klarna
- * "Categories" pattern (Mobbin-validated), echoing Disney Coloring World's
- * franchise tiles. Each card = the category's brand-tint fill + a big FA
- * duotone icon + name. Tap → /category/[slug]. Used on the dedicated
- * "Browse by category" view.
- *
- * On iPad (wide) we go to 3 columns; phones use 2.
+ * Full "Browse by category" grid — big sample-image tiles (same Disney-style
+ * cards as CategoryRow) in a 2-col (3 on iPad) grid. Each tile = the category's
+ * real cover page + name overlay + FA brand chip; FA-on-colour fallback when no
+ * cover. Tap → /category/[slug].
  */
 const GRID_PADDING = 20;
 const GRID_GAP = 14;
 
 const CategoryGrid = () => {
   const { width } = useWindowDimensions();
+  const { coverBySlug } = useCategoryCovers();
   const numColumns = width >= 768 ? 3 : 2;
   const cardWidth =
     (width - GRID_PADDING * 2 - GRID_GAP * (numColumns - 1)) / numColumns;
@@ -36,13 +38,14 @@ const CategoryGrid = () => {
     <View style={styles.grid}>
       {GALLERY_CATEGORIES.map((category) => {
         const { icon, primary, bg } = getCategoryPresentation(category.slug);
+        const cover = coverBySlug[category.slug];
         return (
           <Pressable
             key={category.slug}
             style={({ pressed }) => [
               styles.card,
-              { width: cardWidth, backgroundColor: bg },
-              pressed && styles.cardPressed,
+              { width: cardWidth },
+              pressed && styles.pressed,
             ]}
             onPress={() => {
               tapMedium();
@@ -52,18 +55,49 @@ const CategoryGrid = () => {
               router.push(`/category/${category.slug}`);
             }}
             accessibilityRole="button"
-            accessibilityLabel={`Browse ${category.name} coloring pages`}
+            accessibilityLabel={`Color ${category.name}`}
           >
-            <FontAwesomeIcon
-              icon={icon}
-              size={40}
-              color={primary}
-              secondaryColor={primary}
-              secondaryOpacity={0.35}
-            />
-            <Text style={styles.name} numberOfLines={2}>
-              {category.name}
-            </Text>
+            {cover ? (
+              <View style={styles.art}>
+                <SafeSvgUri
+                  width="100%"
+                  height="100%"
+                  uri={cover}
+                  viewBox="0 0 1024 1024"
+                />
+              </View>
+            ) : (
+              <View
+                style={[styles.art, styles.fallback, { backgroundColor: bg }]}
+              >
+                <FontAwesomeIcon
+                  icon={icon}
+                  size={52}
+                  color={primary}
+                  secondaryColor={primary}
+                  secondaryOpacity={0.35}
+                />
+              </View>
+            )}
+            {/* Brand-orange gradient strip (see CategoryRow) — white text reads
+                clearly over B&W line art. */}
+            <LinearGradient
+              colors={["rgba(228,100,68,0)", "rgba(228,100,68,0.96)"]}
+              style={styles.nameStrip}
+            >
+              <View style={styles.chip}>
+                <FontAwesomeIcon
+                  icon={icon}
+                  size={20}
+                  color={primary}
+                  secondaryColor={primary}
+                  secondaryOpacity={0.35}
+                />
+              </View>
+              <Text style={styles.name} numberOfLines={1}>
+                {category.name}
+              </Text>
+            </LinearGradient>
           </Pressable>
         );
       })}
@@ -81,20 +115,47 @@ const styles = StyleSheet.create({
   card: {
     aspectRatio: 1,
     borderRadius: 20,
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 10,
-    padding: 12,
+    overflow: "hidden",
+    backgroundColor: COLORS.white,
+    ...perfect.boxShadow,
   },
-  cardPressed: {
-    opacity: 0.85,
+  pressed: {
+    opacity: 0.9,
     transform: [{ scale: 0.97 }],
   },
+  art: {
+    flex: 1,
+    backgroundColor: COLORS.white,
+  },
+  fallback: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  nameStrip: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    paddingHorizontal: 10,
+    paddingTop: 22,
+    paddingBottom: 10,
+  },
+  chip: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: COLORS.white,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   name: {
+    flex: 1,
     fontFamily: "TondoTrial-Bold",
-    fontSize: 15,
-    color: COLORS.textPrimary,
-    textAlign: "center",
+    fontSize: 14,
+    color: COLORS.white,
   },
 });
 

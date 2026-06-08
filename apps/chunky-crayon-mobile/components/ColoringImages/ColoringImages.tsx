@@ -98,6 +98,8 @@ const squareStyles = StyleSheet.create({
   },
 });
 
+// Embedded-below-canvas mode (legacy iPad use): conservative columns keyed on
+// the padded container width.
 const getNumColumns = (width: number) => {
   if (width >= 768) {
     return 3; // iPad
@@ -107,6 +109,12 @@ const getNumColumns = (width: number) => {
     return 1; // Small iPhone
   }
 };
+
+// Full-screen grid mode (category / browse-all screens): ALWAYS multi-column —
+// 2 on a phone, 3 on iPad. Keyed on the full screen width, never the padded
+// inner width (that collapses small phones to 1 column → the "one image" bug).
+const getFullScreenColumns = (screenWidth: number) =>
+  screenWidth >= 768 ? 3 : 2;
 
 const getSquareSize = (
   width: number,
@@ -126,9 +134,20 @@ type ColoringImagesProps = {
   category?: string;
   /** Filter by difficulty (beginner|intermediate|advanced|expert). */
   difficulty?: string;
+  /**
+   * Full-screen grid (a category / browse-all SCREEN owns the whole viewport)
+   * vs the legacy embed BELOW the canvas. Full-screen = flex:1 + always
+   * multi-column + a friendly empty state. Embed = the old minHeight:300,
+   * padded-width columns, null-when-empty.
+   */
+  fullScreen?: boolean;
 };
 
-const ColoringImages = ({ category, difficulty }: ColoringImagesProps = {}) => {
+const ColoringImages = ({
+  category,
+  difficulty,
+  fullScreen = false,
+}: ColoringImagesProps = {}) => {
   const [screenWidth, setScreenWidth] = useState(
     Dimensions.get("window").width,
   );
@@ -175,9 +194,12 @@ const ColoringImages = ({ category, difficulty }: ColoringImagesProps = {}) => {
     return () => subscription?.remove();
   }, []);
 
-  // Calculate sizes based on container width (screenWidth - outer padding)
+  // Full-screen grids size columns off the FULL screen width (always 2/3,
+  // never 1); the legacy embed uses the padded container width.
   const containerWidth = screenWidth - outerPadding * 2;
-  const numColumns = getNumColumns(containerWidth);
+  const numColumns = fullScreen
+    ? getFullScreenColumns(screenWidth)
+    : getNumColumns(containerWidth);
   const squareSize = getSquareSize(
     containerWidth,
     innerPadding,
@@ -190,12 +212,25 @@ const ColoringImages = ({ category, difficulty }: ColoringImagesProps = {}) => {
   }
 
   if (!coloringImages || coloringImages.length === 0) {
+    // Full-screen: a friendly empty state (never a blank/collapsed view).
+    // Embed: stay invisible (the surrounding screen owns the layout).
+    if (fullScreen) {
+      return (
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyText}>
+            No pages here yet — check back soon!
+          </Text>
+        </View>
+      );
+    }
     return null;
   }
 
   return (
-    <View style={styles.outerContainer}>
-      <View style={styles.container}>
+    <View
+      style={fullScreen ? styles.outerContainerFull : styles.outerContainer}
+    >
+      <View style={fullScreen ? styles.containerFull : styles.container}>
         <FlashList
           data={coloringImages}
           renderItem={({ item, index }) => {
@@ -252,6 +287,29 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
     // FlashList needs explicit height or flex
     minHeight: 300,
+  },
+  // Full-screen grid: fill the viewport so FlashList virtualizes over the whole
+  // screen (the embed's fixed 300pt box is what truncated category grids to one
+  // visible row).
+  outerContainerFull: {
+    flex: 1,
+    paddingHorizontal: outerPadding,
+  },
+  containerFull: {
+    flex: 1,
+    backgroundColor: "transparent",
+  },
+  emptyContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 32,
+  },
+  emptyText: {
+    fontFamily: "TondoTrial-Regular",
+    fontSize: 15,
+    color: COLORS.textWarmMuted,
+    textAlign: "center",
   },
   refreshControl: {
     justifyContent: "center",

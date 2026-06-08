@@ -13,7 +13,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import {
   faSparkles,
   faTrophy,
-  faChevronRight,
   faUserAstronaut,
   faPalette,
   faStar,
@@ -35,11 +34,12 @@ import ColoBottomSheet from "@/components/ColoBottomSheet";
 import ParentalGate from "@/components/ParentalGate";
 import CategoryRow from "@/components/CategoryRow/CategoryRow";
 import SectionHeader from "@/components/SectionHeader/SectionHeader";
+import SeeAllButton from "@/components/SeeAllButton/SeeAllButton";
 import { useColoContext } from "@/contexts";
 import useHeaderData from "@/hooks/useHeaderData";
 import { tapMedium } from "@/utils/haptics";
 import { useT } from "@/lib/i18n/useT";
-import { COLORS, FONTS } from "@/lib/design";
+import { COLORS } from "@/lib/design";
 
 const padding = 20;
 
@@ -174,113 +174,83 @@ const HomeScreen = () => {
             <CreateColoringImageForm />
           </View>
 
-          {/* Recent creations strip — kid's active workbench.
-              Matches web's logged-in dashboard composition: greeting +
-              create + recent creations, deliberately minimal/kid-focused.
-              Browse content (today's pick / challenge / collections) lives
-              on the Gallery tab, not here — same split as web, where the
-              feed-like content sits on browse routes, not the dashboard. */}
-          <MyRecentCreations />
-
-          {/* Library teaser — ready-made pages to jump straight into, the
-              "color what's already here" path (Disney-style library) shown
-              alongside the kid's own recent creations. The create form above
-              stays the co-equal primary action. Full library lives on Gallery. */}
+          {/* Ready-made library FIRST — the easy start. A kid scans the real
+              sample-page tiles for what they want to color, no generating
+              needed. The create form above stays the co-equal hero; this is
+              the lower-effort alternative, surfaced prominently. */}
           <SectionHeader
-            title="Color a ready-made page"
+            title="Color a picture"
             icon={faShapes}
             tint="purple"
             style={styles.librarySectionHeader}
             right={
-              <Pressable
-                onPress={() => {
-                  tapMedium();
-                  router.push("/categories");
-                }}
-                hitSlop={8}
-                accessibilityRole="button"
+              <SeeAllButton
+                onPress={() => router.push("/categories")}
                 accessibilityLabel="See all categories"
-              >
-                <Text style={styles.seeAll}>See all</Text>
-              </Pressable>
+              />
             }
           />
           <CategoryRow />
 
-          {/* Challenges card — Challenges folds into Home (no longer a
-              tab). Taps through to the challenges route. */}
-          <Pressable
-            style={({ pressed }) => [
-              styles.challengeCard,
-              {
-                width: screenWidth - padding * 2,
-                alignSelf: "center",
-              },
-              pressed && styles.challengeCardPressed,
-            ]}
-            onPress={() => router.push("/challenges")}
-          >
-            <View style={[styles.challengeIcon, styles.challengeIconGold]}>
-              <FontAwesomeIcon
-                icon={faTrophy}
-                size={30}
-                color="#F59E0B"
-                secondaryColor="#FDD835"
-                secondaryOpacity={1}
-              />
-            </View>
-            <View style={styles.challengeText}>
-              <Text style={styles.challengeTitle}>
+          {/* The kid's own pages, below the ready-made library. */}
+          <MyRecentCreations />
+
+          {/* Challenges + My Characters as a side-by-side pair of compact,
+              icon-led tiles (big icon, ≤2-word label, no adult subtitle) —
+              kid-light, consistent with the category-tile language. */}
+          <View style={styles.miniTileRow}>
+            <Pressable
+              style={({ pressed }) => [
+                styles.miniTile,
+                pressed && styles.miniTilePressed,
+              ]}
+              onPress={() => {
+                tapMedium();
+                router.push("/challenges");
+              }}
+              accessibilityRole="button"
+              accessibilityLabel={t("challenges.homeCardTitle")}
+            >
+              <View style={[styles.miniTileIcon, styles.challengeIconGold]}>
+                <FontAwesomeIcon
+                  icon={faTrophy}
+                  size={32}
+                  color="#F59E0B"
+                  secondaryColor="#FDD835"
+                  secondaryOpacity={1}
+                />
+              </View>
+              <Text style={styles.miniTileLabel}>
                 {t("challenges.homeCardTitle")}
               </Text>
-              <Text style={styles.challengeSubtitle}>
-                {t("challenges.homeCardSubtitle")}
-              </Text>
-            </View>
-            <FontAwesomeIcon
-              icon={faChevronRight}
-              size={16}
-              color={COLORS.crayonOrange}
-            />
-          </Pressable>
+            </Pressable>
 
-          {/* My Characters card — Characters surface lives off Home (not a
-              tab). Taps through to the characters route. */}
-          <Pressable
-            style={({ pressed }) => [
-              styles.challengeCard,
-              {
-                width: screenWidth - padding * 2,
-                alignSelf: "center",
-                marginTop: 12,
-              },
-              pressed && styles.challengeCardPressed,
-            ]}
-            onPress={() => router.push("/characters")}
-          >
-            <View style={[styles.challengeIcon, styles.challengeIconPurple]}>
-              <FontAwesomeIcon
-                icon={faUserAstronaut}
-                size={30}
-                color="#A65979"
-                secondaryColor="#C18B9D"
-                secondaryOpacity={1}
-              />
-            </View>
-            <View style={styles.challengeText}>
-              <Text style={styles.challengeTitle}>
+            <Pressable
+              style={({ pressed }) => [
+                styles.miniTile,
+                pressed && styles.miniTilePressed,
+              ]}
+              onPress={() => {
+                tapMedium();
+                router.push("/characters");
+              }}
+              accessibilityRole="button"
+              accessibilityLabel={t("characters.homeCardTitle")}
+            >
+              <View style={[styles.miniTileIcon, styles.challengeIconPurple]}>
+                <FontAwesomeIcon
+                  icon={faUserAstronaut}
+                  size={32}
+                  color="#A65979"
+                  secondaryColor="#C18B9D"
+                  secondaryOpacity={1}
+                />
+              </View>
+              <Text style={styles.miniTileLabel}>
                 {t("characters.homeCardTitle")}
               </Text>
-              <Text style={styles.challengeSubtitle}>
-                {t("characters.homeCardSubtitle")}
-              </Text>
-            </View>
-            <FontAwesomeIcon
-              icon={faChevronRight}
-              size={16}
-              color={COLORS.lavender}
-            />
-          </Pressable>
+            </Pressable>
+          </View>
         </ScrollView>
       </LinearGradient>
 
@@ -322,20 +292,22 @@ const styles = StyleSheet.create({
     marginTop: 20,
     marginBottom: 4,
   },
-  seeAll: {
-    fontFamily: FONTS.bold,
-    fontSize: 13,
-    color: COLORS.crayonOrange,
-  },
-  challengeCard: {
+  // Challenges + My Characters: a side-by-side pair of compact, icon-led tiles
+  // (big icon + ≤2-word label, no adult subtitle) — kid-light, consistent with
+  // the category-tile language.
+  miniTileRow: {
     flexDirection: "row",
-    alignItems: "center",
-    gap: 16,
-    marginTop: 20,
+    gap: 12,
+    paddingHorizontal: padding,
+    marginTop: 24,
+  },
+  miniTile: {
+    flex: 1,
     backgroundColor: "#FFFFFF",
-    borderRadius: 24,
-    paddingVertical: 16,
-    paddingHorizontal: 16,
+    borderRadius: 20,
+    paddingVertical: 18,
+    alignItems: "center",
+    gap: 10,
     borderWidth: 1,
     borderColor: COLORS.bgCreamDark,
     shadowColor: "#E46444",
@@ -344,16 +316,14 @@ const styles = StyleSheet.create({
     shadowRadius: 12,
     elevation: 4,
   },
-  challengeCardPressed: {
+  miniTilePressed: {
     opacity: 0.9,
-    transform: [{ scale: 0.98 }],
+    transform: [{ scale: 0.97 }],
   },
-  // Bigger, bolder icon medallion. Per-card tint (gold / purple) makes each
-  // section pop instead of every row sharing one pale orange circle.
-  challengeIcon: {
-    width: 56,
-    height: 56,
-    borderRadius: 18,
+  miniTileIcon: {
+    width: 60,
+    height: 60,
+    borderRadius: 20,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -363,19 +333,10 @@ const styles = StyleSheet.create({
   challengeIconPurple: {
     backgroundColor: "rgba(193, 139, 157, 0.18)",
   },
-  challengeText: {
-    flex: 1,
-  },
-  challengeTitle: {
+  miniTileLabel: {
     fontFamily: "TondoTrial-Bold",
-    fontSize: 18,
+    fontSize: 15,
     color: COLORS.textPrimary,
-  },
-  challengeSubtitle: {
-    fontFamily: "TondoTrial-Regular",
-    fontSize: 13,
-    color: "#9CA3AF",
-    marginTop: 2,
   },
   greetingRow: {
     flexDirection: "row",

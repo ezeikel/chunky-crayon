@@ -299,6 +299,13 @@ export const getColoringImages = async (
   return response.data;
 };
 
+// One sample page (svgUrl) per category, for the library's image-tile cards.
+export type CategoryCover = { slug: string; svgUrl: string | null };
+export const getCategoryCovers = async (): Promise<CategoryCover[]> => {
+  const response = await api.get("/coloring-images/category-covers");
+  return response.data.covers ?? [];
+};
+
 export const getColoringImage = async (id: string) => {
   const response = await api.get(`/coloring-images/${id}`);
   return response.data;

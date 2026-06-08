@@ -44,6 +44,38 @@ export const ALL_DIFFICULTIES = Object.values(Difficulty) as Difficulty[];
 
 export const GALLERY_PAGE_SIZE = 24;
 
+// ===== CATEGORY COVERS =====
+// One representative sample page (svgUrl) per category — the most recent public
+// READY page whose tags match the category's tag set. Drives the mobile
+// library's image-tiles (Disney-style "show a real page" category cards) in a
+// single request. Cached long (covers rarely change). Categories with no
+// content return svgUrl null (the app falls back to the FA icon tile).
+export type CategoryCover = { slug: string; svgUrl: string | null };
+
+export const getCategoryCovers = async (): Promise<CategoryCover[]> => {
+  'use cache';
+  cacheLife('gallery-category');
+  cacheTag('gallery-covers');
+
+  const covers = await Promise.all(
+    GALLERY_CATEGORIES.map(async (category): Promise<CategoryCover> => {
+      const page = await db.coloringImage.findFirst({
+        where: {
+          ...brandWhere,
+          userId: null,
+          tags: { hasSome: category.tags },
+          svgUrl: { not: null },
+        },
+        select: { svgUrl: true },
+        orderBy: { createdAt: 'desc' },
+      });
+      return { slug: category.slug, svgUrl: page?.svgUrl ?? null };
+    }),
+  );
+
+  return covers;
+};
+
 // ===== COMMUNITY IMAGES =====
 // "Community" on CC = pages made by REAL PEOPLE interacting with the
 // brand from the outside — i.e. not signed-in users' kid art. Two

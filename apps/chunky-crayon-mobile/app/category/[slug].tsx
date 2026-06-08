@@ -28,7 +28,7 @@ const CategoryScreen = () => {
             style={styles.gradient}
           >
             <View style={styles.gridWrap}>
-              <ColoringImages />
+              <ColoringImages fullScreen />
             </View>
           </LinearGradient>
         </View>
@@ -70,7 +70,7 @@ const CategoryScreen = () => {
             <Text style={styles.subtitle}>{category.description}</Text>
           </View>
           <View style={styles.gridWrap}>
-            <ColoringImages category={category.slug} />
+            <ColoringImages category={category.slug} fullScreen />
           </View>
         </LinearGradient>
       </View>

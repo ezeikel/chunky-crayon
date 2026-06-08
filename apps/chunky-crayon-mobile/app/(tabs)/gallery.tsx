@@ -9,6 +9,7 @@ import ParentalGate from "@/components/ParentalGate";
 import Feed from "@/components/Feed/Feed";
 import CategoryRow from "@/components/CategoryRow/CategoryRow";
 import SectionHeader from "@/components/SectionHeader/SectionHeader";
+import SeeAllButton from "@/components/SeeAllButton/SeeAllButton";
 import useHeaderData from "@/hooks/useHeaderData";
 import { tapMedium } from "@/utils/haptics";
 import { track } from "@/utils/analytics";
@@ -60,17 +61,10 @@ const GalleryScreen = () => {
             tint="purple"
             style={styles.sectionHeader}
             right={
-              <Pressable
-                onPress={() => {
-                  tapMedium();
-                  router.push("/categories");
-                }}
-                hitSlop={8}
-                accessibilityRole="button"
+              <SeeAllButton
+                onPress={() => router.push("/categories")}
                 accessibilityLabel="See all categories"
-              >
-                <Text style={styles.seeAll}>See all</Text>
-              </Pressable>
+              />
             }
           />
           <CategoryRow />
@@ -146,11 +140,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     marginTop: 12,
     marginBottom: 4,
-  },
-  seeAll: {
-    fontFamily: FONTS.bold,
-    fontSize: 13,
-    color: COLORS.crayonOrange,
   },
   browseAll: {
     flexDirection: "row",

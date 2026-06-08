@@ -2,12 +2,9 @@ import { View, Text, Pressable, ScrollView, StyleSheet } from "react-native";
 import { Image } from "expo-image";
 import SafeSvgUri from "@/components/SafeSvgUri/SafeSvgUri";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import {
-  faArrowRight,
-  faPalette,
-  faImages,
-} from "@fortawesome/pro-duotone-svg-icons";
+import { faPalette, faImages } from "@fortawesome/pro-duotone-svg-icons";
 import SectionHeader from "@/components/SectionHeader/SectionHeader";
+import SeeAllButton from "@/components/SeeAllButton/SeeAllButton";
 import { tapLight } from "@/utils/haptics";
 import { FONTS, COLORS } from "@/lib/design";
 
@@ -82,25 +79,15 @@ const MyRecentCreationsView = ({
   return (
     <View style={styles.section}>
       <SectionHeader
-        title="My recent creations"
+        title="My pictures"
         icon={faImages}
         tint="gold"
         style={styles.header}
         right={
-          <Pressable
-            style={({ pressed }) => [
-              styles.seeAllPill,
-              pressed && styles.pressed,
-            ]}
-            onPress={() => {
-              tapLight();
-              onSeeAllPress();
-            }}
+          <SeeAllButton
+            onPress={onSeeAllPress}
             accessibilityLabel="See all my pictures"
-          >
-            <Text style={styles.seeAllText}>See all my pictures</Text>
-            <FontAwesomeIcon icon={faArrowRight} size={12} color="#FFFFFF" />
-          </Pressable>
+          />
         }
       />
 
@@ -159,20 +146,6 @@ const styles = StyleSheet.create({
   // Horizontal padding for the shared SectionHeader on this strip.
   header: {
     paddingHorizontal: 20,
-  },
-  seeAllPill: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    backgroundColor: COLORS.crayonOrange,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 999,
-  },
-  seeAllText: {
-    fontFamily: FONTS.bold,
-    fontSize: 13,
-    color: "#FFFFFF",
   },
   scrollContent: {
     paddingHorizontal: 20,
