@@ -235,11 +235,16 @@ const SceneTile = ({
               width: box,
               height: box,
               borderRadius: box / 2,
-              // Add tile: transparent View bg; the round wash is painted by the
-              // SVG DashedRing instead (a rounded View bg polygonizes on Android).
-              backgroundColor: isAdd
-                ? "transparent"
-                : tintFromDuotone(option.duotone.primary),
+              // Background wash only when SELECTED. The add tile paints its own
+              // wash via the SVG DashedRing, and the unselected tile must be a
+              // clean transparent cut-out: once the white sticker ring is removed
+              // (tileFaceDefault), the soft tint wash that the ring used to mask
+              // shows through as a pink/peach circle (a clipped arc on iOS where
+              // the art overflows). Transparent when unselected fixes that.
+              backgroundColor:
+                isAdd || !selected
+                  ? "transparent"
+                  : tintFromDuotone(option.duotone.primary),
             },
             selected
               ? styles.tileFaceSelected
@@ -735,7 +740,19 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
     elevation: 3,
   },
-  tileFaceDefault: {},
+  tileFaceDefault: {
+    // Unselected character/preset disc: drop tileFace's white sticker ring +
+    // elevation entirely. On iOS those read as a subtle lift; on Android the
+    // white `borderWidth: 4` renders as a hard opaque halo and `elevation` adds
+    // a heavy circular drop-shadow that iOS never shows. borderWidth: 0 (not
+    // just a transparent colour) removes the border geometry so no faint halo
+    // survives on Android. The character then reads as a clean cut-out sticker
+    // on both platforms. (The selected state re-adds its own orange ring + halo.)
+    borderWidth: 0,
+    borderColor: "transparent",
+    shadowOpacity: 0,
+    elevation: 0,
+  },
   tileFaceSelected: {
     // Bold orange ring + a warmer halo when picked.
     borderColor: COLORS.crayonOrange,

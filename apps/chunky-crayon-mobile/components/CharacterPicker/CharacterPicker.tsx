@@ -120,8 +120,12 @@ const FriendDisc = ({
       <Animated.View
         style={[
           styles.disc,
-          { backgroundColor: tint },
-          selected && styles.discSelected,
+          // Tint wash only when SELECTED. Unselected must be a clean transparent
+          // cut-out: with the white sticker ring removed (discUnselected), the
+          // per-disc DISC_TINTS wash the ring used to mask shows as a pink/peach
+          // circle (a clipped arc on iOS where the portrait overflows the disc).
+          { backgroundColor: selected ? tint : "transparent" },
+          selected ? styles.discSelected : styles.discUnselected,
           discStyle,
         ]}
       >
@@ -322,6 +326,20 @@ const styles = StyleSheet.create({
   },
   discNeutral: {
     backgroundColor: COLORS.bgCream,
+  },
+  discUnselected: {
+    // Match iOS: drop disc's white sticker ring + elevation on unselected
+    // friends. On Android the white `borderWidth: 4` renders as a hard opaque
+    // halo and `elevation` adds a heavy circular shadow that iOS never shows.
+    // borderWidth: 0 (not just a transparent colour) removes the border geometry
+    // so no faint halo survives on Android; the portrait reads as a clean cut-out
+    // on both platforms. Mirrors SceneBuilder's tileFaceDefault. (Selected state
+    // re-adds the orange ring via discSelected, which restores borderWidth via
+    // disc's base 4px — so the ring still shows when picked.)
+    borderWidth: 0,
+    borderColor: "transparent",
+    shadowOpacity: 0,
+    elevation: 0,
   },
   discSelected: {
     borderColor: COLORS.crayonOrange,
