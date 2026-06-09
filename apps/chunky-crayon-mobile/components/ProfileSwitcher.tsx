@@ -455,6 +455,9 @@ const styles = StyleSheet.create({
   },
   profileInfo: {
     flex: 1,
+    // Breathing room between the avatar disc's right edge and the name/meta —
+    // matches the row's own 14px padding rhythm.
+    marginLeft: 14,
   },
   profileName: {
     fontFamily: "TondoTrial-Bold",
