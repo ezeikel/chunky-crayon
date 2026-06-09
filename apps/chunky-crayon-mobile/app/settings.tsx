@@ -1137,7 +1137,12 @@ const styles = StyleSheet.create({
   discRowCard: {
     backgroundColor: "rgba(255, 255, 255, 0.9)",
     borderRadius: 16,
-    paddingVertical: 12,
+    // 8 here + 4 inside the ScrollView content (discRow) = the same visual 12.
+    // The split matters: a ScrollView clips children to its own bounds, so any
+    // padding out here doesn't stop the active disc's 1.06 scale (+~2.4px) and
+    // the check badge (top: -2) from poking above the scroll content top and
+    // getting sliced flat — the selected ring rendered with a flat-cut top.
+    paddingVertical: 8,
     shadowColor: "#E46444",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
@@ -1146,6 +1151,7 @@ const styles = StyleSheet.create({
   },
   discRow: {
     paddingHorizontal: 16,
+    paddingVertical: 4,
     gap: 14,
   },
   discWrap: {
