@@ -328,15 +328,15 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.bgCream,
   },
   discUnselected: {
-    // Match iOS: drop disc's white sticker ring + elevation on unselected
-    // friends. On Android the white `borderWidth: 4` renders as a hard opaque
-    // halo and `elevation` adds a heavy circular shadow that iOS never shows.
-    // borderWidth: 0 (not just a transparent colour) removes the border geometry
-    // so no faint halo survives on Android; the portrait reads as a clean cut-out
-    // on both platforms. Mirrors SceneBuilder's tileFaceDefault. (Selected state
-    // re-adds the orange ring via discSelected, which restores borderWidth via
-    // disc's base 4px — so the ring still shows when picked.)
-    borderWidth: 0,
+    // Match iOS: hide disc's white sticker ring + elevation on unselected
+    // friends (on Android the white border is a hard halo and elevation adds a
+    // heavy circular shadow iOS never shows). Keep borderWidth at the base 4px
+    // and only make the COLOUR transparent — a transparent border draws nothing
+    // on either platform but preserves the content box, so toggling selection
+    // (which swaps to the orange-coloured 4px border) doesn't change the image's
+    // layout. Setting borderWidth: 0 here instead made the border animate 4↔0 on
+    // select, re-laying-out the <Image> and re-firing its cross-fade → a visible
+    // flash. Mirrors SceneBuilder's tileFaceDefault.
     borderColor: "transparent",
     shadowOpacity: 0,
     elevation: 0,

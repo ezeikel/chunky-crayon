@@ -741,14 +741,15 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   tileFaceDefault: {
-    // Unselected character/preset disc: drop tileFace's white sticker ring +
-    // elevation entirely. On iOS those read as a subtle lift; on Android the
-    // white `borderWidth: 4` renders as a hard opaque halo and `elevation` adds
-    // a heavy circular drop-shadow that iOS never shows. borderWidth: 0 (not
-    // just a transparent colour) removes the border geometry so no faint halo
-    // survives on Android. The character then reads as a clean cut-out sticker
-    // on both platforms. (The selected state re-adds its own orange ring + halo.)
-    borderWidth: 0,
+    // Unselected character/preset disc: hide tileFace's white sticker ring +
+    // elevation. On iOS those read as a subtle lift; on Android the white
+    // `borderWidth: 4` is a hard opaque halo and `elevation` adds a heavy
+    // circular drop-shadow iOS never shows. Keep borderWidth at the base 4px and
+    // only make the COLOUR transparent — a transparent border draws nothing but
+    // preserves the content box, so toggling selection (→ orange-coloured 4px
+    // border) doesn't re-lay-out the <Image> and re-fire its cross-fade (which
+    // caused a select/deselect flash when this was borderWidth: 0). The selected
+    // state re-adds its own orange ring + halo.
     borderColor: "transparent",
     shadowOpacity: 0,
     elevation: 0,
