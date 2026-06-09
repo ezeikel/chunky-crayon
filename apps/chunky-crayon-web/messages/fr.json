@@ -379,7 +379,7 @@
     "dailyPage": "Coloriage du jour",
     "viewAllDaily": "Voir tous les coloriages du jour",
     "communityCreations": "Créations de la communauté",
-    "viewAllCommunity": "Voir toutes les pages de la communauté",
+    "viewAllCommunity": "Voir plus",
     "startColoring": "Commencer à colorier",
     "stats": {
       "totalPages": "Total",
@@ -559,7 +559,7 @@
         "why1Description": "Anime, gaming, fantasy et sci-fi : des dessins qui collent à vos passions !",
         "why2Title": "Dessins détaillés",
         "why2Description": "Des designs complexes qui mettent vos talents au défi et rendent super bien.",
-        "why3Title": "Anti-stress",
+        "why3Title": "Relaxation",
         "why3Description": "Faites une pause et détendez-vous avec un coloriage créatif.",
         "seoTitle": "Coloriages gratuits pour ados",
         "seoParagraph1": "Vous cherchez des coloriages qui ne font pas « trop bébé » ? Notre collection ado propose des dessins stylés et détaillés, parfaits pour les 13-17 ans. Personnages d'anime, scènes de gaming, univers fantastiques ou motifs abstraits : il y en a pour tous les styles.",
@@ -584,7 +584,7 @@
         "seoParagraph1": "Le coloriage pour adultes est devenu une activité bien-être très populaire, et ce n'est pas un hasard. Des études montrent qu'il peut réduire l'anxiété, améliorer la concentration et offrir une pause apaisante loin des écrans. Notre collection propose de magnifiques dessins complexes, parfaits pour les grands.",
         "seoParagraph2": "Des mandalas détaillés pour la pleine conscience aux scènes de nature paisibles et motifs élégants, chaque page est conçue pour offrir des heures de créativité relaxante. Imprimez sur du papier de qualité et utilisez vos outils préférés : crayons de couleur, feutres ou stylos gel, tout fonctionne à merveille.",
         "seoParagraph3": "Envie d'un coloriage unique ? Créez vos pages personnalisées. Décrivez votre scène détente idéale (jardin zen, motif Art nouveau, illustration botanique détaillée) et nous donnerons vie à votre idée.",
-        "popularTitle": "Thèmes populaires de coloriage adulte",
+        "popularTitle": "Thèmes de coloriage populaires pour adultes",
         "popularDescription": "Découvrez nos catégories adultes les plus populaires : mandalas pour la méditation, designs nature et botaniques très détaillés, motifs géométriques, styles Art déco et Art nouveau, pages inspirées du zentangle, et paysages paisibles. Chacune offre un chemin unique vers la détente."
       }
     },
@@ -685,7 +685,7 @@
       },
       "creditsPerPage": {
         "question": "Combien de pages puis-je vraiment créer ?",
-        "answer": "Taper une idée ou prendre une photo coûte 5 crédits. Parler à Chunky Crayon coûte 10 (car il écoute, transcrit et dessine). Splash vous donne environ 50 pages tapées par mois. Rainbow environ 100. Sparkle environ 200. À vous de mixer."
+        "answer": "Taper une idée ou prendre une photo coûte 5 crédits. Parler à Chunky Crayon coûte 10 (car il écoute, transcrit et dessine). Splash vous donne environ 50 pages tapées par mois. Rainbow environ 100. Sparkle environ 200. À vous de mixer selon vos besoins."
       },
       "audience": {
         "question": "C’est seulement pour les enfants ?",
