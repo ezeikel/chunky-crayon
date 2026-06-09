@@ -19,7 +19,16 @@ import {
 import { ANALYTICS_EVENTS } from "@/constants/analytics";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import * as AppleAuthentication from "expo-apple-authentication";
-import { LoginManager, AccessToken } from "react-native-fbsdk-next";
+// NOTE: react-native-fbsdk-next is imported lazily inside the Facebook handler,
+// NOT at the top level. Its FBAccessToken module runs `NativeModules.FBAccessToken`
+// (a native HostObject getter) at import-eval time, which throws
+// "FacebookSdk.sdkInitialize() first" on any build where the FB SDK isn't
+// initialized. That happens whenever the react-native-fbsdk-next config plugin is
+// omitted — which app.config.ts does when EXPO_PUBLIC_FACEBOOK_APP_ID /
+// EXPO_PUBLIC_FACEBOOK_CLIENT_TOKEN are absent (e.g. local dev without FB creds).
+// A static import would crash the whole app at startup; requiring it only when FB
+// sign-in is actually invoked keeps the app loading and degrades FB login gracefully.
+type FbsdkModule = typeof import("react-native-fbsdk-next");
 import {
   signInWithGoogle,
   signInWithApple,
@@ -283,6 +292,23 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     useCallback(async (): Promise<OAuthSignInResponse | null> => {
       try {
         setIsLoading(true);
+
+        // Lazily load the FB SDK only when the user actually taps "Sign in with
+        // Facebook". See the import-site note above: a top-level import crashes
+        // at startup on builds without FB creds. require() defers the native
+        // HostObject access to here, where FB is expected to be configured.
+        let LoginManager: FbsdkModule["LoginManager"];
+        let AccessToken: FbsdkModule["AccessToken"];
+        try {
+          ({ LoginManager, AccessToken } =
+            require("react-native-fbsdk-next") as FbsdkModule);
+        } catch (sdkError) {
+          // FB SDK not initialized in this build (plugin omitted because no FB
+          // env vars). Surface a friendly message instead of a hard crash.
+          Sentry.captureException(sdkError);
+          toast.error("Facebook sign-in isn't available right now");
+          return null;
+        }
 
         // Request permissions from Facebook
         const result = await LoginManager.logInWithPermissions([
