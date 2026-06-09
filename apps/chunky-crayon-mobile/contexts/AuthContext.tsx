@@ -142,8 +142,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         username: user.name ?? undefined,
       });
       identifyAnalytics(user.id, {
-        email: user.email ?? undefined,
-        name: user.name ?? undefined,
+        // null (not undefined) so the analytics helper actively $unsets these on
+        // the PostHog person when absent — clears the legacy "Mobile User" name
+        // / stale email rather than leaving it stuck. has_account/is_anonymous
+        // are the labels to segment on, never `name`.
+        email: user.email ?? null,
+        name: user.name ?? null,
         credits: user.credits,
         locale: getLocales()[0]?.languageTag,
         has_account: hasAccount,

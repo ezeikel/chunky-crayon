@@ -42,9 +42,21 @@ export const identify = (
   properties?: Record<string, unknown>,
 ): void => {
   try {
+    // PostHog person props only ADD/UPDATE on identify — omitting a key does NOT
+    // remove a previously-set value. So an explicit `null` here means "clear this
+    // prop": we collect null-valued keys into `$unset` so e.g. an anon user whose
+    // DB name was reset from the old "Mobile User" placeholder gets that label
+    // actively removed from their PostHog person on next app open, not just
+    // left stale. Non-null props go through as the usual $set.
+    const set: Record<string, unknown> = { platform: Platform.OS };
+    const unset: string[] = [];
+    for (const [key, value] of Object.entries(properties ?? {})) {
+      if (value === null || value === undefined) unset.push(key);
+      else set[key] = value;
+    }
     posthog.identify(userId, {
-      ...properties,
-      platform: Platform.OS,
+      ...set,
+      ...(unset.length ? { $unset: unset } : {}),
     });
   } catch {
     // non-fatal
