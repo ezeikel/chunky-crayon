@@ -2,6 +2,28 @@ import { Component, type ReactNode } from "react";
 import { View, type DimensionValue } from "react-native";
 import { useEffect, useState } from "react";
 import { SvgXml } from "react-native-svg";
+import * as Sentry from "@sentry/react-native";
+
+/**
+ * Failing silently here cost a debugging session: when the Android emulator's
+ * DNS died, every remote SVG fetch failed and this component rendered blank
+ * white boxes that looked exactly like a RENDERING bug (clipping? R2? CORS?)
+ * instead of a NETWORK one. Make every failure observable: a console.warn in
+ * dev (shows in Metro logs) and a Sentry breadcrumb always (attached to any
+ * later event, so prod sessions with image problems carry the evidence).
+ * Breadcrumbs are cheap and don't create Sentry issues by themselves.
+ */
+const reportSvgFailure = (uri: string, reason: string, detail?: unknown) => {
+  if (__DEV__) {
+    console.warn(`[SafeSvgUri] ${reason}: ${uri}`, detail ?? "");
+  }
+  Sentry.addBreadcrumb({
+    category: "svg",
+    level: "warning",
+    message: `SafeSvgUri ${reason}`,
+    data: { uri },
+  });
+};
 
 /**
  * Crash-safe replacement for react-native-svg's `SvgUri`.
@@ -37,6 +59,12 @@ class SvgErrorBoundary extends Component<
 
   static getDerivedStateFromError() {
     return { failed: true };
+  }
+
+  componentDidCatch(error: unknown) {
+    // The boundary exists to swallow native SVG parse crashes — but swallowing
+    // silently hides real problems (bad asset, truncation we didn't catch).
+    reportSvgFailure(this.props.resetKey, "native SVG parse crash", error);
   }
 
   componentDidUpdate(prev: { resetKey: string }) {
@@ -124,14 +152,24 @@ const SafeSvgUri = ({
     (async () => {
       try {
         const res = await fetch(uri);
-        if (!res.ok) return;
+        if (!res.ok) {
+          reportSvgFailure(uri, `HTTP ${res.status}`);
+          return;
+        }
         const text = await res.text();
         // Only accept a COMPLETE document — a truncated body would crash the
         // native path parser. A partial fetch fails this and renders nothing.
         // normalizeSvgRoot ensures a viewBox so the page scales (not clips).
-        if (!cancelled && isCompleteSvg(text)) setXml(normalizeSvgRoot(text));
-      } catch {
-        // Network/parse error → leave xml null (blank). Non-fatal.
+        if (cancelled) return;
+        if (isCompleteSvg(text)) {
+          setXml(normalizeSvgRoot(text));
+        } else {
+          reportSvgFailure(uri, "incomplete/truncated SVG body");
+        }
+      } catch (error) {
+        // Network/DNS error → leave xml null (blank). Non-fatal, but LOUD —
+        // a silent blank here masquerades as a rendering bug.
+        if (!cancelled) reportSvgFailure(uri, "fetch failed", error);
       }
     })();
     return () => {
