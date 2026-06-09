@@ -73,8 +73,17 @@ import {
 import { useSettingsStore } from "@/stores/settingsStore";
 import { useAuth } from "@/contexts";
 import { useOnboardingStore } from "@/stores/onboardingStore";
+import { useFeatureFlag } from "posthog-react-native";
 import { track } from "@/utils/analytics";
 import { ANALYTICS_EVENTS } from "@/constants/analytics";
+
+// PostHog flag that gates the Facebook login button. Facebook isn't wired up
+// natively yet (no FB app id / client token in EAS, so the fbsdk plugin isn't
+// in the build) — tapping the button crashed the app. Gate it OFF until we ship
+// FB creds + native config before the App Store release. `useFeatureFlag`
+// returns undefined for a missing/loading flag, so we treat ONLY an explicit
+// `true` as enabled (default-off, crash-safe). Flag must exist in PostHog.
+const FACEBOOK_LOGIN_FLAG = "mobile-facebook-login";
 
 type SettingsItemProps = {
   icon: IconDefinition;
@@ -259,6 +268,11 @@ const SettingsScreen = () => {
     sendMagicLinkHandler,
     signOut,
   } = useAuth();
+
+  // Default-off: only an explicit `true` shows the FB button (undefined while
+  // loading / missing flag → hidden). Keeps the unconfigured FB native module
+  // from being reachable and crashing the app.
+  const isFacebookLoginEnabled = useFeatureFlag(FACEBOOK_LOGIN_FLAG) === true;
 
   // Audio preference states
   const [soundEffectsEnabled, setSoundEffectsEnabled] = useState(true);
@@ -852,20 +866,22 @@ const SettingsScreen = () => {
                   </Text>
                 </Pressable>
 
-                <Pressable
-                  style={[styles.socialButton, styles.facebookButton]}
-                  onPress={handleFacebookSignIn}
-                  disabled={signInLoading}
-                >
-                  <FontAwesomeIcon
-                    icon={faFacebook}
-                    size={20}
-                    color="#1877F2"
-                  />
-                  <Text style={styles.socialButtonText}>
-                    Continue with Facebook
-                  </Text>
-                </Pressable>
+                {isFacebookLoginEnabled && (
+                  <Pressable
+                    style={[styles.socialButton, styles.facebookButton]}
+                    onPress={handleFacebookSignIn}
+                    disabled={signInLoading}
+                  >
+                    <FontAwesomeIcon
+                      icon={faFacebook}
+                      size={20}
+                      color="#1877F2"
+                    />
+                    <Text style={styles.socialButtonText}>
+                      Continue with Facebook
+                    </Text>
+                  </Pressable>
+                )}
               </View>
 
               <View style={styles.dividerContainer}>
