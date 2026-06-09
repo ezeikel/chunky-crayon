@@ -10,6 +10,18 @@ import esTranslations from "./es.json";
 import zhHansTranslations from "./zh-Hans.json";
 import zhHantTranslations from "./zh-Hant.json";
 
+// Re-export the locale metadata (code / name / nativeName) so consumers can
+// render language pickers (web switchers, the mobile LanguageSwitcher sheet)
+// from the single source of truth instead of duplicating native-name maps.
+export {
+  LOCALES,
+  ALL_LOCALE_CODES,
+  SOURCE_LOCALE,
+  type LocaleCode,
+  type LocaleInfo,
+  type AllLocaleCode,
+} from "./locales";
+
 // AI-generated translations for all supported locales
 export const translations = {
   en: enTranslations,

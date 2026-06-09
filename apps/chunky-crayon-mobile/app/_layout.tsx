@@ -1,5 +1,7 @@
 import "../global.css";
-import "@/lib/i18n"; // side-effect: initialises react-i18next before first render
+// Default import initialises react-i18next before first render (side-effect)
+// AND gives us the instance to mirror the saved locale override into.
+import i18n from "@/lib/i18n";
 import { useState, useEffect } from "react";
 import { Redirect, Stack } from "expo-router";
 import { useFonts } from "expo-font";
@@ -71,6 +73,18 @@ const RootLayout = () => {
   useEffect(() => {
     setHapticsEnabled(hapticsEnabled);
   }, [hapticsEnabled]);
+
+  // Apply the user's saved language override on top of the device default.
+  // i18n initialises synchronously to the device locale (lib/i18n); once the
+  // settings store rehydrates, a non-null preferredLocale wins. Same reactive
+  // pattern as haptics: fires on rehydrate AND on every in-app language change
+  // (the switcher also calls changeLanguage immediately for instant feedback).
+  const preferredLocale = useSettingsStore((s) => s.preferredLocale);
+  useEffect(() => {
+    if (preferredLocale && i18n.language !== preferredLocale) {
+      void i18n.changeLanguage(preferredLocale);
+    }
+  }, [preferredLocale]);
 
   useEffect(() => {
     // Wait for Zustand persist to rehydrate from AsyncStorage

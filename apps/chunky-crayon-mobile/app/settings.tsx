@@ -52,6 +52,9 @@ import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import ProfileSwitcher from "@/components/ProfileSwitcher";
 import ProfileAvatar from "@/components/ProfileAvatar/ProfileAvatar";
 import SubscriptionManager from "@/components/SubscriptionManager";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
+import { useTranslation } from "react-i18next";
+import { LOCALES } from "@one-colored-pixel/translations";
 import { usePlanName, useCredits } from "@/hooks/useEntitlements";
 import {
   useProfiles,
@@ -74,8 +77,6 @@ import { useSettingsStore } from "@/stores/settingsStore";
 import { useAuth } from "@/contexts";
 import { useOnboardingStore } from "@/stores/onboardingStore";
 import { useFeatureFlag } from "posthog-react-native";
-import { track } from "@/utils/analytics";
-import { ANALYTICS_EVENTS } from "@/constants/analytics";
 
 // PostHog flag that gates the Facebook login button. Facebook isn't wired up
 // natively yet (no FB app id / client token in EAS, so the fbsdk plugin isn't
@@ -292,6 +293,14 @@ const SettingsScreen = () => {
   // Profile switcher state
   const [profileSwitcherOpen, setProfileSwitcherOpen] = useState(false);
 
+  // Language switcher state. The subtitle shows the active language's native
+  // name so the row reflects the device default OR a saved override.
+  const [languageSwitcherOpen, setLanguageSwitcherOpen] = useState(false);
+  const { i18n: i18nInstance } = useTranslation();
+  const activeLanguageName =
+    LOCALES.find((l) => l.code === i18nInstance.language)?.nativeName ??
+    "English";
+
   // Subscription modal state
   const [subscriptionModalVisible, setSubscriptionModalVisible] =
     useState(false);
@@ -320,14 +329,7 @@ const SettingsScreen = () => {
   };
 
   const handleLanguage = () => {
-    // Locale switching is still a placeholder ("coming soon"); the app is
-    // English-only today. Fire with the current locale so the event exists in
-    // the funnel and lights up the moment a real toggle ships.
-    track(ANALYTICS_EVENTS.LANGUAGE_CHANGED, {
-      fromLocale: "en",
-      toLocale: "en",
-    });
-    toast.info("Language settings coming soon!");
+    setLanguageSwitcherOpen(true);
   };
 
   const handleSupport = () => {
@@ -620,7 +622,7 @@ const SettingsScreen = () => {
                 iconColor={CRAYON.blue.base}
                 iconSecondaryColor={CRAYON.blue.light}
                 title="Language"
-                subtitle="English"
+                subtitle={activeLanguageName}
                 onPress={handleLanguage}
               />
               <SettingsToggle
@@ -935,6 +937,12 @@ const SettingsScreen = () => {
       <ProfileSwitcher
         isOpen={profileSwitcherOpen}
         onClose={() => setProfileSwitcherOpen(false)}
+      />
+
+      {/* Language Switcher Bottom Sheet */}
+      <LanguageSwitcher
+        isOpen={languageSwitcherOpen}
+        onClose={() => setLanguageSwitcherOpen(false)}
       />
 
       {/* Subscription Manager Modal */}
