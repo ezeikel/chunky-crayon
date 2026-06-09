@@ -82,7 +82,6 @@ const HomeScreen = () => {
           credits={headerData.credits}
           profileName={headerData.profileName}
           avatarId={headerData.avatarId}
-          onColoPress={() => setIsColoSheetOpen(true)}
           onProfilePress={() => setIsProfileSwitcherOpen(true)}
           onChallengePress={() => router.push("/challenges")}
           onStickersPress={() => router.push("/stickers")}
@@ -96,11 +95,18 @@ const HomeScreen = () => {
           {/* Colo Avatar & Greeting */}
           <View className="items-center pt-4">
             <Animated.View style={floatStyle}>
+              {/* Tapping Baby Colo plays the wiggle reaction AND opens the Colo
+                  growth sheet — the mascot is the discoverable home for Colo now
+                  that the header profile pill shows the kid's profile avatar (not
+                  Colo). Previously the Colo sheet was triggered by tapping the
+                  profile avatar, which read as "tap my face → Colo grows" and
+                  felt wrong. */}
               <ColoAvatar
                 coloState={coloState}
                 size="lg"
                 showProgress
                 enableTapReactions
+                onPress={() => setIsColoSheetOpen(true)}
               />
             </Animated.View>
             {!coloLoading && (
