@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { OAuth2Client } from 'google-auth-library';
+import * as Sentry from '@sentry/nextjs';
 import {
   getMobileAuthFromHeaders,
   handleMobileOAuthSignIn,
@@ -79,9 +80,27 @@ export async function POST(request: NextRequest) {
       { headers: corsHeaders },
     );
   } catch (error) {
+    // Report to Sentry so the REAL cause is visible — this catch previously only
+    // console.error'd, so a swallowed failure (e.g. a token-audience mismatch
+    // when the mobile client IDs aren't in this deploy's env) surfaced as an
+    // opaque 500 with nothing in Sentry. Capture with context.
+    Sentry.captureException(error, {
+      tags: { route: 'mobile/auth/google' },
+    });
     console.error('Error with Google sign-in:', error);
+
+    // google-auth-library throws "Wrong recipient, payload audience !=
+    // requiredAudience" when the ID token's `aud` isn't in the verifyIdToken
+    // audience list — i.e. the signing client ID (iOS/web/android) is missing
+    // from this deploy's env. Return a distinct message so it's not confused
+    // with a generic auth failure.
+    const message =
+      error instanceof Error && /audience/i.test(error.message)
+        ? 'Google token audience not accepted by this server'
+        : 'Failed to authenticate with Google';
+
     return NextResponse.json(
-      { error: 'Failed to authenticate with Google' },
+      { error: message },
       { status: 500, headers: corsHeaders },
     );
   }
