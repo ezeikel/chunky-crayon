@@ -1,0 +1,640 @@
+{
+  "startOverButton": {
+    "idle": "重新开始",
+    "confirm": "是的，重新开始",
+    "cancel": "继续涂色"
+  },
+  "downloadPDFButton": {
+    "idle": "打印",
+    "loading": "加载中…",
+    "creating": "生成中…",
+    "error": "不可用"
+  },
+  "coloringPage": {
+    "title": "涂色页",
+    "relatedPages": "更多涂色页",
+    "defaultDescription": "来自 Coloring Habitat 的免费成人涂色页",
+    "progress": {
+      "colored": "已上色",
+      "percentage": "{percent}%",
+      "milestones": {
+        "25": "开局不错！",
+        "50": "完成一半！",
+        "75": "快完成了！",
+        "100": "太棒了！"
+      }
+    },
+    "sidebar": {
+      "colors": "颜色",
+      "tools": "工具",
+      "size": "大小",
+      "history": "历史",
+      "zoom": "缩放",
+      "actions": "操作"
+    },
+    "tools": {
+      "pan": "移动",
+      "fill": "填充",
+      "brush": "画笔",
+      "sticker": "贴纸",
+      "magicReveal": "智能显现",
+      "magicAuto": "智能自动",
+      "magicBrush": "智能画笔",
+      "magicFill": "智能填充",
+      "autoColor": "自动上色",
+      "magic": "智能"
+    },
+    "brushTypes": {
+      "crayon": "蜡笔",
+      "marker": "马克笔",
+      "eraser": "橡皮擦",
+      "glitter": "闪粉",
+      "sparkle": "闪光",
+      "rainbow": "彩虹",
+      "glow": "发光",
+      "neon": "霓虹"
+    },
+    "brushSizes": {
+      "small": "精细",
+      "medium": "常规",
+      "large": "粗笔"
+    },
+    "fillPatterns": {
+      "solid": "纯色",
+      "dots": "波点",
+      "stripes": "条纹",
+      "diagonal": "斜纹",
+      "checkerboard": "棋盘格",
+      "hearts": "爱心",
+      "stars": "星星",
+      "zigzag": "锯齿纹"
+    },
+    "actions": {
+      "save": "保存",
+      "download": "下载",
+      "share": "分享",
+      "print": "打印",
+      "preparing": "正在准备…",
+      "doneSharing": "分享完成",
+      "colorAgain": "再涂一次",
+      "startOver": "重新开始"
+    },
+    "toolbar": {
+      "expand": "展开工具栏",
+      "collapse": "收起工具栏",
+      "moreTools": "更多工具",
+      "less": "更少"
+    },
+    "undoRedo": {
+      "undo": "撤销",
+      "undoShortcut": "撤销 (Ctrl+Z)",
+      "redo": "重做",
+      "redoShortcut": "重做 (Ctrl+Y)"
+    },
+    "colorPalette": {
+      "selectColor": "选择{color}颜色",
+      "magicToolsMessage": "使用智能工具时将自动选择颜色"
+    },
+    "patternSelector": {
+      "label": "图案："
+    },
+    "zoomControls": {
+      "zoomLevel": "缩放比例：{level}%",
+      "zoomOut": "缩小",
+      "zoomOutAria": "缩小（查看更多）",
+      "zoomIn": "放大",
+      "zoomInAria": "放大（看得更近）",
+      "pan": "移动",
+      "panAria": "在图片中移动",
+      "reset": "查看整张图片",
+      "resetAria": "返回完整图片"
+    },
+    "muteToggle": {
+      "mute": "静音",
+      "unmute": "取消静音",
+      "turnOn": "开启声音",
+      "turnOff": "关闭声音"
+    }
+  },
+  "navigation": {
+    "freebies": "免费工具",
+    "myStuff": "我的作品"
+  },
+  "homepage": {
+    "hero": {
+      "title": "用色彩找回平静",
+      "subtitle": "数秒生成精致复杂的涂色页。在线涂色或在家打印。每天一份创意正念时光。",
+      "trustBadge1": "免费开始",
+      "trustBadge2": "无需账号",
+      "trustBadge3": "可打印或在线涂色",
+      "freeCreations": "先送 2 次免费生成 · 无需账号",
+      "users": "浏览画廊"
+    },
+    "showcase": {
+      "title": "热门涂色页",
+      "showAll": "查看全部",
+      "free": "免费",
+      "printReady": "可打印 PDF",
+      "addToFavorites": "加入收藏",
+      "removeFromFavorites": "取消收藏",
+      "filters": {
+        "all": "全部",
+        "mandalas": "曼陀罗",
+        "nature": "自然",
+        "geometric": "几何",
+        "landscapes": "风景",
+        "fantasy": "奇幻",
+        "animals": "动物"
+      }
+    },
+    "stats": {
+      "pagesCreated": "已生成涂色页",
+      "dailyPages": "每日页面",
+      "freeLibraryPages": "免费图库页面",
+      "categories": "分类"
+    },
+    "features": {
+      "badge": "使用方式",
+      "title": "你的创意疗愈工具箱",
+      "subtitle": "研究显示，涂色会激活与冥想相似的平静神经通路。我们让你轻松建立每日创意练习。",
+      "stressReduction": "反馈减压效果",
+      "step": "第 {number} 步",
+      "steps": {
+        "1": {
+          "title": "描述你的想法",
+          "description": "输入提示词、语音描述或上传照片。我们将你的想象化为独特而精致的复杂图案。"
+        },
+        "2": {
+          "title": "在线涂色或打印",
+          "description": "使用我们的舒缓在线画布，或下载高清 PDF，用你最爱的真实彩铅涂色。"
+        },
+        "3": {
+          "title": "保存与分享",
+          "description": "保存你的成品画廊，或与社区分享你的作品。"
+        },
+        "4": {
+          "title": "养成每日习惯",
+          "description": "每天清晨一张免费涂色页。用五分钟的安静，为一天开个好头。"
+        }
+      }
+    },
+    "galleryPreview": {
+      "title": "本周热门",
+      "subtitle": "来自不断扩充的免费图库，深受社区喜爱。",
+      "viewAll": "查看全部",
+      "viewAllPages": "查看全部页面",
+      "dailyPage": "今日涂色页",
+      "colorNow": "立即涂色"
+    },
+    "testimonials": {
+      "fromReviews": "来自 {count} 条评价",
+      "pagesColored": "已涂 {count} 页"
+    },
+    "newsletter": {
+      "badge": "每日免费涂色",
+      "title": "每天清晨一张免费页面",
+      "subtitle": "用片刻创意的平静开启新一天。每天早上，一张新的涂色页直达你的邮箱。",
+      "emailPlaceholder": "your@email.com",
+      "subscribe": "订阅",
+      "subscribed": "已订阅",
+      "noSpam": "绝不发垃圾邮件。随时可退订。"
+    },
+    "faq": {
+      "title": "常见问答",
+      "items": {
+        "1": {
+          "question": "Coloring Habitat 怎么用？",
+          "answer": "用文字、语音或照片描述你想涂的内容。约 30 秒即可生成一张细节丰富、线条精致的涂色页。你可以用我们的数字工具在线涂色，或下载高清 PDF 在家打印。"
+        },
+        "2": {
+          "question": "真的免费吗？",
+          "answer": "新用户可先免费生成 2 张页面，无需账号。注册（同样免费）后，可浏览不断扩充的图库，并每天早上在邮箱收到一张全新的涂色页。"
+        },
+        "3": {
+          "question": "它和其他涂色应用有什么不同？",
+          "answer": "Coloring Habitat 专为追求正念放松的人而设计。每个图案都精致复杂，体验全程无广告，更安静、更舒缓。"
+        },
+        "4": {
+          "question": "涂色页可以打印吗？",
+          "answer": "每一页都可下载为高清 PDF，尺寸适配 A4 或 US Letter 纸。你可以打印后用彩铅、钢笔或马克笔涂色——也可以直接在线涂色，省去打印步骤。"
+        },
+        "5": {
+          "question": "有手机应用吗？",
+          "answer": "iOS 和 Android 原生应用即将上线。在此之前，我们的网页版已适配手机与平板，使用体验同样出色。"
+        }
+      }
+    },
+    "cta": {
+      "title": "准备好找回平静了吗？",
+      "subtitle": "让涂色成为每日身心养护的一部分。每天只需五分钟。",
+      "startColoring": "免费开始涂色",
+      "viewPlans": "查看方案",
+      "getTheApp": "获取 App",
+      "downloadOnAppStore": "下载于",
+      "appStore": "App Store",
+      "getItOn": "下载于",
+      "googlePlay": "Google Play"
+    }
+  },
+  "footer": {
+    "brand": "Coloring Habitat",
+    "tagline": "人人都能进行正念涂色。创作、上色，找回内心平静。",
+    "copyright": "© {year} Coloring Habitat。保留所有权利。",
+    "sections": {
+      "explore": "探索",
+      "company": "公司",
+      "support": "支持",
+      "legal": "法律"
+    },
+    "links": {
+      "gallery": "画廊",
+      "create": "创作",
+      "categories": "分类",
+      "dailyPage": "每日页面",
+      "about": "关于",
+      "pricing": "定价",
+      "blog": "博客",
+      "contactUs": "联系我们",
+      "faq": "常见问题",
+      "privacy": "隐私政策",
+      "terms": "服务条款",
+      "cookies": "Cookie"
+    }
+  },
+  "blog": {
+    "title": "Coloring Habitat 博客",
+    "subtitle": "正念涂色的身心疗愈、技巧与灵感",
+    "allPosts": "全部文章",
+    "all": "全部",
+    "byAuthor": "作者：{author}",
+    "comingSoon": "即将上线",
+    "comingSoonDescription": "我们正在筹备关于涂色与身心疗愈的研究、技巧指南与创作灵感等文章。",
+    "metaTitle": "博客 | Coloring Habitat",
+    "metaDescription": "正念涂色的身心疗愈建议、涂色技巧与创作灵感。了解涂色如何帮助缓解压力。",
+    "home": "首页",
+    "blog": "博客",
+    "postNotFound": "未找到文章 | Coloring Habitat",
+    "minRead": "阅读约 {count} 分钟",
+    "moreFromBlog": "更多博客内容",
+    "categoryNotFound": "未找到分类 | Coloring Habitat",
+    "categoryMetaTitle": "{category} | Coloring Habitat 博客",
+    "categoryDescription": "浏览 Coloring Habitat 博客中的全部“{category}”文章。",
+    "noCategoryPosts": "该分类暂无文章",
+    "checkBackSoon": "敬请期待新文章！"
+  },
+  "email": {
+    "signup": {
+      "title": "每天清晨一页免费作品",
+      "subtitle": "每天把一张<free>免费</free>涂色页发送到你的收件箱。",
+      "placeholder": "your@email.com",
+      "join": "订阅",
+      "success": "订阅成功",
+      "successDescription": "你的第一张涂色页将于明天清晨送达。",
+      "error": "出了点问题",
+      "errorDescription": "未能将你加入订阅列表。请重试。"
+    }
+  },
+  "createForm": {
+    "inputModes": {
+      "type": "输入",
+      "talk": "语音",
+      "photo": "照片"
+    },
+    "loading": {
+      "creating": "正在生成你的涂色页…",
+      "readyIn": "约 30 秒完成"
+    },
+    "textInput": {
+      "placeholder": "例如：宁静的日式庭院，有锦鲤与樱花…",
+      "guestLimitPlaceholder": "你今天已用完 2 次免费生成。注册后可继续！",
+      "noCreditsSubscribed": "你的点数已用完。购买更多即可继续生成！",
+      "noCreditsUnsubscribed": "你的点数已用完。订阅以获得更多生成次数！",
+      "signInPlaceholder": "登录后开始生成涂色页",
+      "createPage": "生成我的页面",
+      "createPageFree": "生成我的页面（剩余 {count} 次免费）",
+      "signUpFree": "免费注册",
+      "signUpSubtext": "创建账号，解锁更多生成次数",
+      "buyCredits": "购买点数",
+      "viewPlans": "查看方案",
+      "buyCreditsSubtext": "获取更多点数，继续生成",
+      "subscribeSubtext": "订阅以尽情创作",
+      "getStarted": "开始使用",
+      "signInSubtext": "登录后开始生成"
+    },
+    "voiceInput": {
+      "tapToDescribe": "点按描述你的页面",
+      "maxSeconds": "最长 {seconds} 秒",
+      "guestLimitReached": "你的免费生成次数已用完。注册后继续！",
+      "noCredits": "你的点数已用完。",
+      "signInToRecord": "登录后录音",
+      "listening": "正在聆听…",
+      "allDone": "说完了吗？{seconds} 秒后停止…",
+      "cancel": "取消",
+      "imDone": "我说完了",
+      "doneTalking": "结束说话",
+      "notSupported": "此浏览器不支持语音录制。",
+      "trySafari": "建议使用 Chrome 或 Safari 以获得最佳体验。",
+      "tryAgain": "重试",
+      "gettingMicReady": "正在准备麦克风…",
+      "understanding": "正在理解你所说的内容…",
+      "createColoringPage": "生成我的涂色页",
+      "notQuiteRight": "不太准确？再试一次",
+      "errors": {
+        "permissionDenied": "麦克风权限被拒绝。请在浏览器设置中允许访问。",
+        "notSupported": "此浏览器不支持语音录制。",
+        "transcriptionFailed": "未能识别录音内容。请重试。",
+        "recordingFailed": "录音失败。请重试。",
+        "timeout": "录音超时。请重试。"
+      }
+    },
+    "imageInput": {
+      "takeOrUpload": "拍照或上传图片",
+      "guestLimitReached": "你的免费生成次数已用完。注册后继续！",
+      "noCredits": "你的点数已用完。",
+      "signInToUpload": "登录后上传",
+      "camera": "相机",
+      "upload": "上传",
+      "dragAndDrop": "或拖拽图片到此处",
+      "dropHere": "拖到这里！",
+      "shareImage": "分享一幅画、照片或任意图片进行转换",
+      "greatPicture": "图片很棒！",
+      "pickAnother": "换一张",
+      "useThis": "就用这张",
+      "processingPhoto": "正在处理你的照片…",
+      "analyzingImage": "正在分析图片…",
+      "iSee": "我看到：",
+      "createColoringPage": "生成我的涂色页",
+      "notQuiteRight": "不太准确？再试一次",
+      "tryAgain": "重试",
+      "errors": {
+        "fileTooLarge": "图片过大。请使用小于 10MB 的图片。",
+        "invalidType": "图片格式无效。请使用 JPEG、PNG 或 WebP。",
+        "processingFailed": "无法处理该图片。请重试。",
+        "cameraFailed": "相机出错。请改为上传照片。",
+        "heicUnsupported": "不支持 HEIC 图片。请先另存为 JPG 或 PNG。"
+      }
+    }
+  },
+  "pricing": {
+    "title": "简单透明的定价",
+    "subtitle": "先免费开始，准备好再升级。无隐藏费用，随时可取消。",
+    "monthly": "按月",
+    "annual": "按年",
+    "savePercent": "省 17%",
+    "free": "免费",
+    "perMonth": "/月",
+    "perYear": "/年",
+    "mostPopular": "最受欢迎",
+    "plans": {
+      "bloom": {
+        "name": "Bloom",
+        "description": "开启你的涂色之旅",
+        "cta": "免费开始",
+        "features": {
+          "0": "赠送 2 次创作",
+          "1": "访问免费图库",
+          "2": "在线涂色画布",
+          "3": "PDF 下载"
+        }
+      },
+      "grove": {
+        "name": "Grove",
+        "description": "适合轻度涂色",
+        "cta": "开始免费试用",
+        "features": {
+          "0": "每月 300 积分",
+          "1": "全部涂色功能",
+          "2": "高清 PDF 下载",
+          "3": "保存到画廊"
+        }
+      },
+      "sanctuary": {
+        "name": "Sanctuary",
+        "description": "适合经常涂色",
+        "cta": "开始免费试用",
+        "features": {
+          "0": "每月 800 积分",
+          "1": "包含 Grove 的全部内容",
+          "2": "积分可结转 1 个月",
+          "3": "优先生成",
+          "4": "每日邮件页面",
+          "5": "优先支持"
+        }
+      },
+      "oasis": {
+        "name": "Oasis",
+        "description": "完整的身心放松体验",
+        "cta": "开始免费试用",
+        "features": {
+          "0": "每月 2,000 积分",
+          "1": "包含 Sanctuary 的全部内容",
+          "2": "积分可结转 2 个月",
+          "3": "商用授权",
+          "4": "专属系列",
+          "5": "自定义配色盘",
+          "6": "氛围音景"
+        }
+      }
+    },
+    "faq": {
+      "title": "套餐常见问题",
+      "items": {
+        "cancelAnytime": {
+          "question": "可以随时取消吗？",
+          "answer": "可以。在账号设置中随时取消订阅。无需解释，也不必有压力。"
+        },
+        "rollover": {
+          "question": "积分会结转吗？",
+          "answer": "Grove 的积分每月重置。Sanctuary 最多可结转 1 个月。Oasis 可结转 2 个月——不必赶着用完。"
+        },
+        "creditsPerPage": {
+          "question": "我能制作多少页？",
+          "answer": "文字或照片页面每页 5 积分。语音模式（通过引导式对话了解你想涂什么）每页 10 积分。因此 Grove 每月约可做 60 页文字/照片或约 30 页语音。Sanctuary 约 160 / 80。Oasis 约 400 / 200。按你的节奏自由组合。"
+        },
+        "audience": {
+          "question": "Coloring Habitat 适合我吗？",
+          "answer": "我们为想放慢脚步、找回平静、享受创意放松的人打造了 Coloring Habitat。如果你觉得涂色能疗愈自己，这里就是你的地方。"
+        },
+        "gettingStarted": {
+          "question": "如何开始？",
+          "answer": "选择一个套餐即可开始创作。Bloom 免费——无需账号也能先体验。"
+        }
+      }
+    }
+  },
+  "billing": {
+    "pageTitle": "账单",
+    "pageSubtitle": "管理订阅与点数",
+    "currentPlan": "当前方案",
+    "currentCredits": "你还剩 <strong>{credits} 点数</strong>。",
+    "renewsOn": "将于 {date} 续费",
+    "manageSubscription": "管理订阅",
+    "noActiveSubscription": "暂无有效订阅",
+    "noActiveSubscriptionDescription": "请选择下方方案，开始使用 Coloring Habitat。",
+    "availablePlans": "可选方案",
+    "mostPopular": "最受欢迎",
+    "perMonth": "/月",
+    "creditsPerMonth": "{credits} 点数/月",
+    "cancelAnytime": "随时取消，无需承诺",
+    "manageInPortal": "在账单门户管理",
+    "loading": "加载中…",
+    "changePlan": "更改方案",
+    "subscribe": "订阅",
+    "viewPlans": "查看方案",
+    "errors": {
+      "noActiveSubscription": "未找到有效订阅。",
+      "changeSubscriptionFailed": "更改订阅失败，请重试。",
+      "checkoutFailed": "无法开始结算，请重试。",
+      "portalFailed": "无法打开订阅管理。",
+      "checkoutSessionFailed": "创建结算会话失败",
+      "redirectFailed": "跳转到结算失败"
+    }
+  },
+  "breadcrumbs": {
+    "home": "首页",
+    "gallery": "画廊"
+  },
+  "gallery": {
+    "pageTitle": "涂色画廊 | Coloring Habitat",
+    "pageDescription": "浏览不断扩充的精致涂色页合集，放松身心、练习正念。可按类别、难度或季节筛选。",
+    "heroTitle": "涂色画廊",
+    "heroSubtitle": "浏览精致涂色页，放松身心、练习正念。每幅设计都为你放慢节奏，找到更安静的片刻。",
+    "browseByCategory": "按类别浏览",
+    "browseByDifficulty": "按难度浏览",
+    "browseByHolidays": "季节与节日",
+    "dailyPage": "今日涂色页",
+    "viewAllDaily": "查看全部每日页面",
+    "communityCreations": "精选页面",
+    "viewAllCommunity": "查看全部精选",
+    "startColoring": "开始涂色",
+    "stats": {
+      "totalPages": "库内页面数",
+      "communityPages": "免费库页面数",
+      "dailyPages": "已生成每日页面",
+      "pagesSuffix": "页"
+    },
+    "filters": {
+      "all": "全部"
+    },
+    "difficulty": {
+      "beginner": {
+        "title": "入门",
+        "shortLabel": "简单",
+        "description": "轻柔图案，适合短暂的平静时刻"
+      },
+      "intermediate": {
+        "title": "中级",
+        "shortLabel": "中等",
+        "description": "细节适中，适合更长的沉浸练习"
+      },
+      "advanced": {
+        "title": "高级",
+        "shortLabel": "困难",
+        "description": "细节丰富，适合从容专注"
+      },
+      "expert": {
+        "title": "大师",
+        "shortLabel": "大师",
+        "description": "繁复作品，进入深度冥想般的心流"
+      }
+    },
+    "categories": {
+      "mandalas": {
+        "name": "曼陀罗",
+        "description": "对称图案，安静专注"
+      },
+      "nature": {
+        "name": "自然",
+        "description": "植物景致与自然之美"
+      },
+      "geometric": {
+        "name": "几何",
+        "description": "精密图案与镶嵌纹样"
+      },
+      "landscapes": {
+        "name": "风景",
+        "description": "群山、海洋与远方地平线"
+      },
+      "fantasy": {
+        "name": "奇幻",
+        "description": "神秘生物与魔法世界"
+      },
+      "animals": {
+        "name": "动物",
+        "description": "细节丰富的野生动物"
+      },
+      "architecture": {
+        "name": "建筑",
+        "description": "建筑、教堂与历史空间"
+      },
+      "abstract": {
+        "name": "抽象",
+        "description": "自由形式，尽情创作表达"
+      },
+      "flowers": {
+        "name": "花卉",
+        "description": "精致花朵，温柔专注"
+      },
+      "ocean": {
+        "name": "海洋",
+        "description": "海底景象与海洋生物"
+      },
+      "patterns": {
+        "name": "纹样",
+        "description": "重复纹样，适合冥想式涂色"
+      },
+      "wildlife": {
+        "name": "野生动物",
+        "description": "栖息地中的野生动物"
+      },
+      "mythology": {
+        "name": "神话",
+        "description": "古老神话与传奇人物"
+      },
+      "steampunk": {
+        "name": "蒸汽朋克",
+        "description": "维多利亚机械与奇妙装置"
+      },
+      "food": {
+        "name": "美食",
+        "description": "盛宴与烹饪场景"
+      }
+    },
+    "holidays": {
+      "title": "季节与节日",
+      "christmas": "圣诞节",
+      "halloween": "万圣节",
+      "easter": "复活节",
+      "valentines": "情人节",
+      "winter": "冬季",
+      "spring": "春季",
+      "summer": "夏季",
+      "autumn": "秋季"
+    },
+    "seo": {
+      "aboutTitle": "一处安静的涂色空间",
+      "aboutParagraph1": "Coloring Habitat 是一个持续扩充的精致涂色页库，专为希望放慢脚步、找回平静，并重新连接创作习惯的成年人而设计。每一页都旨在邀请专注——无论你只有五分钟，还是一个安静的午后。",
+      "aboutParagraph2": "每天都会生成一张全新的涂色页。订阅每日邮件，每天早晨在收件箱里收到新设计；或随时浏览完整库。你可以在我们的数字画布上在线涂色，也可以下载高分辨率 PDF，打印后手绘上色。",
+      "aboutParagraph3": "艺术治疗相关研究表明，即使短暂的涂色练习也可能降低皮质醇水平、让飞速的思绪安静下来，并激活与冥想相同的大脑区域。Coloring Habitat 致力于让你更容易回到这项练习——把它变成每日的小仪式，陪你拥有更平静的心。"
+    }
+  },
+  "accountSettings": {
+    "account": "账户",
+    "accountDetails": "您的账户信息",
+    "email": "邮箱",
+    "name": "姓名",
+    "noEmail": "未设置邮箱",
+    "galleryPreferences": "画廊偏好",
+    "galleryControl": "管理您的画廊体验",
+    "showCommunityArtwork": "显示社区作品",
+    "showCommunityDescription": "在画廊中显示其他成员分享的作品",
+    "communityEnabled": "已启用社区画廊图片",
+    "communityDisabled": "已停用社区画廊图片"
+  },
+  "og": {
+    "homepage": {
+      "tagline": "成人涂色页，按需生成。",
+      "alt": "Coloring Habitat——成人涂色页，按需生成。"
+    }
+  }
+}

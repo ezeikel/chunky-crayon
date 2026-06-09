@@ -6,6 +6,8 @@ import koOverrides from '@/messages/ko.json';
 import deOverrides from '@/messages/de.json';
 import frOverrides from '@/messages/fr.json';
 import esOverrides from '@/messages/es.json';
+import zhHansOverrides from '@/messages/zh-Hans.json';
+import zhHantOverrides from '@/messages/zh-Hant.json';
 
 const ccOverrides: Record<string, Record<string, unknown>> = {
   en: enOverrides,
@@ -14,6 +16,8 @@ const ccOverrides: Record<string, Record<string, unknown>> = {
   de: deOverrides,
   fr: frOverrides,
   es: esOverrides,
+  'zh-Hans': zhHansOverrides,
+  'zh-Hant': zhHantOverrides,
 };
 
 /**

@@ -17,14 +17,18 @@ import koOverrides from "@/messages/ko.json";
 import deOverrides from "@/messages/de.json";
 import frOverrides from "@/messages/fr.json";
 import esOverrides from "@/messages/es.json";
+// zh-Hans / zh-Hant bindings are camelCased; the file paths and the locale
+// keys keep the hyphenated BCP-47 script subtag.
+import zhHansOverrides from "@/messages/zh-Hans.json";
+import zhHantOverrides from "@/messages/zh-Hant.json";
 
 /**
  * Mobile i18n runtime. Same model as CC web (next-intl):
  *   resources[locale] = mergeMessages(sharedNeutral, mobileBrandOverride)
  *
  * - Shared neutral strings come from packages/translations (the same
- *   source web uses — 6 locales: en/ja/ko/de/fr/es, auto-translated by
- *   the GH Action when en.json changes).
+ *   source web uses — 8 locales: en/ja/ko/de/fr/es/zh-Hans/zh-Hant,
+ *   auto-translated by the GH Action when en.json changes).
  * - Mobile-specific brand strings live in apps/chunky-crayon-mobile/
  *   messages/* and override the shared ones.
  * - Device locale via expo-localization; fall back to en.
@@ -44,6 +48,8 @@ const overrides: Record<SupportedLocale, Record<string, unknown>> = {
   de: deOverrides,
   fr: frOverrides,
   es: esOverrides,
+  "zh-Hans": zhHansOverrides,
+  "zh-Hant": zhHantOverrides,
 };
 
 // Build react-i18next resources: one merged bundle per locale under the
@@ -62,9 +68,25 @@ const resources = Object.fromEntries(
 
 // Pick the device locale, narrowed to a supported one (else en).
 function resolveDeviceLocale(): SupportedLocale {
-  const device = getLocales()[0]?.languageCode ?? "en";
-  return (supportedLocales as readonly string[]).includes(device)
-    ? (device as SupportedLocale)
+  const device = getLocales()[0];
+  const languageCode = device?.languageCode ?? "en";
+
+  // Chinese needs script disambiguation: the bare languageCode "zh" maps to
+  // two bundles (zh-Hans / zh-Hant). Prefer the ISO 15924 script code; fall
+  // back to region (TW/HK/MO are Traditional); default to Simplified.
+  if (languageCode === "zh") {
+    const script = device?.languageScriptCode; // "Hans" | "Hant" | null
+    if (script === "Hant") return "zh-Hant";
+    if (script === "Hans") return "zh-Hans";
+    const region = device?.regionCode; // "TW" | "HK" | "MO" | ...
+    if (region === "TW" || region === "HK" || region === "MO") {
+      return "zh-Hant";
+    }
+    return "zh-Hans";
+  }
+
+  return (supportedLocales as readonly string[]).includes(languageCode)
+    ? (languageCode as SupportedLocale)
     : "en";
 }
 

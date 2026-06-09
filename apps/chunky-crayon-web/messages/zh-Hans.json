@@ -1,0 +1,1547 @@
+{
+  "coloLoading": {
+    "title": "正在画你的页面…",
+    "titleSpeaking": "Colo有话要说",
+    "coloSpeaking": "听听看，Colo在说话！",
+    "audioStates": {
+      "idle": "正在准备…",
+      "preparing": "Colo正在准备…",
+      "done": "正在画你的图片…"
+    },
+    "messages": {
+      "sharpeningCrayons": "在削蜡笔…",
+      "mixingColors": "在调出新颜色…",
+      "drawingLines": "在画轮廓线…",
+      "addingSparkles": "悄悄加点亮闪闪…",
+      "almostThere": "快完成啦，做最后润色…",
+      "creatingMasterpiece": "把它做到刚刚好…",
+      "wavingWand": "检查一下都很完美…",
+      "coloringOutsideLines": "努力不涂出线外…"
+    },
+    "pageLoading": "蜡笔马上就绪！",
+    "partialAppearing": "看，你的页面正在出现！"
+  },
+  "colo": {
+    "dashboard": {
+      "greeting": "今天想涂什么呢？",
+      "wantsToGrow": "{stageName}想长大啦！再保存{count}幅作品就能进化！",
+      "proudOfYou": "你的{stageName}为你骄傲！"
+    },
+    "indicator": {
+      "next": "下一阶段：{stageName}",
+      "saveToEvolve": "再保存{count}幅作品就能进化！",
+      "readyToGrow": "准备长大啦！",
+      "maxStage": "你已到达最高阶段！",
+      "accessories": "装扮（{count}）"
+    },
+    "avatar": {
+      "tapMe": "点我！",
+      "artworks": "作品",
+      "maxStage": "完成啦！"
+    },
+    "stages": {
+      "1": {
+        "name": "宝宝Colo",
+        "description": "刚开始涂色冒险！"
+      },
+      "2": {
+        "name": "小小Colo",
+        "description": "每完成一幅作品都在长大！"
+      },
+      "3": {
+        "name": "成长中的Colo",
+        "description": "快看，Colo长大了好多！"
+      },
+      "4": {
+        "name": "开心Colo",
+        "description": "看着这些漂亮作品，太开心啦！"
+      },
+      "5": {
+        "name": "小画家Colo",
+        "description": "正在成为真正的小画家！"
+      },
+      "6": {
+        "name": "大师Colo",
+        "description": "终极涂色大师！"
+      }
+    }
+  },
+  "footer": {
+    "brand": "Chunky Crayon",
+    "tagline": "梦想・创作・涂色",
+    "aboutText": "让想象成真！把天马行空的点子变成奇妙的涂色页。",
+    "madeBy": "用 <heart>♡</heart> 在 <location>伦敦南部</location> 制作",
+    "copyright": "© {year} Chunky Crayon。保留所有权利。",
+    "newsletter": {
+      "title": "每天一张免费涂色页",
+      "subtitle": "加入我们，每天早上邮箱都会收到一张全新的涂色页。"
+    },
+    "sections": {
+      "about": "关于",
+      "connect": "联系",
+      "getTheApp": "下载应用",
+      "support": "支持",
+      "freeTools": "免费工具"
+    },
+    "links": {
+      "privacyPolicy": "隐私政策",
+      "termsOfService": "服务条款",
+      "colorAsYouGo": "随时涂色"
+    },
+    "freeTools": {
+      "allTools": "全部工具",
+      "nameColoringPages": "姓名涂色页",
+      "rewardChartMaker": "奖励表制作器",
+      "birthdayInviteMaker": "生日邀请函制作器",
+      "abcTracingWorksheets": "ABC 描红练习",
+      "seasonalColoringPacks": "季节涂色套装",
+      "forTeachers": "教师专区"
+    },
+    "appStore": {
+      "downloadOnAppStore": "在 App Store 下载",
+      "getOnGooglePlay": "前往 Google Play 获取",
+      "comingSoon": "敬请期待！",
+      "iosComingSoon": "我们的 iOS 应用正在路上，敬请期待！",
+      "androidComingSoon": "我们的 Android 应用正在路上，敬请期待！"
+    }
+  },
+  "homepage": {
+    "pricing": {
+      "title": "免费试用。套餐低至{price}/月。",
+      "body": "先送2次免费生成，无需注册。选择适合全家的订阅，或购买点数包，随用随画随涂。",
+      "cta": "查看所有套餐"
+    },
+    "heroEyebrow": "第一款能“点题”的涂色应用。",
+    "heroTitle": "别再在下午5点搜索“恐龙涂色页”了。",
+    "heroTitlePrefix": "别再搜索",
+    "heroTitleSuffix": "涂色页”到下午5点了。",
+    "heroSubtitle": "孩子描述画面，你大约2分钟就能拿到可打印的涂色页。打印出来，或在应用里上色。先试2张免费页，无需注册。",
+    "heroThumbCaption": "就像这张一样 →",
+    "experiments": {
+      "landingHero": {
+        "outcome": "20分钟安静时光，从一张涂色页开始。",
+        "empathy": "“我好无聊”遇到对手啦。"
+      }
+    },
+    "heroCta": "生成专属涂色页",
+    "cta": "开始创作",
+    "stats": {
+      "coloringPagesCreated": "已生成涂色页",
+      "dailyPages": "每日页面",
+      "freeLibraryPages": "免费图库页面"
+    },
+    "galleryPreview": {
+      "freeColoringPages": "免费涂色页",
+      "exploreGallery": "逛逛图库",
+      "todaysDailyPage": "今日每日页",
+      "latestDailyPage": "最新每日页",
+      "seeAll": "查看全部",
+      "communityPages": "社区作品",
+      "colorNow": "立刻上色",
+      "browseCategories": "浏览分类",
+      "viewAll": "查看全部",
+      "dailyColoringPageAlt": "每日涂色页",
+      "coloringPageAlt": "涂色页"
+    },
+    "recentCreations": {
+      "title": "你的最近创作",
+      "ctaHighlight": "免费开始",
+      "ctaText": "即可永久保存作品并解锁更多！",
+      "ctaButton": "免费开始"
+    },
+    "demo": {
+      "title": "看一张涂色页如何诞生。",
+      "body": "孩子说出来，我们画出来。从描述到可打印，大约2分钟，次次都行。",
+      "idleLabel": "点击播放，看看涂色页是怎么画出来的。",
+      "drawingLabel": "正在绘制画面",
+      "drawingSubLabel": "稍等一下，很快就好。",
+      "playLabel": "播放演示",
+      "pauseLabel": "暂停"
+    },
+    "unleashWords": {
+      "creativity": "创造力",
+      "imagination": "想象力",
+      "fun": "乐趣",
+      "adventure": "冒险",
+      "discovery": "发现",
+      "exploration": "探索",
+      "inspiration": "灵感",
+      "art": "艺术",
+      "joy": "快乐",
+      "learning": "学习",
+      "wonder": "惊喜",
+      "dreams": "梦想",
+      "playtime": "玩乐时光",
+      "innovation": "新点子",
+      "magic": "魔法",
+      "curiosity": "好奇心",
+      "expression": "表达",
+      "fantasy": "奇幻",
+      "stories": "故事",
+      "excitement": "兴奋"
+    },
+    "testimonials": {
+      "title": "万千家庭都喜爱",
+      "fromReviews": "来自{count}条评价",
+      "items": {
+        "1": {
+          "name": "Sophie Bennett",
+          "role": "Maisie的妈妈，4岁",
+          "location": "英国 布里斯托尔",
+          "quote": "Maisie 还不会读也不会打字，但她会说呀。她拿着手机说：“一只猫在茶杯里的美人鱼”，页面立刻就出现了。第一次发生时她惊呼：“等等，它是不是听到我说话了？”我们俩笑了十分钟。"
+        },
+        "2": {
+          "name": "Marcus Reed",
+          "role": "3个孩子的爸爸",
+          "location": "美国 德州 奥斯汀",
+          "quote": "我家老二爱涂鸦。我拍了他画的“狗狗杰夫”的乱线条，应用就把它变成了一张真正能涂色的页面。他从那以后一直在 FaceTime 上给每个亲戚展示。对他来说真的很神奇。"
+        },
+        "3": {
+          "name": "Hannah Whitfield",
+          "role": "两个孩子的妈妈",
+          "location": "英国 利兹",
+          "quote": "我们试了几次才摸清怎么描述，才能得到她脑子里的画面。说“龙”就会得到一条普通的龙；说“粉色小龙在丛林里从闪亮的蛋里破壳而出”，才是她真正想要的。懂了就懂了。"
+        },
+        "4": {
+          "name": "Rachel Doyle",
+          "role": "幼儿园教师",
+          "location": "英国 曼彻斯特",
+          "quote": "我们做“海洋主题周”，给每个孩子都打印了他们指定的海洋生物。Theo 想要“一只戴墨镜的鲨鱼”，他真的得到了，而且还抱着那张纸不撒手。帮我省下了好几个小时去翻免费打印网站。"
+        },
+        "5": {
+          "name": "Brian Coletti",
+          "role": "Nora的爸爸，6岁",
+          "location": "美国 俄勒冈州 波特兰",
+          "quote": "感恩节出发前我先在手机上试了试，不用账号也不用绑卡，就想看看效果。做了两张，在机场附近酒店打印出来，Nora 在整段航程都忙着涂色。回家就订阅了。"
+        },
+        "6": {
+          "name": "Megan Russo",
+          "role": "4岁双胞胎妈妈",
+          "location": "美国 科罗拉多州 丹佛",
+          "quote": "很喜欢，就是等待时间。对一个想“现在就要恐龙”的4岁孩子来说，两分钟可不是两分钟。我们现在会在他们涂上一张的时候，就先点下一张，这是小窍门。除此之外都很棒。"
+        },
+        "7": {
+          "name": "Priya Shah",
+          "role": "育儿保姆",
+          "location": "英国 伯明翰",
+          "quote": "我照顾5个孩子，3到7岁。以前给每个人都打印同一张恐龙页，常常会哭。现在每个孩子都能拿到印着自己“最迷”的那一张（Aiden 的挖掘机、Zara 的独角兽、Ben 的 Bluey）。太救命了。"
+        },
+        "8": {
+          "name": "Tom Whitaker",
+          "role": "Iris的爸爸，3岁",
+          "location": "英国 谢菲尔德",
+          "quote": "我们主要是打印出来涂，而不是在应用里涂。Iris 的小手指在手机屏幕上不太好操作，就连 iPad 对她这个年龄也有点麻烦。不过打印真的很棒，线条清晰，纸面也够大，适合认真上色。"
+        }
+      }
+    },
+    "faq": {
+      "title": "常见问题",
+      "subtitle": "关于用 Chunky Crayon 创作魔法涂色页的一切",
+      "items": {
+        "1": {
+          "question": "什么是 Chunky Crayon？",
+          "answer": "Chunky Crayon 是为孩子和家庭打造的魔法涂色页创作工具。只要描述你想涂的内容——比如“开茶会的龙”或“我最爱的超级英雄在月球上”——我们就会在几秒内做出一张独一无二、可打印的涂色页。雨天、安静时光，或用来点亮孩子的想象力都超合适！"
+        },
+        "2": {
+          "question": "对孩子安全吗？内容合适吗？",
+          "answer": "当然。Chunky Crayon 由爸妈打造，专为爸妈考虑。我们绘制的每一页都童趣友好、适龄健康，适合不同年龄段尽情玩耍。"
+        },
+        "3": {
+          "question": "怎么制作一张涂色页？",
+          "answer": "简单到 1-2-3：输入你想涂的内容（例如“魔法森林里的独角兽”），点击生成，等待约2分钟。涂色页就能下载并打印。你也可以用语音输入，或上传照片找灵感。"
+        },
+        "4": {
+          "question": "生成一张页面要多久？",
+          "answer": "大多数涂色页约2分钟就好。等待时，我们的可爱吉祥物 Colo 会陪你打发时间。细节很多、画面更复杂的场景可能会稍久一点。"
+        },
+        "5": {
+          "question": "涂色页可以打印吗？",
+          "answer": "可以！你制作的每一张涂色页都能下载为高质量 PDF，在家打印很方便。页面针对 A4 纸优化，用蜡笔、彩铅或马克笔都很好看。"
+        },
+        "6": {
+          "question": "如果孩子的要求没有做出来怎么办？",
+          "answer": "有时第一次不太对味也很正常，这也是创作冒险的一部分。换个说法再试一次。小贴士：尽量具体、把画面说清楚。卡住了就试试语音输入——孩子说出来往往更清晰。"
+        },
+        "7": {
+          "question": "Chunky Crayon 可以免费使用吗？",
+          "answer": "可以先免费试 2 次生成——无需注册！之后你可以注册免费账号，获得 15 点奖励点数，或选择我们的实惠订阅方案，畅享更多创作乐趣。"
+        },
+        "8": {
+          "question": "订阅套餐包含什么？",
+          "answer": "套餐从 Splash（最适合最多2个孩子）到 Sparkle（最适合最多10个孩子）。所有套餐包含：生成涂色页、高质量 PDF 下载、语音与照片输入模式、每个孩子独立档案，以及我们持续上线的新功能。更高档位还包含点数结转和商用权利。不想订阅？可以选择“随用随画”：按需购买点数包，用多少付多少。"
+        },
+        "9": {
+          "question": "课堂或托育机构可以用吗？",
+          "answer": "可以！老师和育儿保姆都很喜欢 Chunky Crayon。Splash 和 Rainbow 套餐适合个人与教学使用。如果你在经营机构或希望商用分发页面，请看看包含商用授权的 Sparkle 套餐。"
+        },
+        "10": {
+          "question": "点数怎么用？",
+          "answer": "大多数涂色页需要 5 点：输入描述或上传照片都会消耗。语音模式（你和 Chunky Crayon 简单聊几句）每张需要 10 点。订阅套餐每月补充点数，高阶档位可把未用点数结转。不想订阅？“随用随画”：按需购买点数包，用多少付多少。"
+        }
+      }
+    }
+  },
+  "start": {
+    "eyebrow": "第一款能“按你说的画”的涂色应用。",
+    "cta": "免费试用",
+    "ctaSubtext": "免费2张。不用注册。",
+    "tryColoring": "试试给这张涂色",
+    "dragForTools": "拖动查看工具",
+    "experiments": {
+      "startCta": {
+        "urgency": "今天免费2张，不用绑卡，没有套路。",
+        "proof": "200+家长已加入。先送2张免费页面。"
+      }
+    },
+    "hero": {
+      "trex": {
+        "title": "“妈妈，我能给滑板上的霸王龙涂色吗？”",
+        "subtitle": "当然可以。孩子描述画面，你大约2分钟就能拿到一张可打印的涂色页。打印出来，或在应用里涂色都行。"
+      },
+      "foxes": {
+        "title": "屏幕时间，也能像蜡笔一样可爱。",
+        "subtitle": "5点救场，安排好。给餐桌打印一张涂色页，或把手机递给他们。同一张页面，零负担。"
+      },
+      "dragon": {
+        "title": "从“龙的下午茶派对”到真实的涂色页。",
+        "subtitle": "孩子描述任何画面，我们把它画出来。打印出来，或在应用里涂色。每一张，都是他们真心想涂的那张。"
+      },
+      "default": {
+        "title": "孩子来描述，我们来画涂色页。",
+        "subtitle": "霸王龙宇航员、龙的下午茶派对、狐狸一家野餐……他们想到什么，大约2分钟就能打印出来。"
+      }
+    },
+    "problem": {
+      "title": "5点“我好无聊”救场神器。",
+      "body": "你累了。他们想要蜡笔。你想安静。但上周打印的恐龙涂色页已经涂了三遍。Chunky Crayon 会把孩子描述的任何画面变成全新的涂色页，大约2分钟搞定。"
+    },
+    "howItWorks": {
+      "title": "怎么玩",
+      "steps": {
+        "describe": {
+          "title": "孩子描述画面",
+          "body": "说出来、打字，或拍张照片。把脑海里的画面说给我们听。"
+        },
+        "draw": {
+          "title": "我们画成涂色页",
+          "body": "从描述到可打印，大约2分钟。"
+        },
+        "color": {
+          "title": "打印或在应用里涂",
+          "body": "桌上用蜡笔，手机上用手指。你说了算。"
+        }
+      }
+    },
+    "demo": {
+      "title": "看看一张涂色页是怎么做出来的。",
+      "body": "孩子说出来，我们画出来。每次从描述到可打印，大约2分钟。",
+      "idleLabel": "点播放，看看涂色页如何被画出来。",
+      "drawingLabel": "正在画画面",
+      "drawingSubLabel": "稍等一下，马上就好。",
+      "playLabel": "播放演示",
+      "pauseLabel": "暂停"
+    },
+    "features": {
+      "title": "一款应用，全都搞定。",
+      "items": {
+        "unlimited": {
+          "title": "任何场景，任何主题",
+          "body": "恐龙宇航员、独角兽牙医、在太空的兄弟姐妹……只要他们能描述，我们就能画出来。"
+        },
+        "family": {
+          "title": "一份订阅，全家孩子都能用",
+          "body": "同一套餐可为每个孩子创建独立档案。涂色页、贴纸和奖励都各自保存。Sparkle 最多支持10个档案。"
+        },
+        "print": {
+          "title": "可打印，也可直接涂",
+          "body": "每张涂色页都提供清爽的PDF和可互动的涂色画布。按当下需要选择。"
+        }
+      }
+    },
+    "pricing": {
+      "title": "免费试用。套餐每月 {price} 起。",
+      "body": "先送2次免费生成，不用注册。喜欢的话，选择从偶尔涂到天天涂的订阅套餐，或购买点数包，边用边涂。",
+      "cta": "查看所有套餐"
+    },
+    "finalCta": {
+      "title": "再来一张涂色页，安静20分钟。",
+      "body": "输入一个画面，我们来画。不用注册就能试。"
+    }
+  },
+  "gallery": {
+    "pageTitle": "免费涂色页图库 - Chunky Crayon",
+    "pageDescription": "浏览我们的免费可打印涂色页合集。动物、龙、独角兽、公主等应有尽有。每天上新！",
+    "heroTitle": "免费涂色页",
+    "heroSubtitle": "探索数千张免费可打印涂色页。从可爱小动物到魔法巨龙，找到最适合在线涂色或在家打印的那一张。",
+    "browseByCategory": "按分类浏览",
+    "browseByDifficulty": "按难度浏览",
+    "browseByAge": "按年龄段浏览",
+    "dailyPage": "今日每日涂色页",
+    "viewAllDaily": "查看全部每日页",
+    "communityCreations": "社区作品",
+    "viewAllCommunity": "查看更多",
+    "communitySubtitle": "来自社区的涂色页。每天都有新灵感。",
+    "browseAllCommunity": "浏览社区图库",
+    "ourLatestTitle": "最新涂色页",
+    "ourLatestSubtitle": "我们持续上新，每天都有新作品。点选一张即可在线涂色、在家打印或稍后保存。",
+    "ourLatestCount": "{count, plural, =1 {1 page} other {# pages}}",
+    "difficultyFilter": {
+      "all": "全部",
+      "beginner": "入门",
+      "intermediate": "中级",
+      "advanced": "进阶",
+      "expert": "大师",
+      "easy": "简单",
+      "medium": "中等",
+      "hard": "困难",
+      "filterByDifficulty": "按难度筛选"
+    },
+    "coloringHabitatCallout": {
+      "eyebrow": "来自我们的姊妹站点",
+      "title": {
+        "teens": "想找大孩子的涂色？试试 Coloring Habitat",
+        "adults": "想要成人涂色？Coloring Habitat 为你而设"
+      },
+      "body": {
+        "teens": "Chunky Crayon 专注于低龄儿童（3-8岁）。Coloring Habitat 提供更精细的设计、曼陀罗和复杂场景，适合大孩子、青少年与成人——同样免费可打印，只是更适合更大年龄。",
+        "adults": "Chunky Crayon 为3-8岁孩子打造。Coloring Habitat 是我们的姊妹站点，专为成人涂色——曼陀罗、精细图案、舒缓风格与减压可打印作品。"
+      },
+      "cta": "访问 Coloring Habitat"
+    },
+    "startColoring": "开始涂色",
+    "stats": {
+      "totalPages": "总页数",
+      "ourPages": "我们的作品",
+      "communityPages": "社区作品",
+      "dailyPages": "每日页",
+      "pagesSuffix": "页"
+    },
+    "ageGroups": {
+      "toddlers": {
+        "title": "幼儿适用",
+        "ages": "2-4岁",
+        "description": "形状简单，线条粗大"
+      },
+      "kids": {
+        "title": "儿童适用",
+        "ages": "4-12岁",
+        "description": "有趣又吸引人"
+      },
+      "teens": {
+        "title": "青少年适用",
+        "ages": "13-17岁",
+        "description": "酷炫、细节丰富"
+      },
+      "adults": {
+        "title": "成人适用",
+        "ages": "18+",
+        "description": "放松又精致"
+      }
+    },
+    "difficulty": {
+      "beginner": {
+        "title": "入门",
+        "description": "形状简单，线条粗大"
+      },
+      "intermediate": {
+        "title": "中级",
+        "description": "细节适中"
+      },
+      "advanced": {
+        "title": "进阶",
+        "description": "细节丰富"
+      },
+      "expert": {
+        "title": "大师",
+        "description": "图案精细复杂"
+      }
+    },
+    "categories": {
+      "animals": "动物",
+      "fantasy": "奇幻与魔法",
+      "dragons": "龙",
+      "unicorns": "独角兽",
+      "princesses": "公主与王室",
+      "superheroes": "超级英雄",
+      "dinosaurs": "恐龙",
+      "space": "太空与宇航员",
+      "underwater": "海底与海洋",
+      "vehicles": "交通工具",
+      "pirates": "海盗",
+      "nature": "自然与花朵",
+      "holidays": "节日与四季",
+      "robots": "机器人与科技",
+      "food": "美食与甜点"
+    },
+    "seo": {
+      "aboutTitle": "关于我们的免费涂色页",
+      "aboutParagraph1": "欢迎来到 Chunky Crayon 的免费涂色页图库。这里有不断扩充的可打印涂色页合集，孩子和大人都能玩。描述你想要的画面，我们就能为你绘制一张独一无二的涂色页，涵盖多种主题分类。",
+      "aboutParagraph2": "我们每天都会新增一张每日涂色页，你可以用数字工具在线涂色，也可以下载打印，用蜡笔等传统方式涂色。社区成员也会分享他们的创意想法，让我们的合集更加丰富多样。",
+      "aboutParagraph3": "按分类浏览，快速找到你想要的主题：可爱动物、奇幻生物（如龙和独角兽）、或应景的节日四季主题。每张作品都采用清晰线条设计，特别适合涂色。"
+    },
+    "jumpToNav": {
+      "jumpTo": "跳转到：",
+      "selectSection": "选择版块",
+      "backToTop": "返回顶部",
+      "filters": "筛选",
+      "gallery": "图库",
+      "related": "相关",
+      "about": "关于"
+    },
+    "categoryPage": {
+      "coloringPages": "{category} 涂色页",
+      "relatedCategories": "相关分类",
+      "noPagesYet": "暂无 {category} 涂色页",
+      "beTheFirst": "来做第一张 {category} 涂色页吧！",
+      "createAPage": "创建页面",
+      "freeColoringPages": "免费 {category} 涂色页",
+      "lookingFor": "在找完美的 {category} 涂色页吗？你来对地方了！我们的合集包含丰富多样的 {category} 主题，孩子和大人都适合。",
+      "eachPageDescription": "每张涂色页都可以用我们的数字工具在线涂色，或下载打印，用蜡笔、彩铅或马克笔进行传统涂色。每个设计线条清晰、细节有趣，让涂色既好玩又放松。",
+      "popularThemes": "热门 {category} 主题",
+      "includesPopular": "我们的 {category} 分类包含热门搜索，例如："
+    },
+    "categoryDescriptions": {
+      "animals": "适合孩子和大人的可爱与野生动物涂色页",
+      "fantasy": "给魔法奇幻生物与神秘世界上色",
+      "dragons": "细节燃爆的史诗巨龙涂色页",
+      "unicorns": "带彩虹与闪闪元素的梦幻独角兽涂色页",
+      "princesses": "公主与城堡的王室涂色页",
+      "superheroes": "动作感满满的超级英雄涂色页",
+      "dinosaurs": "史前恐龙涂色页",
+      "space": "太空冒险与宇航员涂色页",
+      "underwater": "海洋生物与海底世界涂色页",
+      "vehicles": "汽车、卡车、飞机等交通工具涂色页",
+      "pirates": "惊险刺激的海盗冒险涂色页",
+      "nature": "美丽自然与花卉涂色页",
+      "holidays": "热闹的节日与四季涂色页",
+      "robots": "未来感机器人与科技主题涂色页",
+      "food": "美味食物与甜点涂色页"
+    },
+    "infiniteScroll": {
+      "allPagesViewed": "你已经看完所有涂色页啦！"
+    },
+    "ageGroupPages": {
+      "common": {
+        "moreAgeGroups": "更多年龄段",
+        "createSimplePages": "创建简单页面",
+        "createYourOwn": "自己创建",
+        "createYourDesign": "创建你的设计"
+      },
+      "toddlers": {
+        "pageTitle": "幼儿涂色页",
+        "featuredSection": "简单幼儿涂色页",
+        "categoriesSection": "幼儿友好分类",
+        "heroDescription": "为小手量身设计的简单好涂页面！大图形、粗线条、熟悉的物品，特别适合2-4岁。帮助发展精细动作能力。",
+        "whyTitle": "小小艺术家的完美选择",
+        "why1Title": "粗大清晰线条",
+        "why1Description": "粗线条让小手更容易在边线内涂色！",
+        "why2Title": "简单图形",
+        "why2Description": "基础形状与熟悉物品，幼儿一眼就懂、超喜欢。",
+        "why3Title": "认识颜色",
+        "why3Description": "非常适合学习颜色、激发创意！",
+        "seoTitle": "幼儿免费涂色页",
+        "seoParagraph1": "想让孩子开始学涂色吗？我们为2-4岁准备了简单涂色页合集。每个设计都有大面积上色区和粗轮廓线，帮助小朋友练习精细动作能力。",
+        "seoParagraph2": "我们的幼儿涂色页围绕小朋友喜欢的熟悉事物——可爱动物、美味食物、彩色交通工具、自然场景等。简单设计更不容易挫败，更能鼓励创意发挥。",
+        "seoParagraph3": "所有页面都可用标准A4纸打印，或用易上手的数字工具在线涂色。适合安静时光、雨天居家，或家庭/幼儿园学习活动。",
+        "benefitsTitle": "幼儿涂色的好处",
+        "benefitsDescription": "涂色能帮助幼儿发展多项重要能力：手眼协调、颜色认知、握笔力量、专注力与创造表达。从最简单的图开始，见证小小艺术家一点点成长！"
+      },
+      "kids": {
+        "pageTitle": "儿童涂色页",
+        "featuredSection": "热门儿童涂色页",
+        "categoriesSection": "浏览儿童分类",
+        "heroDescription": "适合4-12岁的有趣涂色页！恐龙、独角兽、超级英雄等应有尽有。可在线轻松涂色，也可在家打印，创意乐趣不停歇。",
+        "whyTitle": "孩子为什么爱 Chunky Crayon",
+        "why1Title": "想画什么都行",
+        "why1Description": "孩子说出天马行空的想法，就能变成涂色页！",
+        "why2Title": "下载打印涂色",
+        "why2Description": "下载高质量PDF，用普通A4纸即可打印。",
+        "why3Title": "在线涂色",
+        "why3Description": "在浏览器里直接使用我们的数字涂色工具！",
+        "seoTitle": "儿童免费涂色页",
+        "seoParagraph1": "在找适合孩子的涂色页吗？Chunky Crayon 提供海量免费、可打印的涂色页，专为4-12岁设计。从可爱动物到热血超级英雄，每位小画家都能找到喜欢的主题。",
+        "seoParagraph2": "我们的涂色页线条清晰、粗细适中，小手也容易上色。无论孩子喜欢蜡笔、彩铅还是马克笔，都能涂出很好看的效果。你还可以使用在线涂色工具，进行屏幕上的创作。",
+        "seoParagraph3": "更棒的是，孩子还能自己做独一无二的涂色页：描述想涂的内容就行。踢足球的龙？在太空里的独角兽？想到什么，都能在几秒内变成真实的涂色页！",
+        "popularTitle": "儿童热门分类",
+        "popularDescription": "最受欢迎的儿童分类包括：恐龙涂色页、独角兽涂色页、超级英雄涂色页、动物涂色页、太空与火箭涂色页、交通工具涂色页。每个分类都充满适龄设计，孩子涂得开心。"
+      },
+      "teens": {
+        "pageTitle": "青少年涂色页",
+        "featuredSection": "热门青少年涂色页",
+        "categoriesSection": "青少年分类",
+        "heroDescription": "为青少年打造的酷炫细节涂色页！从动漫、游戏到奇幻与科幻，用符合你风格的设计尽情创作。适合放松减压与表达自我。",
+        "whyTitle": "专为创意青少年打造",
+        "why1Title": "酷炫主题",
+        "why1Description": "动漫、游戏、奇幻与科幻，都是你感兴趣的！",
+        "why2Title": "细节更丰富",
+        "why2Description": "更精细的设计更有挑战，完成后超惊艳。",
+        "why3Title": "放松减压",
+        "why3Description": "从屏幕中抽身，靠涂色放松一下。",
+        "seoTitle": "青少年免费涂色页",
+        "seoParagraph1": "想找不那么“幼稚”的涂色页吗？我们的青少年合集有酷炫、细节丰富的设计，适合13-17岁。从动漫角色、游戏场景到奇幻世界和抽象图案，总有一种风格适合你。",
+        "seoParagraph2": "这可不是给小朋友的涂色页。青少年作品更讲究细节、构图更有动感，主题也更贴近兴趣。适合自我表达、学习间隙减压，或随手放空涂一会儿。",
+        "seoParagraph3": "你也可以创建专属涂色页：把想要的画面描述清楚即可。想要太空里龙大战机器人？动漫风人像？带你最爱符号的精细曼陀罗？说出来，我们就把它画出来。",
+        "popularTitle": "青少年热门主题",
+        "popularDescription": "青少年最受欢迎的分类包括：动漫与漫画涂色页、奇幻生物涂色页、超级英雄动作场景、游戏灵感作品、太空与科幻设计、精细图案页面。每个分类都细节丰富、越涂越上头。"
+      },
+      "adults": {
+        "pageTitle": "成人涂色页",
+        "featuredSection": "热门成人涂色页",
+        "categoriesSection": "成人分类",
+        "heroDescription": "发现成人涂色的疗愈力量！我们的合集包含精细曼陀罗、唯美自然场景与细致图案，适合放松与专注。当一天很累时，用涂色好好解压。",
+        "whyTitle": "成人涂色的好处",
+        "why1Title": "缓解压力",
+        "why1Description": "涂色能唤起放松反应，减少焦虑，带来平静。",
+        "why2Title": "专注当下",
+        "why2Description": "把注意力放回当下，享受一种冥想式、远离屏幕的活动。",
+        "why3Title": "释放创意",
+        "why3Description": "通过配色表达自我，创作漂亮作品。",
+        "seoTitle": "成人免费涂色页",
+        "seoParagraph1": "成人涂色已成为很受欢迎的身心放松方式。研究显示，涂色可以减轻焦虑、提升专注力，并让我们从充满屏幕的生活中得到一段平静休息。我们的合集提供精美、细致的设计，专为大人准备。",
+        "seoParagraph2": "从帮助专注的精细曼陀罗，到安静的自然场景与优雅图案，每一页都为你带来数小时的放松创作。建议打印在较好的纸上，使用彩铅、马克笔或啫喱笔，效果都很棒。",
+        "seoParagraph3": "想要更独特？你也可以创建专属涂色页。描述你的理想放松画面（禅意花园、新艺术风图案、精细植物插画等），我们会把你的想法呈现出来。",
+        "popularTitle": "成人热门涂色主题",
+        "popularDescription": "探索最受欢迎的成人分类：适合冥想的曼陀罗涂色页、精细自然与植物设计、几何图案、装饰艺术与新艺术风、禅绕灵感页面、宁静风景场景。每一类都能带你走向更放松的时刻。"
+      }
+    }
+  },
+  "pricing": {
+    "pageTitle": "价格 - Chunky Crayon",
+    "heroTitle": "离20分钟安静时光，只差一张涂色页。",
+    "heroSubtitle": "任意方案先免费试用7天。等他们爱上后，再选最合适的。",
+    "monthly": "按月",
+    "annual": "按年（送2个月）",
+    "notReadyForPlan": "还不想订阅？按需涂色",
+    "mostPopular": "最受欢迎",
+    "buyNow": "开始7天免费试用",
+    "trialMicroCopy": "之后为{price}/月。到期前随时取消。",
+    "noCommitment": "无绑定，一键取消。",
+    "perMonth": "/月",
+    "perYear": "/年",
+    "creditsPerMonth": "点数/月",
+    "trustStrip": {
+      "rating": "4.6分（47条评价）",
+      "cancel": "随时可取消",
+      "guarantee": "30天退款保证"
+    },
+    "included": {
+      "title": "所有方案都解锁",
+      "aiCreation": "他们说什么，就能变成涂色页",
+      "colorOnline": "可在家打印或在屏幕上涂色",
+      "saveFavorites": "每张作品永久保存",
+      "shareCreations": "把涂色页发给爷爷奶奶",
+      "collectStickers": "边涂边收集贴纸和奖励",
+      "familySharing": "一份订阅，多孩独立档案",
+      "mobileApps": "iPhone 和 Android 应用"
+    },
+    "plans": {
+      "splash": {
+        "name": "Splash",
+        "tagline": "最多适合2个孩子。",
+        "audience": "每周约两页。比每月买一盒彩笔还省。"
+      },
+      "rainbow": {
+        "name": "Rainbow",
+        "tagline": "最多适合4个孩子。",
+        "audience": "兄弟姐妹都能各选各的。大多数家庭选它。"
+      },
+      "sparkle": {
+        "name": "Sparkle",
+        "tagline": "最多适合10个孩子。",
+        "audience": "最多10个独立档案。全家一起用，也不怕不够。"
+      }
+    },
+    "features": {
+      "credits250": "约每月50页，每周约2页",
+      "credits500": "约每月100页，约每天1页",
+      "credits1000": "约每月200页，每天几页也绰绰有余",
+      "allFeatures": "全平台功能",
+      "noRollover": "点数每月重置",
+      "rollover1Month": "点数可累积，最多保留额外1个月",
+      "rollover2Months": "点数可累积，最多保留额外2个月",
+      "prioritySupport": "优先支持",
+      "commercialUse": "商用许可",
+      "profiles2": "最多2个孩子档案",
+      "profiles4": "最多4个孩子档案",
+      "profiles10": "最多10个孩子档案"
+    },
+    "creditPacks": {
+      "title": "需要更多点数？",
+      "pack100": "100点数包",
+      "pack500": "500点数包",
+      "pack1000": "1,000点数包"
+    },
+    "faq": {
+      "title": "选择前先看看",
+      "subtitle": "关于方案、点数和取消订阅，你需要知道的都在这里。",
+      "cancelAnytime": {
+        "question": "可以随时取消吗？",
+        "answer": "可以。在账户里一键取消，不问原因。你已经做过的涂色页都归你。"
+      },
+      "rollover": {
+        "question": "没用完的页面会怎样？",
+        "answer": "Splash点数每月重置。Rainbow可累积并多保留1个月。Sparkle可累积并多保留2个月。所以这个月没用完，下个月还在。"
+      },
+      "creditsPerPage": {
+        "question": "我到底能做多少张？",
+        "answer": "输入文字或拍照一次花5点数。和Chunky Crayon语音说一次花10点数（因为它会听、转写并画出来）。Splash每月约50张文字页，Rainbow约100张，Sparkle约200张。可自由搭配使用。"
+      },
+      "audience": {
+        "question": "只适合小朋友吗？",
+        "answer": "任何年龄都能用。幼儿说“戴帽子的狐狸”，家长把页面打印出来。大人也能自己做，睡前在iPad上涂一会儿。同一个产品，不同的人在用。"
+      },
+      "multipleKids": {
+        "question": "一个订阅可以给多个孩子用吗？",
+        "answer": "可以，而且这正是很多应用做错的地方。一个Chunky Crayon方案就能为每个孩子开独立档案（Splash 2个、Rainbow 4个、Sparkle 10个）。他们的页面、贴纸和Colo小伙伴都互不混在一起。不用给每个孩子都买一份。"
+      },
+      "trialMechanics": {
+        "question": "7天免费试用结束后会怎样？",
+        "answer": "会按方案价格扣款。我们会在扣款前24小时发邮件提醒，绝不突然扣费。试用期内随时取消，都不会收费。"
+      },
+      "printPaper": {
+        "question": "在家打印需要准备什么？",
+        "answer": "打印机和纸就行。页面会下载为PDF，无需调整大小即可适配A4或US Letter。"
+      },
+      "gettingStarted": {
+        "question": "怎么开始？",
+        "answer": "选一个方案，登录后，两分钟内就能拿到第一张。"
+      }
+    },
+    "finalCta": {
+      "title": "选个方案，今天就涂一张。",
+      "subtitle": "他们来描述，我们来画。你可以打印出来，或直接把iPad递给他们。免费7天，随时可取消。",
+      "primary": "开始7天免费试用",
+      "secondary": "再对比一次方案"
+    },
+    "secondary": {
+      "packsHeader": "还不想订阅？",
+      "packsBody": "试试一次性点数包。按使用量付费，不用月度方案。",
+      "subscriptionsHeader": "经常涂色？",
+      "subscriptionsBody": "订月度方案更划算。功能全开，每页更省。",
+      "ctaSeePacks": "查看点数包",
+      "ctaSeePlans": "查看月度方案",
+      "packCardCredits": "{count} 点数",
+      "packCardCta": "购买点数包"
+    }
+  },
+  "blog": {
+    "title": "Chunky Crayon 博客",
+    "subtitle": "创意涂色的小贴士、点子与灵感",
+    "allPosts": "全部文章",
+    "byAuthor": "作者：{author}",
+    "categories": {
+      "colouringTips": "涂色技巧",
+      "mindfulnessRelaxation": "专注放松",
+      "artEducation": "美术启蒙",
+      "activitiesForKids": "亲子活动",
+      "seasonalHolidays": "节日与季节"
+    }
+  },
+  "colorAsYouGo": {
+    "heroTitle": "随时随地涂色。",
+    "heroSubtitle": "需要时再买点点数。无订阅。无绑定。只管涂色。",
+    "credits": "{count} 点数",
+    "buyNow": "获取点数",
+    "loading": "加载中…",
+    "failedToCheckout": "无法进入结算。再试一次？",
+    "packs": {
+      "PUBLIC_CREDITS_50": {
+        "name": "入门",
+        "tagline": "约10张涂色页。雨天宅家也不怕。"
+      },
+      "PUBLIC_CREDITS_200": {
+        "name": "周末",
+        "tagline": "约40张涂色页。一周的“我好无聊”都够用。"
+      },
+      "PUBLIC_CREDITS_500": {
+        "name": "假期",
+        "tagline": "约100张涂色页。整个假期都安排妥妥的。"
+      }
+    },
+    "subscribePitch": {
+      "title": "每周都想涂色？",
+      "subtitle": "如果每月做的不止几张，订阅更划算。还可给兄弟姐妹加更多档案，点数也能累积。",
+      "cta": "查看方案"
+    }
+  },
+  "startOverButton": {
+    "idle": "重新开始",
+    "modalTitle": "要清空这一页吗？",
+    "modalBody": "你涂的颜色都会消失，回到空白页面。",
+    "confirm": "好呀，换张新页面",
+    "cancel": "继续涂色"
+  },
+  "stickers": {
+    "categories": {
+      "stars": "星星",
+      "hearts": "爱心",
+      "shapes": "形状",
+      "nature": "自然",
+      "emojis": "表情",
+      "fun": "好玩"
+    },
+    "items": {
+      "yellowStar": "黄色星星",
+      "sparkleStar": "闪闪星星",
+      "glowingStar": "发光星星",
+      "shootingStar": "流星",
+      "redHeart": "红色爱心",
+      "pinkHeart": "粉色爱心",
+      "sparkleHeart": "闪闪爱心",
+      "rainbowHeart": "彩虹爱心",
+      "circle": "圆形",
+      "square": "正方形",
+      "triangle": "三角形",
+      "diamond": "菱形",
+      "flower": "花朵",
+      "sun": "太阳",
+      "rainbow": "彩虹",
+      "cloud": "云朵",
+      "butterfly": "蝴蝶",
+      "leaf": "叶子",
+      "smile": "微笑",
+      "loveEyes": "爱心眼",
+      "cool": "酷酷",
+      "wink": "眨眼",
+      "crown": "皇冠",
+      "unicorn": "独角兽",
+      "rocket": "火箭",
+      "balloon": "气球",
+      "gift": "礼物",
+      "cake": "蛋糕"
+    }
+  },
+  "stickerBook": {
+    "title": "我的贴纸册",
+    "subtitle": "涂色图片，收集有趣贴纸！",
+    "pageTitle": "我的贴纸册 - Chunky Crayon",
+    "pageDescription": "查看你的贴纸收藏，看看还能解锁哪些贴纸！",
+    "loadError": "贴纸加载失败，请重试。",
+    "card": {
+      "viewSticker": "看看{name}贴纸",
+      "lockedSticker": "{name}贴纸，尚未解锁"
+    },
+    "filters": {
+      "all": "全部",
+      "milestones": "里程碑",
+      "categories": "分类",
+      "explore": "探索",
+      "special": "特别"
+    },
+    "emptyState": "这个分类还没有贴纸哦。",
+    "countFormat": "{count}/{total}",
+    "newBadge": "{count} 全新",
+    "progress": {
+      "label": "贴纸收藏",
+      "complete": "太棒了！贴纸全部收集完成！",
+      "almostThere": "就快完成啦！你真棒！",
+      "halfway": "完成一半啦！继续加油！",
+      "greatStart": "开了个好头！"
+    },
+    "detail": {
+      "lockedName": "???",
+      "lockedDescription": "这张贴纸还没解锁！",
+      "unlockedOn": "于 {date} 解锁",
+      "howToUnlock": "解锁方法：",
+      "rarity": {
+        "common": "常见",
+        "uncommon": "不常见",
+        "rare": "稀有",
+        "legendary": "传奇"
+      },
+      "unlockConditions": {
+        "artworkCount": "保存{count}幅作品到相册",
+        "firstCategory": "完成第一张{category}涂色页",
+        "categoryCount": "完成{count}张{category}涂色页",
+        "special": "探索{count}种不同分类"
+      }
+    }
+  },
+  "stickerCatalog": {
+    "first-steps": {
+      "name": "第一步",
+      "description": "保存你的第一幅上色作品！",
+      "unlockMessage": "你做到了！你的第一幅杰作已保存！"
+    },
+    "getting-started": {
+      "name": "开始上手",
+      "description": "手感不错！保存5幅作品。",
+      "unlockMessage": "5幅作品！你越来越像小画家啦！"
+    },
+    "high-five": {
+      "name": "击个掌",
+      "description": "保存10幅漂亮作品到画廊。",
+      "unlockMessage": "击个掌！10幅超棒作品！"
+    },
+    "perfect-ten": {
+      "name": "完美十连",
+      "description": "真正的小画家！保存25幅作品。",
+      "unlockMessage": "25幅作品！你是涂色小明星！"
+    },
+    "super-artist": {
+      "name": "超级小画家",
+      "description": "太有毅力啦！保存50幅作品。",
+      "unlockMessage": "50幅杰作！你是超级小画家！"
+    },
+    "master-creator": {
+      "name": "创作大师",
+      "description": "传奇成就！保存75幅作品。",
+      "unlockMessage": "75幅作品！真正的创作大师！"
+    },
+    "century-club": {
+      "name": "百幅俱乐部",
+      "description": "终极成就！保存100幅作品。",
+      "unlockMessage": "100幅作品！欢迎加入百幅俱乐部！"
+    },
+    "animal-friend": {
+      "name": "动物朋友",
+      "description": "给你的第一张动物页上色！",
+      "unlockMessage": "你交到了一位新动物朋友！"
+    },
+    "fantasy-dreamer": {
+      "name": "奇幻梦游者",
+      "description": "给你的第一张奇幻页上色！",
+      "unlockMessage": "欢迎来到奇幻世界！"
+    },
+    "space-explorer": {
+      "name": "太空探险家",
+      "description": "给你的第一张太空页上色！",
+      "unlockMessage": "3, 2, 1... 发射！太空探险成功！"
+    },
+    "nature-lover": {
+      "name": "自然爱好者",
+      "description": "给你的第一张自然页上色！",
+      "unlockMessage": "大自然真美，就像你的作品一样！"
+    },
+    "vehicle-driver": {
+      "name": "小小司机",
+      "description": "给你的第一张交通工具页上色！",
+      "unlockMessage": "嘀嘀！这车真酷！"
+    },
+    "dino-hunter": {
+      "name": "恐龙猎人",
+      "description": "给你的第一张恐龙页上色！",
+      "unlockMessage": "吼！你发现了一只恐龙！"
+    },
+    "ocean-diver": {
+      "name": "海洋潜水员",
+      "description": "给你的第一张海洋生物页上色！",
+      "unlockMessage": "扑通！海底大冒险开始！"
+    },
+    "food-lover": {
+      "name": "美食爱好者",
+      "description": "给你的第一张美食页上色！",
+      "unlockMessage": "好香呀！看起来真好吃！"
+    },
+    "sports-star": {
+      "name": "运动小明星",
+      "description": "给你的第一张运动页上色！",
+      "unlockMessage": "进球！你是运动小明星！"
+    },
+    "holiday-spirit": {
+      "name": "节日气氛",
+      "description": "给你的第一张节日页上色！",
+      "unlockMessage": "一起庆祝！节日气氛解锁！"
+    },
+    "animal-master": {
+      "name": "动物达人",
+      "description": "给10张动物页上色，成为真正的动物小专家！",
+      "unlockMessage": "你是最棒的动物朋友！"
+    },
+    "fantasy-master": {
+      "name": "奇幻大师",
+      "description": "给10张奇幻页上色，解锁魔法能量！",
+      "unlockMessage": "你的奇幻能量太传奇啦！"
+    },
+    "space-master": {
+      "name": "太空大师",
+      "description": "给10张太空页上色，变身宇航员！",
+      "unlockMessage": "你是认证的太空探险家！"
+    },
+    "category-explorer": {
+      "name": "分类探险家",
+      "description": "试试新花样！给3个不同分类的页面上色。",
+      "unlockMessage": "多彩选择，灵感加倍！"
+    },
+    "world-traveler": {
+      "name": "世界旅行家",
+      "description": "给5个不同分类的页面上色！",
+      "unlockMessage": "你把涂色世界都逛遍啦！"
+    }
+  },
+  "stickerSelector": {
+    "title": "选择贴纸",
+    "close": "关闭",
+    "selected": "已选择：",
+    "helpText": "点按画布放置贴纸"
+  },
+  "profiles": {
+    "pageTitle": "谁在涂色？",
+    "pageSubtitle": "选一个或新建一个",
+    "editTitle": "更换头像",
+    "switcher": {
+      "close": "关闭切换面板"
+    },
+    "ageGroups": {
+      "toddler": "小小孩",
+      "toddlerDescription": "2-4 岁",
+      "child": "小朋友",
+      "childDescription": "5-8 岁",
+      "tween": "大孩子",
+      "tweenDescription": "9-12 岁",
+      "teen": "青少年",
+      "teenDescription": "13-17 岁",
+      "adult": "大人",
+      "adultDescription": "18+"
+    },
+    "form": {
+      "name": "你的名字",
+      "namePlaceholder": "例如：Emma",
+      "nameRequired": "请输入名字",
+      "ageGroup": "多大啦？",
+      "avatar": "选个头像",
+      "difficultyLevel": "难度如何？",
+      "saveChanges": "保存",
+      "saving": "保存中…",
+      "cancel": "取消",
+      "profileUpdated": "都保存好啦！",
+      "profileSwitched": "已切换！",
+      "unnamed": "未命名"
+    },
+    "delete": {
+      "title": "确定吗？",
+      "dangerZone": "移除",
+      "warning": "这会永久移除该资料。你的涂色图会保留。",
+      "confirmText": "这会永久移除该资料。你的涂色图会保留。",
+      "deleteProfile": "移除",
+      "deleting": "移除中…",
+      "deleted": "已移除“{name}”",
+      "coloringPages": "{count, plural, =1 {1 张图片} other {# 张图片}}"
+    },
+    "manager": {
+      "aboutProfiles": "资料怎么用",
+      "ownCollection": "每个资料都有自己的图片",
+      "personalizedDifficulty": "页面会为他们精心挑选",
+      "maxProfiles": "最多 {max} 个资料",
+      "switchAnytime": "点顶部头像就能切换",
+      "profilesUsed": "已用 {count}/{max}",
+      "colorings": "{count, plural, =1 {1 张图片} other {# 张图片}}",
+      "edit": "编辑 {name}",
+      "delete": "移除 {name}",
+      "addProfile": "新建资料"
+    },
+    "create": {
+      "title": "创建资料",
+      "subtitle": "选个名字和头像",
+      "button": "创建资料",
+      "creating": "创建中…",
+      "success": "资料已创建！",
+      "addProfile": "添加资料",
+      "maxReached": "资料数量已达上限",
+      "maxReachedDescription": "你已达到最多 {max} 个资料。删除一个现有资料后再添加新的。",
+      "nameLabel": "名字",
+      "namePlaceholder": "例如：Emma",
+      "nameError": "请输入名字",
+      "ageGroupLabel": "多大啦？",
+      "avatarLabel": "选个头像"
+    }
+  },
+  "social": {
+    "instagram": "Instagram",
+    "facebook": "Facebook",
+    "tiktok": "TikTok",
+    "pinterest": "Pinterest",
+    "x": "X",
+    "threads": "Threads"
+  },
+  "parentalGate": {
+    "title": "快速验证",
+    "subtitle": "点选正确答案",
+    "settingsHint": "可随时在设置中关闭。"
+  },
+  "stickerReward": {
+    "congratulations": "恭喜你！",
+    "youEarned": "你获得了一张贴纸！",
+    "stickerName": "{name}",
+    "tapToContinue": "点击继续",
+    "addedToBook": "已加入你的贴纸册！",
+    "viewStickerBook": "查看贴纸册",
+    "keepColoring": "继续涂色",
+    "previousSticker": "上一张贴纸",
+    "nextSticker": "下一张贴纸",
+    "newSticker": "新贴纸！",
+    "newStickers": "新贴纸！",
+    "ofCount": "第 {current} 张 / 共 {total} 张",
+    "addToStickerBook": "放进我的贴纸册",
+    "goToSticker": "前往第 {number} 张贴纸",
+    "rarity": {
+      "common": "常见",
+      "uncommon": "不常见",
+      "rare": "稀有",
+      "legendary": "百万里挑一"
+    }
+  },
+  "seo": {
+    "home": {
+      "title": "Chunky Crayon - 创意涂色与快乐学习",
+      "description": "Chunky Crayon 是一款色彩缤纷、互动有趣的应用，专为孩子和家长打造，可生成独特、个性化的涂色书页面与趣味学习练习纸。把文字、语音和图片提示变成可打印的涂色页，或在网页、iOS 和 Android 应用中享受数字涂色。"
+    },
+    "gallery": {
+      "title": "免费涂色页图库 - Chunky Crayon",
+      "description": "浏览我们的免费可打印涂色页合集：动物、巨龙、独角兽、公主等应有尽有。每天都有新页面！"
+    }
+  },
+  "altText": {
+    "mascot": "友好的蜡笔吉祥物 Colo",
+    "dailyPage": "每日涂色页",
+    "coloringPage": "涂色页",
+    "toddlerPage": "幼儿涂色页",
+    "kidsPage": "儿童涂色页",
+    "teenPage": "青少年涂色页",
+    "adultPage": "成人涂色页",
+    "ogImage": "Chunky Crayon 定制涂色书页面"
+  },
+  "metadata": {
+    "keywords": "涂色书页面, 儿童创意应用, 个性化涂色页, 教育练习单, 趣味学习活动, 儿童创意应用, 互动涂色应用, 数字涂色, 可打印涂色页"
+  },
+  "myArtwork": {
+    "pageTitle": "我的作品",
+    "pageSubtitle": "所有已保存的涂色作品都在这里。点开任意作品，可再次涂色或做个新版本！",
+    "emptyState": {
+      "title": "还没有保存的作品！",
+      "description": "开始涂色并保存作品，就能在这里看到它们。你的作品会一直保存哦！",
+      "cta": "浏览涂色页"
+    },
+    "grid": {
+      "coloredBy": "由{name}涂色",
+      "viewArtwork": "查看作品",
+      "deleteArtwork": "删除作品",
+      "shareArtwork": "分享作品",
+      "shareWithFamily": "分享给家人",
+      "colorAgain": "再涂一次",
+      "savedArtwork": "已保存作品"
+    },
+    "filters": {
+      "all": "全部",
+      "recent": "最近",
+      "favorites": "收藏"
+    },
+    "sort": {
+      "newest": "最新优先",
+      "oldest": "最早优先"
+    },
+    "stickerCard": {
+      "title": "贴纸书",
+      "newBadge": "{count} 个新",
+      "stickersCollected": "已收集 {total} 个中的 {collected} 个贴纸"
+    },
+    "deleteDialog": {
+      "title": "删除作品？",
+      "description": "确定要删除这幅作品吗？删除后无法恢复！",
+      "confirm": "是的，删除",
+      "cancel": "不要，保留"
+    }
+  },
+  "challenges": {
+    "pageTitle": "每周挑战",
+    "pageSubtitle": "每周完成趣味涂色挑战，赢取专属贴纸和Colo配饰！",
+    "breadcrumbs": {
+      "home": "首页",
+      "account": "账户",
+      "challenges": "挑战"
+    },
+    "currentChallenge": {
+      "title": "本周挑战"
+    },
+    "noActive": {
+      "title": "暂无挑战",
+      "description": "敬请期待，下一个每周挑战很快回来！"
+    },
+    "history": {
+      "title": "往期挑战",
+      "completed": "已完成",
+      "expired": "已过期",
+      "progress": "已完成 {progress} / {requirement}"
+    },
+    "reward": {
+      "claimed": "奖励已领取！",
+      "stickerAdded": "新贴纸已加入你的贴纸册！",
+      "accessoryAdded": "新配饰已加入你的Colo！"
+    }
+  },
+  "recentCreations": {
+    "title": "你的近期作品",
+    "imageAlt": "你的涂色页",
+    "ctaHighlight": "免费开始",
+    "ctaMessage": "即可永久保存作品并解锁更多！",
+    "ctaButton": "免费开始"
+  },
+  "myRecentCreations": {
+    "title": "你最近的图片",
+    "seeAll": "查看我的所有图片",
+    "empty": "用上面的创作区做出你的第一张图片吧！",
+    "untitled": "我的图片"
+  },
+  "coloringPage": {
+    "progress": {
+      "allDone": "完成啦！",
+      "milestones": {
+        "25": "开头真棒！",
+        "50": "完成一半啦！",
+        "75": "快完成啦！",
+        "100": "完成啦！"
+      }
+    },
+    "tapToColor": "点一点上色",
+    "dragForTools": "拖动选工具"
+  },
+  "createForm": {
+    "title": "创造魔法！",
+    "tagline": "打字、说话或拍张照片！",
+    "generatingMessage": "大约 2 分钟就好！",
+    "examplesLabel": "试试这些",
+    "exampleTrex": "滑板上的霸王龙宇航员",
+    "exampleDragon": "龙和小兔子在办茶会",
+    "exampleFoxes": "狐狸一家去野餐",
+    "inputModes": {
+      "scene": "搭配",
+      "type": "打字",
+      "talk": "说话",
+      "photo": "照片",
+      "ariaLabel": "输入方式选择",
+      "unlockFailed": "出错了。再试一次？"
+    },
+    "scene": {
+      "ariaLabel": "搭配你的画面",
+      "surpriseMe": "给我惊喜！",
+      "lockedMakeCharacter": "（先创建角色）",
+      "back": "返回",
+      "next": "下一步",
+      "create": "创建！",
+      "extrasTitle": "小彩蛋",
+      "skip": "跳过",
+      "subjectAddCharacter": "添加角色",
+      "subjectTitle": "谁？",
+      "friendsTitle": "你的朋友们",
+      "subjectGroupTitle": "或选一个",
+      "locationTitle": "在哪？",
+      "weatherTitle": "天气",
+      "activityTitle": "在做什么？",
+      "accentTitle": "小彩蛋",
+      "subject": {
+        "horse": "马",
+        "cow": "奶牛",
+        "sheep": "绵羊",
+        "dog": "小狗",
+        "cat": "小猫",
+        "fox": "狐狸",
+        "lion": "狮子",
+        "fish": "小鱼",
+        "dragon": "龙",
+        "bird": "小鸟",
+        "kid": "小朋友",
+        "astronaut": "宇航员"
+      },
+      "location": {
+        "beach": "海滩",
+        "sea": "海上",
+        "football-game": "足球场",
+        "busy-street": "热闹街道",
+        "shopping-mall": "商场",
+        "desert-island": "小岛",
+        "forest": "森林",
+        "mountains": "大山",
+        "train-station": "车站"
+      },
+      "weather": {
+        "sunny": "晴天",
+        "snowy": "下雪",
+        "rainy": "下雨",
+        "night": "夜晚",
+        "rainbow": "彩虹",
+        "cloudy": "多云"
+      },
+      "activity": {
+        "playing": "玩耍",
+        "sleeping": "睡觉",
+        "running": "奔跑",
+        "swimming": "游泳",
+        "flying-a-kite": "放风筝",
+        "riding-a-bike": "骑车",
+        "having-a-picnic": "野餐",
+        "dancing": "跳舞"
+      },
+      "accent": {
+        "birthday": "生日",
+        "sparkles": "闪闪亮",
+        "underwater-bubbles": "泡泡",
+        "flowers": "花朵",
+        "space-stars": "星星",
+        "balloons": "气球"
+      }
+    },
+    "voiceInput": {
+      "startRecording": "开始录音",
+      "stopRecording": "停止录音",
+      "tapToRecord": "点一下，说说想涂什么！",
+      "signInToRecord": "登录后才能开始录音！",
+      "notSupported": "哎呀！你的浏览器不支持录音。",
+      "notSupportedHint": "请在带麦克风的设备上使用 Chrome、Safari 或 Firefox。",
+      "tryAgain": "再试一次",
+      "listening": "我在听！",
+      "allDone": "说完了吗？{countdown}s…",
+      "cancel": "取消",
+      "doneTalking": "说完了",
+      "imDone": "我说完啦！",
+      "gettingMicReady": "正在准备麦克风…",
+      "understanding": "正在理解你说的内容…",
+      "makeMyColoringPage": "🎨 生成我的涂色页！",
+      "notQuiteRight": "不太对？再试一次",
+      "maxDuration": "最多 {seconds} 秒",
+      "errors": {
+        "permissionDenied": "需要使用你的麦克风！",
+        "notSupported": "换个浏览器试试！",
+        "transcriptionFailed": "没听清！",
+        "recordingFailed": "哎呀！再试一次！",
+        "timeout": "有点太久啦！"
+      }
+    },
+    "imageInput": {
+      "takePhotoOrUpload": "拍一张或选一张！",
+      "signInToUpload": "登录后才能上传图片！",
+      "camera": "相机",
+      "upload": "上传",
+      "takePhoto": "拍照",
+      "uploadImage": "上传图片",
+      "dropHere": "拖到这里！",
+      "dragAndDrop": "或拖到这里",
+      "shareDrawing": "分享一张画或任意想涂色的图片！",
+      "greatPicture": "好棒的图片！就选这张吗？",
+      "pickAnother": "换一张",
+      "useThis": "就用这张！",
+      "iSee": "我看到了：",
+      "makeMyColoringPage": "🎨 生成我的涂色页！",
+      "notQuiteRight": "不太对？再试一次",
+      "capturing": "正在准备你的照片…",
+      "processing": "正在查看你的图片…",
+      "tryAgain": "再试一次",
+      "altImagePreview": "已选图片预览",
+      "altUploadedImage": "你上传的图片",
+      "errors": {
+        "fileTooLarge": "太大啦！换小一点的。",
+        "invalidType": "换一张图片试试！",
+        "processingFailed": "没成功！换一张试试！",
+        "cameraFailed": "相机卡住了！再试一次！",
+        "heicUnsupported": "暂不支持 HEIC。请先保存为 JPG 或 PNG！"
+      }
+    },
+    "placeholder": "你想涂什么？",
+    "placeholderGuestLimit": "你的 {maxTries} 次免费体验已用完！注册可再领 15 个点数。",
+    "placeholderNoCreditsSubscribed": "点数用完啦。去充值或升级套餐！",
+    "placeholderNoCreditsNoSubscription": "免费点数已用完。选个套餐或按需购买继续涂！",
+    "placeholderSignIn": "登录后开始创建神奇的涂色页！",
+    "buttonCreate": "创建",
+    "buttonCreateGuest": "创建",
+    "freeTriesChip": "{remaining, plural, =1 {还剩 # 次免费体验} other {还剩 # 次免费体验}}",
+    "buttonSignUp": "注册领取 15 个免费点数",
+    "buttonBuyCredits": "购买更多点数",
+    "buttonViewPlans": "查看套餐",
+    "linkColorAsYouGo": "或按需购买（无需订阅）",
+    "linkSeePlansGuestLimit": "或开启 7 天免费试用，页面无限量",
+    "buttonGetStarted": "免费开始",
+    "subtextGuestLimit": "你已见证魔法！注册继续创作吧。",
+    "subtextNoCredits": "点数用完啦。去充值或升级！",
+    "subtextNoCreditsSubscribed": "魔法不够啦？充值或升级，继续尽情创作！",
+    "subtextNoCreditsNoSubscription": "选个订阅，或买点点数继续玩。",
+    "subtextFallback": "你将获得 15 个免费点数，够创建 3 页！",
+    "blockReason": {
+      "guestLimit": "免费体验用完",
+      "noSubscription": "订阅后继续",
+      "subscriberNoCredits": "充值后继续"
+    }
+  },
+  "paywall": {
+    "guestLimit": {
+      "title": "免费次数已用完",
+      "subtitle": "订阅即可继续创作，或注册账号再领15次免费机会。"
+    },
+    "noSubscription": {
+      "title": "点数用完啦",
+      "subtitle": "选择一个方案继续创作。"
+    },
+    "subscriberNoCredits": {
+      "title": "点数用完啦",
+      "subtitle": "本月点数已用完。购买加点包继续玩吧。",
+      "primary": "查看加点包"
+    },
+    "common": {
+      "subscribe": "订阅",
+      "creditsPerMonth": "每月{count}点数",
+      "perMonth": "每月",
+      "popular": "热门",
+      "seeAllPlans": "查看加点包和完整方案详情",
+      "signUpFree": "注册领取15点数",
+      "dismiss": "以后再说"
+    }
+  },
+  "feedback": {
+    "title": "有什么想说的吗？",
+    "subtitle": "每条消息我们都会看。真的。",
+    "types": {
+      "bug": {
+        "label": "哪里出问题了",
+        "placeholder": "你做了什么？结果发生了什么？"
+      },
+      "idea": {
+        "label": "我有个点子",
+        "placeholder": "你想看到什么？大胆想也没关系。"
+      },
+      "help": {
+        "label": "我需要帮忙",
+        "placeholder": "你卡在什么地方？"
+      },
+      "other": {
+        "label": "其他",
+        "placeholder": "想告诉我们的都可以，好或不好都行。"
+      }
+    },
+    "emailPlaceholder": "你的邮箱（可选，仅在想收到回复时填写）",
+    "sendButton": "发送",
+    "sending": "发送中…",
+    "successTitle": "收到啦，谢谢",
+    "successMessage": "我们会查看，如有需要会回复你。",
+    "back": "返回"
+  },
+  "og": {
+    "homepage": {
+      "tagline": "定制涂色页，几秒就做好。",
+      "alt": "Chunky Crayon，几秒就能生成的定制涂色页。"
+    },
+    "coloringImage": {
+      "notFound": "未找到涂色页"
+    },
+    "blogPost": {
+      "notFound": "未找到博文",
+      "minRead": "阅读约 {minutes} 分钟",
+      "blog": "博客"
+    },
+    "sharedArtwork": {
+      "notFound": "未找到作品",
+      "createdBy": "创作人"
+    },
+    "difficulty": {
+      "beginner": "入门",
+      "intermediate": "进阶",
+      "advanced": "高级",
+      "expert": "大师"
+    }
+  },
+  "characters": {
+    "pageTitle": "认识你的小伙伴",
+    "pageSubtitle": "做一个会出现在每张涂色页里的朋友。",
+    "comingSoonTitle": "小伙伴马上来",
+    "comingSoonBody": "再等等，我们正在为你准备好。",
+    "emptyTitle": "来做你的第一个小伙伴吧！",
+    "emptyBody": "取个名字，说说TA长什么样，我们来帮你画出来。TA会出现在你的涂色页里。",
+    "addFriendCta": "做个小伙伴",
+    "fullHouse": "小伙伴满啦。先移除一个，给新朋友腾位置吧。",
+    "tile": {
+      "drawing": "绘制中",
+      "retry": "重试",
+      "drawingPlaceholder": "正在为你画新朋友",
+      "failedPlaceholder": "出了点问题",
+      "gettingReady": "准备中"
+    },
+    "modal": {
+      "title": "做个小伙伴",
+      "subtitle": "创建一个会出现在涂色页里的角色。",
+      "name": {
+        "label": "TA叫什么名字？",
+        "placeholder": "雷克斯"
+      },
+      "species": {
+        "label": "是什么小伙伴？（可选）"
+      },
+      "prompt": {
+        "label": "描述你的小伙伴",
+        "placeholder": "TA长什么样？TA喜欢什么？",
+        "examplesLabel": "需要灵感吗？"
+      },
+      "voice": {
+        "label": "选择声音（可选）",
+        "hint": "别担心，之后可以再改。"
+      },
+      "footer": "我们会为你画{name}。大约需要30秒。每个档案最多{max}个小伙伴。",
+      "next": "下一步",
+      "back": "返回",
+      "cancel": "取消",
+      "submit": "做我的小伙伴",
+      "submitting": "绘制中…",
+      "errors": {
+        "nameRequired": "给你的小伙伴取个名字吧。",
+        "promptRequired": "说说你的小伙伴是什么样的吧。",
+        "unauthorized": "请先登录。",
+        "noActiveProfile": "创建角色前先选择一个档案。",
+        "parentGateRequired": "需要再次通过家长验证。",
+        "invalidInput": "请检查名字和描述。",
+        "moderationBlocked": "这个不行哦。换个想法试试。",
+        "limitReached": "小伙伴满啦。先移除一个再试试。",
+        "extractionFailed": "绘制小伙伴时出了点问题。",
+        "workerUnavailable": "绘制小伙伴时出了点问题。",
+        "unknown": "出了点问题，请再试一次。"
+      }
+    },
+    "parentGate": {
+      "header": "家长验证",
+      "questionPrefix": "等于多少：",
+      "questionInfix": "减",
+      "placeholder": "输入答案",
+      "submit": "提交",
+      "checking": "验证中…",
+      "tryAgain": "不太对哦，再试一次。",
+      "needsNumber": "请输入数字。",
+      "lockedPrefix": "先缓一缓，",
+      "lockedSuffix": "秒后再试。",
+      "cancel": "取消"
+    },
+    "profile": {
+      "backLink": "← 所有小伙伴",
+      "stillDrawingTitle": "{name}正在赶来",
+      "stillDrawingBody": "正在绘制TA的头像。稍等一会儿再来看吧。",
+      "seeAllCta": "查看所有小伙伴",
+      "actions": {
+        "feed": "喂食",
+        "exercise": "运动",
+        "dress": "换装"
+      },
+      "outfits": {
+        "heading": "装扮",
+        "none": "不穿装扮",
+        "lockedPrice": "{cost}积分",
+        "errorEquip": "保存失败，请再试一次。",
+        "errorInsufficient": "解锁需要{cost}积分，你有{balance}。",
+        "errorUnlock": "没能解锁，请再试一次。"
+      },
+      "voice": {
+        "heading": "声音",
+        "presetHi": "嗨",
+        "presetFeed": "好香！",
+        "presetExercise": "呼——！",
+        "presetBye": "拜拜！",
+        "customLabel": "让{name}说一句（仅限家长）",
+        "customPlaceholder": "你好，我是{name}！",
+        "customSubmit": "让TA说",
+        "customFooter": "每句{cost}积分",
+        "thinking": "{name}正在思考。稍等一下再试。",
+        "errors": {
+          "notFound": "找不到这个小伙伴。",
+          "invalidInput": "每句需为1到80个字符。",
+          "parentGateRequired": "需要再次通过家长验证。",
+          "moderationBlocked": "这个不行哦。换些词试试。",
+          "insufficientCredits": "积分不够，无法生成这句。",
+          "synthesisFailed": "出了点问题，稍等一下再试。"
+        }
+      }
+    }
+  }
+}

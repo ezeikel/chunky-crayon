@@ -1,0 +1,459 @@
+{
+  "common": {
+    "loading": "加载中...",
+    "error": "出了点问题",
+    "retry": "重试",
+    "save": "保存",
+    "cancel": "取消",
+    "close": "关闭",
+    "done": "完成",
+    "copy": "复制",
+    "copied": "已复制！",
+    "credits": "积分",
+    "creditsWithCount": "{count} 积分",
+    "loadMore": "加载更多"
+  },
+  "navigation": {
+    "home": "首页",
+    "gallery": "图库",
+    "freebies": "免费内容",
+    "myStuff": "我的内容",
+    "challenges": "挑战",
+    "blog": "博客",
+    "pricing": "价格",
+    "support": "支持",
+    "signIn": "登录",
+    "signOut": "退出登录",
+    "billing": "账单",
+    "settings": "设置",
+    "stickerBook": "贴纸书",
+    "account": "账户",
+    "menu": "菜单",
+    "currentlyActive": "当前使用中",
+    "switchTo": "切换到",
+    "selectProfile": "选择档案",
+    "manageProfiles": "管理档案",
+    "openMenu": "打开菜单",
+    "closeMenu": "关闭菜单",
+    "navigationMenu": "导航菜单",
+    "backToGallery": "返回图库"
+  },
+  "coloringPage": {
+    "title": "涂色页",
+    "relatedPages": "更多涂色页",
+    "defaultDescription": "来自 Chunky Crayon 的免费可打印涂色页",
+    "progress": {
+      "colored": "已涂色",
+      "percentage": "{percent}%",
+      "allDone": "完成啦！",
+      "milestones": {
+        "25": "开了个好头！",
+        "50": "完成一半！",
+        "75": "快完成了！",
+        "100": "太棒了！"
+      }
+    },
+    "sidebar": {
+      "colors": "颜色",
+      "tools": "工具",
+      "size": "大小",
+      "history": "历史记录",
+      "zoom": "缩放",
+      "actions": "操作"
+    },
+    "tools": {
+      "pan": "移动",
+      "fill": "填充",
+      "brush": "画笔",
+      "sticker": "贴纸",
+      "magicReveal": "魔法显现",
+      "magicAuto": "魔法自动",
+      "magicBrush": "魔法画笔",
+      "magicFill": "魔法填充",
+      "autoColor": "自动上色",
+      "magic": "魔法"
+    },
+    "brushTypes": {
+      "crayon": "蜡笔",
+      "marker": "马克笔",
+      "pencil": "铅笔",
+      "paintbrush": "画笔",
+      "eraser": "橡皮擦",
+      "glitter": "亮粉",
+      "sparkle": "闪光",
+      "rainbow": "彩虹",
+      "glow": "发光",
+      "neon": "霓虹"
+    },
+    "brushSizes": {
+      "small": "细",
+      "medium": "中",
+      "large": "粗"
+    },
+    "fillPatterns": {
+      "solid": "纯色",
+      "dots": "波点",
+      "stripes": "条纹",
+      "diagonal": "斜纹",
+      "checkerboard": "棋盘格",
+      "hearts": "爱心",
+      "stars": "星星",
+      "zigzag": "锯齿纹"
+    },
+    "actions": {
+      "save": "保存",
+      "download": "下载",
+      "share": "分享",
+      "print": "打印",
+      "preparing": "准备中…",
+      "doneSharing": "分享完成",
+      "colorAgain": "再次涂色",
+      "startOver": "重新开始"
+    },
+    "toolbar": {
+      "expand": "展开工具栏",
+      "collapse": "收起工具栏",
+      "moreTools": "更多工具",
+      "less": "更少"
+    },
+    "undoRedo": {
+      "undo": "撤销",
+      "undoShortcut": "撤销 (Ctrl+Z)",
+      "redo": "重做",
+      "redoShortcut": "重做 (Ctrl+Y)"
+    },
+    "colorPalette": {
+      "selectColor": "选择{color}色",
+      "magicToolsMessage": "使用魔法工具会自动选择颜色"
+    },
+    "patternSelector": {
+      "label": "图案："
+    },
+    "zoomControls": {
+      "zoomLevel": "缩放级别：{level}%",
+      "zoomOut": "缩小",
+      "zoomOutAria": "缩小（查看更多）",
+      "zoomIn": "放大",
+      "zoomInAria": "放大（看得更清）",
+      "pan": "移动",
+      "panAria": "在图片中移动查看",
+      "reset": "查看整张图",
+      "resetAria": "返回全图视图"
+    },
+    "muteToggle": {
+      "mute": "静音",
+      "unmute": "取消静音",
+      "turnOn": "开启声音",
+      "turnOff": "关闭声音"
+    }
+  },
+  "shareModal": {
+    "title": "分享作品",
+    "privacyNote": "任何拥有此链接的人都可查看此作品。不会分享任何个人信息。",
+    "expiresIn": "链接有效期：",
+    "expiration": {
+      "7days": "7天",
+      "30days": "30天",
+      "never": "永久有效"
+    },
+    "createLink": "创建分享链接",
+    "creating": "正在创建分享链接…",
+    "success": {
+      "title": "链接已创建！",
+      "subtitle": "将此链接分享给家人和朋友"
+    },
+    "done": "完成",
+    "error": "创建分享链接失败",
+    "socialShare": "分享到社交媒体"
+  },
+  "saveToGallery": {
+    "idle": "保存到相册",
+    "saving": "正在保存…",
+    "saved": "已保存！",
+    "tryAgain": "重试",
+    "errors": {
+      "captureArtwork": "无法保存你的作品",
+      "generic": "出了点问题，请重试。"
+    }
+  },
+  "shareButton": {
+    "idle": "分享",
+    "preparing": "准备中…",
+    "doneSharing": "分享完成"
+  },
+  "startOverButton": {
+    "idle": "重新开始",
+    "confirm": "是，重新开始",
+    "cancel": "继续涂色",
+    "modalTitle": "重新开始？",
+    "modalBody": "这将清除你所有的涂色内容。确定吗？"
+  },
+  "saveButton": {
+    "idle": "保存",
+    "loading": "加载中...",
+    "saving": "保存中...",
+    "error": "糟糕！"
+  },
+  "printButton": {
+    "idle": "打印",
+    "loading": "加载中...",
+    "printing": "正在打开...",
+    "error": "糟糕！"
+  },
+  "colors": {
+    "primary": {
+      "cherryRed": "樱桃红",
+      "sunsetOrange": "夕阳橙",
+      "sunshineYellow": "阳光黄",
+      "grassGreen": "草地绿",
+      "skyBlue": "天空蓝",
+      "grapePurple": "葡萄紫",
+      "bubblegumPink": "泡泡糖粉",
+      "chocolateBrown": "巧克力棕"
+    },
+    "secondary": {
+      "coral": "珊瑚色",
+      "mint": "薄荷绿",
+      "lavender": "薰衣草紫",
+      "peach": "蜜桃色",
+      "navy": "海军蓝",
+      "forest": "森林绿",
+      "gold": "金色",
+      "rose": "玫瑰色"
+    },
+    "essentials": {
+      "black": "黑色",
+      "white": "白色",
+      "gray": "灰色",
+      "skinTone": "肤色"
+    },
+    "skinTones": {
+      "light": "浅色",
+      "mediumLight": "中浅",
+      "medium": "中等",
+      "mediumDark": "中深",
+      "dark": "深色",
+      "deep": "很深"
+    }
+  },
+  "shareArtwork": {
+    "title": "分享作品",
+    "linkCreated": "链接已创建！",
+    "sharePrompt": "将此链接分享给家人和朋友",
+    "privacyNotice": "任何拥有此链接的人都可查看此作品。不会分享任何个人信息。",
+    "expiresIn": "链接到期时间：",
+    "expiration": {
+      "7days": "7天",
+      "30days": "30天",
+      "never": "永不过期"
+    },
+    "createLink": "创建分享链接",
+    "creating": "正在创建分享链接…",
+    "close": "关闭",
+    "copy": "复制",
+    "copied": "已复制！",
+    "done": "完成",
+    "error": "创建分享链接失败"
+  },
+  "account": {
+    "profiles": "个人资料",
+    "billing": "账单",
+    "settings": "设置",
+    "myArtwork": "我的作品"
+  },
+  "settings": {
+    "pageTitle": "设置",
+    "pageSubtitle": "管理你的账户偏好",
+    "parentalControls": {
+      "title": "家长控制",
+      "description": "控制使用应用时可见的内容"
+    },
+    "communityImages": {
+      "label": "显示社区图片",
+      "description": "开启后，你会在画廊中看到其他用户创建的涂色页。关闭后，只显示你自己的作品。",
+      "enabled": "已开启社区图片",
+      "disabled": "已关闭社区图片"
+    },
+    "modeAccess": {
+      "title": "创作方式",
+      "description": "你的孩子始终可以使用“图片搭建”，无需打字、麦克风或相机。你可以逐个解锁其他方式。此设置仅适用于当前使用的个人资料。",
+      "text": {
+        "label": "打字",
+        "description": "孩子输入要画的内容描述。"
+      },
+      "voice": {
+        "label": "说话",
+        "description": "孩子录音描述场景。使用麦克风。"
+      },
+      "image": {
+        "label": "照片",
+        "description": "孩子拍摄或选择照片，将其变成涂色页。使用相机。"
+      },
+      "unlocked": "已解锁",
+      "locked": "已锁定",
+      "enableFailed": "无法开启，请重试。",
+      "enabledToast": "已解锁",
+      "disabledToast": "已重新锁定"
+    },
+    "languagePreference": {
+      "title": "语言",
+      "description": "选择你偏好的应用语言"
+    },
+    "audio": {
+      "title": "音频",
+      "description": "控制音效和背景音乐",
+      "sfx": {
+        "label": "音效",
+        "description": "笔刷涂抹、点击等涂色声音"
+      },
+      "ambient": {
+        "label": "背景音乐",
+        "description": "涂色时的放松氛围音"
+      }
+    },
+    "communityGalleryEnabled": "已开启社区画廊图片",
+    "communityGalleryDisabled": "已关闭社区画廊图片",
+    "noEmail": "未设置邮箱"
+  },
+  "email": {
+    "signup": {
+      "title": "每天早晨收件箱里都有一张免费涂色页",
+      "subtitle": "每天新鲜绘制，基于孩子们喜欢的内容。<free>免费</free>，不发垃圾邮件，一键退订。",
+      "trustLine": "加入100+位家长",
+      "placeholder": "parent@example.com",
+      "join": "获取每日涂色页",
+      "success": "成功！",
+      "successDescription": "查看收件箱——你的第一张涂色页将于英国时间明天8:30送达。",
+      "error": "出了点问题",
+      "errorDescription": "加入邮件列表失败。请重试。"
+    },
+    "unsubscribe": {
+      "success": "已退订",
+      "successDescription": "你已从我们的邮件列表中移除。很遗憾看到你离开！",
+      "invalid": "链接无效",
+      "invalidDescription": "此退订链接无效或已过期。"
+    }
+  },
+  "billing": {
+    "pageTitle": "账单与订阅",
+    "pageSubtitle": "管理订阅并购买更多点数，持续创作精彩的涂色页。",
+    "currentPlan": "当前方案",
+    "currentCredits": "当前点数：{count}",
+    "renewsOn": "你的订阅将于 {date} 续订",
+    "manageSubscription": "管理订阅",
+    "noActiveSubscription": "暂无有效订阅",
+    "noSubscriptionDescription": "选择一个方案，开始创作精彩的涂色页。",
+    "viewPlans": "查看方案",
+    "buyMoreCredits": "购买更多点数",
+    "credits": "{count} 点数",
+    "buyNow": "立即购买",
+    "loading": "加载中…",
+    "availablePlans": "可选方案",
+    "changePlan": "更改方案",
+    "subscribe": "订阅",
+    "currentPlanBadge": "当前方案",
+    "manageInPortal": "在客户门户中管理你的订阅",
+    "noCommitment": "无合约限制，随时可取消。",
+    "perMonth": "/月",
+    "noSubscriptionForCredits": "需有有效订阅才能购买点数",
+    "noSubscriptionFound": "未找到有效订阅",
+    "failedToChangeSubscription": "更改订阅失败",
+    "failedToCheckout": "跳转至结账页失败",
+    "failedToPurchaseCredits": "购买点数失败",
+    "failedToOpenPortal": "打开客户门户失败"
+  },
+  "auth": {
+    "signIn": "登录",
+    "signUp": "注册",
+    "signOut": "退出登录",
+    "continueWithGoogle": "使用 Google 继续",
+    "continueWithApple": "使用 Apple 继续",
+    "continueWithFacebook": "使用 Facebook 继续",
+    "signInWithEmail": "使用邮箱登录",
+    "sendingLink": "正在发送链接…",
+    "chooseMethod": "选择你喜欢的登录方式",
+    "orContinueWith": "或继续使用",
+    "emailPlaceholder": "name@example.com",
+    "termsAgreement": "继续即表示你同意我们的<terms>服务条款</terms>和<privacy>隐私政策</privacy>。",
+    "verifyRequest": {
+      "title": "请查收你的邮箱！",
+      "description": "我们已向你发送魔法链接用于登录。点击邮件中的链接即可继续。",
+      "checkSpam": "没看到？请检查垃圾邮件文件夹。",
+      "linkExpiry": "链接将在 24 小时后失效。",
+      "tryDifferentEmail": "使用其他邮箱"
+    },
+    "error": {
+      "title": "出了点问题",
+      "tryAgain": "请重新尝试登录。如果问题仍然存在，请联系支持。",
+      "backToSignIn": "返回登录",
+      "goHome": "前往首页"
+    },
+    "errors": {
+      "configuration": "服务器配置有问题。请稍后再试。",
+      "accessDenied": "访问被拒绝。你没有登录权限。",
+      "verification": "登录链接已过期或已被使用。请重新获取一个。",
+      "oauth": "使用你的账号登录时出现问题。请重试。",
+      "email": "发送登录邮件时出现问题。请重试。",
+      "credentials": "凭证无效。请检查你的邮箱并重试。",
+      "sessionRequired": "请先登录以访问此页面。",
+      "default": "发生了意外错误。请重试。"
+    }
+  },
+  "errors": {
+    "generic": "出了点问题。请重试。",
+    "notFound": "页面未找到",
+    "sharedArtworkNotFound": {
+      "title": "未找到作品",
+      "description": "此分享作品链接可能已过期或被移除。请向作者索取新链接！",
+      "cta": "浏览涂色页"
+    },
+    "unauthorized": "请登录以继续",
+    "stripeLoadFailed": "Stripe 加载失败",
+    "checkoutFailed": "创建结账会话失败",
+    "unexpectedError": "发生意外错误。请重试。",
+    "redirectFailed": "跳转到结账失败"
+  },
+  "breadcrumbs": {
+    "home": "首页",
+    "gallery": "图库",
+    "daily": "每日涂色页",
+    "community": "社区涂色页",
+    "forToddlers": "幼儿专属",
+    "forKids": "儿童专属",
+    "forTeens": "青少年专属",
+    "forAdults": "成人专属",
+    "holidays": "节日与季节",
+    "ariaLabel": "面包屑导航"
+  },
+  "jumpToNav": {
+    "jumpToSection": "跳转到章节",
+    "backToTop": "返回顶部"
+  },
+  "time": {
+    "today": "今天",
+    "yesterday": "昨天",
+    "daysAgo": "{count} 天前",
+    "lastWeek": "上周",
+    "weeksAgo": "{count} 周前",
+    "monthsAgo": "{count} 个月前",
+    "justNow": "刚刚",
+    "minutesAgo": "{count} 分钟前",
+    "hoursAgo": "{count} 小时前"
+  },
+  "language": {
+    "switchLanguage": "切换语言",
+    "currentLanguage": "当前语言",
+    "selectLanguage": "选择语言",
+    "language": "语言",
+    "switchTo": "切换到"
+  },
+  "difficulty": {
+    "easy": "简单",
+    "medium": "中等",
+    "hard": "困难"
+  },
+  "gallery": {
+    "categoryNotFound": "未找到分类",
+    "difficultyNotFound": "未找到难度"
+  }
+}

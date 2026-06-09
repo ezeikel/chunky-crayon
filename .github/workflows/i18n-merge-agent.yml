@@ -1,0 +1,78 @@
+name: i18n Merge Agent
+
+# Autonomous, deterministic drain of the translation-review PR backlog.
+#
+# Why this exists: the producer (translation-review.yml) opens one PR per
+# (locale, source). Merging is intentionally NOT done there — the old in-workflow
+# `gh pr merge --auto` raced main (every call failed "Base branch was modified")
+# and, with no required status checks on main, --auto never actually merges. This
+# workflow is the SINGLE, SERIAL merger: it re-checks mergeability per PR, runs a
+# strict guardrail gate (the diff must be exactly one expected locale JSON, valid,
+# structurally identical to English, no reintroduced AI/em-dash regressions), gates
+# on the Vercel deploy checks being green, then squash-merges CLEAN PRs one at a
+# time (re-evaluating after each merge) and CLOSES conflicting ones (the next
+# producer run recreates them clean off main). It posts a summary each run and
+# pings a human only when something genuinely needs review.
+
+on:
+  schedule:
+    # Primary drain: Monday 10:00 UTC, one hour after the 09:00 review producer.
+    - cron: '0 10 * * 1'
+    # Daily safety-net so anything left conflicting / any new PR is re-attempted.
+    - cron: '0 10 * * *'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Report what it would do without merging/closing anything'
+        required: false
+        type: boolean
+        default: false
+
+# Only one drain at a time. A second run (e.g. dispatch overlapping the cron)
+# queues rather than racing — never cancel a merge mid-flight.
+concurrency:
+  group: i18n-merge-agent
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  drain:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Kill-switch check
+        id: killswitch
+        run: |
+          # Set repo variable MERGE_AGENT_PAUSED=true (Settings > Secrets and
+          # variables > Actions > Variables) to freeze the agent — e.g. an
+          # app-store launch window — without editing this workflow.
+          if [ "${{ vars.MERGE_AGENT_PAUSED }}" = "true" ]; then
+            echo "::notice::i18n-merge-agent is PAUSED (vars.MERGE_AGENT_PAUSED=true). Skipping."
+            echo "paused=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "paused=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout
+        if: steps.killswitch.outputs.paused != 'true'
+        uses: actions/checkout@v4
+        with:
+          # Need full history so we can flatten the EN source files for the
+          # structure check.
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        if: steps.killswitch.outputs.paused != 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run drain
+        if: steps.killswitch.outputs.paused != 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: node .github/scripts/i18n-merge-agent.mjs

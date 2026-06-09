@@ -80,6 +80,8 @@ export async function generateMetadata({
         de: 'https://chunkycrayon.com/de',
         fr: 'https://chunkycrayon.com/fr',
         es: 'https://chunkycrayon.com/es',
+        'zh-Hans': 'https://chunkycrayon.com/zh-Hans',
+        'zh-Hant': 'https://chunkycrayon.com/zh-Hant',
         'x-default': 'https://chunkycrayon.com/en',
       },
     },

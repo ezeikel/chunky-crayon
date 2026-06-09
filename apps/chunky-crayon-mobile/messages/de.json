@@ -1,1 +1,204 @@
-{}
+{
+  "mobile": {
+    "tabs": {
+      "home": "Start",
+      "create": "Erstellen",
+      "gallery": "Galerie",
+      "stickers": "Sticker",
+      "myArt": "Meine Kunstwerke",
+      "challenges": "Aufgaben",
+      "settings": "Einstellungen"
+    },
+    "button": {
+      "createColoringPage": "Ausmalbild erstellen",
+      "creating": "Wird erstellt...",
+      "tryAgain": "Nochmal versuchen",
+      "cancel": "Abbrechen"
+    },
+    "header": {
+      "forGrownUps": "Für Erwachsene",
+      "grownUps": "Erwachsene"
+    },
+    "characterBuilder": {
+      "step": {
+        "species": "Wähle deinen Freund",
+        "color": "Wähle eine Farbe",
+        "traits": "Wie ist er/sie so?",
+        "name": "Gib ihm/ihr einen Namen",
+        "voice": "Wähle eine Stimme"
+      },
+      "pickUpTo": "Wähle bis zu {{count}}",
+      "namePlaceholder": "Name eingeben",
+      "nameLabel": "Name der Figur",
+      "redo": "Neu machen",
+      "back": "Zurück",
+      "next": "Weiter",
+      "makeFriend": "Meinen Freund machen",
+      "creating": "Wird gezeichnet...",
+      "createError": "Etwas ist schiefgelaufen. Bitte versuch es noch einmal."
+    },
+    "challenges": {
+      "homeCardTitle": "Aufgaben",
+      "homeCardSubtitle": "Male aus, sammle Sticker und lass Colo wachsen!"
+    },
+    "characters": {
+      "loading": "Deine Freunde werden geladen...",
+      "emptyTitle": "Lass uns deinen ersten Freund machen!",
+      "emptySubtitle": "Wähle einen Namen und wie er aussieht – wir zeichnen ihn für dich. Er taucht in deinen Ausmalbildern auf.",
+      "makeFriend": "Freund machen",
+      "newCharacter": "Freund machen",
+      "addCharacter": "Hinzufügen",
+      "drawing": "{{name}} wird gezeichnet...",
+      "drawingBadge": "Zeichnen",
+      "tryAgain": "Tippe, um es noch mal zu versuchen",
+      "retryBadge": "Erneut",
+      "gettingReady": "Wird vorbereitet",
+      "fullHouse": "Du hast schon ein volles Haus (8 Freunde). Entferne einen, um Platz für jemanden neuen zu machen.",
+      "homeCardTitle": "Meine Figuren",
+      "homeCardSubtitle": "Mach Freunde, die in deinen Ausmalbildern mitspielen!",
+      "close": "Schließen",
+      "deleteTitle": "Diesen Freund entfernen?",
+      "deleteSubtitle": "Erwachsenen-Check, um eine Figur zu entfernen.",
+      "err": {
+        "unauthorized": "Bitte melde dich zuerst an.",
+        "noProfile": "Wähle zuerst ein Profil, bevor du einen Freund machst.",
+        "moderation": "Diesen Namen können wir nicht verwenden. Versuch einen anderen.",
+        "limit": "Du hast schon ein volles Haus. Entferne zuerst einen.",
+        "worker": "Beim Zeichnen deines Freundes ist etwas schiefgelaufen.",
+        "deleteFailed": "Dieser Freund konnte nicht entfernt werden. Bitte versuch es noch einmal.",
+        "generic": "Etwas ist schiefgelaufen. Bitte versuch es noch einmal."
+      },
+      "title": "Meine Figuren"
+    },
+    "gallery": {
+      "title": "Entdecken",
+      "subtitle": "Such dir etwas Lustiges zum Ausmalen aus"
+    },
+    "stickers": {
+      "title": "Sticker-Sammlung",
+      "collected": "{{unlocked}} / {{total}} gesammelt",
+      "loading": "Sticker werden geladen...",
+      "new": "NEU",
+      "hint": "Erledige Aufgaben, um mehr Sticker freizuschalten!",
+      "lockedTitle": "Gesperrter Sticker",
+      "unlockedDefault": "Du hast ihn freigeschaltet!",
+      "unlockHintDefault": "Male weiter, um diesen Sticker freizuschalten!",
+      "unlockedOn": "Freigeschaltet am {{date}}",
+      "progressGreatStart": "Toller Start!",
+      "progressHalfway": "Halb geschafft! Weiter so!",
+      "progressAlmost": "Fast geschafft! Du machst das super!",
+      "progressComplete": "Wahnsinn! Alle Sticker gesammelt!"
+    },
+    "myArtwork": {
+      "loading": "Deine Kunstwerke werden geladen...",
+      "keepColoring": "Weiter ausmalen",
+      "inProgress": "In Arbeit",
+      "savedCount": "{{count}} gespeichertes Kunstwerk",
+      "savedCount_other": "{{count}} gespeicherte Kunstwerke",
+      "emptyTitle": "Deine gespeicherten Kunstwerke",
+      "emptySubtitle": "Deine Lieblingswerke erscheinen hier. Fang an zu malen und speichere deine Meisterwerke!",
+      "emptyTip": "Tippe beim Ausmalen auf das Herz, um zu speichern"
+    },
+    "upsideDownHint": {
+      "title": "Dreh mich um!",
+      "subtitle": "Dreh dein Handy richtig herum, um weiter auszumalen."
+    },
+    "create": {
+      "greeting": "Was möchtest du heute ausmalen?",
+      "subtitle": "Wähle einen Start!"
+    }
+  },
+  "createForm": {
+    "scene": {
+      "ariaLabel": "Bau dein Bild",
+      "surpriseMe": "Überrasch mich!",
+      "back": "Zurück",
+      "next": "Weiter",
+      "create": "Los!",
+      "extrasTitle": "Extras",
+      "skip": "Überspringen",
+      "subjectTitle": "Wer?",
+      "subjectAddCharacter": "Figur hinzufügen",
+      "friendsTitle": "Deine Freunde",
+      "subjectGroupTitle": "oder wähle eins",
+      "lockedMakeCharacter": "(erst eine Figur erstellen)",
+      "locationTitle": "Wo?",
+      "weatherTitle": "Wetter",
+      "activityTitle": "Was machen?",
+      "accentTitle": "Extras",
+      "subject": {
+        "horse": "Pferd",
+        "cow": "Kuh",
+        "sheep": "Schaf",
+        "dog": "Hund",
+        "cat": "Katze",
+        "fox": "Fuchs",
+        "lion": "Löwe",
+        "fish": "Fisch",
+        "dragon": "Drache",
+        "bird": "Vogel",
+        "kid": "Kind",
+        "astronaut": "Astronaut"
+      },
+      "location": {
+        "beach": "Strand",
+        "sea": "Auf See",
+        "football-game": "Fußball",
+        "busy-street": "Belebte Straße",
+        "shopping-mall": "Einkaufszentrum",
+        "desert-island": "Insel",
+        "forest": "Wald",
+        "mountains": "Berge",
+        "train-station": "Bahnhof"
+      },
+      "weather": {
+        "sunny": "Sonnig",
+        "snowy": "Verschneit",
+        "rainy": "Regnerisch",
+        "night": "Nacht",
+        "rainbow": "Regenbogen",
+        "cloudy": "Bewölkt"
+      },
+      "activity": {
+        "playing": "Spielen",
+        "sleeping": "Schlafen",
+        "running": "Rennen",
+        "swimming": "Schwimmen",
+        "flying-a-kite": "Drachen steigen",
+        "riding-a-bike": "Radfahren",
+        "having-a-picnic": "Picknick",
+        "dancing": "Tanzen"
+      },
+      "accent": {
+        "birthday": "Geburtstag",
+        "sparkles": "Glitzer",
+        "underwater-bubbles": "Blubberblasen",
+        "flowers": "Blumen",
+        "space-stars": "Sterne",
+        "balloons": "Luftballons"
+      }
+    },
+    "voice": {
+      "tapToChat": "Tippen zum Sprechen",
+      "listen": "Hör zu…",
+      "listening": "Ich höre zu…",
+      "anythingElse": "Noch etwas?",
+      "thinking": "Hmm, lass mich kurz nachdenken…",
+      "painting": "Male deine Seite…",
+      "doneTalking": "Fertig gesprochen",
+      "imDone": "Ich bin fertig",
+      "cancel": "Abbrechen",
+      "tryAgain": "Nochmal",
+      "startLabel": "Sprachchat starten",
+      "stopLabel": "Aufnahme stoppen",
+      "errorPermissionDenied": "Ich brauche die Erlaubnis, dein Mikrofon zu nutzen.",
+      "errorQ1AudioFailed": "Die Frage konnte nicht abgespielt werden. Nochmal?",
+      "errorSttFailed": "Ich konnte dich nicht gut hören. Versuchen wir es nochmal.",
+      "errorFollowUpFailed": "Etwas ist schiefgelaufen. Nochmal?",
+      "errorFollowUpBlocked": "Probieren wir eine andere Idee!",
+      "errorQ2AudioFailed": "Die Frage konnte nicht abgespielt werden. Nochmal?",
+      "errorTimeout": "Hat zu lange gedauert! Starten wir neu.",
+      "errorRequiresSignin": "Melde dich an, um den Sprachmodus zu nutzen."
+    }
+  }
+}

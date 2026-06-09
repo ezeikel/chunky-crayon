@@ -5,6 +5,10 @@ import koTranslations from "./ko.json";
 import deTranslations from "./de.json";
 import frTranslations from "./fr.json";
 import esTranslations from "./es.json";
+// zh-Hans / zh-Hant import bindings are camelCased — the file paths and the
+// locale keys keep the hyphenated BCP-47 script subtag.
+import zhHansTranslations from "./zh-Hans.json";
+import zhHantTranslations from "./zh-Hant.json";
 
 // AI-generated translations for all supported locales
 export const translations = {
@@ -14,9 +18,20 @@ export const translations = {
   de: deTranslations,
   fr: frTranslations,
   es: esTranslations,
+  "zh-Hans": zhHansTranslations,
+  "zh-Hant": zhHantTranslations,
 } as const;
 
-export const supportedLocales = ["en", "ja", "ko", "de", "fr", "es"] as const;
+export const supportedLocales = [
+  "en",
+  "ja",
+  "ko",
+  "de",
+  "fr",
+  "es",
+  "zh-Hans",
+  "zh-Hant",
+] as const;
 export type SupportedLocale = (typeof supportedLocales)[number];
 
 // Export individual translations for direct import
@@ -26,6 +41,8 @@ export const ko = koTranslations;
 export const de = deTranslations;
 export const fr = frTranslations;
 export const es = esTranslations;
+export const zhHans = zhHansTranslations;
+export const zhHant = zhHantTranslations;
 
 // Type definitions for better TypeScript support
 export type Messages = typeof enTranslations;

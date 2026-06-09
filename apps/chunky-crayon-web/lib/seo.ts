@@ -1,5 +1,14 @@
 const BASE_URL = 'https://chunkycrayon.com';
-const LOCALES = ['en', 'ja', 'ko', 'de', 'fr', 'es'] as const;
+const LOCALES = [
+  'en',
+  'ja',
+  'ko',
+  'de',
+  'fr',
+  'es',
+  'zh-Hans',
+  'zh-Hant',
+] as const;
 
 /**
  * Generate alternates object for Next.js metadata with canonical and hreflang tags.
@@ -14,6 +23,8 @@ export function generateAlternates(locale: string, pagePath: string) {
       de: `${BASE_URL}/de${pagePath}`,
       fr: `${BASE_URL}/fr${pagePath}`,
       es: `${BASE_URL}/es${pagePath}`,
+      'zh-Hans': `${BASE_URL}/zh-Hans${pagePath}`,
+      'zh-Hant': `${BASE_URL}/zh-Hant${pagePath}`,
       'x-default': `${BASE_URL}/en${pagePath}`,
     },
   };

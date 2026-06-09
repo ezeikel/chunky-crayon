@@ -54,7 +54,7 @@ const REPO_ROOT = path.join(__dirname, "..", "..", "..");
 // Translation sources
 // ============================================================================
 
-type SourceId = "shared" | "cc" | "ch";
+type SourceId = "shared" | "cc" | "ch" | "cm";
 
 interface TranslationSource {
   id: SourceId;
@@ -95,6 +95,16 @@ const SOURCES: TranslationSource[] = [
       'Brand: Coloring Habitat — a mindful coloring app for adults focused on relaxation, wellness, and creative calm. The brand name "Coloring Habitat" should NOT be translated.',
     toneGuidance:
       "Calm, grounded, and warm. Wellness-focused without being woo-woo. The audience colors for stress relief, mindfulness, and creative expression. Think 'trusted friend who knows about art therapy' — never childish, never clinical.",
+  },
+  {
+    id: "cm",
+    name: "Chunky Crayon Mobile",
+    dir: path.join(REPO_ROOT, "apps", "chunky-crayon-mobile", "messages"),
+    tone: "kids",
+    brandContext:
+      'Brand: Chunky Crayon mobile app (iOS/Android) — a creative coloring app for children aged 3-8 and families. The brand name "Chunky Crayon" should NOT be translated.',
+    toneGuidance:
+      "Friendly, playful, encouraging, and magical — the same warm voice as Chunky Crayon web, but mobile-first: copy appears on small touch screens, in tab bars, sheets, and native buttons, so keep it tight (aim shorter than web; many labels must fit a tab or a thumb-sized button). Think 'favourite storybook voice', child-safe and delightful without being condescending.",
   },
 ];
 

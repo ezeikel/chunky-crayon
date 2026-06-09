@@ -1,1 +1,204 @@
-{}
+{
+  "mobile": {
+    "tabs": {
+      "home": "ホーム",
+      "create": "つくる",
+      "gallery": "ギャラリー",
+      "stickers": "シール",
+      "myArt": "マイアート",
+      "challenges": "チャレンジ",
+      "settings": "設定"
+    },
+    "button": {
+      "createColoringPage": "ぬりえをつくる",
+      "creating": "つくっています…",
+      "tryAgain": "もう一度",
+      "cancel": "キャンセル"
+    },
+    "header": {
+      "forGrownUps": "保護者の方へ",
+      "grownUps": "保護者の方"
+    },
+    "characterBuilder": {
+      "step": {
+        "species": "おともだちをえらぼう",
+        "color": "いろをえらぼう",
+        "traits": "どんな子にする？",
+        "name": "なまえをつけよう",
+        "voice": "こえをえらぼう"
+      },
+      "pickUpTo": "最大{{count}}つまで",
+      "namePlaceholder": "なまえをいれてね",
+      "nameLabel": "キャラクターのなまえ",
+      "redo": "やりなおす",
+      "back": "もどる",
+      "next": "つぎへ",
+      "makeFriend": "おともだちをつくる",
+      "creating": "かいています…",
+      "createError": "うまくいかなかったよ。もう一度ためしてね。"
+    },
+    "challenges": {
+      "homeCardTitle": "チャレンジ",
+      "homeCardSubtitle": "ぬってシールをゲット！Coloもそだつよ！"
+    },
+    "characters": {
+      "loading": "おともだちをよみこみ中…",
+      "emptyTitle": "はじめてのおともだちをつくろう！",
+      "emptySubtitle": "なまえと見た目をえらぶと、こちらでかいてあげるよ。ぬりえにも登場するよ。",
+      "makeFriend": "おともだちをつくる",
+      "newCharacter": "おともだちをつくる",
+      "addCharacter": "追加",
+      "drawing": "{{name}}をかいています…",
+      "drawingBadge": "おえかき中",
+      "tryAgain": "タップでもう一度",
+      "retryBadge": "再トライ",
+      "gettingReady": "じゅんび中",
+      "fullHouse": "おともだちがいっぱいだよ（8人）。新しくつくるには、だれかを外してね。",
+      "homeCardTitle": "マイキャラクター",
+      "homeCardSubtitle": "おともだちをつくって、ぬりえに登場させよう！",
+      "close": "閉じる",
+      "deleteTitle": "このおともだちを外す？",
+      "deleteSubtitle": "キャラクターを外すには、保護者の確認が必要です。",
+      "err": {
+        "unauthorized": "先にサインインしてね。",
+        "noProfile": "おともだちをつくる前にプロフィールをえらんでね。",
+        "moderation": "そのなまえは使えないよ。別のなまえにしてね。",
+        "limit": "おともだちがいっぱいだよ。先に1人外してね。",
+        "worker": "おともだちをかくのに失敗しちゃった。",
+        "deleteFailed": "おともだちを外せなかったよ。もう一度ためしてね。",
+        "generic": "うまくいかなかったよ。もう一度ためしてね。"
+      },
+      "title": "マイキャラクター"
+    },
+    "gallery": {
+      "title": "さがす",
+      "subtitle": "たのしいぬりえをえらぼう"
+    },
+    "stickers": {
+      "title": "シールコレクション",
+      "collected": "{{unlocked}} / {{total}} あつめたよ",
+      "loading": "シールをよみこみ中…",
+      "new": "NEW",
+      "hint": "チャレンジをクリアして、もっとシールをあつめよう！",
+      "lockedTitle": "ロック中のシール",
+      "unlockedDefault": "ゲットしたよ！",
+      "unlockHintDefault": "ぬりつづけて、このシールをゲットしよう！",
+      "unlockedOn": "{{date}}にゲット",
+      "progressGreatStart": "いいスタート！",
+      "progressHalfway": "半分まできたよ！その調子！",
+      "progressAlmost": "もうすぐ！がんばってるね！",
+      "progressComplete": "すごい！全部のシールをゲット！"
+    },
+    "myArtwork": {
+      "loading": "作品をよみこみ中…",
+      "keepColoring": "ぬりつづける",
+      "inProgress": "作成中",
+      "savedCount": "保存した作品 {{count}}件",
+      "savedCount_other": "保存した作品 {{count}}件",
+      "emptyTitle": "保存した作品",
+      "emptySubtitle": "お気に入りの作品がここに表示されるよ。ぬって、すてきな作品を保存しよう！",
+      "emptyTip": "ぬりえ中にハートをタップで保存"
+    },
+    "upsideDownHint": {
+      "title": "くるっと回して！",
+      "subtitle": "スマホを正しい向きにすると、ぬりえを続けられるよ。"
+    },
+    "create": {
+      "greeting": "今日はなにをぬりたい？",
+      "subtitle": "はじめかたをえらぼう！"
+    }
+  },
+  "createForm": {
+    "scene": {
+      "ariaLabel": "えをつくろう",
+      "surpriseMe": "おまかせ！",
+      "back": "もどる",
+      "next": "つぎへ",
+      "create": "つくる！",
+      "extrasTitle": "おまけ",
+      "skip": "スキップ",
+      "subjectTitle": "だれ？",
+      "subjectAddCharacter": "キャラを追加",
+      "friendsTitle": "おともだち",
+      "subjectGroupTitle": "または、えらぶ",
+      "lockedMakeCharacter": "（まずキャラをつくってね）",
+      "locationTitle": "どこ？",
+      "weatherTitle": "おてんき",
+      "activityTitle": "なにしてる？",
+      "accentTitle": "おまけ",
+      "subject": {
+        "horse": "うま",
+        "cow": "うし",
+        "sheep": "ひつじ",
+        "dog": "いぬ",
+        "cat": "ねこ",
+        "fox": "きつね",
+        "lion": "ライオン",
+        "fish": "さかな",
+        "dragon": "ドラゴン",
+        "bird": "とり",
+        "kid": "こども",
+        "astronaut": "うちゅうひこうし"
+      },
+      "location": {
+        "beach": "ビーチ",
+        "sea": "うみのうえ",
+        "football-game": "サッカー",
+        "busy-street": "にぎやかなまち",
+        "shopping-mall": "モール",
+        "desert-island": "しま",
+        "forest": "もり",
+        "mountains": "やま",
+        "train-station": "えき"
+      },
+      "weather": {
+        "sunny": "はれ",
+        "snowy": "ゆき",
+        "rainy": "あめ",
+        "night": "よる",
+        "rainbow": "にじ",
+        "cloudy": "くもり"
+      },
+      "activity": {
+        "playing": "あそぶ",
+        "sleeping": "ねる",
+        "running": "はしる",
+        "swimming": "およぐ",
+        "flying-a-kite": "たこあげ",
+        "riding-a-bike": "じてんしゃ",
+        "having-a-picnic": "ピクニック",
+        "dancing": "ダンス"
+      },
+      "accent": {
+        "birthday": "たんじょうび",
+        "sparkles": "キラキラ",
+        "underwater-bubbles": "あわ",
+        "flowers": "おはな",
+        "space-stars": "ほし",
+        "balloons": "ふうせん"
+      }
+    },
+    "voice": {
+      "tapToChat": "タップしておしゃべり",
+      "listen": "きいてね…",
+      "listening": "きいてるよ…",
+      "anythingElse": "ほかにもある？",
+      "thinking": "うーん、かんがえるね…",
+      "painting": "ぬりえをつくってるよ…",
+      "doneTalking": "おしゃべりおわり",
+      "imDone": "おわり",
+      "cancel": "キャンセル",
+      "tryAgain": "もういちど",
+      "startLabel": "おんせいでおしゃべりをはじめる",
+      "stopLabel": "ろくおんをとめる",
+      "errorPermissionDenied": "マイクをつかうきょかがひつようです。",
+      "errorQ1AudioFailed": "しつもんをさいせいできなかったよ。もういちど？",
+      "errorSttFailed": "うまくきこえなかったよ。もういちどやってみよう。",
+      "errorFollowUpFailed": "うまくいかなかったよ。もういちど？",
+      "errorFollowUpBlocked": "ちがうアイデアにしてみよう！",
+      "errorQ2AudioFailed": "しつもんをさいせいできなかったよ。もういちど？",
+      "errorTimeout": "じかんがかかりすぎたよ！さいしょからやりなおそう。",
+      "errorRequiresSignin": "おんせいモードをつかうにはログインしてね。"
+    }
+  }
+}

@@ -1,0 +1,1547 @@
+{
+  "coloLoading": {
+    "title": "正在畫出你的頁面…",
+    "titleSpeaking": "Colo 有話要說",
+    "coloSpeaking": "聽聽看，Colo 在說話！",
+    "audioStates": {
+      "idle": "準備中…",
+      "preparing": "Colo 正在準備…",
+      "done": "正在畫出你的圖…"
+    },
+    "messages": {
+      "sharpeningCrayons": "正在削蠟筆…",
+      "mixingColors": "正在調出新顏色…",
+      "drawingLines": "正在畫出外框線…",
+      "addingSparkles": "偷偷加點亮晶晶…",
+      "almostThere": "正在做最後點綴…",
+      "creatingMasterpiece": "正在調整到剛剛好…",
+      "wavingWand": "正在確認一切都很棒…",
+      "coloringOutsideLines": "努力不畫出線外…"
+    },
+    "pageLoading": "正在幫你準備蠟筆！",
+    "partialAppearing": "看！你的頁面出現啦！"
+  },
+  "colo": {
+    "dashboard": {
+      "greeting": "今天想塗什麼呢？",
+      "wantsToGrow": "{stageName} 想長大！再儲存 {count} 幅作品就能進化！",
+      "proudOfYou": "你的 {stageName} 以你為榮！"
+    },
+    "indicator": {
+      "next": "下一階段：{stageName}",
+      "saveToEvolve": "再儲存 {count} 幅作品就能進化！",
+      "readyToGrow": "準備長大囉！",
+      "maxStage": "你已到達最高階段！",
+      "accessories": "配件（{count}）"
+    },
+    "avatar": {
+      "tapMe": "點我！",
+      "artworks": "作品",
+      "maxStage": "完成囉！"
+    },
+    "stages": {
+      "1": {
+        "name": "寶寶 Colo",
+        "description": "剛開始塗色冒險！"
+      },
+      "2": {
+        "name": "小小 Colo",
+        "description": "每一幅作品都讓 Colo 變得更大！"
+      },
+      "3": {
+        "name": "成長中的 Colo",
+        "description": "看看 Colo 長大了多少！"
+      },
+      "4": {
+        "name": "開心 Colo",
+        "description": "看到這麼多漂亮作品，超開心！"
+      },
+      "5": {
+        "name": "小小藝術家 Colo",
+        "description": "真正的藝術家正在誕生！"
+      },
+      "6": {
+        "name": "大師 Colo",
+        "description": "最厲害的塗色大師！"
+      }
+    }
+  },
+  "footer": {
+    "brand": "Chunky Crayon",
+    "tagline": "做夢・創作・上色。",
+    "aboutText": "讓想像力活起來！把天馬行空的點子變成魔法著色頁。",
+    "madeBy": "用 <heart>♡</heart> 在 <location>倫敦南區</location> 製作",
+    "copyright": "© {year} Chunky Crayon。保留一切權利。",
+    "newsletter": {
+      "title": "每天一張免費著色頁",
+      "subtitle": "加入我們，每天早上收件匣都有全新的著色頁。"
+    },
+    "sections": {
+      "about": "關於我們",
+      "connect": "聯絡我們",
+      "getTheApp": "下載 App",
+      "support": "支援",
+      "freeTools": "免費工具"
+    },
+    "links": {
+      "privacyPolicy": "隱私權政策",
+      "termsOfService": "服務條款",
+      "colorAsYouGo": "走到哪畫到哪"
+    },
+    "freeTools": {
+      "allTools": "所有工具",
+      "nameColoringPages": "名字著色頁",
+      "rewardChartMaker": "獎勵表製作器",
+      "birthdayInviteMaker": "生日邀請卡製作器",
+      "abcTracingWorksheets": "ABC 描寫練習單",
+      "seasonalColoringPacks": "季節著色包",
+      "forTeachers": "給老師"
+    },
+    "appStore": {
+      "downloadOnAppStore": "在 App Store 下載",
+      "getOnGooglePlay": "到 Google Play 下載",
+      "comingSoon": "即將推出！",
+      "iosComingSoon": "iOS App 正在路上，敬請期待！",
+      "androidComingSoon": "Android App 正在路上，敬請期待！"
+    }
+  },
+  "homepage": {
+    "pricing": {
+      "title": "免費試用。方案每月 {price} 起。",
+      "body": "先送 2 次免費生成，免帳號。選個適合全家的訂閱，或買點數包，想畫就畫。",
+      "cta": "查看所有方案"
+    },
+    "heroEyebrow": "第一款能照你要求出題的著色 App。",
+    "heroTitle": "別再在下午 5 點狂搜「恐龍著色圖」了。",
+    "heroTitlePrefix": "別再狂搜",
+    "heroTitleSuffix": "著色圖」了（下午 5 點）。",
+    "heroSubtitle": "孩子說出想要的畫面，你大約 2 分鐘就能拿到可列印的著色圖。可列印，也可在 App 裡上色。先送 2 張免費試玩，免帳號。",
+    "heroThumbCaption": "就像這張一樣 →",
+    "experiments": {
+      "landingHero": {
+        "outcome": "想安靜 20 分鐘？一張著色圖就搞定。",
+        "empathy": "「我好無聊」遇到對手了。"
+      }
+    },
+    "heroCta": "做一張給他們",
+    "cta": "開始創作",
+    "stats": {
+      "coloringPagesCreated": "已製作著色圖",
+      "dailyPages": "每日圖",
+      "freeLibraryPages": "免費圖庫"
+    },
+    "galleryPreview": {
+      "freeColoringPages": "免費著色圖",
+      "exploreGallery": "逛逛圖庫",
+      "todaysDailyPage": "今日每日圖",
+      "latestDailyPage": "最新每日圖",
+      "seeAll": "看全部",
+      "communityPages": "社群作品",
+      "colorNow": "立刻上色",
+      "browseCategories": "瀏覽分類",
+      "viewAll": "查看全部",
+      "dailyColoringPageAlt": "每日著色圖",
+      "coloringPageAlt": "著色圖"
+    },
+    "recentCreations": {
+      "title": "你最近的作品",
+      "ctaHighlight": "免費開始",
+      "ctaText": "把作品永久保存，還能解鎖更多！",
+      "ctaButton": "免費開始"
+    },
+    "demo": {
+      "title": "看著色圖誕生的過程。",
+      "body": "孩子說，我們畫。從描述到可列印，大約 2 分鐘，每次都行。",
+      "idleLabel": "按播放，看著色圖如何被畫出來。",
+      "drawingLabel": "正在畫出場景",
+      "drawingSubLabel": "稍等一下，這需要一點時間。",
+      "playLabel": "播放示範",
+      "pauseLabel": "暫停"
+    },
+    "unleashWords": {
+      "creativity": "創意",
+      "imagination": "想像力",
+      "fun": "樂趣",
+      "adventure": "冒險",
+      "discovery": "發現",
+      "exploration": "探索",
+      "inspiration": "靈感",
+      "art": "藝術",
+      "joy": "喜悅",
+      "learning": "學習",
+      "wonder": "驚奇",
+      "dreams": "夢想",
+      "playtime": "玩樂時光",
+      "innovation": "新點子",
+      "magic": "魔法",
+      "curiosity": "好奇心",
+      "expression": "表達",
+      "fantasy": "奇幻",
+      "stories": "故事",
+      "excitement": "興奮"
+    },
+    "testimonials": {
+      "title": "深受各地家庭喜愛",
+      "fromReviews": "來自 {count} 則評價",
+      "items": {
+        "1": {
+          "name": "Sophie Bennett",
+          "role": "Maisie 的媽媽（4 歲）",
+          "location": "英國 布里斯托",
+          "quote": "Maisie 還不會看字或打字，但她會說話。她拿著手機說：「一個茶杯裡的美人魚，旁邊有一隻貓。」結果圖就出現了。第一次看到時她驚呼：「等等，它有聽到我嗎？」我們兩個笑了十分鐘。"
+        },
+        "2": {
+          "name": "Marcus Reed",
+          "role": "三寶爸",
+          "location": "美國 德州奧斯汀",
+          "quote": "我家老二很愛塗鴉。我拍了他畫的「狗狗 Jeff」亂線圖，App 竟然把它變成一張真正能上色的著色圖。他從那之後一直用 FaceTime 逢人就秀，對他來說真的像魔法一樣。"
+        },
+        "3": {
+          "name": "Hannah Whitfield",
+          "role": "二寶媽",
+          "location": "英國 里茲",
+          "quote": "我們試了幾次才摸清楚怎麼描述，才能畫出她腦中的樣子。「一隻龍」只得到很普通的龍；但「一隻粉紅色的小龍在叢林裡，從亮晶晶的蛋裡孵出來」就正是她想要的。懂了就懂了。"
+        },
+        "4": {
+          "name": "Rachel Doyle",
+          "role": "幼兒園小班老師",
+          "location": "英國 曼徹斯特",
+          "quote": "我們在做海底主題週，我替每個孩子都印了他們指定的海洋生物。Theo 想要「戴墨鏡的鯊魚」，他真的拿到一隻，還抱著那張紙不放。省下我好多去免費列印網站翻找的時間。"
+        },
+        "5": {
+          "name": "Brian Coletti",
+          "role": "Nora 的爸爸（6 歲）",
+          "location": "美國 奧勒岡州波特蘭",
+          "quote": "感恩節出門前，我先用手機試試看：不用帳號、不用卡，就先看看。做了兩張，在機場飯店印出來，整趟飛行都讓 Nora 忙得很開心。回家我就訂閱了。"
+        },
+        "6": {
+          "name": "Megan Russo",
+          "role": "雙胞胎媽媽（4 歲）",
+          "location": "美國 科羅拉多州丹佛",
+          "quote": "很喜歡，但等待時間…兩分鐘對大人是兩分鐘，對想要「現在就要恐龍」的 4 歲小孩根本不是。我們現在都在他們還在上一張色的時候先下單下一張，這樣就順了。其他都很棒。"
+        },
+        "7": {
+          "name": "Priya Shah",
+          "role": "保母",
+          "location": "英國 伯明翰",
+          "quote": "我照顧 5 個孩子，3 到 7 歲。以前大家都印同一張恐龍圖，常常有人哭。現在每個孩子都能拿到畫著他真正迷戀的東西（Aiden 的挖土機、Zara 的獨角獸、Ben 的 Bluey）。真的救了我一命。"
+        },
+        "8": {
+          "name": "Tom Whitaker",
+          "role": "Iris 的爸爸（3 歲）",
+          "location": "英國 雪菲爾",
+          "quote": "我們主要是印出來上色，不太在 App 裡塗。Iris 用小手在手機螢幕上真的很難，就算 iPad 對她也有點太細。印出來就很棒，線條清楚、尺寸也夠大，真的能好好上色。"
+        }
+      }
+    },
+    "faq": {
+      "title": "常見問題",
+      "subtitle": "關於用 Chunky Crayon 做出魔法著色圖，你需要知道的一切",
+      "items": {
+        "1": {
+          "question": "Chunky Crayon 是什麼？",
+          "answer": "Chunky Crayon 是為孩子與家庭打造的魔法著色圖製作工具。只要說明你想畫什麼——像「在辦茶會的龍」或「我最喜歡的超級英雄在月亮上」——我們就能在幾秒內做出獨一無二、可列印的著色圖。雨天、安靜時間，或想點亮孩子想像力時都超適合！"
+        },
+        "2": {
+          "question": "對孩子安全、內容合適嗎？",
+          "answer": "當然。Chunky Crayon 由爸媽打造、給爸媽安心使用。我們畫的每一張都適合孩子、符合年齡，讓不同年齡都能玩得健康又開心。"
+        },
+        "3": {
+          "question": "要怎麼做一張著色圖？",
+          "answer": "簡單 1-2-3：輸入你想上色的內容（例如「魔法森林裡的獨角獸」），點「生成」，等約 2 分鐘。著色圖就能下載列印。也可以用語音輸入，或上傳照片找靈感。"
+        },
+        "4": {
+          "question": "做一張圖要多久？",
+          "answer": "大多數著色圖約 2 分鐘就完成。等待時，我們的可愛吉祥物 Colo 會陪你打發時間。細節很多、場景很複雜時可能會久一點。"
+        },
+        "5": {
+          "question": "可以列印著色圖嗎？",
+          "answer": "可以！你做的每一張都能下載高畫質 PDF，在家列印超方便。版面為 A4 最佳化，用蠟筆、色鉛筆或彩色筆都很好看。"
+        },
+        "6": {
+          "question": "如果孩子的要求做不出來怎麼辦？",
+          "answer": "有時第一次不太到位也正常，這就是創作冒險的一部分。換幾個詞再試一次。小撇步：把想要的重點說清楚、場景描述更具體。如果卡住了，試試語音輸入——孩子用說的常常更會講！"
+        },
+        "7": {
+          "question": "Chunky Crayon 可以免費用嗎？",
+          "answer": "可以先用 2 次免費生成試玩——免帳號！之後可註冊免費帳號再拿 15 點加碼點數，或選擇我們實惠的訂閱方案，享受不限量的創作樂趣。"
+        },
+        "8": {
+          "question": "訂閱方案包含什麼？",
+          "answer": "方案從 Splash（最多約 2 個孩子最適合）到 Sparkle（最多約 10 個孩子最適合）。所有方案包含：著色圖生成、高畫質 PDF 下載、語音與照片輸入模式、每個孩子獨立檔案，以及我們新增功能時的優先使用權。更高級方案還包含點數結轉與商用權利。還不想訂閱？可選「邊玩邊買」，依需求購買點數包就好。"
+        },
+        "9": {
+          "question": "可以用在教室或托兒所嗎？",
+          "answer": "可以！老師和保母都很愛 Chunky Crayon。Splash 和 Rainbow 方案很適合個人與教育使用。如果你是商業用途或想要對外發放著色圖，請看看含商業授權的 Sparkle 方案。"
+        },
+        "10": {
+          "question": "點數怎麼計算？",
+          "answer": "大多數著色圖（輸入文字或上傳照片）每張需要 5 點。語音模式（你會和 Chunky Crayon 簡短聊一下）每張需要 10 點。訂閱方案每月會補點，高級方案可把未用點數結轉。不要訂閱也沒關係：選「邊玩邊買」，購買點數包，按使用量付費。"
+        }
+      }
+    }
+  },
+  "start": {
+    "eyebrow": "第一款能照你的點子做的著色 app。",
+    "cta": "免費試用",
+    "ctaSubtext": "2 張免費圖。不用註冊。",
+    "tryColoring": "先來塗這張",
+    "dragForTools": "拖曳叫出工具",
+    "experiments": {
+      "startCta": {
+        "urgency": "今天送 2 張免費圖，不用卡、沒套路。",
+        "proof": "200+ 位家長一起用。先送 2 張免費圖。"
+      }
+    },
+    "hero": {
+      "trex": {
+        "title": "「媽媽，我可以塗一隻踩滑板的 T-rex 嗎？」",
+        "subtitle": "可以，真的。孩子描述畫面，你大約 2 分鐘就拿到可列印的著色頁。印出來，或在 app 裡塗色都行。"
+      },
+      "foxes": {
+        "title": "螢幕時間，也能像蠟筆一樣可愛。",
+        "subtitle": "下午 5 點救援搞定。印一張放桌上，或把手機交給他們。同一張圖，零愧疚。"
+      },
+      "dragon": {
+        "title": "從「龍的下午茶派對」到真的著色頁。",
+        "subtitle": "孩子描述任何畫面，我們把它畫成著色頁。印出來，或在 app 裡塗色。每一張都是他們真的想塗的。"
+      },
+      "default": {
+        "title": "孩子說出來，我們畫成著色頁。",
+        "subtitle": "T-rex 太空人。龍的下午茶派對。狐狸家族野餐。不管他們怎麼想像，大約 2 分鐘就能列印。"
+      }
+    },
+    "problem": {
+      "title": "下午 5 點「我好無聊」救援。",
+      "body": "你累了。他們想要蠟筆。你想要安靜。但上週印的恐龍那張，已經塗第三次了。Chunky Crayon 會把孩子描述的任何畫面，約 2 分鐘變成一張全新的著色頁。"
+    },
+    "howItWorks": {
+      "title": "怎麼用",
+      "steps": {
+        "describe": {
+          "title": "他們描述畫面",
+          "body": "說出來、打字，或拍張照片。把腦中的畫面交給我們。"
+        },
+        "draw": {
+          "title": "我們畫出著色頁",
+          "body": "從描述到可列印，大約 2 分鐘。"
+        },
+        "color": {
+          "title": "印出來或在 app 裡塗色",
+          "body": "桌上拿蠟筆、手機用手指。你決定。"
+        }
+      }
+    },
+    "demo": {
+      "title": "看著色頁怎麼做出來。",
+      "body": "孩子說出來，我們畫出來。每次都能在約 2 分鐘內，從描述變成可列印。",
+      "idleLabel": "按播放，看看著色頁怎麼被畫出來。",
+      "drawingLabel": "正在畫畫面",
+      "drawingSubLabel": "稍等一下，這需要一點時間。",
+      "playLabel": "播放示範",
+      "pauseLabel": "暫停"
+    },
+    "features": {
+      "title": "一個 app 全包。",
+      "items": {
+        "unlimited": {
+          "title": "任何場景、任何主題",
+          "body": "恐龍太空人。獨角獸牙醫。兄弟姊妹在太空。只要說得出來，我們就畫得出來。"
+        },
+        "family": {
+          "title": "一個訂閱，每個孩子都能用",
+          "body": "同一個方案可為每個孩子建立獨立檔案。他們的著色頁、貼紙和獎勵都各自保存。Sparkle 最多可建 10 個檔案。"
+        },
+        "print": {
+          "title": "可列印，也可直接螢幕塗色",
+          "body": "每張著色頁都有乾淨的 PDF，還有可互動的畫布。依情境選最適合的方式。"
+        }
+      }
+    },
+    "pricing": {
+      "title": "免費試用。方案每月 {price} 起。",
+      "body": "先送 2 次免費產生，不用註冊。喜歡再選訂閱，從偶爾塗到天天用都行；也可買點數包，想塗就塗。",
+      "cta": "查看所有方案"
+    },
+    "finalCta": {
+      "title": "只差一張著色頁，就有 20 分鐘安靜。",
+      "body": "輸入一個畫面，我們就畫給你。試用不用註冊。"
+    }
+  },
+  "gallery": {
+    "pageTitle": "免費著色頁圖庫 - Chunky Crayon",
+    "pageDescription": "瀏覽我們免費的可列印著色頁收藏。動物、龍、獨角獸、公主等通通有！每天都有新頁面！",
+    "heroTitle": "免費著色頁",
+    "heroSubtitle": "探索上千張免費可列印著色頁。從可愛動物到魔法巨龍，找到最適合線上塗色或在家列印的那一張。",
+    "browseByCategory": "依類別瀏覽",
+    "browseByDifficulty": "依難度瀏覽",
+    "browseByAge": "依年齡層瀏覽",
+    "dailyPage": "今日每日著色頁",
+    "viewAllDaily": "查看所有每日頁",
+    "communityCreations": "社群作品",
+    "viewAllCommunity": "看更多",
+    "communitySubtitle": "來自社群的著色頁。每天都有新靈感。",
+    "browseAllCommunity": "瀏覽社群圖庫",
+    "ourLatestTitle": "最新著色頁",
+    "ourLatestSubtitle": "我們每天都會新增新頁面。點選一張即可線上塗色、在家列印或先收藏。",
+    "ourLatestCount": "{count, plural, =1 {1 張} other {# 張}}",
+    "difficultyFilter": {
+      "all": "全部",
+      "beginner": "入門",
+      "intermediate": "中階",
+      "advanced": "進階",
+      "expert": "高手",
+      "easy": "簡單",
+      "medium": "中等",
+      "hard": "困難",
+      "filterByDifficulty": "依難度篩選"
+    },
+    "coloringHabitatCallout": {
+      "eyebrow": "來自姊妹網站",
+      "title": {
+        "teens": "想找更大孩子的著色？試試 Coloring Habitat",
+        "adults": "大人也想著色？Coloring Habitat 為你打造"
+      },
+      "body": {
+        "teens": "Chunky Crayon 專為年幼孩子（3-8 歲）設計。Coloring Habitat 提供更細緻的圖案、曼陀羅與精緻場景，適合大孩子、青少年與成人——同樣免費可列印，只是更符合年長使用者。",
+        "adults": "Chunky Crayon 專為 3-8 歲孩子打造。Coloring Habitat 是我們的姊妹網站，提供成人著色：曼陀羅、精緻花紋、靜心設計，以及適合大人的紓壓可列印頁。"
+      },
+      "cta": "前往 Coloring Habitat"
+    },
+    "startColoring": "開始著色",
+    "stats": {
+      "totalPages": "總頁數",
+      "ourPages": "本站頁面",
+      "communityPages": "社群頁面",
+      "dailyPages": "每日頁面",
+      "pagesSuffix": "頁"
+    },
+    "ageGroups": {
+      "toddlers": {
+        "title": "適合幼兒",
+        "ages": "2-4 歲",
+        "description": "簡單圖形、粗線條"
+      },
+      "kids": {
+        "title": "適合兒童",
+        "ages": "4-12 歲",
+        "description": "好玩又吸引人"
+      },
+      "teens": {
+        "title": "適合青少年",
+        "ages": "13-17 歲",
+        "description": "酷炫、細節豐富"
+      },
+      "adults": {
+        "title": "適合成人",
+        "ages": "18+",
+        "description": "放鬆又精緻"
+      }
+    },
+    "difficulty": {
+      "beginner": {
+        "title": "入門",
+        "description": "簡單圖形、粗線條"
+      },
+      "intermediate": {
+        "title": "中階",
+        "description": "適中細節"
+      },
+      "advanced": {
+        "title": "進階",
+        "description": "細節豐富"
+      },
+      "expert": {
+        "title": "高手",
+        "description": "精密花紋"
+      }
+    },
+    "categories": {
+      "animals": "動物",
+      "fantasy": "奇幻與魔法",
+      "dragons": "龍",
+      "unicorns": "獨角獸",
+      "princesses": "公主與皇室",
+      "superheroes": "超級英雄",
+      "dinosaurs": "恐龍",
+      "space": "太空與太空人",
+      "underwater": "海底與海洋",
+      "vehicles": "交通工具",
+      "pirates": "海盜",
+      "nature": "自然與花朵",
+      "holidays": "節日與季節",
+      "robots": "機器人與科技",
+      "food": "美食與甜點"
+    },
+    "seo": {
+      "aboutTitle": "關於我們的免費著色頁",
+      "aboutParagraph1": "歡迎來到 Chunky Crayon 的免費著色頁圖庫。這裡有持續增加的可列印著色頁收藏，孩子和大人都能玩。告訴我們你想要的場景，我們就能在各種主題中畫出一張獨一無二的頁面。",
+      "aboutParagraph2": "我們每天都會新增一張每日著色頁，你可以用數位工具直接線上塗色，或下載列印，用蠟筆、色鉛筆等傳統方式上色。社群成員也會分享創意點子，讓收藏更豐富多元。",
+      "aboutParagraph3": "依類別瀏覽，輕鬆找到你想要的主題：可愛動物、龍與獨角獸等奇幻生物，或季節節日主題。每一張都有乾淨線條，最適合著色。"
+    },
+    "jumpToNav": {
+      "jumpTo": "跳到：",
+      "selectSection": "選擇區段",
+      "backToTop": "回到頂部",
+      "filters": "篩選",
+      "gallery": "圖庫",
+      "related": "相關",
+      "about": "關於"
+    },
+    "categoryPage": {
+      "coloringPages": "{category} 著色頁",
+      "relatedCategories": "相關類別",
+      "noPagesYet": "目前還沒有 {category} 著色頁",
+      "beTheFirst": "搶先製作第一張 {category} 著色頁！",
+      "createAPage": "製作頁面",
+      "freeColoringPages": "免費 {category} 著色頁",
+      "lookingFor": "在找最完美的 {category} 著色頁嗎？你來對地方了！我們的收藏有各式各樣的 {category} 圖案，孩子和大人都適合。",
+      "eachPageDescription": "每張著色頁都可用我們的數位工具線上塗色，或下載列印，用蠟筆、色鉛筆或麥克筆上色。每個設計線條清楚、細節有趣，讓著色既好玩又療癒。",
+      "popularThemes": "熱門 {category} 主題",
+      "includesPopular": "我們的 {category} 類別包含常見熱門搜尋："
+    },
+    "categoryDescriptions": {
+      "animals": "適合孩子與大人的可愛與野生動物著色頁",
+      "fantasy": "魔法奇幻生物與夢幻世界等你上色",
+      "dragons": "氣勢磅礴、火焰細節滿滿的龍著色頁",
+      "unicorns": "彩虹與亮晶晶點綴的魔法獨角獸著色頁",
+      "princesses": "皇室公主與城堡著色頁",
+      "superheroes": "動作滿滿的超級英雄著色頁",
+      "dinosaurs": "史前恐龍著色頁",
+      "space": "太空冒險與太空人著色頁",
+      "underwater": "海洋生物與海底世界等你上色",
+      "vehicles": "汽車、卡車、飛機等交通工具著色頁",
+      "pirates": "刺激的海盜冒險著色頁",
+      "nature": "美麗自然與花朵著色頁",
+      "holidays": "歡樂節日與季節主題著色頁",
+      "robots": "未來感機器人與科技著色頁",
+      "food": "美味食物與甜點著色頁"
+    },
+    "infiniteScroll": {
+      "allPagesViewed": "你已看完所有著色頁！"
+    },
+    "ageGroupPages": {
+      "common": {
+        "moreAgeGroups": "更多年齡層",
+        "createSimplePages": "製作簡單頁面",
+        "createYourOwn": "自己製作",
+        "createYourDesign": "製作你的設計"
+      },
+      "toddlers": {
+        "pageTitle": "幼兒著色頁",
+        "featuredSection": "簡單幼兒著色頁",
+        "categoriesSection": "幼兒友善類別",
+        "heroDescription": "為小小手量身打造的簡單好塗頁！大圖形、粗線條、熟悉物件，最適合 2-4 歲孩子。也很適合練習精細動作。",
+        "whyTitle": "小小藝術家最適合",
+        "why1Title": "粗粗大線條",
+        "why1Description": "加粗外框，小手也能更容易塗在框線內！",
+        "why2Title": "簡單圖形",
+        "why2Description": "基本形狀與熟悉物件，幼兒一看就懂、超喜歡。",
+        "why3Title": "認識顏色",
+        "why3Description": "學顏色、玩創意，一次完成！",
+        "seoTitle": "幼兒免費著色頁",
+        "seoParagraph1": "想讓幼兒開始接觸著色嗎？我們的簡單著色頁很適合 2-4 歲孩子。每個設計都有大面積好上色區塊與粗線條外框，幫助小朋友培養精細動作能力。",
+        "seoParagraph2": "幼兒著色頁主打孩子最愛的熟悉主題：可愛動物、好吃食物、繽紛交通工具與美麗自然場景。簡單設計能降低挫折感，鼓勵孩子盡情創作。",
+        "seoParagraph3": "所有頁面都能用標準 A4 紙列印，或用好上手的數位工具線上塗色。很適合安靜時光、雨天在家，或家中與幼兒園的學習活動。",
+        "benefitsTitle": "幼兒著色的好處",
+        "benefitsDescription": "著色能幫助幼兒發展多項重要能力：手眼協調、顏色辨識、握筆力、專注力，以及創意表達。先從最簡單的設計開始，一起看著孩子進步！"
+      },
+      "kids": {
+        "pageTitle": "兒童著色頁",
+        "featuredSection": "人氣兒童著色頁",
+        "categoriesSection": "瀏覽兒童類別",
+        "heroDescription": "適合 4-12 歲孩子的好玩著色頁！恐龍、獨角獸、超級英雄等通通有。線上塗色或在家列印都很方便，創意樂趣玩不完。",
+        "whyTitle": "孩子為什麼愛 Chunky Crayon",
+        "why1Title": "什麼都能做",
+        "why1Description": "孩子說出天馬行空的想法，就能變成著色頁！",
+        "why2Title": "下載列印來上色",
+        "why2Description": "下載高畫質 PDF，A4 紙直接列印就能用。",
+        "why3Title": "線上塗色",
+        "why3Description": "在瀏覽器就能使用數位著色工具！",
+        "seoTitle": "兒童免費著色頁",
+        "seoParagraph1": "在找最適合孩子的著色頁嗎？Chunky Crayon 提供超多免費可列印著色頁，專為 4-12 歲孩子設計。從可愛動物到熱血超級英雄，每位小小藝術家都能找到最愛。",
+        "seoParagraph2": "我們的著色頁線條乾淨、外框清楚，小手也好上色。不管孩子喜歡蠟筆、色鉛筆或麥克筆，都能塗出漂亮效果；也能用線上著色工具，享受螢幕上的創作樂趣。",
+        "seoParagraph3": "更棒的是，孩子還能自己做專屬著色頁：只要描述想畫什麼就行。踢足球的龍？在太空的獨角獸？想到什麼都能在幾秒內變成真的著色頁！",
+        "popularTitle": "孩子最愛的熱門類別",
+        "popularDescription": "最受歡迎的兒童類別包含：恐龍著色頁、獨角獸著色頁、超級英雄著色頁、動物著色頁、太空與火箭著色頁，以及交通工具著色頁。每個類別都有適齡設計，最適合孩子。"
+      },
+      "teens": {
+        "pageTitle": "青少年著色頁",
+        "featuredSection": "人氣青少年著色頁",
+        "categoriesSection": "青少年類別",
+        "heroDescription": "為青少年打造的酷炫、細節滿滿著色頁！從動漫、遊戲到奇幻與科幻，用符合你風格的設計展現創意。很適合紓壓與自我表達。",
+        "whyTitle": "專為創意青少年而做",
+        "why1Title": "酷炫主題",
+        "why1Description": "動漫、遊戲、奇幻與科幻設計，貼近你的興趣！",
+        "why2Title": "細緻畫風",
+        "why2Description": "精緻細節挑戰你的技巧，完成後超有成就感。",
+        "why3Title": "紓壓放鬆",
+        "why3Description": "暫時離開螢幕，用著色好好放鬆一下。",
+        "seoTitle": "青少年免費著色頁",
+        "seoParagraph1": "想找不會「太幼稚」的著色頁嗎？我們的青少年收藏提供酷炫、細節豐富的設計，適合 13-17 歲。從動漫角色、遊戲場景到奇幻世界與抽象花紋，各種風格都有。",
+        "seoParagraph2": "這不是給弟弟妹妹的著色頁。我們的青少年設計有更精緻的細節、更有張力的構圖與更貼近興趣的主題。很適合創意表達、讀書空檔紓壓，或想放空時來一張。",
+        "seoParagraph3": "你也能自己做客製著色頁：想要什麼就描述清楚。想畫太空裡的龍在打機器人？動漫風肖像？加上最愛符號的細緻曼陀羅？說出來，我們就把它做出來。",
+        "popularTitle": "熱門青少年主題",
+        "popularDescription": "青少年最受歡迎的類別包含：動漫與漫畫著色頁、奇幻生物著色頁、超級英雄動作場景、遊戲風格創作、太空與科幻設計，以及精緻花紋頁。每個類別都有細節豐富、引人入勝的圖案。"
+      },
+      "adults": {
+        "pageTitle": "成人著色頁",
+        "featuredSection": "人氣成人著色頁",
+        "categoriesSection": "成人類別",
+        "heroDescription": "探索成人著色的療癒魅力！收藏包含精緻曼陀羅、優美自然場景與細密花紋，專為放鬆與靜心設計。忙了一整天後，最適合用來紓壓。",
+        "whyTitle": "成人著色的好處",
+        "why1Title": "紓壓",
+        "why1Description": "著色能啟動放鬆反應，減少焦慮、帶來平靜。",
+        "why2Title": "靜心專注",
+        "why2Description": "把注意力放在當下，享受一種冥想般、遠離螢幕的活動。",
+        "why3Title": "創意表達",
+        "why3Description": "用配色說出你的風格，做出漂亮作品。",
+        "seoTitle": "成人免費著色頁",
+        "seoParagraph1": "成人著色已成為受歡迎的身心放鬆活動，原因很簡單：研究指出，著色能減輕焦慮、提升專注，並讓我們從充滿螢幕的生活中得到片刻平靜。我們的收藏提供精美、細緻的設計，特別適合大人。",
+        "seoParagraph2": "從能幫助靜心的精緻曼陀羅，到寧靜自然場景與優雅花紋，每一張都為你帶來長時間的放鬆創作。建議用較好的紙張列印，再搭配你喜歡的工具——色鉛筆、麥克筆或果凍筆都很適合。",
+        "seoParagraph3": "想要獨一無二？你也能做客製著色頁。描述你最理想的放鬆場景（禪風庭園、新藝術風格花紋、細緻植物插畫等），我們就能把你的想像變成作品。",
+        "popularTitle": "熱門成人著色主題",
+        "popularDescription": "探索最受歡迎的成人類別：適合冥想的曼陀羅著色頁、精緻自然與植物設計、幾何花紋、新藝術與裝飾藝術風格、禪繞風頁面，以及寧靜風景場景。每一種都帶來不同的放鬆體驗。"
+      }
+    }
+  },
+  "pricing": {
+    "pageTitle": "方案與價格 - Chunky Crayon",
+    "heroTitle": "只差一張著色頁，安靜 20 分鐘就到手。",
+    "heroSubtitle": "任一方案免費試用 7 天。等孩子愛上後，再挑最適合的。",
+    "monthly": "月付",
+    "annual": "年付（送 2 個月）",
+    "notReadyForPlan": "還不想訂方案？用多少買多少",
+    "mostPopular": "最受歡迎",
+    "buyNow": "開始 7 天免費試用",
+    "trialMicroCopy": "之後每月 {price}。可在此之前隨時取消。",
+    "noCommitment": "無綁約，一鍵取消。",
+    "perMonth": "/月",
+    "perYear": "/年",
+    "creditsPerMonth": "點數/月",
+    "trustStrip": {
+      "rating": "4.6 分（47 則評價）",
+      "cancel": "隨時可取消",
+      "guarantee": "30 天退款保證"
+    },
+    "included": {
+      "title": "每個方案都能解鎖",
+      "aiCreation": "把孩子的描述變成著色頁",
+      "colorOnline": "在家列印或直接螢幕著色",
+      "saveFavorites": "每張作品永久保存",
+      "shareCreations": "把著色頁傳給爺爺奶奶",
+      "collectStickers": "邊著色邊收集貼紙與獎勵",
+      "familySharing": "一個訂閱，每個孩子各自獨立檔案",
+      "mobileApps": "支援 iPhone 與 Android 的 App"
+    },
+    "plans": {
+      "splash": {
+        "name": "Splash",
+        "tagline": "最適合最多 2 個孩子。",
+        "audience": "一週大約兩張。比每月一盒彩色蠟筆還省。"
+      },
+      "rainbow": {
+        "name": "Rainbow",
+        "tagline": "最適合最多 4 個孩子。",
+        "audience": "手足各選各的也夠用。多數家庭都選這個。"
+      },
+      "sparkle": {
+        "name": "Sparkle",
+        "tagline": "最適合最多 10 個孩子。",
+        "audience": "最多 10 個獨立檔案。不怕不夠用，全家一起分享。"
+      }
+    },
+    "features": {
+      "credits250": "每月約 50 張，一週約兩張",
+      "credits500": "每月約 100 張，差不多一天一張",
+      "credits1000": "每月約 200 張，一天好幾張也綽綽有餘",
+      "allFeatures": "全平台功能",
+      "noRollover": "點數每月重置",
+      "rollover1Month": "點數可累積，最多保留多 1 個月",
+      "rollover2Months": "點數可累積，最多保留多 2 個月",
+      "prioritySupport": "優先支援",
+      "commercialUse": "商用授權",
+      "profiles2": "最多 2 個孩子檔案",
+      "profiles4": "最多 4 個孩子檔案",
+      "profiles10": "最多 10 個孩子檔案"
+    },
+    "creditPacks": {
+      "title": "需要更多點數？",
+      "pack100": "100 點數包",
+      "pack500": "500 點數包",
+      "pack1000": "1,000 點數包"
+    },
+    "faq": {
+      "title": "選擇前先看看",
+      "subtitle": "關於方案、點數與取消訂閱，該知道的都在這裡。",
+      "cancelAnytime": {
+        "question": "我可以隨時取消嗎？",
+        "answer": "可以。在帳戶裡一鍵取消，不用回答任何問題。你已經做出的著色頁都會保留給你。"
+      },
+      "rollover": {
+        "question": "沒用完的頁數會怎樣？",
+        "answer": "Splash 的點數每月重置。Rainbow 會多累積 1 個月。Sparkle 會多累積 2 個月。所以這個月沒用完，下個月還在。"
+      },
+      "creditsPerPage": {
+        "question": "我到底能做幾張頁面？",
+        "answer": "輸入文字或拍張照片需要 5 點數。對 Chunky Crayon 說話需要 10 點數（因為它會聽、轉成文字，還會畫出來）。Splash 每月約 50 張文字頁。Rainbow 約 100。Sparkle 約 200。想怎麼搭配都行。"
+      },
+      "audience": {
+        "question": "這只給小孩用嗎？",
+        "answer": "任何年齡都適用。幼兒說「戴帽子的狐狸」，爸媽把頁面印出來。大人也能自己做，睡前在 iPad 上慢慢上色。同一個產品，不同的人。"
+      },
+      "multipleKids": {
+        "question": "一個訂閱可以給多個孩子用嗎？",
+        "answer": "可以，而且這正是很多 App 做錯的地方。一個 Chunky Crayon 方案就能讓每個孩子有獨立檔案（Splash 2、Rainbow 4、Sparkle 10）。他們的頁面、貼紙和 Colo 吉祥物各自分開。不用每個孩子都買一個訂閱。"
+      },
+      "trialMechanics": {
+        "question": "7 天免費試用後會怎樣？",
+        "answer": "你的卡片會以方案價格扣款。我們會在 24 小時前寄信提醒，絕不會讓你措手不及。試用期間隨時取消就完全不會被收費。"
+      },
+      "printPaper": {
+        "question": "在家列印需要準備什麼？",
+        "answer": "印表機和紙就可以。頁面會下載為 PDF，不用調整大小就能符合 A4 或 US Letter。"
+      },
+      "gettingStarted": {
+        "question": "我要怎麼開始？",
+        "answer": "選擇方案、登入，兩分鐘內就能拿到第一張著色頁。"
+      }
+    },
+    "finalCta": {
+      "title": "選個方案，今天就來上色。",
+      "subtitle": "孩子說出來，我們把它畫出來；你可以列印，或直接把 iPad 給他。免費 7 天，隨時可取消。",
+      "primary": "開始 7 天免費試用",
+      "secondary": "再比較一次方案"
+    },
+    "secondary": {
+      "packsHeader": "還不想訂閱？",
+      "packsBody": "試試單次點數包。用多少付多少，不用月方案。",
+      "subscriptionsHeader": "常常在著色？",
+      "subscriptionsBody": "月方案更划算。功能全開、每張更便宜。",
+      "ctaSeePacks": "查看點數包",
+      "ctaSeePlans": "查看月方案",
+      "packCardCredits": "{count} 點數",
+      "packCardCta": "購買點數包"
+    }
+  },
+  "blog": {
+    "title": "Chunky Crayon 部落格",
+    "subtitle": "創意著色活動的小技巧、點子與靈感",
+    "allPosts": "所有文章",
+    "byAuthor": "作者：{author}",
+    "categories": {
+      "colouringTips": "著色小技巧",
+      "mindfulnessRelaxation": "專注放鬆",
+      "artEducation": "美術教育",
+      "activitiesForKids": "親子活動",
+      "seasonalHolidays": "節慶與假日"
+    }
+  },
+  "colorAsYouGo": {
+    "heroTitle": "想畫就畫。",
+    "heroSubtitle": "需要時再買點數。不訂閱、不綁約。就是畫畫。",
+    "credits": "{count} 點數",
+    "buyNow": "取得點數",
+    "loading": "載入中...",
+    "failedToCheckout": "無法前往結帳。再試一次？",
+    "packs": {
+      "PUBLIC_CREDITS_50": {
+        "name": "入門",
+        "tagline": "約 10 張著色頁。雨天午後，輕鬆搞定。"
+      },
+      "PUBLIC_CREDITS_200": {
+        "name": "週末",
+        "tagline": "約 40 張著色頁。一週的「我好無聊」都夠用。"
+      },
+      "PUBLIC_CREDITS_500": {
+        "name": "假期",
+        "tagline": "約 100 張著色頁。整個學校假期，輕鬆搞定。"
+      }
+    },
+    "subscribePitch": {
+      "title": "每週都想畫？",
+      "subtitle": "如果每個月畫超過幾張，訂閱更划算。還能為手足新增更多個人檔案，點數也會累積。",
+      "cta": "查看方案"
+    }
+  },
+  "startOverButton": {
+    "idle": "重新開始",
+    "modalTitle": "要清空這一頁嗎？",
+    "modalBody": "你畫的顏色都會消失，回到空白頁重新開始。",
+    "confirm": "好呀，換新頁",
+    "cancel": "繼續上色"
+  },
+  "stickers": {
+    "categories": {
+      "stars": "星星",
+      "hearts": "愛心",
+      "shapes": "形狀",
+      "nature": "大自然",
+      "emojis": "表情",
+      "fun": "好玩"
+    },
+    "items": {
+      "yellowStar": "黃色星星",
+      "sparkleStar": "閃亮星星",
+      "glowingStar": "發光星星",
+      "shootingStar": "流星",
+      "redHeart": "紅色愛心",
+      "pinkHeart": "粉紅愛心",
+      "sparkleHeart": "閃亮愛心",
+      "rainbowHeart": "彩虹愛心",
+      "circle": "圓形",
+      "square": "方形",
+      "triangle": "三角形",
+      "diamond": "菱形",
+      "flower": "花朵",
+      "sun": "太陽",
+      "rainbow": "彩虹",
+      "cloud": "雲朵",
+      "butterfly": "蝴蝶",
+      "leaf": "葉子",
+      "smile": "微笑",
+      "loveEyes": "愛心眼",
+      "cool": "酷酷",
+      "wink": "眨眼",
+      "crown": "皇冠",
+      "unicorn": "獨角獸",
+      "rocket": "火箭",
+      "balloon": "氣球",
+      "gift": "禮物",
+      "cake": "蛋糕"
+    }
+  },
+  "stickerBook": {
+    "title": "我的貼紙書",
+    "subtitle": "替圖畫上色，收集好玩的貼紙！",
+    "pageTitle": "我的貼紙書 - Chunky Crayon",
+    "pageDescription": "查看你的貼紙收藏，看看還能解鎖哪些貼紙！",
+    "loadError": "無法載入貼紙。請再試一次。",
+    "card": {
+      "viewSticker": "看看{name}貼紙",
+      "lockedSticker": "{name}貼紙，尚未解鎖"
+    },
+    "filters": {
+      "all": "全部",
+      "milestones": "里程碑",
+      "categories": "分類",
+      "explore": "探索",
+      "special": "特別"
+    },
+    "emptyState": "這個分類還沒有貼紙喔。",
+    "countFormat": "{count}/{total}",
+    "newBadge": "{count} 新",
+    "progress": {
+      "label": "貼紙收藏",
+      "complete": "太棒了！貼紙全都收集完成！",
+      "almostThere": "快完成囉！你做得很棒！",
+      "halfway": "完成一半囉！繼續加油！",
+      "greatStart": "起步很棒！"
+    },
+    "detail": {
+      "lockedName": "???",
+      "lockedDescription": "這張貼紙還沒解鎖！",
+      "unlockedOn": "{date} 解鎖",
+      "howToUnlock": "解鎖方式：",
+      "rarity": {
+        "common": "普通",
+        "uncommon": "不常見",
+        "rare": "稀有",
+        "legendary": "傳奇"
+      },
+      "unlockConditions": {
+        "artworkCount": "儲存 {count} 張作品到相簿",
+        "firstCategory": "替你的第一張{category}頁上色",
+        "categoryCount": "替 {count} 張{category}頁上色",
+        "special": "探索 {count} 種不同分類"
+      }
+    }
+  },
+  "stickerCatalog": {
+    "first-steps": {
+      "name": "第一步",
+      "description": "儲存你的第一幅上色作品！",
+      "unlockMessage": "你做到了！已儲存你的第一件傑作！"
+    },
+    "getting-started": {
+      "name": "開始上手",
+      "description": "進度超順！儲存 5 幅作品。",
+      "unlockMessage": "5 幅作品！你越來越像小小藝術家了！"
+    },
+    "high-five": {
+      "name": "擊掌五連",
+      "description": "儲存 10 幅漂亮作品到相簿。",
+      "unlockMessage": "擊掌！10 幅超棒作品！"
+    },
+    "perfect-ten": {
+      "name": "完美十全",
+      "description": "真正的藝術家！儲存 25 幅作品。",
+      "unlockMessage": "25 幅作品！你是塗色小明星！"
+    },
+    "super-artist": {
+      "name": "超級藝術家",
+      "description": "太有毅力了！儲存 50 幅作品。",
+      "unlockMessage": "50 件傑作！你是超級藝術家！"
+    },
+    "master-creator": {
+      "name": "創作大師",
+      "description": "傳奇成就！儲存 75 幅作品。",
+      "unlockMessage": "75 幅作品！真正的創作大師！"
+    },
+    "century-club": {
+      "name": "百幅俱樂部",
+      "description": "終極成就！儲存 100 幅作品。",
+      "unlockMessage": "100 幅作品！歡迎加入百幅俱樂部！"
+    },
+    "animal-friend": {
+      "name": "動物好朋友",
+      "description": "為你的第一張動物頁上色！",
+      "unlockMessage": "你交到一位新的動物朋友！"
+    },
+    "fantasy-dreamer": {
+      "name": "奇幻夢想家",
+      "description": "為你的第一張奇幻頁上色！",
+      "unlockMessage": "歡迎來到奇幻世界！"
+    },
+    "space-explorer": {
+      "name": "太空探險家",
+      "description": "為你的第一張太空頁上色！",
+      "unlockMessage": "3、2、1…發射！太空探險成功！"
+    },
+    "nature-lover": {
+      "name": "自然愛好者",
+      "description": "為你的第一張自然頁上色！",
+      "unlockMessage": "大自然好美，就像你的作品一樣！"
+    },
+    "vehicle-driver": {
+      "name": "交通工具駕駛",
+      "description": "為你的第一張交通工具頁上色！",
+      "unlockMessage": "叭叭！好帥的車車！"
+    },
+    "dino-hunter": {
+      "name": "恐龍獵人",
+      "description": "為你的第一張恐龍頁上色！",
+      "unlockMessage": "吼～你找到恐龍了！"
+    },
+    "ocean-diver": {
+      "name": "海洋潛水員",
+      "description": "為你的第一張海洋生物頁上色！",
+      "unlockMessage": "撲通！海底大冒險！"
+    },
+    "food-lover": {
+      "name": "美食愛好者",
+      "description": "為你的第一張食物頁上色！",
+      "unlockMessage": "好香！看起來超好吃！"
+    },
+    "sports-star": {
+      "name": "運動小明星",
+      "description": "為你的第一張運動頁上色！",
+      "unlockMessage": "進球！你是運動小明星！"
+    },
+    "holiday-spirit": {
+      "name": "節日氣氛",
+      "description": "為你的第一張節日頁上色！",
+      "unlockMessage": "一起慶祝！節日氣氛解鎖！"
+    },
+    "animal-master": {
+      "name": "動物達人",
+      "description": "為 10 張動物頁上色，成為真正的動物專家！",
+      "unlockMessage": "你是最棒的動物好朋友！"
+    },
+    "fantasy-master": {
+      "name": "奇幻大師",
+      "description": "為 10 張奇幻頁上色，解鎖魔法力量！",
+      "unlockMessage": "你的奇幻力量超傳奇！"
+    },
+    "space-master": {
+      "name": "太空大師",
+      "description": "為 10 張太空頁上色，成為太空人！",
+      "unlockMessage": "你是認證的太空探險家！"
+    },
+    "category-explorer": {
+      "name": "分類探險家",
+      "description": "試試新花樣！為 3 種不同分類的頁面上色。",
+      "unlockMessage": "多一點變化，作品更精彩！"
+    },
+    "world-traveler": {
+      "name": "世界旅行家",
+      "description": "為 5 種不同分類的頁面上色！",
+      "unlockMessage": "你探索了所有塗色世界！"
+    }
+  },
+  "stickerSelector": {
+    "title": "選擇貼紙",
+    "close": "關閉",
+    "selected": "已選：",
+    "helpText": "在畫布上點一下就能放上貼紙"
+  },
+  "profiles": {
+    "pageTitle": "誰在著色？",
+    "pageSubtitle": "選你的，或新增一個",
+    "editTitle": "更換頭像",
+    "switcher": {
+      "close": "關閉個人檔案切換器"
+    },
+    "ageGroups": {
+      "toddler": "小小孩",
+      "toddlerDescription": "2–4 歲",
+      "child": "小朋友",
+      "childDescription": "5–8 歲",
+      "tween": "大童",
+      "tweenDescription": "9–12 歲",
+      "teen": "青少年",
+      "teenDescription": "13–17 歲",
+      "adult": "大人",
+      "adultDescription": "18+"
+    },
+    "form": {
+      "name": "你的名字",
+      "namePlaceholder": "例如：Emma",
+      "nameRequired": "請輸入名字",
+      "ageGroup": "幾歲呢？",
+      "avatar": "選一張圖片",
+      "difficultyLevel": "難度呢？",
+      "saveChanges": "儲存",
+      "saving": "儲存中…",
+      "cancel": "取消",
+      "profileUpdated": "都存好囉！",
+      "profileSwitched": "已切換！",
+      "unnamed": "未命名"
+    },
+    "delete": {
+      "title": "確定嗎？",
+      "dangerZone": "移除",
+      "warning": "這會永久移除個人檔案。你的著色圖片會安全保留。",
+      "confirmText": "這會永久移除個人檔案。你的著色圖片會安全保留。",
+      "deleteProfile": "移除",
+      "deleting": "移除中…",
+      "deleted": "已移除「{name}」",
+      "coloringPages": "{count, plural, =1 {1 張圖片} other {# 張圖片}}"
+    },
+    "manager": {
+      "aboutProfiles": "個人檔案怎麼用",
+      "ownCollection": "每個檔案都有自己的圖片",
+      "personalizedDifficulty": "每次都挑適合他的頁面",
+      "maxProfiles": "最多 {max} 個檔案",
+      "switchAnytime": "點上方頭像就能切換",
+      "profilesUsed": "{count} / {max}",
+      "colorings": "{count, plural, =1 {1 張圖片} other {# 張圖片}}",
+      "edit": "編輯 {name}",
+      "delete": "移除 {name}",
+      "addProfile": "新增檔案"
+    },
+    "create": {
+      "title": "建立個人檔案",
+      "subtitle": "取個名字，再選張圖片",
+      "button": "建立檔案",
+      "creating": "建立中…",
+      "success": "建立成功！",
+      "addProfile": "新增檔案",
+      "maxReached": "已達上限",
+      "maxReachedDescription": "你已達到最多 {max} 個檔案。刪除現有檔案後才能新增。",
+      "nameLabel": "名字",
+      "namePlaceholder": "例如：Emma",
+      "nameError": "請輸入名字",
+      "ageGroupLabel": "幾歲呢？",
+      "avatarLabel": "選一張圖片"
+    }
+  },
+  "social": {
+    "instagram": "Instagram",
+    "facebook": "Facebook",
+    "tiktok": "TikTok",
+    "pinterest": "Pinterest",
+    "x": "X",
+    "threads": "Threads"
+  },
+  "parentalGate": {
+    "title": "小小確認",
+    "subtitle": "點選正確答案",
+    "settingsHint": "你可隨時到「設定」關閉。"
+  },
+  "stickerReward": {
+    "congratulations": "恭喜你！",
+    "youEarned": "你獲得一張貼紙！",
+    "stickerName": "{name}",
+    "tapToContinue": "點一下繼續",
+    "addedToBook": "已加入你的貼紙本！",
+    "viewStickerBook": "查看貼紙本",
+    "keepColoring": "繼續上色",
+    "previousSticker": "上一張貼紙",
+    "nextSticker": "下一張貼紙",
+    "newSticker": "新貼紙！",
+    "newStickers": "新貼紙！",
+    "ofCount": "第 {current}/{total} 張貼紙",
+    "addToStickerBook": "放進我的貼紙本",
+    "goToSticker": "前往第 {number} 張貼紙",
+    "rarity": {
+      "common": "常見",
+      "uncommon": "不常見",
+      "rare": "稀有",
+      "legendary": "百萬分之一"
+    }
+  },
+  "seo": {
+    "home": {
+      "title": "Chunky Crayon - 創意著色與學習樂趣",
+      "description": "Chunky Crayon 是一款繽紛互動的應用程式，為孩子與家長打造，可製作獨特、個人化的著色本頁面與有趣的學習練習單。把文字、語音與圖片提示變成可列印的著色頁，或在我們的網頁、iOS 與 Android App 上享受數位著色。"
+    },
+    "gallery": {
+      "title": "免費著色頁圖庫 - Chunky Crayon",
+      "description": "瀏覽我們的免費可列印著色頁收藏。找到動物、龍、獨角獸、公主等更多主題。每天新增新頁面！"
+    }
+  },
+  "altText": {
+    "mascot": "友善的蠟筆吉祥物 Colo",
+    "dailyPage": "每日著色頁",
+    "coloringPage": "著色頁",
+    "toddlerPage": "幼兒著色頁",
+    "kidsPage": "兒童著色頁",
+    "teenPage": "青少年著色頁",
+    "adultPage": "成人著色頁",
+    "ogImage": "Chunky Crayon 客製著色本頁面"
+  },
+  "metadata": {
+    "keywords": "著色本頁面, 兒童創意 App, 客製化著色頁, 教育學習單, 好玩的學習活動, 兒童創造力 App, 互動著色 App, 數位著色, 可列印著色頁"
+  },
+  "myArtwork": {
+    "pageTitle": "我的作品",
+    "pageSubtitle": "所有已儲存的著色作品都在這裡！點選任何作品即可再次上色或建立新版本！",
+    "emptyState": {
+      "title": "還沒有已儲存的作品！",
+      "description": "開始著色並儲存作品，就能在這裡看到。你的作品會永久保存！",
+      "cta": "瀏覽著色頁"
+    },
+    "grid": {
+      "coloredBy": "由 {name} 著色",
+      "viewArtwork": "查看作品",
+      "deleteArtwork": "刪除作品",
+      "shareArtwork": "分享作品",
+      "shareWithFamily": "分享給家人",
+      "colorAgain": "再上色一次",
+      "savedArtwork": "已儲存的作品"
+    },
+    "filters": {
+      "all": "全部",
+      "recent": "最近",
+      "favorites": "最愛"
+    },
+    "sort": {
+      "newest": "最新優先",
+      "oldest": "最舊優先"
+    },
+    "stickerCard": {
+      "title": "貼紙簿",
+      "newBadge": "{count} 個新",
+      "stickersCollected": "已收集 {collected}/{total} 張貼紙"
+    },
+    "deleteDialog": {
+      "title": "刪除作品？",
+      "description": "確定要刪除這個作品嗎？刪除後無法復原！",
+      "confirm": "是的，刪除",
+      "cancel": "不要，保留"
+    }
+  },
+  "challenges": {
+    "pageTitle": "每週挑戰",
+    "pageSubtitle": "每週完成有趣的著色挑戰，獲得專屬貼紙和 Colo 配件！",
+    "breadcrumbs": {
+      "home": "首頁",
+      "account": "帳號",
+      "challenges": "挑戰"
+    },
+    "currentChallenge": {
+      "title": "本週挑戰"
+    },
+    "noActive": {
+      "title": "目前沒有挑戰",
+      "description": "敬請期待下一個每週挑戰！"
+    },
+    "history": {
+      "title": "過往挑戰",
+      "completed": "已完成",
+      "expired": "已過期",
+      "progress": "已完成 {progress} / {requirement}"
+    },
+    "reward": {
+      "claimed": "獎勵已領取！",
+      "stickerAdded": "新貼紙已加入你的貼紙本！",
+      "accessoryAdded": "新配件已加入你的 Colo！"
+    }
+  },
+  "recentCreations": {
+    "title": "你的最新作品",
+    "imageAlt": "你的著色頁",
+    "ctaHighlight": "免費開始",
+    "ctaMessage": "即可永久保存作品並解鎖更多！",
+    "ctaButton": "免費開始"
+  },
+  "myRecentCreations": {
+    "title": "你最近的圖片",
+    "seeAll": "查看我所有圖片",
+    "empty": "用上方的創作表單製作你的第一張圖片吧！",
+    "untitled": "我的圖片"
+  },
+  "coloringPage": {
+    "progress": {
+      "allDone": "完成囉！",
+      "milestones": {
+        "25": "很棒的開始！",
+        "50": "完成一半囉！",
+        "75": "快完成了！",
+        "100": "完成囉！"
+      }
+    },
+    "tapToColor": "點一下就上色",
+    "dragForTools": "拖曳叫出工具"
+  },
+  "createForm": {
+    "title": "創造魔法！",
+    "tagline": "打字、說說看，或拍張照片！",
+    "generatingMessage": "約 2 分鐘就好！",
+    "examplesLabel": "試試這些",
+    "exampleTrex": "滑板上的暴龍太空人",
+    "exampleDragon": "龍和兔子在開茶會",
+    "exampleFoxes": "狐狸一家在野餐",
+    "inputModes": {
+      "scene": "組合",
+      "type": "打字",
+      "talk": "說話",
+      "photo": "照片",
+      "ariaLabel": "輸入方式選擇",
+      "unlockFailed": "怪怪的，再試一次？"
+    },
+    "scene": {
+      "ariaLabel": "組合你的圖片",
+      "surpriseMe": "給我驚喜！",
+      "lockedMakeCharacter": "（先做一個角色）",
+      "back": "返回",
+      "next": "下一步",
+      "create": "開始創作！",
+      "extrasTitle": "小加分",
+      "skip": "略過",
+      "subjectAddCharacter": "加入角色",
+      "subjectTitle": "誰？",
+      "friendsTitle": "你的朋友",
+      "subjectGroupTitle": "或選一個",
+      "locationTitle": "在哪裡？",
+      "weatherTitle": "天氣",
+      "activityTitle": "在做什麼？",
+      "accentTitle": "小加分",
+      "subject": {
+        "horse": "馬",
+        "cow": "牛",
+        "sheep": "羊",
+        "dog": "狗",
+        "cat": "貓",
+        "fox": "狐狸",
+        "lion": "獅子",
+        "fish": "魚",
+        "dragon": "龍",
+        "bird": "鳥",
+        "kid": "小朋友",
+        "astronaut": "太空人"
+      },
+      "location": {
+        "beach": "海灘",
+        "sea": "海上",
+        "football-game": "足球",
+        "busy-street": "熱鬧街道",
+        "shopping-mall": "購物中心",
+        "desert-island": "小島",
+        "forest": "森林",
+        "mountains": "山上",
+        "train-station": "車站"
+      },
+      "weather": {
+        "sunny": "晴天",
+        "snowy": "下雪",
+        "rainy": "下雨",
+        "night": "夜晚",
+        "rainbow": "彩虹",
+        "cloudy": "多雲"
+      },
+      "activity": {
+        "playing": "在玩",
+        "sleeping": "在睡覺",
+        "running": "在跑步",
+        "swimming": "在游泳",
+        "flying-a-kite": "放風箏",
+        "riding-a-bike": "騎腳踏車",
+        "having-a-picnic": "野餐",
+        "dancing": "跳舞"
+      },
+      "accent": {
+        "birthday": "生日",
+        "sparkles": "閃亮亮",
+        "underwater-bubbles": "泡泡",
+        "flowers": "花朵",
+        "space-stars": "星星",
+        "balloons": "氣球"
+      }
+    },
+    "voiceInput": {
+      "startRecording": "開始錄音",
+      "stopRecording": "停止錄音",
+      "tapToRecord": "點一下，告訴我想塗什麼！",
+      "signInToRecord": "登入後就能開始錄音！",
+      "notSupported": "哎呀！你的瀏覽器不支援錄音。",
+      "notSupportedHint": "請用有麥克風的裝置，試試 Chrome、Safari 或 Firefox。",
+      "tryAgain": "再試一次",
+      "listening": "我在聽喔！",
+      "allDone": "說完了嗎？{countdown}s…",
+      "cancel": "取消",
+      "doneTalking": "說完了",
+      "imDone": "我說完了！",
+      "gettingMicReady": "正在準備麥克風…",
+      "understanding": "正在聽懂你說的話…",
+      "makeMyColoringPage": "🎨 做出我的著色頁！",
+      "notQuiteRight": "不太對？再試一次",
+      "maxDuration": "最多 {seconds} 秒",
+      "errors": {
+        "permissionDenied": "我需要你的麥克風！",
+        "notSupported": "換個瀏覽器試試！",
+        "transcriptionFailed": "我沒聽清楚！",
+        "recordingFailed": "哎呀！再試一次吧！",
+        "timeout": "有點久了！"
+      }
+    },
+    "imageInput": {
+      "takePhotoOrUpload": "拍一張或選一張！",
+      "signInToUpload": "登入後才能上傳圖片！",
+      "camera": "相機",
+      "upload": "上傳",
+      "takePhoto": "拍照",
+      "uploadImage": "上傳圖片",
+      "dropHere": "拖到這裡！",
+      "dragAndDrop": "或拖到這裡",
+      "shareDrawing": "分享一張畫作或任何想塗色的圖片！",
+      "greatPicture": "這張很棒！要用這張嗎？",
+      "pickAnother": "換一張",
+      "useThis": "用這張！",
+      "iSee": "我看到：",
+      "makeMyColoringPage": "🎨 做出我的著色頁！",
+      "notQuiteRight": "不太對？再試一次",
+      "capturing": "正在準備你的照片…",
+      "processing": "正在看看你的圖片…",
+      "tryAgain": "再試一次",
+      "altImagePreview": "已選圖片預覽",
+      "altUploadedImage": "你上傳的圖片",
+      "errors": {
+        "fileTooLarge": "太大了！換小一點的。",
+        "invalidType": "換一張圖片試試！",
+        "processingFailed": "沒成功！換另一張！",
+        "cameraFailed": "相機卡住了！再試一次！",
+        "heicUnsupported": "暫不支援 HEIC。請先存成 JPG 或 PNG！"
+      }
+    },
+    "placeholder": "你想塗什麼？",
+    "placeholderGuestLimit": "你已用完 {maxTries} 次免費試用！註冊再拿 15 點數。",
+    "placeholderNoCreditsSubscribed": "點數用完了。加購或升級方案！",
+    "placeholderNoCreditsNoSubscription": "你已用完免費點數。選個方案或按次使用！",
+    "placeholderSignIn": "登入後就能開始創作魔法著色頁！",
+    "buttonCreate": "創作",
+    "buttonCreateGuest": "創作",
+    "freeTriesChip": "{remaining, plural, =1 {剩下 # 次免費試用} other {剩下 # 次免費試用}}",
+    "buttonSignUp": "註冊拿 15 點免費點數",
+    "buttonBuyCredits": "加購點數",
+    "buttonViewPlans": "查看方案",
+    "linkColorAsYouGo": "或按次使用（免訂閱）",
+    "linkSeePlansGuestLimit": "或開始 7 天免費試用，無限頁面",
+    "buttonGetStarted": "免費開始",
+    "subtextGuestLimit": "你已看見魔法！註冊繼續創作。",
+    "subtextNoCredits": "點數用完了。加購或升級！",
+    "subtextNoCreditsSubscribed": "魔法不夠了？加購或升級，創意不中斷！",
+    "subtextNoCreditsNoSubscription": "選擇訂閱，或買幾點繼續玩。",
+    "subtextFallback": "你會拿到 15 點免費點數，夠做 3 張！",
+    "blockReason": {
+      "guestLimit": "免費試用已用完",
+      "noSubscription": "訂閱後繼續",
+      "subscriberNoCredits": "加購後繼續"
+    }
+  },
+  "paywall": {
+    "guestLimit": {
+      "title": "免費次數已用完",
+      "subtitle": "訂閱即可繼續創作，或註冊帳號再拿 15 次免費。"
+    },
+    "noSubscription": {
+      "title": "點數用完了",
+      "subtitle": "選擇方案，繼續創作。"
+    },
+    "subscriberNoCredits": {
+      "title": "點數用完了",
+      "subtitle": "本月點數已用完。購買加值包繼續玩。",
+      "primary": "查看加值包"
+    },
+    "common": {
+      "subscribe": "訂閱",
+      "creditsPerMonth": "每月 {count} 點數",
+      "perMonth": "每月",
+      "popular": "熱門",
+      "seeAllPlans": "查看加值包與完整方案內容",
+      "signUpFree": "註冊領 15 點數",
+      "dismiss": "等等再說"
+    }
+  },
+  "feedback": {
+    "title": "想跟我們說些什麼呢？",
+    "subtitle": "每則訊息我們都會看，真的。",
+    "types": {
+      "bug": {
+        "label": "有東西壞掉了",
+        "placeholder": "你做了什麼？結果發生了什麼？"
+      },
+      "idea": {
+        "label": "我有個點子",
+        "placeholder": "你想看到什麼新功能？大膽做夢也沒關係。"
+      },
+      "help": {
+        "label": "我需要幫忙",
+        "placeholder": "你卡在哪裡呢？"
+      },
+      "other": {
+        "label": "其他",
+        "placeholder": "任何想告訴我們的事都可以，好或不好都行。"
+      }
+    },
+    "emailPlaceholder": "你的 Email（選填，想收到回覆再留）",
+    "sendButton": "送出",
+    "sending": "傳送中…",
+    "successTitle": "收到囉，謝謝你",
+    "successMessage": "我們會看看情況，需要的話再回覆你。",
+    "back": "返回"
+  },
+  "og": {
+    "homepage": {
+      "tagline": "專屬著色頁，幾秒就完成。",
+      "alt": "Chunky Crayon，專屬著色頁，幾秒就完成。"
+    },
+    "coloringImage": {
+      "notFound": "找不到著色頁"
+    },
+    "blogPost": {
+      "notFound": "找不到部落格文章",
+      "minRead": "閱讀約 {minutes} 分鐘",
+      "blog": "部落格"
+    },
+    "sharedArtwork": {
+      "notFound": "找不到作品",
+      "createdBy": "創作者"
+    },
+    "difficulty": {
+      "beginner": "入門",
+      "intermediate": "中級",
+      "advanced": "進階",
+      "expert": "專家"
+    }
+  },
+  "characters": {
+    "pageTitle": "認識你的朋友",
+    "pageSubtitle": "做一位會出現在每張著色頁的朋友。",
+    "comingSoonTitle": "角色即將登場",
+    "comingSoonBody": "再等一下，我們正在準備中。",
+    "emptyTitle": "來做你的第一位朋友吧！",
+    "emptyBody": "取個名字、描述外表，我們會幫你畫出來。之後會出現在你的著色頁裡。",
+    "addFriendCta": "做個朋友",
+    "fullHouse": "朋友已滿。先移除一位，才能新增新的朋友。",
+    "tile": {
+      "drawing": "繪製中",
+      "retry": "重試",
+      "drawingPlaceholder": "正在畫你的新朋友",
+      "failedPlaceholder": "出了一點狀況",
+      "gettingReady": "準備中"
+    },
+    "modal": {
+      "title": "做個朋友",
+      "subtitle": "打造孩子會在著色頁看到的角色。",
+      "name": {
+        "label": "他/她叫什麼名字？",
+        "placeholder": "Rex"
+      },
+      "species": {
+        "label": "想做哪種朋友？（選填）"
+      },
+      "prompt": {
+        "label": "描述你的朋友",
+        "placeholder": "他/她長什麼樣？喜歡什麼？",
+        "examplesLabel": "需要靈感嗎？"
+      },
+      "voice": {
+        "label": "選一個聲音（選填）",
+        "hint": "別擔心，之後可以再改。"
+      },
+      "footer": "我們會幫你畫出 {name}。大約需要 30 秒。每個檔案最多 {max} 位朋友。",
+      "next": "下一步",
+      "back": "返回",
+      "cancel": "取消",
+      "submit": "做我的朋友",
+      "submitting": "繪製中…",
+      "errors": {
+        "nameRequired": "請幫朋友取個名字。",
+        "promptRequired": "請跟我們說說你的朋友。",
+        "unauthorized": "請先登入。",
+        "noActiveProfile": "先選擇一個檔案，再建立角色。",
+        "parentGateRequired": "需要再次通過大人驗證。",
+        "invalidInput": "請檢查名字與描述。",
+        "moderationBlocked": "這個不行喔，換個想法試試。",
+        "limitReached": "朋友已滿，先移除一位再試。",
+        "extractionFailed": "畫朋友時出了點狀況。",
+        "workerUnavailable": "畫朋友時出了點狀況。",
+        "unknown": "出了點狀況，請再試一次。"
+      }
+    },
+    "parentGate": {
+      "header": "大人驗證",
+      "questionPrefix": "多少是",
+      "questionInfix": "減",
+      "placeholder": "輸入答案",
+      "submit": "送出",
+      "checking": "檢查中…",
+      "tryAgain": "不太對喔，再試一次。",
+      "needsNumber": "請輸入數字。",
+      "lockedPrefix": "深呼吸，",
+      "lockedSuffix": " 秒後再試。",
+      "cancel": "取消"
+    },
+    "profile": {
+      "backLink": "← 所有朋友",
+      "stillDrawingTitle": "{name} 快來了",
+      "stillDrawingBody": "肖像正在繪製中，稍後再回來看看。",
+      "seeAllCta": "查看所有朋友",
+      "actions": {
+        "feed": "餵食",
+        "exercise": "運動",
+        "dress": "換裝"
+      },
+      "outfits": {
+        "heading": "穿搭",
+        "none": "不穿搭",
+        "lockedPrice": "{cost} 點數",
+        "errorEquip": "無法儲存變更，請再試一次。",
+        "errorInsufficient": "需要 {cost} 點數才能解鎖。你目前有 {balance}。",
+        "errorUnlock": "無法解鎖，請再試一次。"
+      },
+      "voice": {
+        "heading": "聲音",
+        "presetHi": "打招呼",
+        "presetFeed": "好吃！",
+        "presetExercise": "呼咻！",
+        "presetBye": "掰掰！",
+        "customLabel": "讓 {name} 說句話（僅限大人）",
+        "customPlaceholder": "哈囉，我是 {name}！",
+        "customSubmit": "說出來",
+        "customFooter": "每句 {cost} 點數",
+        "thinking": "{name} 正在想一想，等一下再試。",
+        "errors": {
+          "notFound": "找不到這位朋友。",
+          "invalidInput": "每句需為 1 到 80 個字。",
+          "parentGateRequired": "需要再次通過大人驗證。",
+          "moderationBlocked": "這個不行喔，換個說法試試。",
+          "insufficientCredits": "點數不夠，無法製作這句。",
+          "synthesisFailed": "出了點狀況，等一下再試。"
+        }
+      }
+    }
+  }
+}

@@ -32,6 +32,14 @@
     "./es": {
       "import": "./src/es.json",
       "require": "./src/es.json"
+    },
+    "./zh-Hans": {
+      "import": "./src/zh-Hans.json",
+      "require": "./src/zh-Hans.json"
+    },
+    "./zh-Hant": {
+      "import": "./src/zh-Hant.json",
+      "require": "./src/zh-Hant.json"
     }
   },
   "scripts": {

@@ -20,6 +20,8 @@ const LANGUAGE_NAMES: Record<Locale, string> = {
   de: "Deutsch",
   fr: "Français",
   es: "Español",
+  "zh-Hans": "简体中文",
+  "zh-Hant": "繁體中文",
 };
 
 const LANGUAGE_FLAGS: Record<Locale, string> = {
@@ -29,9 +31,20 @@ const LANGUAGE_FLAGS: Record<Locale, string> = {
   de: "🇩🇪",
   fr: "🇫🇷",
   es: "🇪🇸",
+  "zh-Hans": "🇨🇳",
+  "zh-Hant": "🇹🇼",
 };
 
-const LOCALES: Locale[] = ["en", "ja", "ko", "de", "fr", "es"];
+const LOCALES: Locale[] = [
+  "en",
+  "ja",
+  "ko",
+  "de",
+  "fr",
+  "es",
+  "zh-Hans",
+  "zh-Hant",
+];
 
 type LanguageSwitcherProps = {
   className?: string;

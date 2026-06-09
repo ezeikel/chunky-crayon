@@ -22,6 +22,8 @@ const LANGUAGE_NAMES: Record<Locale, string> = {
   de: 'Deutsch',
   fr: 'Français',
   es: 'Español',
+  'zh-Hans': '简体中文',
+  'zh-Hant': '繁體中文',
 };
 
 // Flag emojis are intentional — Unicode flags are the universal cross-platform
@@ -33,9 +35,20 @@ const LANGUAGE_FLAGS: Record<Locale, string> = {
   de: '🇩🇪',
   fr: '🇫🇷',
   es: '🇪🇸',
+  'zh-Hans': '🇨🇳',
+  'zh-Hant': '🇹🇼',
 };
 
-const LOCALES: Locale[] = ['en', 'ja', 'ko', 'de', 'fr', 'es'];
+const LOCALES: Locale[] = [
+  'en',
+  'ja',
+  'ko',
+  'de',
+  'fr',
+  'es',
+  'zh-Hans',
+  'zh-Hant',
+];
 
 const LanguageSettings = () => {
   const t = useTranslations('settings');

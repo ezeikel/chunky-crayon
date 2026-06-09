@@ -1,0 +1,640 @@
+{
+  "startOverButton": {
+    "idle": "重新開始",
+    "confirm": "是的，重新開始",
+    "cancel": "繼續上色"
+  },
+  "downloadPDFButton": {
+    "idle": "列印",
+    "loading": "載入中…",
+    "creating": "準備中…",
+    "error": "無法使用"
+  },
+  "coloringPage": {
+    "title": "著色頁",
+    "relatedPages": "更多著色頁",
+    "defaultDescription": "來自 Coloring Habitat 的免費成人著色頁",
+    "progress": {
+      "colored": "已上色",
+      "percentage": "{percent}%",
+      "milestones": {
+        "25": "不錯的開始！",
+        "50": "完成一半了！",
+        "75": "快完成了！",
+        "100": "太棒了！"
+      }
+    },
+    "sidebar": {
+      "colors": "顏色",
+      "tools": "工具",
+      "size": "大小",
+      "history": "歷史記錄",
+      "zoom": "縮放",
+      "actions": "操作"
+    },
+    "tools": {
+      "pan": "平移",
+      "fill": "填色",
+      "brush": "畫筆",
+      "sticker": "貼紙",
+      "magicReveal": "魔法顯現",
+      "magicAuto": "魔法自動",
+      "magicBrush": "魔法畫筆",
+      "magicFill": "魔法填色",
+      "autoColor": "自動上色",
+      "magic": "魔法"
+    },
+    "brushTypes": {
+      "crayon": "蠟筆",
+      "marker": "麥克筆",
+      "eraser": "橡皮擦",
+      "glitter": "亮粉",
+      "sparkle": "閃光",
+      "rainbow": "彩虹",
+      "glow": "發光",
+      "neon": "霓虹"
+    },
+    "brushSizes": {
+      "small": "細",
+      "medium": "一般",
+      "large": "粗"
+    },
+    "fillPatterns": {
+      "solid": "純色",
+      "dots": "圓點",
+      "stripes": "條紋",
+      "diagonal": "斜紋",
+      "checkerboard": "棋盤格",
+      "hearts": "愛心",
+      "stars": "星星",
+      "zigzag": "之字紋"
+    },
+    "actions": {
+      "save": "儲存",
+      "download": "下載",
+      "share": "分享",
+      "print": "列印",
+      "preparing": "準備中…",
+      "doneSharing": "分享完成",
+      "colorAgain": "再上色一次",
+      "startOver": "重新開始"
+    },
+    "toolbar": {
+      "expand": "展開工具列",
+      "collapse": "收合工具列",
+      "moreTools": "更多工具",
+      "less": "更少"
+    },
+    "undoRedo": {
+      "undo": "復原",
+      "undoShortcut": "復原 (Ctrl+Z)",
+      "redo": "重做",
+      "redoShortcut": "重做 (Ctrl+Y)"
+    },
+    "colorPalette": {
+      "selectColor": "選擇{color}色",
+      "magicToolsMessage": "使用魔法工具時會自動選色"
+    },
+    "patternSelector": {
+      "label": "圖案："
+    },
+    "zoomControls": {
+      "zoomLevel": "縮放比例：{level}%",
+      "zoomOut": "縮小",
+      "zoomOutAria": "縮小（看更多）",
+      "zoomIn": "放大",
+      "zoomInAria": "放大（看更清楚）",
+      "pan": "移動",
+      "panAria": "在圖片中移動",
+      "reset": "查看全圖",
+      "resetAria": "回到全圖"
+    },
+    "muteToggle": {
+      "mute": "靜音",
+      "unmute": "取消靜音",
+      "turnOn": "開啟音效",
+      "turnOff": "關閉音效"
+    }
+  },
+  "navigation": {
+    "freebies": "免費工具",
+    "myStuff": "我的作品"
+  },
+  "homepage": {
+    "hero": {
+      "title": "用色彩找回平靜",
+      "subtitle": "幾秒內創作精緻的著色頁。在線上上色或在家列印。每天一點創意正念時光。",
+      "trustBadge1": "免費開始",
+      "trustBadge2": "免註冊",
+      "trustBadge3": "可列印或線上上色",
+      "freeCreations": "先享 2 次免費創作 · 免註冊",
+      "users": "瀏覽畫廊"
+    },
+    "showcase": {
+      "title": "熱門著色頁",
+      "showAll": "顯示所有頁面",
+      "free": "免費",
+      "printReady": "可列印 PDF",
+      "addToFavorites": "加入收藏",
+      "removeFromFavorites": "移除收藏",
+      "filters": {
+        "all": "全部",
+        "mandalas": "曼陀羅",
+        "nature": "自然",
+        "geometric": "幾何",
+        "landscapes": "風景",
+        "fantasy": "奇幻",
+        "animals": "動物"
+      }
+    },
+    "stats": {
+      "pagesCreated": "已創作著色頁",
+      "dailyPages": "每日頁面",
+      "freeLibraryPages": "免費圖庫頁面",
+      "categories": "分類"
+    },
+    "features": {
+      "badge": "運作方式",
+      "title": "你的創意療癒工具箱",
+      "subtitle": "研究顯示，著色會啟動與冥想相同的安定神經路徑。我們讓你輕鬆建立每日的創作習慣。",
+      "stressReduction": "回報壓力降低",
+      "step": "第 {number} 步",
+      "steps": {
+        "1": {
+          "title": "描述你的想像",
+          "description": "輸入文字、語音描述或上傳照片。我們將你的靈感化為獨特、精緻的圖案。"
+        },
+        "2": {
+          "title": "數位上色或列印",
+          "description": "使用我們舒心的線上畫布，或下載高解析 PDF，搭配你喜愛的真實色鉛筆。"
+        },
+        "3": {
+          "title": "儲存並分享",
+          "description": "收藏你的完成作品到個人畫廊，或與社群分享你的創作。"
+        },
+        "4": {
+          "title": "建立每日習慣",
+          "description": "每天早晨一張免費著色頁。五分鐘的平靜，讓一天從容展開。"
+        }
+      }
+    },
+    "galleryPreview": {
+      "title": "本週熱門",
+      "subtitle": "來自持續擴充的免費圖庫頁面，深受社群喜愛。",
+      "viewAll": "查看全部",
+      "viewAllPages": "查看所有頁面",
+      "dailyPage": "今日著色頁",
+      "colorNow": "立即上色"
+    },
+    "testimonials": {
+      "fromReviews": "來自 {count} 則評價",
+      "pagesColored": "已上色 {count} 頁"
+    },
+    "newsletter": {
+      "badge": "每日免費著色",
+      "title": "每天早晨，一張免費頁面",
+      "subtitle": "用一刻創意平靜開啟新的一天。每天早晨寄送一張全新著色頁到你的信箱。",
+      "emailPlaceholder": "your@email.com",
+      "subscribe": "訂閱",
+      "subscribed": "已訂閱",
+      "noSpam": "絕不發垃圾信，隨時可取消訂閱。"
+    },
+    "faq": {
+      "title": "常見問題",
+      "items": {
+        "1": {
+          "question": "Coloring Habitat 如何運作？",
+          "answer": "用文字、語音或照片描述你想上色的主題。我們約 30 秒內就能產出細緻、精緻的著色頁。你可以用數位工具在線上上色，或下載高解析 PDF 在家列印。"
+        },
+        "2": {
+          "question": "真的免費嗎？",
+          "answer": "一開始可免費創作 2 張頁面，免註冊。註冊（同樣免費）後可瀏覽持續擴充的圖庫，並每天早晨收到一張全新的著色頁寄到信箱。"
+        },
+        "3": {
+          "question": "和其他著色 App 有什麼不同？",
+          "answer": "Coloring Habitat 專為追求正念放鬆的人而設計。每張作品都細緻且富質感，整體體驗完全無廣告、沉靜舒心。"
+        },
+        "4": {
+          "question": "我可以列印著色頁嗎？",
+          "answer": "每一頁都可下載為高解析 PDF，完美適配 A4 或 US Letter 紙張。列印後用真實的色鉛筆、原子筆與麥克筆上色；也可直接線上上色，省去列印。"
+        },
+        "5": {
+          "question": "有手機 App 嗎？",
+          "answer": "原生 iOS 與 Android App 即將推出。期間我們的網頁版已完整支援響應式設計，在手機與平板上同樣好用。"
+        }
+      }
+    },
+    "cta": {
+      "title": "準備好找回平靜了嗎？",
+      "subtitle": "把著色融入每日身心保養。一天五分鐘就足夠。",
+      "startColoring": "免費開始著色",
+      "viewPlans": "查看方案",
+      "getTheApp": "取得 App",
+      "downloadOnAppStore": "下載於",
+      "appStore": "App Store",
+      "getItOn": "前往",
+      "googlePlay": "Google Play"
+    }
+  },
+  "footer": {
+    "brand": "Coloring Habitat",
+    "tagline": "為每個人打造的正念著色。創作、上色，找回內心平靜。",
+    "copyright": "© {year} Coloring Habitat。版權所有。",
+    "sections": {
+      "explore": "探索",
+      "company": "公司",
+      "support": "支援",
+      "legal": "法律"
+    },
+    "links": {
+      "gallery": "作品集",
+      "create": "創作",
+      "categories": "分類",
+      "dailyPage": "每日頁面",
+      "about": "關於我們",
+      "pricing": "方案與價格",
+      "blog": "部落格",
+      "contactUs": "聯絡我們",
+      "faq": "常見問題",
+      "privacy": "隱私權政策",
+      "terms": "服務條款",
+      "cookies": "Cookie 政策"
+    }
+  },
+  "blog": {
+    "title": "Coloring Habitat 部落格",
+    "subtitle": "身心靈、技巧與靈感，陪你專注著色",
+    "allPosts": "所有文章",
+    "all": "全部",
+    "byAuthor": "作者：{author}",
+    "comingSoon": "即將推出",
+    "comingSoonDescription": "我們正在撰寫關於著色與身心健康的科學、技巧指南與創作靈感的文章。",
+    "metaTitle": "部落格 | Coloring Habitat",
+    "metaDescription": "身心健康小訣竅、著色技巧與創作靈感，陪你專注著色。探索著色舒緩壓力背後的科學。",
+    "home": "首頁",
+    "blog": "部落格",
+    "postNotFound": "找不到文章 | Coloring Habitat",
+    "minRead": "閱讀約 {count} 分鐘",
+    "moreFromBlog": "更多部落格內容",
+    "categoryNotFound": "找不到分類 | Coloring Habitat",
+    "categoryMetaTitle": "{category} | Coloring Habitat 部落格",
+    "categoryDescription": "瀏覽 Coloring Habitat 部落格中所有「{category}」文章。",
+    "noCategoryPosts": "此分類目前尚無文章",
+    "checkBackSoon": "敬請期待新文章！"
+  },
+  "email": {
+    "signup": {
+      "title": "每天早晨，一張免費著色頁",
+      "subtitle": "每天在信箱收到一張<free>免費</free>著色頁。",
+      "placeholder": "your@email.com",
+      "join": "訂閱",
+      "success": "訂閱成功",
+      "successDescription": "你的第一張著色頁將於明天早晨送達。",
+      "error": "發生錯誤",
+      "errorDescription": "無法將你加入訂閱名單，請再試一次。"
+    }
+  },
+  "createForm": {
+    "inputModes": {
+      "type": "輸入",
+      "talk": "說話",
+      "photo": "照片"
+    },
+    "loading": {
+      "creating": "正在建立你的著色頁…",
+      "readyIn": "約 30 秒完成"
+    },
+    "textInput": {
+      "placeholder": "例如：寧靜的日式庭園，有錦鯉與櫻花…",
+      "guestLimitPlaceholder": "你今天已用完 2 次免費建立。註冊即可繼續！",
+      "noCreditsSubscribed": "點數已用完。購買更多以繼續建立！",
+      "noCreditsUnsubscribed": "點數已用完。訂閱即可獲得更多建立次數！",
+      "signInPlaceholder": "登入以開始建立著色頁",
+      "createPage": "建立我的頁面",
+      "createPageFree": "建立我的頁面（剩 {count} 次免費）",
+      "signUpFree": "免費註冊",
+      "signUpSubtext": "建立帳號以解鎖更多建立次數",
+      "buyCredits": "購買點數",
+      "viewPlans": "查看方案",
+      "buyCreditsSubtext": "取得更多點數，繼續建立",
+      "subscribeSubtext": "訂閱，盡情創作",
+      "getStarted": "開始使用",
+      "signInSubtext": "登入以開始建立"
+    },
+    "voiceInput": {
+      "tapToDescribe": "點一下描述你的頁面",
+      "maxSeconds": "最多 {seconds} 秒",
+      "guestLimitReached": "你的免費建立次數已用完。註冊以繼續！",
+      "noCredits": "點數已用完。",
+      "signInToRecord": "登入以錄音",
+      "listening": "正在聆聽…",
+      "allDone": "完成了嗎？{seconds} 秒後停止…",
+      "cancel": "取消",
+      "imDone": "我完成了",
+      "doneTalking": "說完了",
+      "notSupported": "此瀏覽器不支援語音錄製。",
+      "trySafari": "建議使用 Chrome 或 Safari 以獲得最佳體驗。",
+      "tryAgain": "再試一次",
+      "gettingMicReady": "正在準備麥克風…",
+      "understanding": "正在理解你說的內容…",
+      "createColoringPage": "建立我的著色頁",
+      "notQuiteRight": "不太對嗎？再試一次",
+      "errors": {
+        "permissionDenied": "麥克風權限遭拒。請在瀏覽器設定中允許存取。",
+        "notSupported": "此瀏覽器不支援語音錄製。",
+        "transcriptionFailed": "無法辨識錄音內容。請再試一次。",
+        "recordingFailed": "錄音失敗。請再試一次。",
+        "timeout": "錄音逾時。請再試一次。"
+      }
+    },
+    "imageInput": {
+      "takeOrUpload": "拍照或上傳圖片",
+      "guestLimitReached": "你的免費建立次數已用完。註冊以繼續！",
+      "noCredits": "點數已用完。",
+      "signInToUpload": "登入以上傳",
+      "camera": "相機",
+      "upload": "上傳",
+      "dragAndDrop": "或拖放圖片",
+      "dropHere": "放到這裡！",
+      "shareImage": "分享插畫、照片或任何圖片來轉換",
+      "greatPicture": "好照片！",
+      "pickAnother": "換一張",
+      "useThis": "使用這張",
+      "processingPhoto": "正在處理你的照片…",
+      "analyzingImage": "正在分析圖片…",
+      "iSee": "我看到：",
+      "createColoringPage": "建立我的著色頁",
+      "notQuiteRight": "不太對嗎？再試一次",
+      "tryAgain": "再試一次",
+      "errors": {
+        "fileTooLarge": "圖片太大。請使用小於 10MB 的圖片。",
+        "invalidType": "圖片格式無效。請使用 JPEG、PNG 或 WebP。",
+        "processingFailed": "無法處理圖片。請再試一次。",
+        "cameraFailed": "相機發生問題。請改為上傳照片。",
+        "heicUnsupported": "不支援 HEIC 圖片。請先另存為 JPG 或 PNG。"
+      }
+    }
+  },
+  "pricing": {
+    "title": "簡單、透明的定價",
+    "subtitle": "先免費開始，準備好再升級。無隱藏費用，隨時可取消。",
+    "monthly": "月繳",
+    "annual": "年繳",
+    "savePercent": "省 17%",
+    "free": "免費",
+    "perMonth": "/月",
+    "perYear": "/年",
+    "mostPopular": "最受歡迎",
+    "plans": {
+      "bloom": {
+        "name": "Bloom",
+        "description": "開啟你的著色旅程",
+        "cta": "免費開始",
+        "features": {
+          "0": "起步含 2 次免費製作",
+          "1": "使用免費圖庫",
+          "2": "線上著色畫布",
+          "3": "PDF 下載"
+        }
+      },
+      "grove": {
+        "name": "Grove",
+        "description": "適合偶爾著色的人",
+        "cta": "開始免費試用",
+        "features": {
+          "0": "每月 300 點數",
+          "1": "所有著色功能",
+          "2": "HD PDF 下載",
+          "3": "儲存到藝廊"
+        }
+      },
+      "sanctuary": {
+        "name": "Sanctuary",
+        "description": "適合固定著色的人",
+        "cta": "開始免費試用",
+        "features": {
+          "0": "每月 800 點數",
+          "1": "包含 Grove 全部內容",
+          "2": "點數可延用 1 個月",
+          "3": "優先產生",
+          "4": "每日 Email 頁面",
+          "5": "優先支援"
+        }
+      },
+      "oasis": {
+        "name": "Oasis",
+        "description": "完整的身心療癒體驗",
+        "cta": "開始免費試用",
+        "features": {
+          "0": "每月 2,000 點數",
+          "1": "包含 Sanctuary 全部內容",
+          "2": "點數可延用 2 個月",
+          "3": "商用授權",
+          "4": "專屬系列",
+          "5": "自訂配色盤",
+          "6": "沉浸式音景"
+        }
+      }
+    },
+    "faq": {
+      "title": "方案常見問題",
+      "items": {
+        "cancelAnytime": {
+          "question": "可以隨時取消嗎？",
+          "answer": "可以。你可在帳號設定中隨時取消訂閱。不用解釋，也不用有壓力。"
+        },
+        "rollover": {
+          "question": "點數會延用嗎？",
+          "answer": "Grove 點數每月重置。Sanctuary 最多可延用 1 個月。Oasis 可延用 2 個月——讓你不必趕著用完。"
+        },
+        "creditsPerPage": {
+          "question": "我可以製作多少頁？",
+          "answer": "文字或照片頁面每張 5 點數。語音模式（透過引導式對話了解你想上色的內容）每張 10 點數。因此 Grove 每月約可做 60 張文字/照片或約 30 張語音頁面。Sanctuary 約 160 / 80。Oasis 約 400 / 200。依你的節奏自由搭配。"
+        },
+        "audience": {
+          "question": "Coloring Habitat 適合我嗎？",
+          "answer": "我們為想放慢步調、找回平靜、享受創作式放鬆的人設計了 Coloring Habitat。若你覺得著色能帶來療癒，你來對地方了。"
+        },
+        "gettingStarted": {
+          "question": "我該怎麼開始？",
+          "answer": "選擇方案後即可開始製作。Bloom 可免費使用——不需要帳號也能先試試。"
+        }
+      }
+    }
+  },
+  "billing": {
+    "pageTitle": "帳務",
+    "pageSubtitle": "管理您的訂閱與點數",
+    "currentPlan": "目前方案",
+    "currentCredits": "您還剩 <strong>{credits} 點</strong>。",
+    "renewsOn": "將於 {date} 續訂",
+    "manageSubscription": "管理訂閱",
+    "noActiveSubscription": "尚無有效訂閱",
+    "noActiveSubscriptionDescription": "請從下方選擇方案，開始使用 Coloring Habitat。",
+    "availablePlans": "可選方案",
+    "mostPopular": "最受歡迎",
+    "perMonth": "/月",
+    "creditsPerMonth": "{credits} 點/月",
+    "cancelAnytime": "可隨時取消，無需綁約",
+    "manageInPortal": "在帳務入口管理",
+    "loading": "載入中…",
+    "changePlan": "更改方案",
+    "subscribe": "訂閱",
+    "viewPlans": "查看方案",
+    "errors": {
+      "noActiveSubscription": "未找到有效訂閱。",
+      "changeSubscriptionFailed": "更改訂閱失敗。請再試一次。",
+      "checkoutFailed": "無法開始結帳。請再試一次。",
+      "portalFailed": "無法開啟訂閱管理。",
+      "checkoutSessionFailed": "建立結帳工作階段失敗",
+      "redirectFailed": "無法重新導向至結帳頁面"
+    }
+  },
+  "breadcrumbs": {
+    "home": "首頁",
+    "gallery": "藝廊"
+  },
+  "gallery": {
+    "pageTitle": "著色圖庫｜Coloring Habitat",
+    "pageDescription": "瀏覽不斷擴充的精緻著色頁收藏，放鬆身心、培養正念。可依分類、難度或季節篩選。",
+    "heroTitle": "著色圖庫",
+    "heroSubtitle": "瀏覽精緻著色頁，放鬆身心、培養正念。每款設計都讓你放慢步調，找回一段安靜時光。",
+    "browseByCategory": "依分類瀏覽",
+    "browseByDifficulty": "依難度瀏覽",
+    "browseByHolidays": "季節與節日",
+    "dailyPage": "今日著色頁",
+    "viewAllDaily": "查看所有每日頁面",
+    "communityCreations": "精選頁面",
+    "viewAllCommunity": "查看所有精選",
+    "startColoring": "開始著色",
+    "stats": {
+      "totalPages": "圖庫頁數",
+      "communityPages": "免費圖庫頁數",
+      "dailyPages": "每日產生頁數",
+      "pagesSuffix": "頁"
+    },
+    "filters": {
+      "all": "全部"
+    },
+    "difficulty": {
+      "beginner": {
+        "title": "初學",
+        "shortLabel": "簡單",
+        "description": "柔和圖樣，適合短暫的安定時刻"
+      },
+      "intermediate": {
+        "title": "中階",
+        "shortLabel": "中等",
+        "description": "細節適中，適合更長、更踏實的練習"
+      },
+      "advanced": {
+        "title": "進階",
+        "shortLabel": "困難",
+        "description": "細緻設計，值得慢慢專注投入"
+      },
+      "expert": {
+        "title": "專家",
+        "shortLabel": "專家",
+        "description": "極致繁複之作，帶你進入深度冥想流"
+      }
+    },
+    "categories": {
+      "mandalas": {
+        "name": "曼陀羅",
+        "description": "對稱圖樣，凝神專注"
+      },
+      "nature": {
+        "name": "自然",
+        "description": "植物景致與自然之美"
+      },
+      "geometric": {
+        "name": "幾何",
+        "description": "精準圖樣與鑲嵌結構"
+      },
+      "landscapes": {
+        "name": "風景",
+        "description": "群山、海洋與遠方地平線"
+      },
+      "fantasy": {
+        "name": "奇幻",
+        "description": "神話生物與魔幻世界"
+      },
+      "animals": {
+        "name": "動物",
+        "description": "細節豐富的野生動物"
+      },
+      "architecture": {
+        "name": "建築",
+        "description": "建築、教堂與歷史空間"
+      },
+      "abstract": {
+        "name": "抽象",
+        "description": "自由構圖，盡情創作表達"
+      },
+      "flowers": {
+        "name": "花卉",
+        "description": "細緻花朵，溫柔專注"
+      },
+      "ocean": {
+        "name": "海洋",
+        "description": "海底景色與海洋生物"
+      },
+      "patterns": {
+        "name": "圖案",
+        "description": "重複母題，適合沉浸式著色"
+      },
+      "wildlife": {
+        "name": "野生動物",
+        "description": "棲息地中的動物身影"
+      },
+      "mythology": {
+        "name": "神話",
+        "description": "古老傳說與傳奇人物"
+      },
+      "steampunk": {
+        "name": "蒸汽龐克",
+        "description": "維多利亞機械與奇趣裝置"
+      },
+      "food": {
+        "name": "美食",
+        "description": "盛宴與料理場景"
+      }
+    },
+    "holidays": {
+      "title": "季節與節日",
+      "christmas": "聖誕節",
+      "halloween": "萬聖節",
+      "easter": "復活節",
+      "valentines": "情人節",
+      "winter": "冬季",
+      "spring": "春季",
+      "summer": "夏季",
+      "autumn": "秋季"
+    },
+    "seo": {
+      "aboutTitle": "一處安靜的著色角落",
+      "aboutParagraph1": "Coloring Habitat 是一座持續成長的精緻著色頁圖庫，為想放慢步調、找回平靜、重新連結創作習慣的成人而設計。每一頁都用心打造，邀你專注投入——無論只有五分鐘，或是一個安靜的午後。",
+      "aboutParagraph2": "每天都會產生一張全新的著色頁。訂閱每日電子郵件，每天早上在收件匣收到新設計；也可隨時瀏覽完整圖庫。在線上使用數位畫布著色，或下載高解析度 PDF 列印後手繪上色。",
+      "aboutParagraph3": "藝術治療研究指出，即使是短暫的著色，也可能降低皮質醇、安撫紛亂思緒，並啟動與冥想相似的大腦區域。Coloring Habitat 讓這項練習更容易回到生活裡——成為每日的小儀式，讓心更安定。"
+    }
+  },
+  "accountSettings": {
+    "account": "帳號",
+    "accountDetails": "您的帳號資訊",
+    "email": "電子郵件",
+    "name": "姓名",
+    "noEmail": "未設定電子郵件",
+    "galleryPreferences": "畫廊偏好設定",
+    "galleryControl": "自訂您的畫廊體驗",
+    "showCommunityArtwork": "顯示社群作品",
+    "showCommunityDescription": "在畫廊中顯示其他會員分享的作品",
+    "communityEnabled": "已啟用社群畫廊圖片",
+    "communityDisabled": "已停用社群畫廊圖片"
+  },
+  "og": {
+    "homepage": {
+      "tagline": "成人著色頁，隨選即製。",
+      "alt": "Coloring Habitat — 成人著色頁，隨選即製。"
+    }
+  }
+}

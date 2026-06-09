@@ -1,1 +1,204 @@
-{}
+{
+  "mobile": {
+    "tabs": {
+      "home": "홈",
+      "create": "만들기",
+      "gallery": "갤러리",
+      "stickers": "스티커",
+      "myArt": "내 작품",
+      "challenges": "도전",
+      "settings": "설정"
+    },
+    "button": {
+      "createColoringPage": "색칠 페이지 만들기",
+      "creating": "만드는 중...",
+      "tryAgain": "다시 시도",
+      "cancel": "취소"
+    },
+    "header": {
+      "forGrownUps": "보호자용",
+      "grownUps": "보호자"
+    },
+    "characterBuilder": {
+      "step": {
+        "species": "친구 고르기",
+        "color": "색 고르기",
+        "traits": "어떤 친구인가요?",
+        "name": "이름 지어주기",
+        "voice": "목소리 고르기"
+      },
+      "pickUpTo": "최대 {{count}}개 선택",
+      "namePlaceholder": "이름을 입력하세요",
+      "nameLabel": "캐릭터 이름",
+      "redo": "다시 하기",
+      "back": "뒤로",
+      "next": "다음",
+      "makeFriend": "내 친구 만들기",
+      "creating": "그리는 중...",
+      "createError": "문제가 생겼어요. 다시 시도해 주세요."
+    },
+    "challenges": {
+      "homeCardTitle": "도전",
+      "homeCardSubtitle": "색칠하고 스티커를 모아 Colo를 키워요!"
+    },
+    "characters": {
+      "loading": "친구 불러오는 중...",
+      "emptyTitle": "첫 친구를 만들어 볼까요?",
+      "emptySubtitle": "이름과 생김새를 고르면 우리가 그려 드려요. 친구가 색칠 페이지에 등장해요.",
+      "makeFriend": "친구 만들기",
+      "newCharacter": "친구 만들기",
+      "addCharacter": "추가",
+      "drawing": "{{name}} 그리는 중...",
+      "drawingBadge": "그리는 중",
+      "tryAgain": "눌러서 다시 시도",
+      "retryBadge": "재시도",
+      "gettingReady": "준비 중",
+      "fullHouse": "친구가 가득해요(8명). 새 친구를 만들려면 한 명을 지워 주세요.",
+      "homeCardTitle": "내 캐릭터",
+      "homeCardSubtitle": "친구를 만들어 색칠 페이지의 주인공으로!",
+      "close": "닫기",
+      "deleteTitle": "이 친구를 지울까요?",
+      "deleteSubtitle": "캐릭터를 지우려면 보호자 확인이 필요해요.",
+      "err": {
+        "unauthorized": "먼저 로그인해 주세요.",
+        "noProfile": "친구를 만들기 전에 프로필을 선택해 주세요.",
+        "moderation": "그 이름은 사용할 수 없어요. 다른 이름을 골라 주세요.",
+        "limit": "친구가 가득해요. 먼저 한 명을 지워 주세요.",
+        "worker": "친구를 그리는 중 문제가 생겼어요.",
+        "deleteFailed": "친구를 지울 수 없어요. 다시 시도해 주세요.",
+        "generic": "문제가 생겼어요. 다시 시도해 주세요."
+      },
+      "title": "내 캐릭터"
+    },
+    "gallery": {
+      "title": "탐색",
+      "subtitle": "재미있는 걸 골라 색칠해요"
+    },
+    "stickers": {
+      "title": "스티커 모음",
+      "collected": "{{unlocked}} / {{total}}개 모음",
+      "loading": "스티커 불러오는 중...",
+      "new": "NEW",
+      "hint": "도전을 완료하고 더 많은 스티커를 잠금 해제하세요!",
+      "lockedTitle": "잠긴 스티커",
+      "unlockedDefault": "잠금 해제했어요!",
+      "unlockHintDefault": "계속 색칠하면 이 스티커가 열려요!",
+      "unlockedOn": "{{date}}에 잠금 해제",
+      "progressGreatStart": "좋은 시작이에요!",
+      "progressHalfway": "반쯤 왔어요! 계속해요!",
+      "progressAlmost": "거의 다 됐어요! 정말 잘하고 있어요!",
+      "progressComplete": "대단해요! 스티커를 모두 모았어요!"
+    },
+    "myArtwork": {
+      "loading": "작품 불러오는 중...",
+      "keepColoring": "계속 색칠하기",
+      "inProgress": "진행 중",
+      "savedCount": "저장한 작품 {{count}}개",
+      "savedCount_other": "저장한 작품 {{count}}개",
+      "emptyTitle": "저장한 작품",
+      "emptySubtitle": "마음에 든 작품이 여기에 모여요. 색칠하고 멋진 작품을 저장해 보세요!",
+      "emptyTip": "색칠하는 동안 하트 아이콘을 눌러 저장하세요"
+    },
+    "upsideDownHint": {
+      "title": "거꾸로예요!",
+      "subtitle": "계속 색칠하려면 휴대폰을 바르게 돌려 주세요."
+    },
+    "create": {
+      "greeting": "오늘은 무엇을 색칠해 볼까요?",
+      "subtitle": "시작하는 방법을 골라요!"
+    }
+  },
+  "createForm": {
+    "scene": {
+      "ariaLabel": "그림 만들기",
+      "surpriseMe": "깜짝 추천!",
+      "back": "뒤로",
+      "next": "다음",
+      "create": "만들기!",
+      "extrasTitle": "꾸미기",
+      "skip": "건너뛰기",
+      "subjectTitle": "누구?",
+      "subjectAddCharacter": "캐릭터 추가",
+      "friendsTitle": "내 친구들",
+      "subjectGroupTitle": "또는 하나 고르기",
+      "lockedMakeCharacter": "(먼저 캐릭터를 만들어 주세요)",
+      "locationTitle": "어디?",
+      "weatherTitle": "날씨",
+      "activityTitle": "뭐 하고 있어?",
+      "accentTitle": "꾸미기",
+      "subject": {
+        "horse": "말",
+        "cow": "소",
+        "sheep": "양",
+        "dog": "강아지",
+        "cat": "고양이",
+        "fox": "여우",
+        "lion": "사자",
+        "fish": "물고기",
+        "dragon": "용",
+        "bird": "새",
+        "kid": "아이",
+        "astronaut": "우주비행사"
+      },
+      "location": {
+        "beach": "해변",
+        "sea": "바다 위",
+        "football-game": "축구장",
+        "busy-street": "북적한 거리",
+        "shopping-mall": "쇼핑몰",
+        "desert-island": "섬",
+        "forest": "숲",
+        "mountains": "산",
+        "train-station": "역"
+      },
+      "weather": {
+        "sunny": "맑음",
+        "snowy": "눈",
+        "rainy": "비",
+        "night": "밤",
+        "rainbow": "무지개",
+        "cloudy": "흐림"
+      },
+      "activity": {
+        "playing": "놀기",
+        "sleeping": "잠자기",
+        "running": "달리기",
+        "swimming": "수영하기",
+        "flying-a-kite": "연날리기",
+        "riding-a-bike": "자전거 타기",
+        "having-a-picnic": "소풍가기",
+        "dancing": "춤추기"
+      },
+      "accent": {
+        "birthday": "생일",
+        "sparkles": "반짝이",
+        "underwater-bubbles": "거품",
+        "flowers": "꽃",
+        "space-stars": "별",
+        "balloons": "풍선"
+      }
+    },
+    "voice": {
+      "tapToChat": "탭해서 대화하기",
+      "listen": "들어볼게요…",
+      "listening": "듣는 중…",
+      "anythingElse": "또 있어?",
+      "thinking": "음, 생각 중…",
+      "painting": "색칠 페이지 만드는 중…",
+      "doneTalking": "말하기 끝",
+      "imDone": "끝났어",
+      "cancel": "취소",
+      "tryAgain": "다시 시도",
+      "startLabel": "음성 대화 시작",
+      "stopLabel": "녹음 중지",
+      "errorPermissionDenied": "마이크를 사용하려면 권한이 필요해요.",
+      "errorQ1AudioFailed": "질문을 재생할 수 없어요. 다시 해볼까요?",
+      "errorSttFailed": "목소리가 잘 들리지 않았어요. 다시 해볼까요?",
+      "errorFollowUpFailed": "문제가 생겼어요. 다시 해볼까요?",
+      "errorFollowUpBlocked": "다른 아이디어로 해볼까요!",
+      "errorQ2AudioFailed": "질문을 재생할 수 없어요. 다시 해볼까요?",
+      "errorTimeout": "너무 오래 걸렸어요! 처음부터 다시 해요.",
+      "errorRequiresSignin": "음성 모드를 사용하려면 로그인해 주세요."
+    }
+  }
+}

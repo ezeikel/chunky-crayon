@@ -1,0 +1,204 @@
+{
+  "mobile": {
+    "tabs": {
+      "home": "首页",
+      "create": "创作",
+      "gallery": "图库",
+      "stickers": "贴纸",
+      "myArt": "我的作品",
+      "challenges": "挑战",
+      "settings": "设置"
+    },
+    "button": {
+      "createColoringPage": "生成涂色页",
+      "creating": "生成中…",
+      "tryAgain": "再试一次",
+      "cancel": "取消"
+    },
+    "header": {
+      "forGrownUps": "给大人",
+      "grownUps": "大人专区"
+    },
+    "characterBuilder": {
+      "step": {
+        "species": "选一个小伙伴",
+        "color": "选个颜色",
+        "traits": "它是什么性格？",
+        "name": "给它起个名字",
+        "voice": "选个声音"
+      },
+      "pickUpTo": "最多选 {{count}} 个",
+      "namePlaceholder": "输入名字",
+      "nameLabel": "角色名字",
+      "redo": "重做",
+      "back": "返回",
+      "next": "下一步",
+      "makeFriend": "制作我的小伙伴",
+      "creating": "绘制中…",
+      "createError": "出错了，请再试一次。"
+    },
+    "challenges": {
+      "homeCardTitle": "挑战",
+      "homeCardSubtitle": "涂色赢贴纸，帮助 Colo 成长！"
+    },
+    "characters": {
+      "loading": "正在加载你的小伙伴…",
+      "emptyTitle": "来做第一个小伙伴吧！",
+      "emptySubtitle": "选个名字和外形，我们就帮你画出来。它会出现在你的涂色页里。",
+      "makeFriend": "制作小伙伴",
+      "newCharacter": "制作小伙伴",
+      "addCharacter": "添加",
+      "drawing": "正在绘制 {{name}}…",
+      "drawingBadge": "绘制中",
+      "tryAgain": "点按重试",
+      "retryBadge": "重试",
+      "gettingReady": "准备中",
+      "fullHouse": "小伙伴满员啦（8个）。先移除一个，再添加新的吧。",
+      "homeCardTitle": "我的角色",
+      "homeCardSubtitle": "交朋友，让它们成为涂色页主角！",
+      "close": "关闭",
+      "deleteTitle": "移除这个小伙伴？",
+      "deleteSubtitle": "移除角色需要大人确认。",
+      "err": {
+        "unauthorized": "请先登录。",
+        "noProfile": "先选择一个个人档案再制作小伙伴。",
+        "moderation": "这个名字不能用，换一个试试。",
+        "limit": "小伙伴已满员，请先移除一个。",
+        "worker": "绘制小伙伴时出了点问题。",
+        "deleteFailed": "移除失败，请再试一次。",
+        "generic": "出错了，请再试一次。"
+      },
+      "title": "我的角色"
+    },
+    "gallery": {
+      "title": "探索",
+      "subtitle": "挑个好玩的来涂色"
+    },
+    "stickers": {
+      "title": "贴纸收藏",
+      "collected": "已收集 {{unlocked}} / {{total}}",
+      "loading": "正在加载贴纸…",
+      "new": "新",
+      "hint": "完成挑战，解锁更多贴纸！",
+      "lockedTitle": "未解锁的贴纸",
+      "unlockedDefault": "你解锁啦！",
+      "unlockHintDefault": "继续涂色就能解锁这张贴纸！",
+      "unlockedOn": "{{date}} 已解锁",
+      "progressGreatStart": "开局很棒！",
+      "progressHalfway": "完成一半啦！继续加油！",
+      "progressAlmost": "快到了！你做得真棒！",
+      "progressComplete": "太棒了！贴纸全收集！"
+    },
+    "myArtwork": {
+      "loading": "正在加载你的作品…",
+      "keepColoring": "继续涂色",
+      "inProgress": "进行中",
+      "savedCount": "已保存 {{count}} 幅作品",
+      "savedCount_other": "已保存 {{count}} 幅作品",
+      "emptyTitle": "已保存的作品",
+      "emptySubtitle": "你最喜欢的作品会出现在这里。开始涂色并保存你的杰作吧！",
+      "emptyTip": "涂色时点按爱心即可保存"
+    },
+    "upsideDownHint": {
+      "title": "把我转过来！",
+      "subtitle": "把手机翻正，继续涂色吧。"
+    },
+    "create": {
+      "greeting": "今天想涂什么？",
+      "subtitle": "选一种开始方式！"
+    }
+  },
+  "createForm": {
+    "scene": {
+      "ariaLabel": "搭建你的图片",
+      "surpriseMe": "给我惊喜！",
+      "back": "返回",
+      "next": "下一步",
+      "create": "开始创作！",
+      "extrasTitle": "小惊喜",
+      "skip": "跳过",
+      "subjectTitle": "谁？",
+      "subjectAddCharacter": "添加角色",
+      "friendsTitle": "你的朋友",
+      "subjectGroupTitle": "或选一个",
+      "lockedMakeCharacter": "（先创建一个角色）",
+      "locationTitle": "在哪里？",
+      "weatherTitle": "天气",
+      "activityTitle": "在做什么？",
+      "accentTitle": "小装饰",
+      "subject": {
+        "horse": "马",
+        "cow": "奶牛",
+        "sheep": "小羊",
+        "dog": "小狗",
+        "cat": "小猫",
+        "fox": "狐狸",
+        "lion": "狮子",
+        "fish": "小鱼",
+        "dragon": "龙",
+        "bird": "小鸟",
+        "kid": "小朋友",
+        "astronaut": "宇航员"
+      },
+      "location": {
+        "beach": "海滩",
+        "sea": "海上",
+        "football-game": "足球场",
+        "busy-street": "热闹街道",
+        "shopping-mall": "商场",
+        "desert-island": "小岛",
+        "forest": "森林",
+        "mountains": "大山",
+        "train-station": "车站"
+      },
+      "weather": {
+        "sunny": "晴天",
+        "snowy": "下雪",
+        "rainy": "下雨",
+        "night": "夜晚",
+        "rainbow": "彩虹",
+        "cloudy": "多云"
+      },
+      "activity": {
+        "playing": "玩耍",
+        "sleeping": "睡觉",
+        "running": "跑步",
+        "swimming": "游泳",
+        "flying-a-kite": "放风筝",
+        "riding-a-bike": "骑车",
+        "having-a-picnic": "野餐",
+        "dancing": "跳舞"
+      },
+      "accent": {
+        "birthday": "生日",
+        "sparkles": "闪闪亮",
+        "underwater-bubbles": "泡泡",
+        "flowers": "花朵",
+        "space-stars": "星星",
+        "balloons": "气球"
+      }
+    },
+    "voice": {
+      "tapToChat": "点按聊天",
+      "listen": "听一听…",
+      "listening": "正在听…",
+      "anythingElse": "还想加点什么？",
+      "thinking": "嗯，让我想想…",
+      "painting": "正在准备你的涂色页…",
+      "doneTalking": "说完啦",
+      "imDone": "我说完了",
+      "cancel": "取消",
+      "tryAgain": "再试一次",
+      "startLabel": "开始语音对话",
+      "stopLabel": "停止录音",
+      "errorPermissionDenied": "我需要麦克风权限才能使用哦。",
+      "errorQ1AudioFailed": "问题没播放出来。再试一次？",
+      "errorSttFailed": "我没听清楚。我们再试一次吧。",
+      "errorFollowUpFailed": "出了点小问题。再试一次？",
+      "errorFollowUpBlocked": "我们换个点子试试！",
+      "errorQ2AudioFailed": "问题没播放出来。再试一次？",
+      "errorTimeout": "等太久啦！我们重新开始吧。",
+      "errorRequiresSignin": "登录后才能使用语音模式。"
+    }
+  }
+}

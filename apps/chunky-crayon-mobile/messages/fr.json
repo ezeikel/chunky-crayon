@@ -1,1 +1,204 @@
-{}
+{
+  "mobile": {
+    "tabs": {
+      "home": "Accueil",
+      "create": "Créer",
+      "gallery": "Galerie",
+      "stickers": "Autocollants",
+      "myArt": "Mes dessins",
+      "challenges": "Défis",
+      "settings": "Réglages"
+    },
+    "button": {
+      "createColoringPage": "Créer une page à colorier",
+      "creating": "Création...",
+      "tryAgain": "Réessayer",
+      "cancel": "Annuler"
+    },
+    "header": {
+      "forGrownUps": "Pour les grands",
+      "grownUps": "Les grands"
+    },
+    "characterBuilder": {
+      "step": {
+        "species": "Choisis ton ami",
+        "color": "Choisis une couleur",
+        "traits": "Comment est-il ?",
+        "name": "Donne-lui un nom",
+        "voice": "Choisis une voix"
+      },
+      "pickUpTo": "Choisis jusqu’à {{count}}",
+      "namePlaceholder": "Tape un nom",
+      "nameLabel": "Nom du personnage",
+      "redo": "Refaire",
+      "back": "Retour",
+      "next": "Suivant",
+      "makeFriend": "Créer mon ami",
+      "creating": "Dessin en cours...",
+      "createError": "Oups, un souci. Réessaie."
+    },
+    "challenges": {
+      "homeCardTitle": "Défis",
+      "homeCardSubtitle": "Colorie pour gagner des autocollants et faire grandir Colo !"
+    },
+    "characters": {
+      "loading": "Chargement de tes amis...",
+      "emptyTitle": "Créons ton premier ami !",
+      "emptySubtitle": "Choisis un nom et son apparence, et on le dessinera pour toi. Il apparaîtra dans tes pages à colorier.",
+      "makeFriend": "Créer un ami",
+      "newCharacter": "Créer un ami",
+      "addCharacter": "Ajouter",
+      "drawing": "Dessin de {{name}}...",
+      "drawingBadge": "Dessin",
+      "tryAgain": "Appuie pour réessayer",
+      "retryBadge": "Réessayer",
+      "gettingReady": "Préparation...",
+      "fullHouse": "Ta maison est pleine (8 amis). Supprime-en un pour faire de la place.",
+      "homeCardTitle": "Mes personnages",
+      "homeCardSubtitle": "Crée des amis pour tes pages à colorier !",
+      "close": "Fermer",
+      "deleteTitle": "Retirer cet ami ?",
+      "deleteSubtitle": "Vérification par un grand pour retirer un personnage.",
+      "err": {
+        "unauthorized": "Connecte-toi d’abord.",
+        "noProfile": "Choisis un profil avant de créer un ami.",
+        "moderation": "Ce nom ne convient pas. Essaie-en un autre.",
+        "limit": "Ta maison est pleine. Supprime-en un d’abord.",
+        "worker": "Oups, on n’a pas pu dessiner ton ami.",
+        "deleteFailed": "Impossible de retirer cet ami. Réessaie.",
+        "generic": "Oups, un souci. Réessaie."
+      },
+      "title": "Mes personnages"
+    },
+    "gallery": {
+      "title": "Explorer",
+      "subtitle": "Choisis quelque chose de sympa à colorier"
+    },
+    "stickers": {
+      "title": "Collection d’autocollants",
+      "collected": "{{unlocked}} / {{total}} collectés",
+      "loading": "Chargement des autocollants...",
+      "new": "NOUVEAU",
+      "hint": "Termine des défis pour débloquer plus d’autocollants !",
+      "lockedTitle": "Autocollant verrouillé",
+      "unlockedDefault": "Tu l’as débloqué !",
+      "unlockHintDefault": "Continue à colorier pour débloquer cet autocollant !",
+      "unlockedOn": "Débloqué le {{date}}",
+      "progressGreatStart": "Super début !",
+      "progressHalfway": "À mi-chemin ! Continue !",
+      "progressAlmost": "Presque ! Tu assures !",
+      "progressComplete": "Incroyable ! Tous les autocollants sont collectés !"
+    },
+    "myArtwork": {
+      "loading": "Chargement de tes dessins...",
+      "keepColoring": "Continuer à colorier",
+      "inProgress": "En cours",
+      "savedCount": "{{count}} dessin enregistré",
+      "savedCount_other": "{{count}} dessins enregistrés",
+      "emptyTitle": "Tes dessins enregistrés",
+      "emptySubtitle": "Tes créations préférées apparaîtront ici. Commence à colorier et sauvegarde tes chefs-d’œuvre !",
+      "emptyTip": "Appuie sur le cœur pendant le coloriage pour enregistrer"
+    },
+    "upsideDownHint": {
+      "title": "Retourne-moi !",
+      "subtitle": "Remets ton téléphone à l’endroit pour continuer à colorier."
+    },
+    "create": {
+      "greeting": "Qu’est-ce que tu veux colorier aujourd’hui ?",
+      "subtitle": "Choisis comment commencer !"
+    }
+  },
+  "createForm": {
+    "scene": {
+      "ariaLabel": "Crée ton image",
+      "surpriseMe": "Surprends-moi !",
+      "back": "Retour",
+      "next": "Suivant",
+      "create": "Créer !",
+      "extrasTitle": "Extras",
+      "skip": "Passer",
+      "subjectTitle": "Qui ?",
+      "subjectAddCharacter": "Ajouter un personnage",
+      "friendsTitle": "Tes amis",
+      "subjectGroupTitle": "ou choisis-en un",
+      "lockedMakeCharacter": "(crée d'abord un personnage)",
+      "locationTitle": "Où ?",
+      "weatherTitle": "Météo",
+      "activityTitle": "Faire quoi ?",
+      "accentTitle": "Extras",
+      "subject": {
+        "horse": "Cheval",
+        "cow": "Vache",
+        "sheep": "Mouton",
+        "dog": "Chien",
+        "cat": "Chat",
+        "fox": "Renard",
+        "lion": "Lion",
+        "fish": "Poisson",
+        "dragon": "Dragon",
+        "bird": "Oiseau",
+        "kid": "Enfant",
+        "astronaut": "Astronaute"
+      },
+      "location": {
+        "beach": "Plage",
+        "sea": "En mer",
+        "football-game": "Foot",
+        "busy-street": "Rue animée",
+        "shopping-mall": "Centre commercial",
+        "desert-island": "Île",
+        "forest": "Forêt",
+        "mountains": "Montagnes",
+        "train-station": "Gare"
+      },
+      "weather": {
+        "sunny": "Ensoleillé",
+        "snowy": "Neigeux",
+        "rainy": "Pluvieux",
+        "night": "Nuit",
+        "rainbow": "Arc-en-ciel",
+        "cloudy": "Nuageux"
+      },
+      "activity": {
+        "playing": "Jouer",
+        "sleeping": "Dormir",
+        "running": "Courir",
+        "swimming": "Nager",
+        "flying-a-kite": "Cerf-volant",
+        "riding-a-bike": "Vélo",
+        "having-a-picnic": "Pique-nique",
+        "dancing": "Danser"
+      },
+      "accent": {
+        "birthday": "Anniversaire",
+        "sparkles": "Paillettes",
+        "underwater-bubbles": "Bulles",
+        "flowers": "Fleurs",
+        "space-stars": "Étoiles",
+        "balloons": "Ballons"
+      }
+    },
+    "voice": {
+      "tapToChat": "Appuie pour parler",
+      "listen": "Écoute…",
+      "listening": "J'écoute…",
+      "anythingElse": "Autre chose ?",
+      "thinking": "Hmm, je réfléchis…",
+      "painting": "Je prépare ta page…",
+      "doneTalking": "J'ai fini de parler",
+      "imDone": "J'ai fini",
+      "cancel": "Annuler",
+      "tryAgain": "Réessayer",
+      "startLabel": "Démarrer la conversation vocale",
+      "stopLabel": "Arrêter l'enregistrement",
+      "errorPermissionDenied": "J'ai besoin d'autorisation pour utiliser ton micro.",
+      "errorQ1AudioFailed": "Impossible de lire la question. Réessayer ?",
+      "errorSttFailed": "Je ne t'ai pas bien entendu. On réessaie.",
+      "errorFollowUpFailed": "Oups, un souci. Réessayer ?",
+      "errorFollowUpBlocked": "Essayons une autre idée !",
+      "errorQ2AudioFailed": "Impossible de lire la question. Réessayer ?",
+      "errorTimeout": "Trop long ! On recommence.",
+      "errorRequiresSignin": "Connecte-toi pour utiliser le mode vocal."
+    }
+  }
+}

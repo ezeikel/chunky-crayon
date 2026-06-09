@@ -16,6 +16,8 @@ export const LOCALES = [
   { code: "de", name: "German", nativeName: "Deutsch" },
   { code: "fr", name: "French", nativeName: "Français" },
   { code: "es", name: "Spanish", nativeName: "Español" },
+  { code: "zh-Hans", name: "Simplified Chinese", nativeName: "简体中文" },
+  { code: "zh-Hant", name: "Traditional Chinese", nativeName: "繁體中文" },
 ] as const;
 
 export type LocaleCode = (typeof LOCALES)[number]["code"];

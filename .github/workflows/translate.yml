@@ -8,6 +8,7 @@ on:
       - 'packages/translations/src/en.json'
       - 'apps/chunky-crayon-web/messages/en.json'
       - 'apps/coloring-habitat-web/messages/en.json'
+      - 'apps/chunky-crayon-mobile/messages/en.json'
   # Allow manual trigger for testing
   workflow_dispatch:
 
@@ -73,9 +74,16 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: pnpm tsx scripts/translate-app-overrides.ts --app=coloring-habitat-web --tone=adults
 
+      # 4. CC mobile overrides (kids tone — same audience as CC web)
+      - name: Translate CC mobile overrides
+        working-directory: packages/translations
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: pnpm tsx scripts/translate-app-overrides.ts --app=chunky-crayon-mobile --tone=kids
+
       - name: Commit translations
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "chore(i18n): auto-translate missing keys [skip ci]"
-          file_pattern: "packages/translations/src/*.json apps/chunky-crayon-web/messages/*.json apps/coloring-habitat-web/messages/*.json"
+          file_pattern: "packages/translations/src/*.json apps/chunky-crayon-web/messages/*.json apps/coloring-habitat-web/messages/*.json apps/chunky-crayon-mobile/messages/*.json"
           commit_author: "github-actions[bot] <github-actions[bot]@users.noreply.github.com>"
