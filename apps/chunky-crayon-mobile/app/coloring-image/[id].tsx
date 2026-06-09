@@ -810,10 +810,26 @@ const ColoringImage = () => {
               >
                 <View style={styles.canvasContainer}>
                   <View style={styles.canvasCard}>
+                    {/* Subtract the card's inner padding like every other
+                        canvasArea call site: the hook's canvasArea accounts for
+                        the scroll gutter (CANVAS.horizontalPadding) but not the
+                        card's 12pt padding — passing it raw made the canvas 24pt
+                        wider than the card's content box, so the artwork sat
+                        left-anchored and spilled past the right edge (clipped by
+                        overflow: hidden → white margin on the left only). */}
                     <ImageCanvas
                       coloringImage={coloringImage}
                       setScroll={setScroll}
-                      canvasArea={canvasArea}
+                      canvasArea={{
+                        width: Math.max(
+                          0,
+                          canvasArea.width - CANVAS_CARD_PADDING * 2,
+                        ),
+                        height: Math.max(
+                          0,
+                          canvasArea.height - CANVAS_CARD_PADDING * 2,
+                        ),
+                      }}
                       layoutMode={layoutMode}
                     />
                   </View>
