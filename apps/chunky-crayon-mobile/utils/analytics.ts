@@ -1,6 +1,11 @@
 import { Platform } from "react-native";
 import { posthog } from "@/lib/posthog";
 
+// The SDK's property-bag type (Record<string, JsonType>) isn't re-exported from
+// posthog-react-native's barrel, so derive it from the identify signature itself
+// rather than reaching into the nested @posthog/core path.
+type PostHogProps = NonNullable<Parameters<typeof posthog.identify>[1]>;
+
 /**
  * Thin analytics wrapper around the shared PostHog client. Mirrors web's
  * analytics-client so events look the same in one project:
@@ -43,21 +48,25 @@ export const identify = (
 ): void => {
   try {
     // PostHog person props only ADD/UPDATE on identify — omitting a key does NOT
-    // remove a previously-set value. So an explicit `null` here means "clear this
-    // prop": we collect null-valued keys into `$unset` so e.g. an anon user whose
-    // DB name was reset from the old "Mobile User" placeholder gets that label
-    // actively removed from their PostHog person on next app open, not just
-    // left stale. Non-null props go through as the usual $set.
+    // remove a previously-set value. An explicit `null` here means "clear this
+    // prop": e.g. an anon user whose DB name was reset from the old "Mobile User"
+    // placeholder needs that label ACTIVELY removed from their PostHog person on
+    // next app open, not just left stale.
     const set: Record<string, unknown> = { platform: Platform.OS };
     const unset: string[] = [];
     for (const [key, value] of Object.entries(properties ?? {})) {
       if (value === null || value === undefined) unset.push(key);
       else set[key] = value;
     }
-    posthog.identify(userId, {
-      ...set,
-      ...(unset.length ? { $unset: unset } : {}),
-    });
+    posthog.identify(userId, set as PostHogProps);
+    // `identify(distinctId, props)` ONLY does $set — posthog-react-native does
+    // NOT read a `$unset` key out of the properties object (verified: the $set
+    // event it emits has unset=None). The supported way to REMOVE a person prop
+    // is `$unset` on a capture event's properties. So fire a follow-up capture
+    // carrying the $unset array. Fires only when there's something to clear.
+    if (unset.length) {
+      posthog.capture("$set", { $unset: unset });
+    }
   } catch {
     // non-fatal
   }
