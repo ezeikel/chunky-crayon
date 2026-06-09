@@ -33,6 +33,8 @@ import AppHeader from "@/components/AppHeader";
 import ProfileSwitcher from "@/components/ProfileSwitcher";
 import ColoBottomSheet from "@/components/ColoBottomSheet";
 import ParentalGate from "@/components/ParentalGate";
+import PaywallRouter from "@/components/PaywallRouter";
+import { useRefreshEntitlements } from "@/hooks/useEntitlements";
 import CategoryRow from "@/components/CategoryRow/CategoryRow";
 import SectionHeader from "@/components/SectionHeader/SectionHeader";
 import SeeAllButton from "@/components/SeeAllButton/SeeAllButton";
@@ -54,6 +56,12 @@ const HomeScreen = () => {
   const { width: screenWidth } = useWindowDimensions();
   const [isProfileSwitcherOpen, setIsProfileSwitcherOpen] = useState(false);
   const [isColoSheetOpen, setIsColoSheetOpen] = useState(false);
+  // Tapping the credits chip opens the paywall router — TopUpPackModal for
+  // subscribers (buy more credits), SubscriptionPaywallModal for non-subs. The
+  // actual purchase is parent-gated INSIDE those modals (Kids Category rule), so
+  // opening the surface itself needs no gate — same pattern as the create form.
+  const [isPaywallOpen, setIsPaywallOpen] = useState(false);
+  const refreshEntitlements = useRefreshEntitlements();
   // Settings lives behind a parent-gated corner (not a tab). Tapping the
   // gear opens the gate; passing it routes to the settings stack.
   const [isSettingsGateOpen, setIsSettingsGateOpen] = useState(false);
@@ -82,6 +90,10 @@ const HomeScreen = () => {
           credits={headerData.credits}
           profileName={headerData.profileName}
           avatarId={headerData.avatarId}
+          onCreditsPress={() => {
+            track(ANALYTICS_EVENTS.PAYWALL_VIEWED, { source: "credits_chip" });
+            setIsPaywallOpen(true);
+          }}
           onProfilePress={() => setIsProfileSwitcherOpen(true)}
           onChallengePress={() => router.push("/challenges")}
           onStickersPress={() => router.push("/stickers")}
@@ -300,6 +312,18 @@ const HomeScreen = () => {
         isOpen={isColoSheetOpen}
         onClose={() => setIsColoSheetOpen(false)}
         coloState={coloState}
+      />
+
+      {/* Opened by the header credits chip. Router picks top-up vs subscription
+          by entitlement; the buy is parent-gated inside. Refresh entitlements on
+          a successful purchase so the chip's credit count updates. */}
+      <PaywallRouter
+        visible={isPaywallOpen}
+        onClose={() => setIsPaywallOpen(false)}
+        onSuccess={() => {
+          setIsPaywallOpen(false);
+          refreshEntitlements();
+        }}
       />
 
       {/* Settings is parent-gated: the gear opens this gate, passing it
