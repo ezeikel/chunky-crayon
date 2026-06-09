@@ -188,7 +188,16 @@ const ToolbarContent = () => {
                     icon={config.icon}
                     label={config.label}
                     isMagic={config.isMagic}
-                    selected={isToolActive(config)}
+                    // A magic tool can't be MEANINGFULLY active unless the magic
+                    // system is ready — but selectedTool persists in the global
+                    // store across images, so opening a store-less image with
+                    // Magic Brush still selected painted the tile "active" while
+                    // the status was waiting/timeout (active bg + retry arrow =
+                    // unreadable pink-on-pink, and a tool that silently does
+                    // nothing). Gate the visual on readiness.
+                    selected={
+                      isToolActive(config) && (!config.isMagic || magicReady)
+                    }
                     // Magic tiles: spinner while waiting/retrying, rotate-arrow
                     // retry on timeout (tap re-kicks generation). Web parity.
                     loading={

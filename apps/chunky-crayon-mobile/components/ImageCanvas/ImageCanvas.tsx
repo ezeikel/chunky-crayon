@@ -678,12 +678,32 @@ const ImageCanvas = ({
     setMagicRetryNonce((n) => n + 1); // resume the 3s/90-attempt poll
   }, [coloringImage.id, setMagicStatus]);
 
+  // FOCUS GATE for the magic-state store writes below. coloring-image/[id] is
+  // a native-stack route opened via router.push, so navigating image A →
+  // image B leaves A's ImageCanvas MOUNTED underneath. Both instances write
+  // magicReady/magicStatus/onMagicRetry into ONE global store — A's region
+  // store decoding asynchronously could assert magicReady=true AFTER B (a
+  // store-less image) set waiting/timeout, leaving mixed state: B's tiles
+  // looked "ready" (or active) for an image with no magic data, and the tap
+  // silently did nothing. Same bug family as the autosave 409 storm (see the
+  // ACTIVE-IMAGE GATE in the autosave effect); here we gate on focus so only
+  // the visible screen owns the shared magic state, and a refocus re-runs the
+  // effects to re-assert it for the image actually on screen.
+  const [isMagicStateOwner, setIsMagicStateOwner] = useState(true);
+  useFocusEffect(
+    useCallback(() => {
+      setIsMagicStateOwner(true);
+      return () => setIsMagicStateOwner(false);
+    }, []),
+  );
+
   // Expose the retry handler to the (sibling) ToolsSidebar via the store, the
   // way web's coloring-context does with onMagicRetry. Cleared on unmount.
   useEffect(() => {
+    if (!isMagicStateOwner) return;
     setOnMagicRetry(handleMagicRetry);
     return () => setOnMagicRetry(null);
-  }, [handleMagicRetry, setOnMagicRetry]);
+  }, [handleMagicRetry, setOnMagicRetry, isMagicStateOwner]);
 
   // Magic tools enable as soon as EITHER the region store is ready OR legacy
   // colour data exists. Region store is the modern path; fillPoints/colorMap
@@ -699,6 +719,11 @@ const ImageCanvas = ({
     (!!colorMap && isValidColorMap(colorMap));
 
   useEffect(() => {
+    // Only the FOCUSED screen may write the shared magic state (and poll) —
+    // see the focus-gate comment above. Refocus flips the flag → this effect
+    // re-runs → state is re-asserted for the visible image.
+    if (!isMagicStateOwner) return;
+
     // READY: the region store has decoded, OR legacy fill/colorMap is present.
     // Only here does magicReady become true — it now reflects ACTUAL usability,
     // so a store-less image never presents a tappable-but-dead tile.
@@ -758,7 +783,8 @@ const ImageCanvas = ({
     };
     // coloringImage.id/regionMapUrl identify the image; hasLegacyMagic +
     // isReady gate the early-out. magicRetryNonce lets the retry button
-    // restart this whole effect (re-kick + fresh poll).
+    // restart this whole effect (re-kick + fresh poll). isMagicStateOwner
+    // re-runs it on focus changes so the visible screen re-asserts the state.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     coloringImage.id,
@@ -766,6 +792,7 @@ const ImageCanvas = ({
     regionStore.state.isReady,
     hasLegacyMagic,
     magicRetryNonce,
+    isMagicStateOwner,
   ]);
 
   // Sync haptics enabled state with mute setting
