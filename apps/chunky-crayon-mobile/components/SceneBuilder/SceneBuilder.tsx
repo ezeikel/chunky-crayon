@@ -8,6 +8,7 @@ import {
   type ImageSourcePropType as ImageSource,
 } from "react-native";
 import { Image } from "expo-image";
+import Svg, { Circle } from "react-native-svg";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import {
   faDice,
@@ -155,6 +156,38 @@ const tintFromDuotone = (hex: string): string => {
   return `rgba(${r}, ${g}, ${b}, 0.14)`;
 };
 
+// Smooth dashed ring drawn as an absolutely-positioned SVG <Circle> overlay.
+// Android's CSS dashed border polygonizes a large-radius rounded border into a
+// flat-edged octagon; SVG strokeDasharray renders a true circle on both
+// platforms. Sized to overlay the full tile box.
+const DashedRing = ({ box }: { box: number }) => {
+  const stroke = 3;
+  const r = (box - stroke) / 2; // keep the stroke inside the box bounds
+  const dash = box >= 100 ? "10 8" : "8 6"; // chunkier dashes on the lg tile
+  return (
+    <Svg
+      width={box}
+      height={box}
+      style={StyleSheet.absoluteFill}
+      pointerEvents="none"
+    >
+      <Circle
+        cx={box / 2}
+        cy={box / 2}
+        r={r}
+        // Faint round wash painted by the SVG, not the View background, so it
+        // stays circular on Android (a rounded View background polygonizes the
+        // same way the dashed border does).
+        fill="rgba(228,100,68,0.05)"
+        stroke={COLORS.crayonOrangeLight}
+        strokeWidth={stroke}
+        strokeDasharray={dash}
+        strokeLinecap="round"
+      />
+    </Svg>
+  );
+};
+
 type SceneTileProps = {
   option: SceneTileOption;
   selected: boolean;
@@ -202,8 +235,10 @@ const SceneTile = ({
               width: box,
               height: box,
               borderRadius: box / 2,
+              // Add tile: transparent View bg; the round wash is painted by the
+              // SVG DashedRing instead (a rounded View bg polygonizes on Android).
               backgroundColor: isAdd
-                ? "rgba(228,100,68,0.05)"
+                ? "transparent"
                 : tintFromDuotone(option.duotone.primary),
             },
             selected
@@ -216,11 +251,14 @@ const SceneTile = ({
           ]}
         >
           {isAdd ? (
-            <FontAwesomeIcon
-              icon={faPlus}
-              size={iconSize}
-              color={COLORS.crayonOrange}
-            />
+            <>
+              <DashedRing box={box} />
+              <FontAwesomeIcon
+                icon={faPlus}
+                size={iconSize}
+                color={COLORS.crayonOrange}
+              />
+            </>
           ) : option.thumbnail ? (
             <Image
               source={option.thumbnail}
@@ -708,8 +746,22 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   tileFaceAdd: {
-    borderColor: COLORS.crayonOrangeLight,
-    borderStyle: "dashed",
+    // The add tile strips ALL of tileFace's sticker chrome and draws only the
+    // SVG DashedRing + the "+" icon. Every one of these properties produces an
+    // octagon on Android for a large-radius disc:
+    //   • borderWidth/borderColor (white sticker ring) → polygonized dashed/solid
+    //     border
+    //   • backgroundColor (set transparent inline) + overflow:'hidden' → clipped
+    //     octagonal fill, and clips the round SVG ring's outer edge
+    //   • elevation / shadow* → Android draws the drop-shadow from a polygonized
+    //     outline, i.e. an octagonal shadow
+    // SVG strokeDasharray renders a true circle on both platforms, so the ring
+    // is the only visual and there's nothing left to polygonize.
+    borderWidth: 0,
+    borderColor: "transparent",
+    overflow: "visible",
+    shadowOpacity: 0,
+    elevation: 0,
   },
   tileFaceDisabled: {
     opacity: 0.6,

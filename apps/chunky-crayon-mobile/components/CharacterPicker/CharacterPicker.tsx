@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { View, Text, Pressable, ScrollView, StyleSheet } from "react-native";
 import { Image } from "expo-image";
+import Svg, { Circle } from "react-native-svg";
 import { router } from "expo-router";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faBan, faUserPlus, faCheck } from "@fortawesome/pro-duotone-svg-icons";
@@ -45,6 +46,34 @@ const DISC_TINTS = [
 ] as const;
 
 const DISC = 80;
+
+// Smooth dashed ring for the "New friend" add disc, drawn as an SVG <Circle>.
+// Android's CSS dashed border (and the disc's elevation shadow) polygonize a
+// large-radius disc into a flat-edged octagon; SVG strokeDasharray draws a true
+// circle on both platforms. Mirrors SceneBuilder's DashedRing.
+const DashedRing = () => {
+  const stroke = 3;
+  const r = (DISC - stroke) / 2;
+  return (
+    <Svg
+      width={DISC}
+      height={DISC}
+      style={StyleSheet.absoluteFill}
+      pointerEvents="none"
+    >
+      <Circle
+        cx={DISC / 2}
+        cy={DISC / 2}
+        r={r}
+        fill="rgba(228,100,68,0.05)"
+        stroke={COLORS.crayonOrangeLight}
+        strokeWidth={stroke}
+        strokeDasharray="8 6"
+        strokeLinecap="round"
+      />
+    </Svg>
+  );
+};
 
 const goToCharacters = () => {
   tapLight();
@@ -235,6 +264,7 @@ const CharacterPicker = ({ value, onChange }: Props) => {
           style={styles.item}
         >
           <View style={[styles.disc, styles.discAdd]}>
+            <DashedRing />
             <FontAwesomeIcon
               icon={faUserPlus}
               size={22}
@@ -297,9 +327,18 @@ const styles = StyleSheet.create({
     borderColor: COLORS.crayonOrange,
   },
   discAdd: {
-    borderStyle: "dashed",
-    borderColor: COLORS.crayonOrangeLight,
-    backgroundColor: "rgba(228,100,68,0.05)",
+    // Strip ALL of disc's sticker chrome and draw only the SVG DashedRing + the
+    // user-plus icon. On Android, the CSS dashed border, the rounded
+    // overflow:'hidden' fill, and the elevation shadow each polygonize a
+    // large-radius disc into a flat-edged octagon. SVG strokeDasharray renders a
+    // true circle, so the ring is the only visual. Mirrors SceneBuilder's
+    // tileFaceAdd.
+    borderWidth: 0,
+    borderColor: "transparent",
+    backgroundColor: "transparent",
+    overflow: "visible",
+    shadowOpacity: 0,
+    elevation: 0,
   },
   discSkeleton: {
     backgroundColor: COLORS.bgCreamDark,
