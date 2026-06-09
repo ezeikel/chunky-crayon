@@ -18,6 +18,7 @@
     "prebuild:android": "pnpm install-skia && expo prebuild --platform android --clean",
     "ios": "expo run:ios --no-build-cache",
     "android": "expo run:android --no-build-cache",
+    "android:emu": "${ANDROID_HOME:-$HOME/Library/Android/sdk}/emulator/emulator -avd ${ANDROID_AVD:-Pixel_9_Pro_API_Baklava} -dns-server 8.8.8.8,1.1.1.1",
     "build:ios": "pnpm prebuild:ios && pnpm ios",
     "build:android": "pnpm prebuild:android && pnpm android",
     "build": "expo export",
