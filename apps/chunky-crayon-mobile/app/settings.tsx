@@ -188,6 +188,12 @@ const SettingsToggle = ({
 // brand-orange ring + a check badge; the trailing "Add" disc is a dashed
 // outline with a plus. Mirrors the character/scene picker disc pattern.
 const PROFILE_DISC = 64;
+// Ring sits OUTSIDE the avatar with a visible gap (ring | gap | avatar), so the
+// avatar's coloured circle never touches the ring — at gap 0 it reads as
+// clipped/cramped even though nothing is cropped.
+const PROFILE_RING = 4;
+const PROFILE_RING_GAP = 3;
+const PROFILE_DISC_BOX = PROFILE_DISC + 2 * (PROFILE_RING + PROFILE_RING_GAP);
 
 type ProfileDiscProps = {
   avatarId: string;
@@ -223,9 +229,12 @@ const ProfileDisc = ({ avatarId, name, active, onPress }: ProfileDiscProps) => (
 // (and its elevation shadow draws a square halo); SVG strokeDasharray renders a
 // true circle on both platforms. Same pattern as SceneBuilder/CharacterPicker.
 const AddDashedRing = () => {
-  // Sized to the full disc box (avatar 64 + 4px ring each side = 72) so the
-  // dashed ring lands where the solid ring sits on selected profiles.
-  const box = PROFILE_DISC + 8;
+  // Sized to the full disc box so the dashed ring lands where the solid ring
+  // sits on selected profiles. NOTE: discAdd zeroes the disc's borderWidth —
+  // RN positions absolute children relative to the PADDING box, so any border
+  // on the parent would shift this overlay down-right by the border width and
+  // the centred "+" icon would read off-centre against the ring.
+  const box = PROFILE_DISC_BOX;
   const stroke = 3;
   const r = (box - stroke) / 2;
   return (
@@ -1141,20 +1150,21 @@ const styles = StyleSheet.create({
   },
   discWrap: {
     alignItems: "center",
-    // Room for the 72px disc box + its 1.06 active scale + the check badge.
-    width: PROFILE_DISC + 20,
+    // Room for the disc box + its 1.06 active scale + the check badge.
+    width: PROFILE_DISC_BOX + 8,
   },
   disc: {
-    // Ring layer sits OUTSIDE the avatar: the box is the avatar (64) + a 4px
-    // ring on each side = 72, and `overflow: 'visible'` so the avatar centred
-    // inside is NOT clipped (it was being cropped when disc==avatar size with
-    // overflow:hidden). No background / shadow here — the ProfileAvatar paints
-    // its own circle, and an elevation shadow would draw a square halo on
-    // Android. The ring colour is transparent by default; selected adds orange.
-    width: PROFILE_DISC + 8,
-    height: PROFILE_DISC + 8,
-    borderRadius: (PROFILE_DISC + 8) / 2,
-    borderWidth: 4,
+    // Ring layer sits OUTSIDE the avatar with a breathing gap: box = avatar +
+    // (ring + gap) each side, and `overflow: 'visible'` so the avatar centred
+    // inside is never cropped. With no gap the avatar's coloured circle touches
+    // the ring's inner edge and reads as clipped. No background / shadow here —
+    // the ProfileAvatar paints its own circle, and an elevation shadow would
+    // draw a square halo on Android. Ring colour is transparent by default;
+    // selected adds orange.
+    width: PROFILE_DISC_BOX,
+    height: PROFILE_DISC_BOX,
+    borderRadius: PROFILE_DISC_BOX / 2,
+    borderWidth: PROFILE_RING,
     borderColor: "transparent",
     alignItems: "center",
     justifyContent: "center",
@@ -1166,9 +1176,13 @@ const styles = StyleSheet.create({
   },
   discAdd: {
     // Dashed ring is drawn by the AddDashedRing SVG overlay (CSS dashed border
-    // octagonizes on Android). Strip the disc's own chrome so only the SVG shows:
-    // transparent border + bg, no shadow/elevation halo, overflow visible so the
-    // round ring isn't clipped to an octagon.
+    // octagonizes on Android). Strip the disc's own chrome so only the SVG
+    // shows. borderWidth MUST be 0 here: RN places absolute children relative
+    // to the padding box, so the base 4px border shifted the SVG ring 4px
+    // down-right and the flex-centred "+" icon read off-centre. Zeroing the
+    // border is safe — the Add disc has a single state, so there's no
+    // width-toggle flash like the selectable discs.
+    borderWidth: 0,
     borderColor: "transparent",
     backgroundColor: "transparent",
     overflow: "visible",
@@ -1193,7 +1207,7 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: COLORS.textGray,
     marginTop: 6,
-    maxWidth: PROFILE_DISC + 20,
+    maxWidth: PROFILE_DISC_BOX + 8,
     textAlign: "center",
   },
   settingsItem: {
