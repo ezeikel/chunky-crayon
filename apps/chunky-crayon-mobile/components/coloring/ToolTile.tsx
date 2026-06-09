@@ -1,7 +1,6 @@
 import { View, StyleSheet, type StyleProp, type ViewStyle } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
-import { LinearGradient } from "expo-linear-gradient";
 import { faSparkles, faRotateRight } from "@fortawesome/pro-duotone-svg-icons";
 import SquishyPressable from "@/components/SquishyPressable";
 import Spinner from "@/components/Spinner/Spinner";
@@ -27,7 +26,8 @@ const ACCENT = "#E46444";
 const SURFACE_DARK = "#F0E9DC";
 const TEXT_PRIMARY = "#433A33";
 const MAGIC_FROM = "#C088A0";
-const MAGIC_TO = "#E58A93";
+// MAGIC_TO (#E58A93) was the gradient's second stop — folded into the flat
+// #D38999 midpoint in tileMagicActive (see styles).
 
 type ToolTileProps = {
   icon: IconDefinition;
@@ -96,27 +96,28 @@ const ToolTile = ({
         <View
           style={[
             styles.tileBase,
-            // Soft (idle/timed-out) state: a flat 10%-alpha tint + border on
-            // tileBase ITSELF, not a translucent LinearGradient child. Android
-            // doesn't clip a gradient child to the parent's rounded bounds —
-            // the tint bled past the corners as pink stripes at the tile edges
-            // (iOS clipped it fine). A translucent bg on the same view as the
-            // borderRadius + overflow:'hidden' renders correctly on both
-            // platforms, and the original 10% two-pastel gradient read as a
-            // flat tint anyway. The full-strength gradient stays for
-            // selected/loading.
-            !showGradient && styles.tileSoftMagic,
+            // No absolute-fill child needs clipping anymore (the gradients are
+            // gone — flat backgrounds paint inside the radius natively), and on
+            // Android an OPAQUE bg + borderRadius + overflow:'hidden' swallowed
+            // the tile's CHILDREN — the selected tile rendered as a blank pink
+            // box (no icon, no spinner). Same escape hatch as the regular
+            // tiles below.
+            styles.tileVisible,
+            // Both magic states paint flat colour on tileBase ITSELF — no
+            // LinearGradient children. Two Android failure modes forced this:
+            // (1) the translucent soft-state gradient bled past the rounded
+            // corners as pink stripes (Android doesn't clip a gradient child to
+            // the parent's rounded bounds), and (2) the opaque selected-state
+            // gradient doesn't render AT ALL on Android/Fabric — the active
+            // tile painted nothing, leaving a white icon on the white sheet
+            // (the "magic brush disappears when tapped" bug). iOS rendered
+            // both fine. The two stops are close pinks, so flat equivalents
+            // are visually faithful: the soft state keeps its 10% tint +
+            // border, the active state uses the stops' midpoint.
+            showGradient ? styles.tileMagicActive : styles.tileSoftMagic,
             loading && styles.dimmed,
           ]}
         >
-          {showGradient && (
-            <LinearGradient
-              colors={[MAGIC_FROM, MAGIC_TO]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.fill}
-            />
-          )}
           {loading ? (
             // Loading shows the full-strength gradient (showGradient), so the
             // spinner must be WHITE to read against it — a MAGIC_FROM (pink)
@@ -139,10 +140,18 @@ const ToolTile = ({
               color={MAGIC_FROM}
             />
           ) : (
+            // The magic glyphs are duotone icons whose body sits mostly in the
+            // SECONDARY layer. With only `color` set, the secondary layer
+            // renders at its ~40% default opacity — white-at-40% over the
+            // active pink is near-invisible (the selected tile looked like a
+            // blank pink box on Android, washed-out on iOS). Force the whole
+            // glyph solid white when selected.
             <FontAwesomeIcon
               icon={icon}
               size={iconSize}
               color={selected ? "#FFFFFF" : MAGIC_FROM}
+              secondaryColor={selected ? "#FFFFFF" : undefined}
+              secondaryOpacity={selected ? 1 : undefined}
             />
           )}
         </View>
@@ -215,21 +224,17 @@ const styles = StyleSheet.create({
   tileVisible: {
     overflow: "visible",
   },
-  fill: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    borderRadius: 24,
-    overflow: "hidden",
-  },
   // Soft idle/timed-out magic tile: flat 10%-alpha tint + border on the
   // radius-owning view (Android-safe; see the render comment).
   tileSoftMagic: {
     backgroundColor: `${MAGIC_FROM}1A`,
     borderWidth: 2,
     borderColor: `${MAGIC_FROM}4D`,
+  },
+  // Selected/loading magic tile: flat midpoint of the old MAGIC_FROM→MAGIC_TO
+  // gradient stops (Android-safe; see the render comment).
+  tileMagicActive: {
+    backgroundColor: "#D38999",
   },
   selected: {
     backgroundColor: ACCENT,
