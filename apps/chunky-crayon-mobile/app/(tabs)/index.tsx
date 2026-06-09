@@ -57,9 +57,13 @@ const HomeScreen = () => {
   const [isProfileSwitcherOpen, setIsProfileSwitcherOpen] = useState(false);
   const [isColoSheetOpen, setIsColoSheetOpen] = useState(false);
   // Tapping the credits chip opens the paywall router — TopUpPackModal for
-  // subscribers (buy more credits), SubscriptionPaywallModal for non-subs. The
-  // actual purchase is parent-gated INSIDE those modals (Kids Category rule), so
-  // opening the surface itself needs no gate — same pattern as the create form.
+  // subscribers (buy more credits), SubscriptionPaywallModal for non-subs. We
+  // gate BEFORE opening (a math question), matching the "For Grown-ups" pill so
+  // the two adult header pills feel consistent and a kid never lands on the
+  // plans screen alone. Because the gate already fired here, we open the paywall
+  // with skipParentalGate so the Buy button doesn't ask the parent AGAIN in the
+  // same flow.
+  const [isCreditsGateOpen, setIsCreditsGateOpen] = useState(false);
   const [isPaywallOpen, setIsPaywallOpen] = useState(false);
   const refreshEntitlements = useRefreshEntitlements();
   // Settings lives behind a parent-gated corner (not a tab). Tapping the
@@ -90,10 +94,7 @@ const HomeScreen = () => {
           credits={headerData.credits}
           profileName={headerData.profileName}
           avatarId={headerData.avatarId}
-          onCreditsPress={() => {
-            track(ANALYTICS_EVENTS.PAYWALL_VIEWED, { source: "credits_chip" });
-            setIsPaywallOpen(true);
-          }}
+          onCreditsPress={() => setIsCreditsGateOpen(true)}
           onProfilePress={() => setIsProfileSwitcherOpen(true)}
           onChallengePress={() => router.push("/challenges")}
           onStickersPress={() => router.push("/stickers")}
@@ -314,12 +315,27 @@ const HomeScreen = () => {
         coloState={coloState}
       />
 
-      {/* Opened by the header credits chip. Router picks top-up vs subscription
-          by entitlement; the buy is parent-gated inside. Refresh entitlements on
-          a successful purchase so the chip's credit count updates. */}
+      {/* Credits-chip parental gate. Fires the math question BEFORE the paywall
+          opens (consistent with the Grown-ups pill). On success, open the paywall
+          with skipParentalGate so the Buy button doesn't re-gate in the same flow. */}
+      <ParentalGate
+        visible={isCreditsGateOpen}
+        onClose={() => setIsCreditsGateOpen(false)}
+        onSuccess={() => {
+          setIsCreditsGateOpen(false);
+          track(ANALYTICS_EVENTS.PAYWALL_VIEWED, { source: "credits_chip" });
+          setIsPaywallOpen(true);
+        }}
+      />
+
+      {/* Opened (already gated) by the header credits chip. Router picks top-up
+          vs subscription by entitlement. skipParentalGate=true because the chip
+          gate above already cleared. Refresh entitlements on a successful
+          purchase so the chip's credit count updates. */}
       <PaywallRouter
         visible={isPaywallOpen}
         onClose={() => setIsPaywallOpen(false)}
+        skipParentalGate
         onSuccess={() => {
           setIsPaywallOpen(false);
           refreshEntitlements();

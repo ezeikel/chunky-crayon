@@ -57,6 +57,15 @@ export type PaywallRouterProps = {
    * specific paywall surface. Do not use in production call sites.
    */
   forceVariant?: "subscription" | "top_up" | "color_as_you_go";
+  /**
+   * Skip the in-modal parental gate on the Buy button because a gate
+   * has ALREADY fired upstream in the SAME flow (e.g. the caller gated
+   * before opening the paywall, like the header credits chip or the
+   * gated Settings area). Without this the parent would be asked the
+   * math question twice in one flow. Defaults to false (always gate the
+   * purchase) so call sites that open the paywall ungated stay safe.
+   */
+  skipParentalGate?: boolean;
 };
 
 const PaywallRouter = ({
@@ -65,6 +74,7 @@ const PaywallRouter = ({
   onSuccess,
   variant = "subscription_first",
   forceVariant,
+  skipParentalGate = false,
 }: PaywallRouterProps) => {
   const hasSubscription = useHasSubscription();
 
@@ -75,6 +85,7 @@ const PaywallRouter = ({
         visible={visible}
         onClose={onClose}
         onSuccess={onSuccess}
+        skipParentalGate={skipParentalGate}
       />
     );
   }
@@ -84,6 +95,7 @@ const PaywallRouter = ({
         visible={visible}
         onClose={onClose}
         onSuccess={onSuccess}
+        skipParentalGate={skipParentalGate}
       />
     );
   }
@@ -93,6 +105,7 @@ const PaywallRouter = ({
         visible={visible}
         onClose={onClose}
         onSuccess={onSuccess}
+        skipParentalGate={skipParentalGate}
       />
     );
   }
@@ -105,6 +118,7 @@ const PaywallRouter = ({
         visible={visible}
         onClose={onClose}
         onSuccess={onSuccess}
+        skipParentalGate={skipParentalGate}
       />
     );
   }
@@ -117,6 +131,7 @@ const PaywallRouter = ({
         visible={visible}
         onClose={onClose}
         onSuccess={onSuccess}
+        skipParentalGate={skipParentalGate}
       />
     );
   }
@@ -126,6 +141,7 @@ const PaywallRouter = ({
       visible={visible}
       onClose={onClose}
       onSuccess={onSuccess}
+      skipParentalGate={skipParentalGate}
     />
   );
 };
