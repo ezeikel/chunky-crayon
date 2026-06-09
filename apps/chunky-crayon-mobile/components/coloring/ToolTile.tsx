@@ -93,23 +93,28 @@ const ToolTile = ({
         accessibilityState={{ selected, disabled: disabled || loading }}
         style={[{ width: size, height: size }, style]}
       >
-        <View style={[styles.tileBase, loading && styles.dimmed]}>
-          {showGradient ? (
+        <View
+          style={[
+            styles.tileBase,
+            // Soft (idle/timed-out) state: a flat 10%-alpha tint + border on
+            // tileBase ITSELF, not a translucent LinearGradient child. Android
+            // doesn't clip a gradient child to the parent's rounded bounds —
+            // the tint bled past the corners as pink stripes at the tile edges
+            // (iOS clipped it fine). A translucent bg on the same view as the
+            // borderRadius + overflow:'hidden' renders correctly on both
+            // platforms, and the original 10% two-pastel gradient read as a
+            // flat tint anyway. The full-strength gradient stays for
+            // selected/loading.
+            !showGradient && styles.tileSoftMagic,
+            loading && styles.dimmed,
+          ]}
+        >
+          {showGradient && (
             <LinearGradient
               colors={[MAGIC_FROM, MAGIC_TO]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
               style={styles.fill}
-            />
-          ) : (
-            <LinearGradient
-              colors={[`${MAGIC_FROM}1A`, `${MAGIC_TO}1A`]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={[
-                styles.fill,
-                { borderWidth: 2, borderColor: `${MAGIC_FROM}4D` },
-              ]}
             />
           )}
           {loading ? (
@@ -217,6 +222,14 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     borderRadius: 24,
+    overflow: "hidden",
+  },
+  // Soft idle/timed-out magic tile: flat 10%-alpha tint + border on the
+  // radius-owning view (Android-safe; see the render comment).
+  tileSoftMagic: {
+    backgroundColor: `${MAGIC_FROM}1A`,
+    borderWidth: 2,
+    borderColor: `${MAGIC_FROM}4D`,
   },
   selected: {
     backgroundColor: ACCENT,
