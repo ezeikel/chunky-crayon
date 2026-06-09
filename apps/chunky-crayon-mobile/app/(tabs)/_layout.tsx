@@ -269,6 +269,11 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     alignItems: "center",
     justifyContent: "center",
+    // Android (Fabric/New Arch) can drop borderRadius on a View whose only
+    // background is a translucent rgba() set via a conditional style merge,
+    // rendering the active chip as a hard square. overflow:'hidden' forces it to
+    // clip the fill to the radius → the rounded pill iOS already shows.
+    overflow: "hidden",
   },
   tabChipActive: {
     backgroundColor: "rgba(228, 100, 68, 0.12)",
