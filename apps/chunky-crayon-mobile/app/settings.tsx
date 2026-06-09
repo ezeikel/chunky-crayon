@@ -18,6 +18,7 @@ import { toast } from "@/components/Toaster";
 import ConfirmSheet from "@/components/ConfirmSheet";
 import { resetLocalDeviceData } from "@/lib/dev/resetLocalData";
 import { LinearGradient } from "expo-linear-gradient";
+import Svg, { Circle } from "react-native-svg";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import {
   faCreditCard,
@@ -217,6 +218,37 @@ const ProfileDisc = ({ avatarId, name, active, onPress }: ProfileDiscProps) => (
   </Pressable>
 );
 
+// Smooth dashed ring for the "Add profile" disc, drawn as an SVG <Circle>.
+// Android's CSS dashed border polygonizes a large-radius circle into an octagon
+// (and its elevation shadow draws a square halo); SVG strokeDasharray renders a
+// true circle on both platforms. Same pattern as SceneBuilder/CharacterPicker.
+const AddDashedRing = () => {
+  // Sized to the full disc box (avatar 64 + 4px ring each side = 72) so the
+  // dashed ring lands where the solid ring sits on selected profiles.
+  const box = PROFILE_DISC + 8;
+  const stroke = 3;
+  const r = (box - stroke) / 2;
+  return (
+    <Svg
+      width={box}
+      height={box}
+      style={StyleSheet.absoluteFill}
+      pointerEvents="none"
+    >
+      <Circle
+        cx={box / 2}
+        cy={box / 2}
+        r={r}
+        fill="rgba(228, 100, 68, 0.08)"
+        stroke={COLORS.crayonOrange}
+        strokeWidth={stroke}
+        strokeDasharray="7 6"
+        strokeLinecap="round"
+      />
+    </Svg>
+  );
+};
+
 const AddProfileDisc = ({ onPress }: { onPress: () => void }) => (
   <Pressable
     style={styles.discWrap}
@@ -225,6 +257,7 @@ const AddProfileDisc = ({ onPress }: { onPress: () => void }) => (
     accessibilityLabel="Add a profile"
   >
     <View style={[styles.disc, styles.discAdd]}>
+      <AddDashedRing />
       <FontAwesomeIcon
         icon={faPlus}
         size={20}
@@ -1108,28 +1141,39 @@ const styles = StyleSheet.create({
   },
   discWrap: {
     alignItems: "center",
-    width: PROFILE_DISC + 8,
+    // Room for the 72px disc box + its 1.06 active scale + the check badge.
+    width: PROFILE_DISC + 20,
   },
   disc: {
-    width: PROFILE_DISC,
-    height: PROFILE_DISC,
-    borderRadius: PROFILE_DISC / 2,
+    // Ring layer sits OUTSIDE the avatar: the box is the avatar (64) + a 4px
+    // ring on each side = 72, and `overflow: 'visible'` so the avatar centred
+    // inside is NOT clipped (it was being cropped when disc==avatar size with
+    // overflow:hidden). No background / shadow here — the ProfileAvatar paints
+    // its own circle, and an elevation shadow would draw a square halo on
+    // Android. The ring colour is transparent by default; selected adds orange.
+    width: PROFILE_DISC + 8,
+    height: PROFILE_DISC + 8,
+    borderRadius: (PROFILE_DISC + 8) / 2,
     borderWidth: 4,
-    borderColor: COLORS.white,
+    borderColor: "transparent",
     alignItems: "center",
     justifyContent: "center",
-    overflow: "hidden",
-    backgroundColor: COLORS.bgCream,
-    ...SHADOWS.md,
+    overflow: "visible",
   },
   discActive: {
     borderColor: COLORS.crayonOrange,
     transform: [{ scale: 1.06 }],
   },
   discAdd: {
-    borderStyle: "dashed",
-    borderColor: COLORS.crayonOrange,
-    backgroundColor: "rgba(228, 100, 68, 0.08)",
+    // Dashed ring is drawn by the AddDashedRing SVG overlay (CSS dashed border
+    // octagonizes on Android). Strip the disc's own chrome so only the SVG shows:
+    // transparent border + bg, no shadow/elevation halo, overflow visible so the
+    // round ring isn't clipped to an octagon.
+    borderColor: "transparent",
+    backgroundColor: "transparent",
+    overflow: "visible",
+    shadowOpacity: 0,
+    elevation: 0,
   },
   discCheck: {
     position: "absolute",
@@ -1149,7 +1193,7 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: COLORS.textGray,
     marginTop: 6,
-    maxWidth: PROFILE_DISC + 8,
+    maxWidth: PROFILE_DISC + 20,
     textAlign: "center",
   },
   settingsItem: {
