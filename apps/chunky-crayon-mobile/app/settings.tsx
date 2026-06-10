@@ -18,7 +18,7 @@ import { toast } from "@/components/Toaster";
 import ConfirmSheet from "@/components/ConfirmSheet";
 import { resetLocalDeviceData } from "@/lib/dev/resetLocalData";
 import { LinearGradient } from "expo-linear-gradient";
-import Svg, { Circle } from "react-native-svg";
+import DashedRing from "@/components/DashedRing/DashedRing";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import {
   faCreditCard,
@@ -224,40 +224,6 @@ const ProfileDisc = ({ avatarId, name, active, onPress }: ProfileDiscProps) => (
   </Pressable>
 );
 
-// Smooth dashed ring for the "Add profile" disc, drawn as an SVG <Circle>.
-// Android's CSS dashed border polygonizes a large-radius circle into an octagon
-// (and its elevation shadow draws a square halo); SVG strokeDasharray renders a
-// true circle on both platforms. Same pattern as SceneBuilder/CharacterPicker.
-const AddDashedRing = () => {
-  // Sized to the full disc box so the dashed ring lands where the solid ring
-  // sits on selected profiles. NOTE: discAdd zeroes the disc's borderWidth —
-  // RN positions absolute children relative to the PADDING box, so any border
-  // on the parent would shift this overlay down-right by the border width and
-  // the centred "+" icon would read off-centre against the ring.
-  const box = PROFILE_DISC_BOX;
-  const stroke = 3;
-  const r = (box - stroke) / 2;
-  return (
-    <Svg
-      width={box}
-      height={box}
-      style={StyleSheet.absoluteFill}
-      pointerEvents="none"
-    >
-      <Circle
-        cx={box / 2}
-        cy={box / 2}
-        r={r}
-        fill="rgba(228, 100, 68, 0.08)"
-        stroke={COLORS.crayonOrange}
-        strokeWidth={stroke}
-        strokeDasharray="7 6"
-        strokeLinecap="round"
-      />
-    </Svg>
-  );
-};
-
 const AddProfileDisc = ({ onPress }: { onPress: () => void }) => (
   <Pressable
     style={styles.discWrap}
@@ -266,7 +232,15 @@ const AddProfileDisc = ({ onPress }: { onPress: () => void }) => (
     accessibilityLabel="Add a profile"
   >
     <View style={[styles.disc, styles.discAdd]}>
-      <AddDashedRing />
+      {/* Sized to the full disc box so the dashed ring lands where the solid
+          ring sits on selected profiles; discAdd zeroes the parent borderWidth
+          (see DashedRing's parent contract). */}
+      <DashedRing
+        size={PROFILE_DISC_BOX}
+        color={COLORS.crayonOrange}
+        dash="7 6"
+        fill="rgba(228, 100, 68, 0.08)"
+      />
       <FontAwesomeIcon
         icon={faPlus}
         size={20}
@@ -1181,7 +1155,7 @@ const styles = StyleSheet.create({
     transform: [{ scale: 1.06 }],
   },
   discAdd: {
-    // Dashed ring is drawn by the AddDashedRing SVG overlay (CSS dashed border
+    // Dashed ring is drawn by the shared DashedRing SVG overlay (CSS dashed border
     // octagonizes on Android). Strip the disc's own chrome so only the SVG
     // shows. borderWidth MUST be 0 here: RN places absolute children relative
     // to the padding box, so the base 4px border shifted the SVG ring 4px

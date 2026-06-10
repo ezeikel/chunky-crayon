@@ -8,7 +8,7 @@ import {
   type ImageSourcePropType as ImageSource,
 } from "react-native";
 import { Image } from "expo-image";
-import Svg, { Circle } from "react-native-svg";
+import DashedRing from "@/components/DashedRing/DashedRing";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import {
   faDice,
@@ -156,38 +156,6 @@ const tintFromDuotone = (hex: string): string => {
   return `rgba(${r}, ${g}, ${b}, 0.14)`;
 };
 
-// Smooth dashed ring drawn as an absolutely-positioned SVG <Circle> overlay.
-// Android's CSS dashed border polygonizes a large-radius rounded border into a
-// flat-edged octagon; SVG strokeDasharray renders a true circle on both
-// platforms. Sized to overlay the full tile box.
-const DashedRing = ({ box }: { box: number }) => {
-  const stroke = 3;
-  const r = (box - stroke) / 2; // keep the stroke inside the box bounds
-  const dash = box >= 100 ? "10 8" : "8 6"; // chunkier dashes on the lg tile
-  return (
-    <Svg
-      width={box}
-      height={box}
-      style={StyleSheet.absoluteFill}
-      pointerEvents="none"
-    >
-      <Circle
-        cx={box / 2}
-        cy={box / 2}
-        r={r}
-        // Faint round wash painted by the SVG, not the View background, so it
-        // stays circular on Android (a rounded View background polygonizes the
-        // same way the dashed border does).
-        fill="rgba(228,100,68,0.05)"
-        stroke={COLORS.crayonOrangeLight}
-        strokeWidth={stroke}
-        strokeDasharray={dash}
-        strokeLinecap="round"
-      />
-    </Svg>
-  );
-};
-
 type SceneTileProps = {
   option: SceneTileOption;
   selected: boolean;
@@ -257,7 +225,12 @@ const SceneTile = ({
         >
           {isAdd ? (
             <>
-              <DashedRing box={box} />
+              <DashedRing
+                size={box}
+                color={COLORS.crayonOrangeLight}
+                dash={box >= 100 ? "10 8" : "8 6"}
+                fill="rgba(228,100,68,0.05)"
+              />
               <FontAwesomeIcon
                 icon={faPlus}
                 size={iconSize}

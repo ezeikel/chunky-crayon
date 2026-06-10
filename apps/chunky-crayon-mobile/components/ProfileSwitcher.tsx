@@ -21,6 +21,7 @@ import {
   faXmark,
 } from "@fortawesome/pro-solid-svg-icons";
 import ProfileAvatar from "@/components/ProfileAvatar";
+import DashedRing from "@/components/DashedRing/DashedRing";
 import CreateProfileCard from "@/components/CreateProfileCard";
 import {
   useProfiles,
@@ -329,6 +330,7 @@ const ProfileSwitcher = ({ isOpen, onClose }: ProfileSwitcherProps) => {
                     }}
                   >
                     <View style={styles.avatarContainerNew}>
+                      <DashedRing size={48} stroke={2} color="#D1D5DB" />
                       <FontAwesomeIcon
                         icon={faPlus}
                         size={20}
@@ -442,6 +444,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#E46444",
   },
   avatarContainerNew: {
+    // Dashed outline drawn by the DashedRing SVG overlay — CSS dashed borders
+    // octagonize at this radius on Android. No borderWidth here (it would
+    // offset the absolute overlay; see DashedRing's parent contract).
     width: 48,
     height: 48,
     borderRadius: 24,
@@ -449,9 +454,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     marginRight: 14,
-    borderWidth: 2,
-    borderStyle: "dashed",
-    borderColor: "#D1D5DB",
   },
   profileInfo: {
     flex: 1,

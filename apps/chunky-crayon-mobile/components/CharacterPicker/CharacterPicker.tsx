@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { View, Text, Pressable, ScrollView, StyleSheet } from "react-native";
 import { Image } from "expo-image";
-import Svg, { Circle } from "react-native-svg";
+import DashedRing from "@/components/DashedRing/DashedRing";
 import { router } from "expo-router";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faBan, faUserPlus, faCheck } from "@fortawesome/pro-duotone-svg-icons";
@@ -46,34 +46,6 @@ const DISC_TINTS = [
 ] as const;
 
 const DISC = 80;
-
-// Smooth dashed ring for the "New friend" add disc, drawn as an SVG <Circle>.
-// Android's CSS dashed border (and the disc's elevation shadow) polygonize a
-// large-radius disc into a flat-edged octagon; SVG strokeDasharray draws a true
-// circle on both platforms. Mirrors SceneBuilder's DashedRing.
-const DashedRing = () => {
-  const stroke = 3;
-  const r = (DISC - stroke) / 2;
-  return (
-    <Svg
-      width={DISC}
-      height={DISC}
-      style={StyleSheet.absoluteFill}
-      pointerEvents="none"
-    >
-      <Circle
-        cx={DISC / 2}
-        cy={DISC / 2}
-        r={r}
-        fill="rgba(228,100,68,0.05)"
-        stroke={COLORS.crayonOrangeLight}
-        strokeWidth={stroke}
-        strokeDasharray="8 6"
-        strokeLinecap="round"
-      />
-    </Svg>
-  );
-};
 
 const goToCharacters = () => {
   tapLight();
@@ -268,7 +240,11 @@ const CharacterPicker = ({ value, onChange }: Props) => {
           style={styles.item}
         >
           <View style={[styles.disc, styles.discAdd]}>
-            <DashedRing />
+            <DashedRing
+              size={DISC}
+              color={COLORS.crayonOrangeLight}
+              fill="rgba(228,100,68,0.05)"
+            />
             <FontAwesomeIcon
               icon={faUserPlus}
               size={22}
