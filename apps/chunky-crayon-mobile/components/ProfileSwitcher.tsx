@@ -35,6 +35,7 @@ import { SHEET_HANDLE } from "@/lib/design";
 import { tapMedium, tapLight } from "@/utils/haptics";
 import { track } from "@/utils/analytics";
 import { ANALYTICS_EVENTS } from "@/constants/analytics";
+import { useT } from "@/lib/i18n/useT";
 import type { Profile } from "@/api";
 
 type ProfileSwitcherProps = {
@@ -46,6 +47,7 @@ const MAX_PROFILES = 5;
 
 const ProfileSwitcher = ({ isOpen, onClose }: ProfileSwitcherProps) => {
   const insets = useSafeAreaInsets();
+  const t = useT("mobile.profileSwitcher");
 
   const { data: profilesData, isLoading: profilesLoading } = useProfiles();
   const { data: activeProfileData } = useActiveProfile();
@@ -98,7 +100,7 @@ const ProfileSwitcher = ({ isOpen, onClose }: ProfileSwitcherProps) => {
       await setActiveProfile.mutateAsync(profile.id);
       onClose();
     } catch {
-      toast.error("Couldn't switch profile. Please try again.");
+      toast.error(t("toast.switchFailed"));
     }
   };
 
@@ -113,7 +115,7 @@ const ProfileSwitcher = ({ isOpen, onClose }: ProfileSwitcherProps) => {
       });
       setIsCreating(false);
     } catch {
-      toast.error("Couldn't create profile. Please try again.");
+      toast.error(t("toast.createFailed"));
     }
   };
 
@@ -133,7 +135,7 @@ const ProfileSwitcher = ({ isOpen, onClose }: ProfileSwitcherProps) => {
       setEditingProfileId(null);
       setEditProfileName("");
     } catch {
-      toast.error("Couldn't update profile. Please try again.");
+      toast.error(t("toast.updateFailed"));
     }
   };
 
@@ -144,7 +146,7 @@ const ProfileSwitcher = ({ isOpen, onClose }: ProfileSwitcherProps) => {
 
   const handleDeleteProfile = (profile: Profile) => {
     if (profiles.length <= 1) {
-      toast.error("You must have at least one profile.");
+      toast.error(t("toast.minOneProfile"));
       return;
     }
     setDeleteTargetProfile(profile);
@@ -159,7 +161,7 @@ const ProfileSwitcher = ({ isOpen, onClose }: ProfileSwitcherProps) => {
         profileCount: profiles.length - 1,
       });
     } catch {
-      toast.error("Couldn't delete profile. Please try again.");
+      toast.error(t("toast.deleteFailed"));
     } finally {
       setDeleteTargetProfile(null);
     }
@@ -178,13 +180,13 @@ const ProfileSwitcher = ({ isOpen, onClose }: ProfileSwitcherProps) => {
         <View style={styles.surface}>
           <View style={styles.handleIndicator} />
           <View style={styles.header}>
-            <Text style={styles.headerTitle}>Profiles</Text>
+            <Text style={styles.headerTitle}>{t("title")}</Text>
             <Pressable
               style={styles.editButton}
               onPress={() => setIsEditing(!isEditing)}
             >
               <Text style={styles.editButtonText}>
-                {isEditing ? "Done" : "Edit"}
+                {isEditing ? t("done") : t("edit")}
               </Text>
             </Pressable>
           </View>
@@ -211,7 +213,7 @@ const ProfileSwitcher = ({ isOpen, onClose }: ProfileSwitcherProps) => {
                           style={styles.editInput}
                           value={editProfileName}
                           onChangeText={setEditProfileName}
-                          placeholder="Profile name"
+                          placeholder={t("namePlaceholder")}
                           placeholderTextColor="#9CA3AF"
                           autoFocus
                           maxLength={20}
@@ -264,8 +266,7 @@ const ProfileSwitcher = ({ isOpen, onClose }: ProfileSwitcherProps) => {
                         <View style={styles.profileInfo}>
                           <Text style={styles.profileName}>{profile.name}</Text>
                           <Text style={styles.profileMeta}>
-                            {profile.artworkCount} artwork
-                            {profile.artworkCount !== 1 ? "s" : ""}
+                            {t("artworkCount", { count: profile.artworkCount })}
                           </Text>
                         </View>
                         {profile.id === activeProfile?.id && !isEditing && (
@@ -337,12 +338,14 @@ const ProfileSwitcher = ({ isOpen, onClose }: ProfileSwitcherProps) => {
                         color="#9CA3AF"
                       />
                     </View>
-                    <Text style={styles.addProfileText}>Add Profile</Text>
+                    <Text style={styles.addProfileText}>
+                      {t("addProfile")}
+                    </Text>
                   </Pressable>
                 ) : (
                   <View style={styles.maxProfilesNote}>
                     <Text style={styles.maxProfilesText}>
-                      Maximum of {MAX_PROFILES} profiles reached
+                      {t("maxReached", { count: MAX_PROFILES })}
                     </Text>
                   </View>
                 )}
@@ -355,13 +358,15 @@ const ProfileSwitcher = ({ isOpen, onClose }: ProfileSwitcherProps) => {
       <ConfirmSheet
         isOpen={deleteTargetProfile !== null}
         onClose={() => setDeleteTargetProfile(null)}
-        title="Delete profile?"
+        title={t("deleteConfirm.title")}
         description={
           deleteTargetProfile
-            ? `This will erase "${deleteTargetProfile.name}" and all their saved pictures.`
+            ? t("deleteConfirm.description", {
+                name: deleteTargetProfile.name,
+              })
             : undefined
         }
-        confirmLabel="Delete"
+        confirmLabel={t("deleteConfirm.confirm")}
         onConfirm={confirmDeleteProfile}
         tone="destructive"
       />

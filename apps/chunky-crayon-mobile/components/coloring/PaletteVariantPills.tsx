@@ -4,9 +4,9 @@ import SquishyPressable from "@/components/SquishyPressable";
 import {
   PALETTE_VARIANTS,
   PALETTE_VARIANT_ICONS,
-  PALETTE_VARIANT_LABELS,
   type PaletteVariant,
 } from "@/lib/coloring/palette";
+import { useT } from "@/lib/i18n/useT";
 
 /**
  * Row of four icon-only palette-variant pills (realistic / pastel / cute
@@ -44,6 +44,7 @@ const PaletteVariantPills = ({
   columns = 4,
   pillHeight = 48,
 }: PaletteVariantPillsProps) => {
+  const t = useT("mobile.coloring.palette");
   // Icon sized to match the tools-rail icons (24px) so the left-panel
   // variant icons read at the same scale as the right-panel tool icons.
   const iconSize = Math.round(pillHeight * 0.5);
@@ -64,7 +65,7 @@ const PaletteVariantPills = ({
             onPress={() => onSelect(variant)}
             scaleTo={0.96}
             accessibilityRole="button"
-            accessibilityLabel={PALETTE_VARIANT_LABELS[variant]}
+            accessibilityLabel={t(variant)}
             accessibilityState={{ selected: isSelected }}
             style={[
               styles.pillSlot,

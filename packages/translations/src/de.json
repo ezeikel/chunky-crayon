@@ -447,7 +447,8 @@
     "currentLanguage": "Aktuelle Sprache",
     "selectLanguage": "Sprache auswählen",
     "language": "Sprache",
-    "switchTo": "Wechseln zu"
+    "switchTo": "Wechseln zu",
+    "title": "Sprache"
   },
   "difficulty": {
     "easy": "Einfach",
@@ -456,6 +457,40 @@
   },
   "gallery": {
     "categoryNotFound": "Kategorie nicht gefunden",
-    "difficultyNotFound": "Schwierigkeitsgrad nicht gefunden"
+    "difficultyNotFound": "Schwierigkeitsgrad nicht gefunden",
+    "category": {
+      "animals": "Tiere",
+      "dinosaurs": "Dinosaurier",
+      "dragons": "Drachen",
+      "fantasy": "Fantasie & Magie",
+      "food": "Essen & Süßes",
+      "holidays": "Feiertage & Jahreszeiten",
+      "nature": "Natur & Blumen",
+      "pirates": "Piraten",
+      "princesses": "Prinzessinnen & Adel",
+      "robots": "Roboter & Technik",
+      "space": "Weltraum & Astronauten",
+      "superheroes": "Superhelden",
+      "underwater": "Unterwasser & Ozean",
+      "unicorns": "Einhörner",
+      "vehicles": "Fahrzeuge & Transport"
+    },
+    "categoryDescription": {
+      "animals": "Niedliche und wilde Tier-Ausmalbilder für Kinder und Erwachsene",
+      "dinosaurs": "Prähistorische Dinosaurier-Ausmalbilder für jedes Alter",
+      "dragons": "Epische Drachen-Ausmalbilder von niedlich bis furchteinflößend",
+      "fantasy": "Ausmalbilder mit magischen Wesen und Fantasiewelten",
+      "food": "Leckere Ausmalbilder mit Essen, Süßigkeiten und Desserts",
+      "holidays": "Weihnachten, Ostern, Halloween und saisonale Ausmalbilder",
+      "nature": "Schöne Naturmotive und Blumen-Ausmalbilder",
+      "pirates": "Abenteuerliche Piraten-Ausmalbilder",
+      "princesses": "Ausmalbilder mit Prinzessinnen, Prinzen und Schlössern",
+      "robots": "Futuristische Roboter- und Technik-Ausmalbilder",
+      "space": "Ausmalbilder mit Weltall, Raketen und Astronauten",
+      "superheroes": "Actionreiche Superhelden-Ausmalbilder",
+      "underwater": "Ausmalbilder mit Meereswelt und Unterwasser-Abenteuern",
+      "unicorns": "Schöne Einhorn- und Regenbogen-Ausmalbilder",
+      "vehicles": "Ausmalbilder mit Autos, Lkw, Flugzeugen und Zügen"
+    }
   }
 }

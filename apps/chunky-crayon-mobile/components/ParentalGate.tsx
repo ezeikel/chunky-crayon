@@ -10,6 +10,7 @@ import Animated, {
   Easing,
 } from "react-native-reanimated";
 import { FONTS, COLORS } from "@/lib/design";
+import { useT } from "@/lib/i18n/useT";
 import { notifySuccess, notifyWarning } from "@/utils/haptics";
 
 /**
@@ -97,9 +98,14 @@ const ParentalGate = ({
   visible,
   onClose,
   onSuccess,
-  title = "Quick check",
-  subtitle = "Tap the right answer to keep going.",
+  title,
+  subtitle,
 }: ParentalGateProps) => {
+  const t = useT("mobile.parentalGate");
+  // Default copy resolves through i18n; explicit title/subtitle props (passed by
+  // purchase / subscription gates) still win when provided.
+  const resolvedTitle = title ?? t("defaultTitle");
+  const resolvedSubtitle = subtitle ?? t("defaultSubtitle");
   const [problem, setProblem] = useState<Problem>(DEFAULT_PROBLEM);
   const [choices, setChoices] = useState<number[]>(() =>
     buildAnswerChoices(DEFAULT_PROBLEM.answer, false),
@@ -180,7 +186,7 @@ const ParentalGate = ({
       <Pressable
         style={styles.overlay}
         onPress={onClose}
-        accessibilityLabel="Close"
+        accessibilityLabel={t("closeA11y")}
       >
         <Animated.View style={[styles.container, containerStyle]}>
           <Pressable onPress={(e) => e.stopPropagation()}>
@@ -196,8 +202,8 @@ const ParentalGate = ({
               />
             </Animated.View>
 
-            <Text style={styles.title}>{title}</Text>
-            <Text style={styles.subtitle}>{subtitle}</Text>
+            <Text style={styles.title}>{resolvedTitle}</Text>
+            <Text style={styles.subtitle}>{resolvedSubtitle}</Text>
 
             {/* The sum. Soft cream pill matches web's bg-paper-cream. */}
             <View style={styles.sumPill} accessibilityLiveRegion="polite">
@@ -226,9 +232,7 @@ const ParentalGate = ({
               ))}
             </View>
 
-            <Text style={styles.hint}>
-              Adults: tap the right answer to continue.
-            </Text>
+            <Text style={styles.hint}>{t("hint")}</Text>
           </Pressable>
         </Animated.View>
       </Pressable>

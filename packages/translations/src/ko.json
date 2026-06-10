@@ -447,7 +447,8 @@
     "currentLanguage": "현재 언어",
     "selectLanguage": "언어 선택",
     "language": "언어",
-    "switchTo": "다음으로 전환"
+    "switchTo": "다음으로 전환",
+    "title": "언어"
   },
   "difficulty": {
     "easy": "쉬움",
@@ -456,6 +457,40 @@
   },
   "gallery": {
     "categoryNotFound": "카테고리를 찾을 수 없음",
-    "difficultyNotFound": "난이도를 찾을 수 없음"
+    "difficultyNotFound": "난이도를 찾을 수 없음",
+    "category": {
+      "animals": "동물",
+      "dinosaurs": "공룡",
+      "dragons": "드래곤",
+      "fantasy": "판타지 & 마법",
+      "food": "음식 & 디저트",
+      "holidays": "휴일 & 계절",
+      "nature": "자연 & 꽃",
+      "pirates": "해적",
+      "princesses": "공주 & 왕실",
+      "robots": "로봇 & 기술",
+      "space": "우주 & 우주비행사",
+      "superheroes": "슈퍼히어로",
+      "underwater": "바닷속 & 바다",
+      "unicorns": "유니콘",
+      "vehicles": "탈것 & 교통수단"
+    },
+    "categoryDescription": {
+      "animals": "아이와 어른 모두를 위한 귀엽고 야생적인 동물 색칠공부",
+      "dinosaurs": "모든 연령을 위한 선사시대 공룡 색칠공부",
+      "dragons": "귀여운 것부터 강렬한 것까지, 멋진 드래곤 색칠공부",
+      "fantasy": "마법 생물과 판타지 세계 색칠공부",
+      "food": "맛있는 음식, 사탕, 디저트 색칠공부",
+      "holidays": "크리스마스, 부활절, 할로윈 등 계절별 색칠공부",
+      "nature": "아름다운 자연 풍경과 꽃 색칠공부",
+      "pirates": "스릴 넘치는 해적 모험 색칠공부",
+      "princesses": "공주, 왕자, 성 색칠공부",
+      "robots": "미래적인 로봇과 기술 색칠공부",
+      "space": "우주, 로켓, 우주비행사 색칠공부",
+      "superheroes": "액션 가득한 슈퍼히어로 색칠공부",
+      "underwater": "바다 생물과 바닷속 모험 색칠공부",
+      "unicorns": "아름다운 유니콘과 무지개 색칠공부",
+      "vehicles": "자동차, 트럭, 비행기, 기차 색칠공부"
+    }
   }
 }

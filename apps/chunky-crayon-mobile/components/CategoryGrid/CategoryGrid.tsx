@@ -11,6 +11,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { GALLERY_CATEGORIES } from "@one-colored-pixel/coloring-core/gallery";
 import SafeSvgUri from "@/components/SafeSvgUri/SafeSvgUri";
 import { getCategoryPresentation } from "@/lib/gallery/categoryPresentation";
+import { useT } from "@/lib/i18n/useT";
 import useCategoryCovers from "@/hooks/api/useCategoryCovers";
 import { tapMedium } from "@/utils/haptics";
 import { track } from "@/utils/analytics";
@@ -30,6 +31,11 @@ const GRID_GAP = 14;
 const CategoryGrid = () => {
   const { width } = useWindowDimensions();
   const { coverBySlug } = useCategoryCovers();
+  // Category names come from the shared catalog (slug-keyed); translate at the
+  // render site via slug -> key lookup (gallery.category.<slug>) so we never
+  // edit the shared catalog source.
+  const tCategoryName = useT("gallery.category");
+  const tGallery = useT("mobile.gallery");
   const numColumns = width >= 768 ? 3 : 2;
   // floor so N columns always fit — rounding up overflows and wraps the last
   // tile, leaving a dead gutter on the right.
@@ -42,6 +48,7 @@ const CategoryGrid = () => {
       {GALLERY_CATEGORIES.map((category) => {
         const { icon, primary, bg } = getCategoryPresentation(category.slug);
         const cover = coverBySlug[category.slug];
+        const categoryName = tCategoryName(category.slug);
         return (
           <Pressable
             key={category.slug}
@@ -58,7 +65,9 @@ const CategoryGrid = () => {
               router.push(`/category/${category.slug}`);
             }}
             accessibilityRole="button"
-            accessibilityLabel={`Color ${category.name}`}
+            accessibilityLabel={tGallery("colorCategoryA11y", {
+              name: categoryName,
+            })}
           >
             {cover ? (
               <View style={styles.art}>
@@ -95,7 +104,7 @@ const CategoryGrid = () => {
                 />
               </View>
               <Text style={styles.name} numberOfLines={1}>
-                {category.name}
+                {categoryName}
               </Text>
             </LinearGradient>
           </Pressable>

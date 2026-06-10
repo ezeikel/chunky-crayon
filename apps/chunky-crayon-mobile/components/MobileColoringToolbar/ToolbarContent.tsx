@@ -28,6 +28,23 @@ import {
   COLORING_MAGIC_TOOLS,
   type ColoringToolConfig,
 } from "@/lib/coloring/tools";
+import { useT } from "@/lib/i18n/useT";
+
+// Tool slug (catalog id) -> i18n key under mobile.coloring.tool.*. The shared
+// tools catalog stays untouched; the localized label is resolved at the render
+// site, mirroring SceneInput's t(`subject.${key}`) pattern.
+const TOOL_LABEL_KEY: Record<string, string> = {
+  crayon: "crayon",
+  marker: "marker",
+  pencil: "pencil",
+  paintbrush: "paint",
+  glitter: "glitter",
+  fill: "fill",
+  eraser: "eraser",
+  sticker: "sticker",
+  "magic-reveal": "magicBrush",
+  "magic-auto": "autoColor",
+};
 
 /**
  * The scrollable body of the phone-tier coloring toolbar — the content of
@@ -55,6 +72,7 @@ const TOOL_COLUMNS = 5;
 const TOOL_GAP = 8;
 
 const ToolbarContent = () => {
+  const t = useT("mobile.coloring");
   const { touchTargetSize } = useResponsiveLayout();
   const tile = touchTargetSize.medium;
 
@@ -186,7 +204,7 @@ const ToolbarContent = () => {
                 >
                   <ToolTile
                     icon={config.icon}
-                    label={config.label}
+                    label={t(`tool.${TOOL_LABEL_KEY[config.id] ?? config.id}`)}
                     isMagic={config.isMagic}
                     // A magic tool can't be MEANINGFULLY active unless the magic
                     // system is ready — but selectedTool persists in the global
@@ -298,7 +316,7 @@ const ToolbarContent = () => {
             { width: toolTileSize, height: toolTileSize },
             !canUndo() && styles.disabled,
           ]}
-          accessibilityLabel="Undo"
+          accessibilityLabel={t("undo")}
         >
           <UndoIcon
             size={28}
@@ -313,7 +331,7 @@ const ToolbarContent = () => {
             { width: toolTileSize, height: toolTileSize },
             !canRedo() && styles.disabled,
           ]}
-          accessibilityLabel="Redo"
+          accessibilityLabel={t("redo")}
         >
           <RedoIcon
             size={28}

@@ -160,6 +160,8 @@ type SceneTileProps = {
   option: SceneTileOption;
   selected: boolean;
   locked: boolean;
+  /** Suffix appended to the a11y label for a locked tile (app-translated). */
+  lockedSuffix: string;
   disabled: boolean;
   size: "lg" | "sm";
   onToggle: () => void;
@@ -169,6 +171,7 @@ const SceneTile = ({
   option,
   selected,
   locked,
+  lockedSuffix,
   disabled,
   size,
   onToggle,
@@ -188,7 +191,9 @@ const SceneTile = ({
       disabled={disabled}
       accessibilityRole="button"
       accessibilityState={{ selected }}
-      accessibilityLabel={locked ? `${option.label} (locked)` : option.label}
+      accessibilityLabel={
+        locked ? `${option.label}${lockedSuffix}` : option.label
+      }
       style={styles.tileWrapper}
     >
       <View style={{ width: box, height: box }}>
@@ -289,6 +294,7 @@ type TileCarouselProps = {
   layer: SceneLayer;
   selected: readonly string[];
   locked: readonly string[];
+  lockedSuffix: string;
   disabled: boolean;
   size: "lg" | "sm";
   onToggle: (optionKey: string) => void;
@@ -299,6 +305,7 @@ const TileCarousel = ({
   layer,
   selected,
   locked,
+  lockedSuffix,
   disabled,
   size,
   onToggle,
@@ -322,6 +329,7 @@ const TileCarousel = ({
             option={option}
             selected={selectedSet.has(option.key)}
             locked={isLocked}
+            lockedSuffix={lockedSuffix}
             disabled={disabled}
             size={size}
             onToggle={() =>
@@ -447,6 +455,8 @@ const SceneBuilder = ({
   );
   const hasExtras = extraLayers.length > 0;
   const [step, setStep] = useState(0);
+  // App-translated suffix for a locked tile's a11y label (e.g. " (locked)").
+  const lockedSuffix = labels.lockedSuffix ?? " (locked)";
 
   const toggleOption = (layer: SceneLayer, optionKey: string) => {
     if (disabled) return;
@@ -516,6 +526,7 @@ const SceneBuilder = ({
                 layer={{ ...subjectLayer, options: friendOptions }}
                 selected={selection[subjectLayer.id] ?? []}
                 locked={lockedKeys?.[subjectLayer.id] ?? []}
+                lockedSuffix={lockedSuffix}
                 disabled={disabled}
                 size="lg"
                 onToggle={(k) => toggleOption(subjectLayer, k)}
@@ -534,6 +545,7 @@ const SceneBuilder = ({
                 layer={{ ...subjectLayer, options: presetOptions }}
                 selected={selection[subjectLayer.id] ?? []}
                 locked={lockedKeys?.[subjectLayer.id] ?? []}
+                lockedSuffix={lockedSuffix}
                 disabled={disabled}
                 size="lg"
                 onToggle={(k) => toggleOption(subjectLayer, k)}
@@ -544,6 +556,7 @@ const SceneBuilder = ({
               layer={subjectLayer}
               selected={selection[subjectLayer.id] ?? []}
               locked={lockedKeys?.[subjectLayer.id] ?? []}
+              lockedSuffix={lockedSuffix}
               disabled={disabled}
               size="lg"
               onToggle={(k) => toggleOption(subjectLayer, k)}
@@ -572,6 +585,7 @@ const SceneBuilder = ({
             layer={locationLayer}
             selected={selection[locationLayer.id] ?? []}
             locked={lockedKeys?.[locationLayer.id] ?? []}
+            lockedSuffix={lockedSuffix}
             disabled={disabled}
             size="lg"
             onToggle={(k) => toggleOption(locationLayer, k)}
@@ -619,6 +633,7 @@ const SceneBuilder = ({
                 layer={layer}
                 selected={selection[layer.id] ?? []}
                 locked={lockedKeys?.[layer.id] ?? []}
+                lockedSuffix={lockedSuffix}
                 disabled={disabled}
                 size="sm"
                 onToggle={(k) => toggleOption(layer, k)}

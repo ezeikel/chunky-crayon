@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faExpand, faXmark } from "@fortawesome/pro-solid-svg-icons";
 import { useFocusMode } from "./FocusModeProvider";
 import { tapLight } from "@/utils/haptics";
+import { useT } from "@/lib/i18n/useT";
 import { COLORS } from "@/lib/design";
 
 /**
@@ -32,6 +33,7 @@ const FocusModeToggleButton = ({
   hideInFocusMode = true,
   style,
 }: FocusModeToggleButtonProps) => {
+  const t = useT("mobile.coloring");
   const { isFocusMode, toggleFocus } = useFocusMode();
 
   if (hideInFocusMode && isFocusMode) return null;
@@ -43,7 +45,9 @@ const FocusModeToggleButton = ({
         toggleFocus();
       }}
       style={({ pressed }) => [styles.button, pressed && styles.pressed, style]}
-      accessibilityLabel={isFocusMode ? "Exit focus mode" : "Enter focus mode"}
+      accessibilityLabel={
+        isFocusMode ? t("exitFocusMode") : t("enterFocusMode")
+      }
     >
       <FontAwesomeIcon
         icon={isFocusMode ? faXmark : faExpand}

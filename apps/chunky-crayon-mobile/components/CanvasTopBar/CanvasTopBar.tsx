@@ -10,6 +10,7 @@ import {
 import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { useCanvasStore } from "@/stores/canvasStore";
 import { tapLight } from "@/utils/haptics";
+import { useT } from "@/lib/i18n/useT";
 import { COLORS, CRAYON } from "@/lib/design";
 
 /**
@@ -72,6 +73,7 @@ const AudioTile = ({
 );
 
 const CanvasTopBar = () => {
+  const t = useT("mobile.coloring");
   const progress = useCanvasStore((s) => Math.round(s.progress));
   const isSfxMuted = useCanvasStore((s) => s.isSfxMuted);
   const isAmbientMuted = useCanvasStore((s) => s.isAmbientMuted);
@@ -109,14 +111,14 @@ const CanvasTopBar = () => {
         onToggle={toggleSfxMuted}
         iconOn={faVolumeHigh}
         iconOff={faVolumeXmark}
-        label={isSfxMuted ? "Sound effects off" : "Sound effects on"}
+        label={isSfxMuted ? t("sfxOff") : t("sfxOn")}
       />
       <AudioTile
         on={!isAmbientMuted}
         onToggle={toggleAmbientMuted}
         iconOn={faMusic}
         iconOff={faMusicSlash}
-        label={isAmbientMuted ? "Music off" : "Music on"}
+        label={isAmbientMuted ? t("musicOff") : t("musicOn")}
       />
     </View>
   );

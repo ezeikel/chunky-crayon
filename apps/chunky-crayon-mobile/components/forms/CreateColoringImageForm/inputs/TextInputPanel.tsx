@@ -15,6 +15,7 @@ type TextInputPanelProps = {
 const TextInputPanel = ({ onSubmit, isSubmitting }: TextInputPanelProps) => {
   const { description, setDescription } = useInputMode();
   const t = useT("mobile.button");
+  const tText = useT("createForm.text");
 
   const disabled = isSubmitting || !description.trim();
 
@@ -24,7 +25,7 @@ const TextInputPanel = ({ onSubmit, isSubmitting }: TextInputPanelProps) => {
         style={styles.textInput}
         onChangeText={setDescription}
         value={description}
-        placeholder="What do you want to color?"
+        placeholder={tText("placeholder")}
         placeholderTextColor={COLORS.textMuted}
         multiline
         numberOfLines={4}

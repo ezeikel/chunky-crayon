@@ -313,7 +313,7 @@ const CharacterBuilder = ({ onSubmit, submitting = false }: Props) => {
           {SPECIES_TILES.map((o) => (
             <Tile
               key={o.key}
-              label={o.label}
+              label={t(`species.${o.key}`)}
               icon={o.icon}
               duotone={o.duotone}
               thumbnail={o.thumbnail}
@@ -337,14 +337,14 @@ const CharacterBuilder = ({ onSubmit, submitting = false }: Props) => {
                 disabled={submitting}
                 accessibilityRole="button"
                 accessibilityState={{ selected }}
-                accessibilityLabel={c.label}
+                accessibilityLabel={t(`color.${c.key}`)}
                 style={[
                   styles.colorTile,
                   selected ? styles.colorTileSelected : styles.colorTileDefault,
                 ]}
               >
                 <View style={[styles.swatch, { backgroundColor: c.swatch }]} />
-                <Text style={styles.colorLabel}>{c.label}</Text>
+                <Text style={styles.colorLabel}>{t(`color.${c.key}`)}</Text>
               </Pressable>
             );
           })}
@@ -365,7 +365,7 @@ const CharacterBuilder = ({ onSubmit, submitting = false }: Props) => {
             {TRAIT_TILES.map((o) => (
               <Tile
                 key={o.key}
-                label={o.label}
+                label={t(`trait.${o.key}`)}
                 icon={o.icon}
                 duotone={o.duotone}
                 thumbnail={o.thumbnail}
@@ -441,7 +441,7 @@ const CharacterBuilder = ({ onSubmit, submitting = false }: Props) => {
           {VOICE_PERSONA_TILES.map((o) => (
             <Tile
               key={o.key}
-              label={o.label}
+              label={t(`voice.${o.key}`)}
               icon={o.icon}
               duotone={o.duotone}
               thumbnail={o.thumbnail}

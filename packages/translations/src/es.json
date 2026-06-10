@@ -447,7 +447,8 @@
     "currentLanguage": "Idioma actual",
     "selectLanguage": "Seleccionar idioma",
     "language": "Idioma",
-    "switchTo": "Cambiar a"
+    "switchTo": "Cambiar a",
+    "title": "Idioma"
   },
   "difficulty": {
     "easy": "Fácil",
@@ -456,6 +457,40 @@
   },
   "gallery": {
     "categoryNotFound": "Categoría no encontrada",
-    "difficultyNotFound": "Dificultad no encontrada"
+    "difficultyNotFound": "Dificultad no encontrada",
+    "category": {
+      "animals": "Animales",
+      "dinosaurs": "Dinosaurios",
+      "dragons": "Dragones",
+      "fantasy": "Fantasía y magia",
+      "food": "Comida y dulces",
+      "holidays": "Fiestas y estaciones",
+      "nature": "Naturaleza y flores",
+      "pirates": "Piratas",
+      "princesses": "Princesas y realeza",
+      "robots": "Robots y tecnología",
+      "space": "Espacio y astronautas",
+      "superheroes": "Superhéroes",
+      "underwater": "Bajo el mar y océano",
+      "unicorns": "Unicornios",
+      "vehicles": "Vehículos y transporte"
+    },
+    "categoryDescription": {
+      "animals": "Láminas para colorear de animales, tiernos y salvajes, para niños y adultos",
+      "dinosaurs": "Láminas para colorear de dinosaurios prehistóricos para todas las edades",
+      "dragons": "Láminas para colorear de dragones épicos, de tiernos a feroces",
+      "fantasy": "Láminas para colorear de criaturas mágicas y mundos de fantasía",
+      "food": "Láminas para colorear de comida deliciosa, caramelos y postres",
+      "holidays": "Láminas para colorear de Navidad, Pascua, Halloween y por estaciones",
+      "nature": "Láminas para colorear de bellos paisajes y flores",
+      "pirates": "Láminas para colorear de aventuras de piratas",
+      "princesses": "Láminas para colorear de princesas, príncipes y castillos",
+      "robots": "Láminas para colorear de robots futuristas y tecnología",
+      "space": "Láminas para colorear del espacio exterior, cohetes y astronautas",
+      "superheroes": "Láminas para colorear de superhéroes llenas de acción",
+      "underwater": "Láminas para colorear de vida marina y aventuras submarinas",
+      "unicorns": "Láminas para colorear de unicornios y arcoíris",
+      "vehicles": "Láminas para colorear de coches, camiones, aviones y trenes"
+    }
   }
 }

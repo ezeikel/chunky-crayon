@@ -7,6 +7,7 @@ import Animated, {
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { COLORS } from "@/lib/design";
 import { tapMedium } from "@/utils/haptics";
+import { useT } from "@/lib/i18n/useT";
 import {
   ONBOARDING_SCENES,
   type OnboardingScene,
@@ -33,35 +34,44 @@ const SceneIconPicker = ({
   activeId,
   onSelect,
   direction = "row",
-}: SceneIconPickerProps) => (
-  <View
-    style={[
-      styles.container,
-      direction === "column" ? styles.column : styles.row,
-    ]}
-    accessibilityRole="tablist"
-  >
-    {ONBOARDING_SCENES.map((scene) => (
-      <SceneChip
-        key={scene.id}
-        scene={scene}
-        active={scene.id === activeId}
-        onPress={() => {
-          if (scene.id !== activeId) tapMedium();
-          onSelect(scene);
-        }}
-      />
-    ))}
-  </View>
-);
+}: SceneIconPickerProps) => {
+  const t = useT("mobile.onboarding");
+  // Scene labels come from the shared ONBOARDING_SCENES catalog; we don't edit
+  // the catalog, so resolve the visible/a11y label from the scene id at the
+  // render site (mirrors SceneInput's `subject.${key}` lookup).
+  return (
+    <View
+      style={[
+        styles.container,
+        direction === "column" ? styles.column : styles.row,
+      ]}
+      accessibilityRole="tablist"
+    >
+      {ONBOARDING_SCENES.map((scene) => (
+        <SceneChip
+          key={scene.id}
+          scene={scene}
+          active={scene.id === activeId}
+          a11yLabel={t("sceneA11y", { label: t(`scene.${scene.id}`) })}
+          onPress={() => {
+            if (scene.id !== activeId) tapMedium();
+            onSelect(scene);
+          }}
+        />
+      ))}
+    </View>
+  );
+};
 
 const SceneChip = ({
   scene,
   active,
+  a11yLabel,
   onPress,
 }: {
   scene: OnboardingScene;
   active: boolean;
+  a11yLabel: string;
   onPress: () => void;
 }) => {
   const scale = useSharedValue(active ? 1.08 : 1);
@@ -75,7 +85,7 @@ const SceneChip = ({
       onPress={onPress}
       accessibilityRole="button"
       accessibilityState={{ selected: active }}
-      accessibilityLabel={`${scene.label} scene`}
+      accessibilityLabel={a11yLabel}
     >
       <Animated.View
         style={[

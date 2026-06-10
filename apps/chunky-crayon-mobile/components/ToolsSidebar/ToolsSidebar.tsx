@@ -29,6 +29,23 @@ import {
   type ColoringToolConfig,
 } from "@/lib/coloring/tools";
 import { getLandscapeRailFit } from "@/constants/Sizes";
+import { useT } from "@/lib/i18n/useT";
+
+// Tool slug (catalog id) -> i18n key under mobile.coloring.tool.*. The shared
+// tools catalog stays untouched; the localized label is resolved at the render
+// site, mirroring SceneInput's t(`subject.${key}`) pattern.
+const TOOL_LABEL_KEY: Record<string, string> = {
+  crayon: "crayon",
+  marker: "marker",
+  pencil: "pencil",
+  paintbrush: "paint",
+  glitter: "glitter",
+  fill: "fill",
+  eraser: "eraser",
+  sticker: "sticker",
+  "magic-reveal": "magicBrush",
+  "magic-auto": "autoColor",
+};
 
 type ToolsSidebarProps = {
   /** Width of the sidebar */
@@ -105,6 +122,7 @@ const ToolsSidebar = ({
   availableHeight,
   edgeInset = 0,
 }: ToolsSidebarProps) => {
+  const t = useT("mobile.coloring");
   const { isFocusMode, toggleFocus } = useFocusMode();
 
   // Narrow per-slice selectors instead of a whole-store subscription. The old
@@ -270,7 +288,7 @@ const ToolsSidebar = ({
               <ToolTile
                 key={config.id}
                 icon={config.icon}
-                label={config.label}
+                label={t(`tool.${TOOL_LABEL_KEY[config.id] ?? config.id}`)}
                 selected={isToolActive(config)}
                 size={tileSize}
                 onPress={() => handleToolSelect(config)}
@@ -291,7 +309,7 @@ const ToolsSidebar = ({
                 <ToolTile
                   key={config.id}
                   icon={config.icon}
-                  label={config.label}
+                  label={t(`tool.${TOOL_LABEL_KEY[config.id] ?? config.id}`)}
                   isMagic
                   selected={isToolActive(config)}
                   // Spinner while waiting/retrying; rotate-arrow on timeout
@@ -346,7 +364,7 @@ const ToolsSidebar = ({
                 { width: controlSize, height: controlSize },
                 !canUndoNow && styles.disabled,
               ]}
-              accessibilityLabel="Undo"
+              accessibilityLabel={t("undo")}
             >
               <UndoIcon
                 size={24}
@@ -361,7 +379,7 @@ const ToolsSidebar = ({
                 { width: controlSize, height: controlSize },
                 !canRedoNow && styles.disabled,
               ]}
-              accessibilityLabel="Redo"
+              accessibilityLabel={t("redo")}
             >
               <RedoIcon
                 size={24}
@@ -390,7 +408,7 @@ const ToolsSidebar = ({
                 { width: controlSize, height: controlSize },
                 zoom <= minZoom && styles.disabled,
               ]}
-              accessibilityLabel="Zoom out"
+              accessibilityLabel={t("zoomOut")}
             >
               <ZoomOutIcon
                 size={22}
@@ -410,7 +428,7 @@ const ToolsSidebar = ({
                 { width: controlSize, height: controlSize },
                 zoom >= maxZoom && styles.disabled,
               ]}
-              accessibilityLabel="Zoom in"
+              accessibilityLabel={t("zoomIn")}
             >
               <ZoomInIcon
                 size={22}
@@ -430,7 +448,7 @@ const ToolsSidebar = ({
                 styles.controlButtonBorderless,
                 { width: controlSize, height: controlSize },
               ]}
-              accessibilityLabel="See whole picture"
+              accessibilityLabel={t("seeWholePicture")}
             >
               <HomeIcon size={22} color={COLORS.textSecondary} />
             </Pressable>
@@ -446,7 +464,7 @@ const ToolsSidebar = ({
                 { width: controlSize, height: controlSize },
               ]}
               accessibilityLabel={
-                isFocusMode ? "Exit focus mode" : "Enter focus mode"
+                isFocusMode ? t("exitFocusMode") : t("enterFocusMode")
               }
             >
               <ExpandIcon size={22} color={COLORS.textSecondary} />
@@ -476,7 +494,7 @@ const ToolsSidebar = ({
                     styles.actionTile,
                     { width: actionSize, height: actionSize },
                   ]}
-                  accessibilityLabel="Start Over"
+                  accessibilityLabel={t("startOver")}
                 >
                   <FontAwesomeIcon
                     icon={faArrowsRotate}
@@ -493,7 +511,7 @@ const ToolsSidebar = ({
                     styles.actionTile,
                     { width: actionSize, height: actionSize },
                   ]}
-                  accessibilityLabel="Print"
+                  accessibilityLabel={t("print")}
                 >
                   <FontAwesomeIcon
                     icon={faPrint}
@@ -510,7 +528,7 @@ const ToolsSidebar = ({
                     styles.actionTile,
                     { width: actionSize, height: actionSize },
                   ]}
-                  accessibilityLabel="Save"
+                  accessibilityLabel={t("save")}
                 >
                   <FontAwesomeIcon
                     icon={faFloppyDisk}
@@ -527,7 +545,7 @@ const ToolsSidebar = ({
                     styles.actionTile,
                     { width: actionSize, height: actionSize },
                   ]}
-                  accessibilityLabel="My Artwork"
+                  accessibilityLabel={t("myArtwork")}
                 >
                   <FontAwesomeIcon
                     icon={faHeart}

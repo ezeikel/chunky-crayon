@@ -13,11 +13,20 @@
       "createColoringPage": "Crear página para colorear",
       "creating": "Creando...",
       "tryAgain": "Intentar de nuevo",
-      "cancel": "Cancelar"
+      "cancel": "Cancelar",
+      "seeAll": "Ver todo"
     },
     "header": {
       "forGrownUps": "Para mayores",
-      "grownUps": "Mayores"
+      "grownUps": "Mayores",
+      "creditsA11y": "{{value}} monedas de crayón",
+      "openColoA11y": "Abrir Colo",
+      "profileA11y": "Perfil: {{name}}",
+      "switchProfileA11y": "Cambiar perfil, actual: {{name}}",
+      "back": "Atrás",
+      "challengesTitle": "Retos",
+      "charactersTitle": "Mis personajes",
+      "settingsTitle": "Ajustes"
     },
     "characterBuilder": {
       "step": {
@@ -35,11 +44,85 @@
       "next": "Siguiente",
       "makeFriend": "Crear mi amigo",
       "creating": "Dibujando...",
-      "createError": "Algo salió mal. Inténtalo de nuevo."
+      "createError": "Algo salió mal. Inténtalo de nuevo.",
+      "color": {
+        "green": "Verde",
+        "orange": "Naranja",
+        "pink": "Rosa",
+        "purple": "Morado",
+        "teal": "Verde azulado",
+        "yellow": "Amarillo"
+      },
+      "species": {
+        "dragon": "Dragón",
+        "fairy": "Hada",
+        "kid": "Niño/a",
+        "kitten": "Gatito",
+        "monster": "Monstruo",
+        "puppy": "Cachorro",
+        "robot": "Robot",
+        "unicorn": "Unicornio"
+      },
+      "trait": {
+        "bouncy": "Saltarin/a",
+        "brave": "Valiente",
+        "curious": "Curioso/a",
+        "loves-snacks": "Muy comilón/a",
+        "shy": "Tímido/a",
+        "silly": "Gracioso/a",
+        "sleepy": "Soñoliento/a",
+        "sparkly": "Brillante"
+      },
+      "voice": {
+        "brave-neutral": "Valiente",
+        "gentle-neutral": "Dulce",
+        "playful-boy-5yo": "Juguetón/a",
+        "playful-girl-5yo": "Saltarin/a",
+        "silly-neutral": "Gracioso/a",
+        "sleepy-neutral": "Soñoliento/a",
+        "warm-boy-7yo": "Acogedor/a",
+        "warm-girl-7yo": "Cálido/a"
+      }
     },
     "challenges": {
       "homeCardTitle": "Retos",
-      "homeCardSubtitle": "¡Colorea para ganar pegatinas y hacer crecer a Colo!"
+      "homeCardSubtitle": "¡Colorea para ganar pegatinas y hacer crecer a Colo!",
+      "achievements": {
+        "dedicatedArtist": {
+          "description": "Completa 10 páginas para colorear",
+          "title": "Artista dedicado/a"
+        },
+        "firstSteps": {
+          "description": "Completa tu primera página para colorear",
+          "title": "Primeros pasos"
+        },
+        "gettingStarted": {
+          "description": "Completa 5 páginas para colorear",
+          "title": "Para empezar"
+        },
+        "masterArtist": {
+          "description": "Completa 50 páginas para colorear",
+          "title": "Artista maestro/a"
+        }
+      },
+      "claimFailed": "No se pudo reclamar esa recompensa. Inténtalo de nuevo.",
+      "claimReward": "¡Reclamar recompensa!",
+      "completedBang": "¡Completado!",
+      "daysLeft": "Queda {{count}} día",
+      "lifetimeAchievements": "Logros de toda la vida",
+      "noChallengeSubtitle": "Vuelve pronto para ganar más recompensas.",
+      "noChallengeTitle": "¡Un reto nuevo está en camino!",
+      "pastChallenges": "Retos anteriores",
+      "rewardAccessory": "Accesorio de Colo",
+      "rewardEarned": "¡Has ganado un/a {{reward}} nuevo/a!",
+      "rewardSticker": "pegatina",
+      "screenSubtitle": "¡Completa retos para ganar recompensas!",
+      "screenTitle": "Retos",
+      "statusCompleted": "Completado",
+      "statusIncomplete": "Incompleto",
+      "statusRewardUnclaimed": "Recompensa sin reclamar",
+      "thisWeek": "Reto de esta semana",
+      "daysLeft_other": "Quedan {{count}} días"
     },
     "characters": {
       "loading": "Cargando tus amigos...",
@@ -72,7 +155,8 @@
     },
     "gallery": {
       "title": "Explorar",
-      "subtitle": "Elige algo divertido para colorear"
+      "subtitle": "Elige algo divertido para colorear",
+      "colorCategoryA11y": "Color {{name}}"
     },
     "stickers": {
       "title": "Colección de pegatinas",
@@ -97,7 +181,11 @@
       "savedCount_other": "{{count}} obras guardadas",
       "emptyTitle": "Tus obras guardadas",
       "emptySubtitle": "Tus creaciones favoritas aparecerán aquí. ¡Empieza a colorear y guarda tus obras maestras!",
-      "emptyTip": "Toca el icono del corazón mientras coloreas para guardar"
+      "emptyTip": "Toca el icono del corazón mientras coloreas para guardar",
+      "coloringPageA11y": "Página para colorear",
+      "recentEmpty": "Aún no hay dibujos. ¡Toca arriba para crear el primero!",
+      "recentTitle": "Mis dibujos",
+      "seeAllRecent": "Ver todos mis dibujos"
     },
     "upsideDownHint": {
       "title": "¡Dame la vuelta!",
@@ -106,6 +194,425 @@
     "create": {
       "greeting": "¿Qué quieres colorear hoy?",
       "subtitle": "¡Elige cómo empezar!"
+    },
+    "category": {
+      "allTitle": "Todas las páginas para colorear",
+      "fallbackTitle": "Categoría",
+      "notFound": "No pudimos encontrar esa categoría."
+    },
+    "coloring": {
+      "enterFocusMode": "Entrar en modo concentración",
+      "exitFocusMode": "Salir del modo concentración",
+      "generating": {
+        "title": "Creando tu página para colorear…",
+        "messages": {
+          "addingSparkles": "Añadiendo un poco de brillo...",
+          "almostThere": "Dando los últimos toques...",
+          "coloringOutsideLines": "Intentando no salirme de las líneas...",
+          "creatingMasterpiece": "Dejándolo perfecto...",
+          "drawingLines": "Dibujando los contornos...",
+          "mixingColors": "Mezclando nuevos colores...",
+          "sharpeningCrayons": "Sacando punta a los crayones...",
+          "wavingWand": "Comprobando que todo esté genial..."
+        }
+      },
+      "magicHint": {
+        "useColor": "Usar color"
+      },
+      "musicOff": "Música desactivada",
+      "musicOn": "Música activada",
+      "myArtwork": "Mi arte",
+      "print": "Imprimir",
+      "redo": "Rehacer",
+      "save": "Guardar",
+      "seeWholePicture": "Ver el dibujo completo",
+      "sfxOff": "Efectos de sonido desactivados",
+      "sfxOn": "Efectos de sonido activados",
+      "startOver": "Empezar de nuevo",
+      "stickerPicker": {
+        "categoryA11y": "Pegatinas de {{label}}",
+        "heading": "¡Elige una pegatina!",
+        "hint": "¡Ahora toca tu dibujo!",
+        "stickerA11y": "Pegatina {{name}}",
+        "category": {
+          "animals": "Animales",
+          "fun": "Diversión",
+          "hearts": "Corazones",
+          "nature": "Naturaleza",
+          "shapes": "Formas",
+          "stars": "Estrellas"
+        }
+      },
+      "tool": {
+        "gettingReady": "{{label}} (preparando)",
+        "tapToTryAgain": "{{label}} (toca para reintentar)",
+        "autoColor": "Colorear solo",
+        "crayon": "Crayón",
+        "eraser": "Borrador",
+        "fill": "Rellenar",
+        "glitter": "Purpurina",
+        "magicBrush": "Pincel mágico",
+        "marker": "Rotulador",
+        "paint": "Pintura",
+        "pencil": "Lápiz",
+        "sticker": "Pegatina"
+      },
+      "undo": "Deshacer",
+      "zoomIn": "Acercar",
+      "zoomOut": "Alejar",
+      "addedToCollection": "¡Añadido a tu colección!",
+      "back": "Atrás",
+      "brushSize": {
+        "chunky": "Grueso",
+        "fine": "Fino",
+        "regular": "Normal"
+      },
+      "captureFailed": "No pudimos capturar tu dibujo.",
+      "myArtworkSheetConfirm": "Añadir a mi colección",
+      "myArtworkSheetTitle": "¿Añadir a Mi arte?",
+      "noData": "Sin datos",
+      "palette": {
+        "cute": "Tierno",
+        "pastel": "Pastel",
+        "realistic": "Realista",
+        "surprise": "Sorpresa"
+      },
+      "panMode": "Mover",
+      "photoPermissionDenied": "Permite el acceso a tu fototeca para guardar tu dibujo.",
+      "printFailed": "No pudimos crear un PDF para imprimir. Inténtalo de nuevo.",
+      "printQrCta": "¡Escanea el código QR para descubrir más páginas para colorear!",
+      "printSheetConfirm": "Crear un PDF para imprimir",
+      "printSheetTitle": "¿Imprimir esta página?",
+      "saveFailed": "No pudimos guardar tu dibujo. Inténtalo de nuevo.",
+      "saveSheetConfirm": "Guardar en Fotos",
+      "saveSheetTitle": "¿Guardar tu dibujo?",
+      "savedToPhotos": "¡Guardado en tu fototeca!",
+      "startOverCancel": "No, seguir coloreando",
+      "startOverConfirm": "Sí, empezar de nuevo",
+      "startOverTitle": "¿Empezar de nuevo?",
+      "untitledArtwork": "Mi arte"
+    },
+    "creditPack": {
+      "bestValue": "Mejor oferta",
+      "creditsLabel": "créditos",
+      "rowA11y": "{{credits}} créditos por {{price}}",
+      "rowA11yBestValue": "{{credits}} créditos por {{price}}, mejor oferta"
+    },
+    "feed": {
+      "challenge": "Reto",
+      "claim": "¡Reclamar!",
+      "continueColoring": "Seguir coloreando",
+      "discoverMorePages": "Descubrir más páginas",
+      "emptyNoPages": "Ahora mismo no hay páginas para colorear. ¡Vuelve pronto!",
+      "errorLoading": "¡Uy! Algo salió mal al cargar tu inicio.",
+      "moreToColor": "Más para colorear",
+      "seeAllYourArt": "Ver todo tu arte",
+      "seeAllYourColoring": "Ver todos tus colores",
+      "seeAllYourCreations": "Ver todas tus creaciones",
+      "today": "Hoy",
+      "yourArt": "Tu arte",
+      "yourCreations": "Tus creaciones"
+    },
+    "home": {
+      "coloProud": "¡Tu {{stageName}} está muy orgulloso/a de ti!",
+      "coloWantsToGrow": "¡{{stageName}} quiere crecer! Guarda {{count}} obras más para evolucionar.",
+      "discoverMore": "Descubrir más",
+      "discoverMoreA11y": "Descubrir más páginas para colorear",
+      "greeting": "¿Qué quieres colorear hoy?",
+      "seeAllCategories": "Ver todas las categorías",
+      "whatDoYouLike": "¿Qué te gusta?",
+      "browseAllA11y": "Explorar todas las páginas para colorear"
+    },
+    "onboarding": {
+      "coloring": {
+        "celebrationSubtitle": "Se te da genial",
+        "celebrationTitle": "¡Genial!",
+        "done": "Listo",
+        "doneA11y": "Listo",
+        "subtitle": "Elige una escena y colorea a Colo",
+        "title": "¡Te toca crear!"
+      },
+      "paywall": {
+        "continue": "Continuar",
+        "continueA11y": "Continuar a la app",
+        "description": "Luego elige el plan ideal cuando se enamoren.",
+        "finePrint": "Hoy no se te cobrará nada. Luego {{price}}/mes después de tu semana gratis. Cancela cuando quieras en Ajustes. {{guarantee}}.",
+        "maybeLater": "Quizá más tarde",
+        "rainbowPlan": "Plan Arcoíris",
+        "reviews": "({{count}} reseñas)",
+        "seeAllPlans": "Ver todos los planes",
+        "startTrial": "Empezar mi semana gratis",
+        "startTrialA11y": "Empezar mi semana gratis",
+        "title": "Coloreo ilimitado, gratis por una semana",
+        "trustLead": "Adorado por las familias",
+        "unavailable": "Ahora mismo no hay planes disponibles. Puedes empezar a colorear y mejorar más tarde.",
+        "feature": {
+          "challenges": "Retos diarios y recompensas de pegatinas",
+          "magic": "Pincel mágico y colorear con la voz",
+          "unlimited": "Páginas para colorear ilimitadas, cuando quieras"
+        },
+        "timeline": {
+          "day5": {
+            "text": "Te avisaremos antes de que termine la prueba.",
+            "when": "Día 5"
+          },
+          "day7": {
+            "text": "Termina tu semana gratis. Cancela cuando quieras antes, sin coste.",
+            "when": "Día 7"
+          },
+          "today": {
+            "text": "Desbloquea todo. Colorea todo lo que quieras.",
+            "when": "Hoy"
+          }
+        }
+      },
+      "sceneA11y": "Escena: {{label}}",
+      "skip": "Saltar",
+      "slide": {
+        "colo": {
+          "description": "¡Colo evoluciona mientras tu peque colorea! Gana pegatinas, completa retos diarios y desbloquea nuevas etapas.",
+          "title": "Mira cómo crecen con Colo"
+        },
+        "creativity": {
+          "description": "Tu peque lo imagina hablando, dibujando o sacando una foto. Lo convertimos en una página para colorear hecha solo para él/ella.",
+          "title": "Creatividad sin fin, cero lío"
+        },
+        "safety": {
+          "description": "Sin anuncios, sin funciones sociales, sin recopilar datos. Para peques de 3 a 8 años. Tú tienes el control.",
+          "title": "Seguro, sencillo y para manitas pequeñas"
+        }
+      },
+      "scene": {
+        "onboarding-jungle": "Selva",
+        "onboarding-party": "Fiesta",
+        "onboarding-space": "Espacio",
+        "onboarding-underwater": "Bajo el mar"
+      }
+    },
+    "paywall": {
+      "annualSaveBadge": "2 meses gratis",
+      "closeA11y": "Cerrar",
+      "creditsPerMo": "{{credits}} créditos/mes",
+      "ctaA11y": "Empezar prueba gratis de 7 días de {{plan}}",
+      "ctaMicrocopy": "Luego {{price}}/{{period}}. Cancela cuando quieras antes.",
+      "ctaText": "Empezar prueba gratis de 7 días",
+      "guarantee": "Garantía de devolución de 30 días",
+      "legalRenew": "Las suscripciones se renuevan automáticamente. Cancela cuando quieras en Ajustes.",
+      "loadingPlans": "Cargando planes…",
+      "monthPeriod": "mes",
+      "monthly": "Mensual",
+      "mostPopular": "Más popular",
+      "perMonthShort": "mes",
+      "perYearShort": "año",
+      "planRowA11y": "{{plan}}, {{credits}} créditos al mes, {{price}} por {{period}}",
+      "plansUnavailable": "Ahora mismo no hay planes disponibles. Inténtalo de nuevo más tarde.",
+      "privacyPolicy": "Política de privacidad",
+      "processing": "Procesando…",
+      "restore": "Restaurar compras",
+      "restoreA11y": "Restaurar compras",
+      "socialProof": {
+        "reviewCount": "de {{count}} reseñas",
+        "title": "Adorado por familias de todas partes"
+      },
+      "subtitle": "Crea tantas páginas como quieran. Imprímelas o colorea en pantalla.",
+      "termsOfService": "Términos del servicio",
+      "title": "Desbloquea coloreo ilimitado",
+      "yearPeriod": "año",
+      "yearly": "Anual"
+    },
+    "profileSwitcher": {
+      "addProfile": "Añadir perfil",
+      "artworkCount": "{{count}} obra",
+      "done": "Listo",
+      "edit": "Editar",
+      "maxReached": "Se alcanzó el máximo de {{count}} perfiles",
+      "namePlaceholder": "Nombre del perfil",
+      "title": "Perfiles",
+      "toast": {
+        "createFailed": "No se pudo crear el perfil. Inténtalo de nuevo.",
+        "deleteFailed": "No se pudo eliminar el perfil. Inténtalo de nuevo.",
+        "minOneProfile": "Debes tener al menos un perfil.",
+        "switchFailed": "No se pudo cambiar de perfil. Inténtalo de nuevo.",
+        "updateFailed": "No se pudo actualizar el perfil. Inténtalo de nuevo."
+      },
+      "deleteConfirm": {
+        "title": "¿Eliminar perfil?",
+        "description": "Esto borrará \"{{name}}\" y todos sus dibujos guardados.",
+        "confirm": "Eliminar"
+      },
+      "artworkCount_other": "{{count}} obras"
+    },
+    "settings": {
+      "backgroundMusic": {
+        "subtitle": "Sonidos ambiente mientras coloreas",
+        "title": "Música de fondo"
+      },
+      "bannerA11y": "Plan {{plan}}, {{credits}} créditos. Administrar suscripción.",
+      "bannerCtaManage": "Administrar",
+      "bannerCtaUpgrade": "Mejorar",
+      "bannerPlanTitle": "Plan {{plan}}",
+      "bannerSubtitleUpgrade": " · Mejora para seguir coloreando",
+      "contact": {
+        "title": "Contáctanos"
+      },
+      "creditCount": "{{formattedCount}} crédito",
+      "help": {
+        "subtitle": "Respuestas a preguntas comunes",
+        "title": "Ayuda y preguntas frecuentes"
+      },
+      "language": {
+        "title": "Idioma"
+      },
+      "madeWith": "Hecho con",
+      "madeWithIn": "en",
+      "madeWithLocation": "Sur de Londres",
+      "magicLinkSent": {
+        "body": "Enviamos un enlace de inicio de sesión a {{email}}",
+        "subtext": "Haz clic en el enlace del correo para iniciar sesión. Caduca en 15 minutos.",
+        "title": "¡Revisa tu correo!",
+        "useDifferentEmail": "Usar otro correo"
+      },
+      "onboarding": {
+        "subtitle": "Repetir la guía de bienvenida",
+        "title": "Ver onboarding"
+      },
+      "planChip": "Plan {{plan}}",
+      "privacy": {
+        "title": "Política de privacidad"
+      },
+      "profiles": {
+        "add": "Añadir",
+        "addA11y": "Añadir un perfil",
+        "currentProfileA11y": "{{name}}, perfil actual",
+        "manageA11y": "{{name}}, administrar perfiles"
+      },
+      "rate": {
+        "subtitle": "Comparte tu opinión",
+        "title": "Valorar la app"
+      },
+      "section": {
+        "account": "Cuenta",
+        "appInfo": "Información de la app",
+        "legal": "Legal",
+        "preferences": "Preferencias",
+        "profiles": "Perfiles",
+        "support": "Soporte"
+      },
+      "signIn": {
+        "subtitle": "Sincroniza tus dibujos entre dispositivos",
+        "title": "Iniciar sesión"
+      },
+      "signInModal": {
+        "continueApple": "Continuar con Apple",
+        "continueFacebook": "Continuar con Facebook",
+        "continueGoogle": "Continuar con Google",
+        "emailLabel": "Inicia sesión con correo",
+        "emailPlaceholder": "Escribe tu correo",
+        "or": "o",
+        "privacyNote": "Al iniciar sesión, aceptas nuestros Términos del servicio y Política de privacidad.",
+        "sendMagicLink": "Enviar enlace de acceso",
+        "subtitle": "Inicia sesión para sincronizar tus dibujos entre dispositivos y acceder a tu cuenta en la web.",
+        "title": "Iniciar sesión"
+      },
+      "signOut": {
+        "subtitle": "Tus dibujos se quedan en este dispositivo",
+        "title": "Cerrar sesión"
+      },
+      "signOutConfirm": {
+        "confirm": "Cerrar sesión",
+        "description": "Tus dibujos se quedarán en este dispositivo.",
+        "title": "¿Cerrar sesión?"
+      },
+      "soundEffects": {
+        "subtitle": "Toques de botones y acciones",
+        "title": "Efectos de sonido"
+      },
+      "terms": {
+        "title": "Términos del servicio"
+      },
+      "toast": {
+        "accountLinked": "¡Cuenta vinculada y dibujos sincronizados!",
+        "appleSignInFailed": "No se pudo iniciar sesión con Apple. Inténtalo de nuevo.",
+        "facebookSignInFailed": "No se pudo iniciar sesión con Facebook. Inténtalo de nuevo.",
+        "googleSignInFailed": "No se pudo iniciar sesión con Google. Inténtalo de nuevo.",
+        "invalidEmail": "Introduce un correo válido.",
+        "magicLinkFailed": "No se pudo enviar el enlace de acceso. Inténtalo de nuevo.",
+        "signedIn": "¡Has iniciado sesión!",
+        "signedOut": "Has cerrado sesión. Tus dibujos se quedan en este dispositivo."
+      },
+      "version": {
+        "title": "Versión"
+      },
+      "vibration": {
+        "subtitle": "Vibración suave en toques y recompensas",
+        "title": "Vibración"
+      },
+      "creditCount_other": "{{formattedCount}} créditos"
+    },
+    "subscriptionManager": {
+      "accessUntil": "Acceso hasta",
+      "buyCredits": "Comprar créditos",
+      "creditsAvailable": "{{count}} crédito disponible",
+      "legal": "Las suscripciones se renuevan automáticamente, a menos que se cancelen al menos 24 horas antes de que termine el periodo actual. Administra o cancela cuando quieras en los ajustes de {{store}}.",
+      "manageSubscription": "Administrar suscripción",
+      "noActiveSubscription": "Sin suscripción activa",
+      "planIncludes": "Tu plan incluye",
+      "planName": "Plan {{plan}}",
+      "renews": "Se renueva",
+      "restorePurchases": "Restaurar compras",
+      "status": {
+        "active": "Activa",
+        "cancelled": "Cancelada",
+        "paymentIssue": "Problema de pago",
+        "trial": "Prueba"
+      },
+      "subscribeNow": "Suscribirme ahora",
+      "title": "Suscripción y créditos",
+      "upgradePlan": "Mejorar plan",
+      "creditsAvailable_other": "{{count}} créditos disponibles"
+    },
+    "topUp": {
+      "closeA11y": "Cerrar",
+      "legal": "Los créditos se añaden a tu cuenta inmediatamente tras la compra. Los créditos no caducan.",
+      "loading": "Cargando packs de créditos…",
+      "subtitle": "Añade más créditos para seguir creando, sin cambiar tu plan.",
+      "title": "Recarga tus créditos",
+      "unavailable": "Los packs de créditos no están disponibles en este momento."
+    },
+    "avatar": {
+      "alien": "Alienígena",
+      "astronaut": "Astronauta",
+      "dragon": "Dragón",
+      "ghost": "Fantasma",
+      "ice-cream": "Helado",
+      "mermaid": "Sirena",
+      "rainbow": "Arcoíris",
+      "rocket": "Cohete",
+      "sun": "Sol",
+      "superhero": "Superhéroe",
+      "unicorn": "Unicornio",
+      "wizard": "Mago"
+    },
+    "avatarPicker": {
+      "pickA11y": "Elegir {{name}}"
+    },
+    "createProfile": {
+      "create": "Crear",
+      "namePlaceholder": "¿Cómo te llamas?",
+      "pickCharacter": "Elige tu personaje"
+    },
+    "parentalGate": {
+      "closeA11y": "Cerrar",
+      "defaultSubtitle": "Toca la respuesta correcta para seguir.",
+      "defaultTitle": "Comprobación rápida",
+      "hint": "Adultos: toquen la respuesta correcta para continuar.",
+      "purchaseSubtitle": "Verifica que eres padre/madre para realizar esta compra",
+      "purchaseTitle": "Verificación parental",
+      "subscriptionSubtitle": "Verifica que eres padre/madre para iniciar una suscripción"
+    },
+    "profileAvatar": {
+      "a11yFallback": "Avatar del perfil",
+      "a11yNamed": "Avatar de {{name}}"
     }
   },
   "createForm": {
@@ -199,6 +706,46 @@
       "errorQ2AudioFailed": "No pude reproducir la pregunta. ¿Intentamos de nuevo?",
       "errorTimeout": "¡Tardaste mucho! Empecemos de nuevo.",
       "errorRequiresSignin": "Inicia sesión para usar el modo de voz."
+    },
+    "error": {
+      "characterNotReady": "Ese amiguito aún no está listo. Inténtalo de nuevo en un momento.",
+      "generic": "Algo salió mal. Inténtalo de nuevo.",
+      "moderationBlocked": "¡Probemos otra idea para tu dibujo!"
+    },
+    "friendPicker": {
+      "emptyInviteSuffix": " que aparece en tus páginas.",
+      "header": "Añadir un amigo",
+      "includeFriendA11y": "Incluir a {{name}}, un(a) {{species}}",
+      "makeFriend": "Crear un amigo",
+      "makeNewFriend": "Crear un nuevo amigo",
+      "newFriend": "Nuevo amigo",
+      "noFriend": "Sin amigo",
+      "optional": "(opcional)"
+    },
+    "image": {
+      "camera": "Cámara",
+      "cameraPermissionDenied": "Se necesita acceso a la cámara para sacar fotos.",
+      "confirmInstructions": "¡Qué foto tan genial! ¿Es esta la que quieres?",
+      "createFailed": "No se pudo crear la página para colorear a partir de la foto.",
+      "createFailedToast": "No pudimos crear una página para colorear con tu foto. ¡Inténtalo de nuevo!",
+      "instructions": "¡Saca una foto o sube una imagen!",
+      "libraryPermissionDenied": "Se necesita acceso a tu galería para elegir una imagen.",
+      "pickAnother": "Elegir otra",
+      "pickImageFailed": "No se pudo seleccionar esa imagen. Inténtalo de nuevo.",
+      "processing": "Creando tu página para colorear...",
+      "takePhotoFailed": "No se pudo sacar la foto. Inténtalo de nuevo.",
+      "upload": "Subir"
+    },
+    "mode": {
+      "a11yLabel": "Modo de entrada: {{mode}}",
+      "unlockSaveFailed": "No se pudo guardar ese desbloqueo. Puede que no se quede, inténtalo de nuevo.",
+      "image": "Foto",
+      "scene": "Construir",
+      "text": "Escribir",
+      "voice": "Hablar"
+    },
+    "text": {
+      "placeholder": "¿Qué quieres colorear?"
     }
   }
 }

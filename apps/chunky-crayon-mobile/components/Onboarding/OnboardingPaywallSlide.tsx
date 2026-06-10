@@ -40,6 +40,7 @@ import {
 import { PAYWALL_TRUST } from "@/lib/paywall/plans";
 import { tapMedium, notifySuccess } from "@/utils/haptics";
 import { COLORS, CRAYON } from "@/lib/design";
+import { useT } from "@/lib/i18n/useT";
 import type { PurchasesPackage } from "react-native-purchases";
 import ParentalGate from "../ParentalGate";
 import Spinner from "../Spinner/Spinner";
@@ -51,60 +52,64 @@ type OnboardingPaywallSlideProps = {
 };
 
 // Each feature carries its own crayon-duotone icon (no flat green checks).
+// `labelKey` resolves to the translated copy at render time (under
+// mobile.onboarding.paywall.feature.*).
 const FEATURES: {
   icon: IconDefinition;
   primary: string;
   secondary: string;
-  label: string;
+  labelKey: string;
 }[] = [
   {
     icon: faInfinity,
     primary: CRAYON.blue.base,
     secondary: CRAYON.blue.light,
-    label: "Unlimited coloring pages, anytime",
+    labelKey: "feature.unlimited",
   },
   {
     icon: faWandMagicSparkles,
     primary: CRAYON.purple.dark,
     secondary: CRAYON.purple.light,
-    label: "Magic Brush and color-by-voice",
+    labelKey: "feature.magic",
   },
   {
     icon: faTrophy,
     primary: CRAYON.yellow.dark,
     secondary: CRAYON.yellow.base,
-    label: "Daily challenges and sticker rewards",
+    labelKey: "feature.challenges",
   },
 ];
 
 // "How your free trial works" — the trust/anxiety-reducer (Strava/TIDE pattern).
+// `whenKey`/`textKey` resolve to translated copy under
+// mobile.onboarding.paywall.timeline.*.
 const TIMELINE: {
   icon: IconDefinition;
   primary: string;
   secondary: string;
-  when: string;
-  text: string;
+  whenKey: string;
+  textKey: string;
 }[] = [
   {
     icon: faLockOpen,
     primary: COLORS.crayonOrange,
     secondary: COLORS.secondaryOrange,
-    when: "Today",
-    text: "Unlock everything. Color as much as you like.",
+    whenKey: "timeline.today.when",
+    textKey: "timeline.today.text",
   },
   {
     icon: faBell,
     primary: CRAYON.yellow.dark,
     secondary: CRAYON.yellow.base,
-    when: "Day 5",
-    text: "We'll remind you before your trial ends.",
+    whenKey: "timeline.day5.when",
+    textKey: "timeline.day5.text",
   },
   {
     icon: faCalendarCheck,
     primary: CRAYON.green.base,
     secondary: CRAYON.green.light,
-    when: "Day 7",
-    text: "Your free week ends. Cancel anytime before then, no charge.",
+    whenKey: "timeline.day7.when",
+    textKey: "timeline.day7.text",
   },
 ];
 
@@ -112,6 +117,10 @@ const OnboardingPaywallSlide = ({
   onComplete,
   isActive = true,
 }: OnboardingPaywallSlideProps) => {
+  const t = useT("mobile.onboarding.paywall");
+  // Raw global t for shared keys outside this slide's namespace (the parental
+  // gate copy lives under mobile.parentalGate.*).
+  const tGlobal = useT();
   const { width } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const { data: offering, isPending: isLoadingOfferings } = useOfferings();
@@ -234,16 +243,16 @@ const OnboardingPaywallSlide = ({
       </View>
 
       <Text style={[styles.title, isTablet && styles.titleTablet]}>
-        Unlimited coloring, free for a week
+        {t("title")}
       </Text>
       <Text style={[styles.description, isTablet && styles.descriptionTablet]}>
-        Then pick the plan that fits after they fall in love.
+        {t("description")}
       </Text>
 
       {/* Features — each with its own crayon-duotone icon */}
       <View style={styles.featuresList}>
         {FEATURES.map((feature) => (
-          <View key={feature.label} style={styles.featureRow}>
+          <View key={feature.labelKey} style={styles.featureRow}>
             <View
               style={[
                 styles.featureIcon,
@@ -258,7 +267,7 @@ const OnboardingPaywallSlide = ({
                 secondaryOpacity={1}
               />
             </View>
-            <Text style={styles.featureText}>{feature.label}</Text>
+            <Text style={styles.featureText}>{t(feature.labelKey)}</Text>
           </View>
         ))}
       </View>
@@ -266,7 +275,7 @@ const OnboardingPaywallSlide = ({
       {/* How your free trial works — timeline (trust/anxiety reducer) */}
       <View style={styles.timeline}>
         {TIMELINE.map((step, i) => (
-          <View key={step.when} style={styles.timelineRow}>
+          <View key={step.whenKey} style={styles.timelineRow}>
             <View style={styles.timelineRail}>
               <View
                 style={[
@@ -287,8 +296,8 @@ const OnboardingPaywallSlide = ({
               )}
             </View>
             <View style={styles.timelineContent}>
-              <Text style={styles.timelineWhen}>{step.when}</Text>
-              <Text style={styles.timelineText}>{step.text}</Text>
+              <Text style={styles.timelineWhen}>{t(step.whenKey)}</Text>
+              <Text style={styles.timelineText}>{t(step.textKey)}</Text>
             </View>
           </View>
         ))}
@@ -296,7 +305,7 @@ const OnboardingPaywallSlide = ({
 
       {/* Trust / social proof — real rating from PAYWALL_TRUST (shared w/ web). */}
       <View style={styles.trustLine}>
-        <Text style={styles.trustLead}>Loved by families</Text>
+        <Text style={styles.trustLead}>{t("trustLead")}</Text>
         <FontAwesomeIcon
           icon={faStar}
           size={13}
@@ -306,7 +315,7 @@ const OnboardingPaywallSlide = ({
         />
         <Text style={styles.trustRating}>{PAYWALL_TRUST.averageRating}</Text>
         <Text style={styles.trustReviews}>
-          ({PAYWALL_TRUST.reviewCount} reviews)
+          {t("reviews", { count: PAYWALL_TRUST.reviewCount })}
         </Text>
       </View>
     </>
@@ -329,17 +338,14 @@ const OnboardingPaywallSlide = ({
     </View>
   ) : offeringsUnavailable ? (
     <View style={styles.loadingContainer}>
-      <Text style={styles.unavailableText}>
-        Plans aren&apos;t available right now. You can start coloring and
-        upgrade later.
-      </Text>
+      <Text style={styles.unavailableText}>{t("unavailable")}</Text>
       <Pressable
         onPress={onComplete}
         accessibilityRole="button"
-        accessibilityLabel="Continue to the app"
+        accessibilityLabel={t("continueA11y")}
         style={styles.unavailableContinue}
       >
-        <Text style={styles.unavailableContinueText}>Continue</Text>
+        <Text style={styles.unavailableContinueText}>{t("continue")}</Text>
       </Pressable>
     </View>
   ) : (
@@ -357,7 +363,7 @@ const OnboardingPaywallSlide = ({
             secondaryColor="#F9A8D4"
             secondaryOpacity={1}
           />
-          <Text style={styles.priceAnchorPlan}>Rainbow Plan</Text>
+          <Text style={styles.priceAnchorPlan}>{t("rainbowPlan")}</Text>
           <Text style={styles.priceAnchorPrice}>{pricePerMonth}/mo</Text>
         </Animated.View>
       )}
@@ -373,12 +379,12 @@ const OnboardingPaywallSlide = ({
           onPress={handleStartTrial}
           disabled={isLoading || !targetPackage}
           accessibilityRole="button"
-          accessibilityLabel="Start my free week"
+          accessibilityLabel={t("startTrialA11y")}
         >
           {isLoading ? (
             <Spinner size={20} color="#FFFFFF" />
           ) : (
-            <Text style={styles.trialButtonText}>Start My Free Week</Text>
+            <Text style={styles.trialButtonText}>{t("startTrial")}</Text>
           )}
         </Pressable>
       </Animated.View>
@@ -391,7 +397,7 @@ const OnboardingPaywallSlide = ({
           disabled={isLoading}
           accessibilityRole="button"
         >
-          <Text style={styles.secondaryLinkText}>See all plans</Text>
+          <Text style={styles.secondaryLinkText}>{t("seeAllPlans")}</Text>
         </Pressable>
         <Pressable
           style={styles.secondaryLink}
@@ -399,14 +405,16 @@ const OnboardingPaywallSlide = ({
           disabled={isLoading}
           accessibilityRole="button"
         >
-          <Text style={styles.secondaryLinkText}>Maybe later</Text>
+          <Text style={styles.secondaryLinkText}>{t("maybeLater")}</Text>
         </Pressable>
       </View>
 
       {/* Fine print — no-surprise reassurance, read at tap-time. */}
       <Text style={styles.finePrint}>
-        No charge today.{pricePerMonth ? ` Then ${pricePerMonth}/mo` : ""} after
-        your free week. Cancel anytime in Settings. {PAYWALL_TRUST.guarantee}.
+        {t("finePrint", {
+          price: pricePerMonth,
+          guarantee: PAYWALL_TRUST.guarantee,
+        })}
       </Text>
     </>
   );
@@ -453,8 +461,8 @@ const OnboardingPaywallSlide = ({
         visible={showParentalGate}
         onClose={handleParentalGateClose}
         onSuccess={handleParentalGateSuccess}
-        title="Parent Verification"
-        subtitle="Please verify you are a parent to start a subscription"
+        title={tGlobal("mobile.parentalGate.purchaseTitle")}
+        subtitle={tGlobal("mobile.parentalGate.subscriptionSubtitle")}
       />
 
       {/* "See All Plans" → full subscription plan grid. The user is a

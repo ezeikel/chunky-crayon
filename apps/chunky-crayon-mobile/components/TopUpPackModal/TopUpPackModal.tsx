@@ -21,6 +21,7 @@ import PaywallHero from "@/components/SubscriptionPaywallModal/PaywallHero";
 import { useRefreshEntitlements } from "@/hooks/useEntitlements";
 import { track } from "@/utils/analytics";
 import { ANALYTICS_EVENTS } from "@/constants/analytics";
+import { useT } from "@/lib/i18n/useT";
 
 type TopUpPackModalProps = {
   visible: boolean;
@@ -105,6 +106,8 @@ const TopUpPackModal = ({
   skipParentalGate = false,
 }: TopUpPackModalProps) => {
   const insets = useSafeAreaInsets();
+  const t = useT("mobile.topUp");
+  const tRoot = useT();
   const { data: offering, isLoading } = useCreditPacksOffering();
   const purchaseMutation = usePurchaseCreditPack();
 
@@ -176,7 +179,7 @@ const TopUpPackModal = ({
             onPress={onClose}
             scaleTo={0.9}
             accessibilityRole="button"
-            accessibilityLabel="Close"
+            accessibilityLabel={t("closeA11y")}
             hitSlop={8}
             style={[styles.closeButton, { top: insets.top + 8 }]}
           >
@@ -192,22 +195,18 @@ const TopUpPackModal = ({
             {/* Same fanned coloring-page hero as the other paywalls. */}
             <PaywallHero play={visible} />
 
-            <Text style={styles.title}>Top up your credits</Text>
-            <Text style={styles.subtitle}>
-              Add more credits to keep creating, without changing your plan.
-            </Text>
+            <Text style={styles.title}>{t("title")}</Text>
+            <Text style={styles.subtitle}>{t("subtitle")}</Text>
 
             {isLoading ? (
               <View style={styles.loadingContainer}>
                 {/* No `color` → brand duotone thirds (matches app loaders). */}
                 <Spinner size={36} />
-                <Text style={styles.loadingText}>Loading credit packs…</Text>
+                <Text style={styles.loadingText}>{t("loading")}</Text>
               </View>
             ) : packages.length === 0 ? (
               <View style={styles.emptyContainer}>
-                <Text style={styles.emptyText}>
-                  Credit packs are not available at the moment.
-                </Text>
+                <Text style={styles.emptyText}>{t("unavailable")}</Text>
               </View>
             ) : (
               <View style={styles.packs}>
@@ -224,10 +223,7 @@ const TopUpPackModal = ({
               </View>
             )}
 
-            <Text style={styles.legalText}>
-              Credits are added to your account immediately after purchase.
-              Credits do not expire.
-            </Text>
+            <Text style={styles.legalText}>{t("legal")}</Text>
 
             {/* Terms / Privacy — required on any IAP screen. */}
             <View style={styles.legalLinks}>
@@ -237,9 +233,11 @@ const TopUpPackModal = ({
                 }
                 scaleTo={0.94}
                 accessibilityRole="link"
-                accessibilityLabel="Terms of Service"
+                accessibilityLabel={tRoot("mobile.paywall.termsOfService")}
               >
-                <Text style={styles.legalLink}>Terms of Service</Text>
+                <Text style={styles.legalLink}>
+                  {tRoot("mobile.paywall.termsOfService")}
+                </Text>
               </SquishyPressable>
               <Text style={styles.legalDot}>·</Text>
               <SquishyPressable
@@ -248,9 +246,11 @@ const TopUpPackModal = ({
                 }
                 scaleTo={0.94}
                 accessibilityRole="link"
-                accessibilityLabel="Privacy Policy"
+                accessibilityLabel={tRoot("mobile.paywall.privacyPolicy")}
               >
-                <Text style={styles.legalLink}>Privacy Policy</Text>
+                <Text style={styles.legalLink}>
+                  {tRoot("mobile.paywall.privacyPolicy")}
+                </Text>
               </SquishyPressable>
             </View>
           </ScrollView>
@@ -259,7 +259,9 @@ const TopUpPackModal = ({
           {isPurchasing && (
             <View style={styles.loadingOverlay}>
               <Spinner size={36} color="#FFFFFF" />
-              <Text style={styles.loadingOverlayText}>Processing…</Text>
+              <Text style={styles.loadingOverlayText}>
+                {tRoot("mobile.paywall.processing")}
+              </Text>
             </View>
           )}
         </View>
@@ -269,8 +271,8 @@ const TopUpPackModal = ({
           visible={showParentalGate}
           onClose={handleParentalGateClose}
           onSuccess={handleParentalGateSuccess}
-          title="Parent Verification"
-          subtitle="Please verify you are a parent to make this purchase"
+          title={tRoot("mobile.parentalGate.purchaseTitle")}
+          subtitle={tRoot("mobile.parentalGate.purchaseSubtitle")}
         />
       </Modal>
     </>

@@ -4,6 +4,7 @@ import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { faSparkles, faRotateRight } from "@fortawesome/pro-duotone-svg-icons";
 import SquishyPressable from "@/components/SquishyPressable";
 import Spinner from "@/components/Spinner/Spinner";
+import { useT } from "@/lib/i18n/useT";
 
 /**
  * A single coloring tool tile, matching CC web's current tool tiles
@@ -61,6 +62,7 @@ const ToolTile = ({
   disabled = false,
   style,
 }: ToolTileProps) => {
+  const t = useT("mobile.coloring.tool");
   const iconSize = Math.round(size * 0.42);
   // The magic tiles carry a sparkle badge in the top-right corner. Web sizes
   // the main glyph at FA `xl` (24px) and the sparkle at FA `lg` (~21px) — i.e.
@@ -85,9 +87,9 @@ const ToolTile = ({
         accessibilityRole="button"
         accessibilityLabel={
           loading
-            ? `${label} (getting ready)`
+            ? t("gettingReady", { label })
             : timedOut
-              ? `${label} (tap to try again)`
+              ? t("tapToTryAgain", { label })
               : label
         }
         accessibilityState={{ selected, disabled: disabled || loading }}

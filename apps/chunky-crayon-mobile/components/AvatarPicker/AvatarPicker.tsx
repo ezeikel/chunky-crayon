@@ -1,6 +1,7 @@
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import ProfileAvatar from "@/components/ProfileAvatar";
 import { AVATARS } from "@/lib/avatars";
+import { useT } from "@/lib/i18n/useT";
 import { selectionChanged } from "@/utils/haptics";
 
 /**
@@ -23,10 +24,16 @@ type AvatarPickerProps = {
 };
 
 const AvatarPicker = ({ selectedAvatarId, onSelect }: AvatarPickerProps) => {
+  const t = useT("mobile.avatarPicker");
+  // Avatar display names come from the catalog (slug-keyed); translate at the
+  // render site via a slug -> key lookup (mobile.avatar.<id>) rather than
+  // editing the shared avatar catalog.
+  const tAvatar = useT("mobile.avatar");
   return (
     <View style={styles.grid}>
       {AVATARS.map((avatar) => {
         const isSelected = avatar.id === selectedAvatarId;
+        const avatarName = tAvatar(avatar.id);
         return (
           <Pressable
             key={avatar.id}
@@ -35,12 +42,12 @@ const AvatarPicker = ({ selectedAvatarId, onSelect }: AvatarPickerProps) => {
               selectionChanged();
               onSelect(avatar.id);
             }}
-            accessibilityLabel={`Pick ${avatar.name}`}
+            accessibilityLabel={t("pickA11y", { name: avatarName })}
             accessibilityState={{ selected: isSelected }}
           >
             <ProfileAvatar avatarId={avatar.id} size="md" />
             <Text style={styles.label} numberOfLines={1}>
-              {avatar.name}
+              {avatarName}
             </Text>
           </Pressable>
         );

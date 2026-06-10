@@ -2,6 +2,7 @@ import { useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { Image } from "expo-image";
 import { getAvatar, getInitials } from "@/lib/avatars";
+import { useT } from "@/lib/i18n/useT";
 import { COLORS, FONTS } from "@/lib/design";
 
 /**
@@ -70,6 +71,11 @@ const ProfileAvatar = ({
   size = "md",
   showBorder = false,
 }: ProfileAvatarProps) => {
+  const t = useT("mobile.profileAvatar");
+  // Avatar display names come from the catalog (slug-keyed); translate at the
+  // render site via a slug -> key lookup (mobile.avatar.<id>) rather than
+  // editing the shared avatar catalog.
+  const tAvatar = useT("mobile.avatar");
   const avatar = getAvatar(avatarId);
   const initials = name ? getInitials(name) : "?";
   const [imageError, setImageError] = useState(false);
@@ -89,7 +95,7 @@ const ProfileAvatar = ({
   const renderInitialsFallback = () => (
     <View
       style={[styles.fallback, wrapperStyle]}
-      accessibilityLabel={name ? `${name}'s avatar` : "Profile avatar"}
+      accessibilityLabel={name ? t("a11yNamed", { name }) : t("a11yFallback")}
     >
       <Text style={[styles.initialsText, { fontSize: TEXT_SIZE[size] }]}>
         {initials}
@@ -106,7 +112,7 @@ const ProfileAvatar = ({
         wrapperStyle,
         { backgroundColor: avatar.bg, padding },
       ]}
-      accessibilityLabel={name ? `${name}'s avatar` : avatar.name}
+      accessibilityLabel={name ? t("a11yNamed", { name }) : tAvatar(avatar.id)}
     >
       <Image
         source={avatar.image}

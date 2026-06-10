@@ -13,11 +13,20 @@
       "createColoringPage": "Create coloring page",
       "creating": "Creating...",
       "tryAgain": "Try again",
-      "cancel": "Cancel"
+      "cancel": "Cancel",
+      "seeAll": "See all"
     },
     "header": {
       "forGrownUps": "For Grown-ups",
-      "grownUps": "Grown-ups"
+      "grownUps": "Grown-ups",
+      "creditsA11y": "{{value}} crayon coins",
+      "openColoA11y": "Open Colo",
+      "profileA11y": "Profile: {{name}}",
+      "switchProfileA11y": "Switch profile, current: {{name}}",
+      "back": "Back",
+      "challengesTitle": "Challenges",
+      "charactersTitle": "My Characters",
+      "settingsTitle": "Settings"
     },
     "characterBuilder": {
       "step": {
@@ -35,11 +44,85 @@
       "next": "Next",
       "makeFriend": "Make my friend",
       "creating": "Drawing...",
-      "createError": "Something went wrong. Please try again."
+      "createError": "Something went wrong. Please try again.",
+      "color": {
+        "green": "Green",
+        "orange": "Orange",
+        "pink": "Pink",
+        "purple": "Purple",
+        "teal": "Teal",
+        "yellow": "Yellow"
+      },
+      "species": {
+        "dragon": "Dragon",
+        "fairy": "Fairy",
+        "kid": "Kid",
+        "kitten": "Kitten",
+        "monster": "Monster",
+        "puppy": "Puppy",
+        "robot": "Robot",
+        "unicorn": "Unicorn"
+      },
+      "trait": {
+        "bouncy": "Bouncy",
+        "brave": "Brave",
+        "curious": "Curious",
+        "loves-snacks": "Snacky",
+        "shy": "Shy",
+        "silly": "Silly",
+        "sleepy": "Sleepy",
+        "sparkly": "Sparkly"
+      },
+      "voice": {
+        "brave-neutral": "Brave",
+        "gentle-neutral": "Gentle",
+        "playful-boy-5yo": "Playful",
+        "playful-girl-5yo": "Bouncy",
+        "silly-neutral": "Silly",
+        "sleepy-neutral": "Sleepy",
+        "warm-boy-7yo": "Cosy",
+        "warm-girl-7yo": "Warm"
+      }
     },
     "challenges": {
       "homeCardTitle": "Challenges",
-      "homeCardSubtitle": "Color to earn stickers and grow Colo!"
+      "homeCardSubtitle": "Color to earn stickers and grow Colo!",
+      "achievements": {
+        "dedicatedArtist": {
+          "description": "Complete 10 coloring pages",
+          "title": "Dedicated Artist"
+        },
+        "firstSteps": {
+          "description": "Complete your first coloring page",
+          "title": "First Steps"
+        },
+        "gettingStarted": {
+          "description": "Complete 5 coloring pages",
+          "title": "Getting Started"
+        },
+        "masterArtist": {
+          "description": "Complete 50 coloring pages",
+          "title": "Master Artist"
+        }
+      },
+      "claimFailed": "Couldn't claim that reward. Please try again.",
+      "claimReward": "Claim Reward!",
+      "completedBang": "Completed!",
+      "daysLeft": "{{count}} day left",
+      "lifetimeAchievements": "Lifetime Achievements",
+      "noChallengeSubtitle": "Check back soon to earn more rewards.",
+      "noChallengeTitle": "A brand-new challenge is on its way!",
+      "pastChallenges": "Past Challenges",
+      "rewardAccessory": "Colo accessory",
+      "rewardEarned": "You earned a new {{reward}}!",
+      "rewardSticker": "sticker",
+      "screenSubtitle": "Complete challenges to earn rewards!",
+      "screenTitle": "Challenges",
+      "statusCompleted": "Completed",
+      "statusIncomplete": "Incomplete",
+      "statusRewardUnclaimed": "Reward unclaimed",
+      "thisWeek": "This Week's Challenge",
+      "daysLeft_other": "{{count}} days left"
     },
     "characters": {
       "loading": "Loading your friends...",
@@ -72,7 +155,8 @@
     },
     "gallery": {
       "title": "Explore",
-      "subtitle": "Pick something fun to color"
+      "subtitle": "Pick something fun to color",
+      "colorCategoryA11y": "Color {{name}}"
     },
     "stickers": {
       "title": "Sticker Collection",
@@ -97,7 +181,11 @@
       "savedCount_other": "{{count}} Saved Artworks",
       "emptyTitle": "Your Saved Artwork",
       "emptySubtitle": "Your favorite creations will appear here. Start coloring and save your masterpieces!",
-      "emptyTip": "Tap the heart icon while coloring to save"
+      "emptyTip": "Tap the heart icon while coloring to save",
+      "coloringPageA11y": "Coloring page",
+      "recentEmpty": "No pictures yet. Tap above to create your first one!",
+      "recentTitle": "My pictures",
+      "seeAllRecent": "See all my pictures"
     },
     "upsideDownHint": {
       "title": "Turn me around!",
@@ -106,6 +194,425 @@
     "create": {
       "greeting": "What do you want to color today?",
       "subtitle": "Pick a way to start!"
+    },
+    "category": {
+      "allTitle": "All coloring pages",
+      "fallbackTitle": "Category",
+      "notFound": "We couldn't find that category."
+    },
+    "coloring": {
+      "enterFocusMode": "Enter focus mode",
+      "exitFocusMode": "Exit focus mode",
+      "generating": {
+        "title": "Making your coloring page…",
+        "messages": {
+          "addingSparkles": "Sneaking in some sparkles...",
+          "almostThere": "Putting on the finishing touches...",
+          "coloringOutsideLines": "Trying not to color outside the lines...",
+          "creatingMasterpiece": "Making it just right...",
+          "drawingLines": "Drawing the outlines...",
+          "mixingColors": "Mixing some new colors...",
+          "sharpeningCrayons": "Sharpening the crayons...",
+          "wavingWand": "Checking everything looks good..."
+        }
+      },
+      "magicHint": {
+        "useColor": "Use Color"
+      },
+      "musicOff": "Music off",
+      "musicOn": "Music on",
+      "myArtwork": "My Artwork",
+      "print": "Print",
+      "redo": "Redo",
+      "save": "Save",
+      "seeWholePicture": "See whole picture",
+      "sfxOff": "Sound effects off",
+      "sfxOn": "Sound effects on",
+      "startOver": "Start Over",
+      "stickerPicker": {
+        "categoryA11y": "{{label}} stickers",
+        "heading": "Pick a sticker!",
+        "hint": "Now tap your picture!",
+        "stickerA11y": "Sticker {{name}}",
+        "category": {
+          "animals": "Animals",
+          "fun": "Fun",
+          "hearts": "Hearts",
+          "nature": "Nature",
+          "shapes": "Shapes",
+          "stars": "Stars"
+        }
+      },
+      "tool": {
+        "gettingReady": "{{label}} (getting ready)",
+        "tapToTryAgain": "{{label}} (tap to try again)",
+        "autoColor": "Auto Color",
+        "crayon": "Crayon",
+        "eraser": "Eraser",
+        "fill": "Fill",
+        "glitter": "Glitter",
+        "magicBrush": "Magic Brush",
+        "marker": "Marker",
+        "paint": "Paint",
+        "pencil": "Pencil",
+        "sticker": "Sticker"
+      },
+      "undo": "Undo",
+      "zoomIn": "Zoom in",
+      "zoomOut": "Zoom out",
+      "addedToCollection": "Added to your collection!",
+      "back": "Back",
+      "brushSize": {
+        "chunky": "Chunky",
+        "fine": "Fine",
+        "regular": "Regular"
+      },
+      "captureFailed": "Couldn't capture your artwork.",
+      "myArtworkSheetConfirm": "Add to my collection",
+      "myArtworkSheetTitle": "Add to My Artwork?",
+      "noData": "No data",
+      "palette": {
+        "cute": "Cute",
+        "pastel": "Pastel",
+        "realistic": "Realistic",
+        "surprise": "Surprise"
+      },
+      "panMode": "Move around",
+      "photoPermissionDenied": "Please allow access to your photo library to save your artwork.",
+      "printFailed": "Couldn't make a PDF to print. Please try again.",
+      "printQrCta": "Scan the QR code to discover more coloring pages!",
+      "printSheetConfirm": "Make a PDF to print",
+      "printSheetTitle": "Print this page?",
+      "saveFailed": "Couldn't save your artwork. Please try again.",
+      "saveSheetConfirm": "Save to photos",
+      "saveSheetTitle": "Save your picture?",
+      "savedToPhotos": "Saved to your photo library!",
+      "startOverCancel": "No, keep my coloring",
+      "startOverConfirm": "Yes, start over",
+      "startOverTitle": "Start over?",
+      "untitledArtwork": "My artwork"
+    },
+    "creditPack": {
+      "bestValue": "Best Value",
+      "creditsLabel": "credits",
+      "rowA11y": "{{credits}} credits for {{price}}",
+      "rowA11yBestValue": "{{credits}} credits for {{price}}, best value"
+    },
+    "feed": {
+      "challenge": "Challenge",
+      "claim": "Claim!",
+      "continueColoring": "Continue Coloring",
+      "discoverMorePages": "Discover more pages",
+      "emptyNoPages": "No coloring pages available right now. Check back soon!",
+      "errorLoading": "Oops! Something went wrong loading your feed.",
+      "moreToColor": "More to Color",
+      "seeAllYourArt": "See all your art",
+      "seeAllYourColoring": "See all your coloring",
+      "seeAllYourCreations": "See all your creations",
+      "today": "Today",
+      "yourArt": "Your Art",
+      "yourCreations": "Your Creations"
+    },
+    "home": {
+      "coloProud": "Your {{stageName}} is so proud of you!",
+      "coloWantsToGrow": "{{stageName}} wants to grow! Save {{count}} more artworks to evolve!",
+      "discoverMore": "Discover more",
+      "discoverMoreA11y": "Discover more coloring pages",
+      "greeting": "What do you want to color today?",
+      "seeAllCategories": "See all categories",
+      "whatDoYouLike": "What do you like?",
+      "browseAllA11y": "Browse all coloring pages"
+    },
+    "onboarding": {
+      "coloring": {
+        "celebrationSubtitle": "You're a natural artist",
+        "celebrationTitle": "Amazing!",
+        "done": "I'm Done",
+        "doneA11y": "Done",
+        "subtitle": "Pick a scene and color Colo in",
+        "title": "Your Turn to Create!"
+      },
+      "paywall": {
+        "continue": "Continue",
+        "continueA11y": "Continue to the app",
+        "description": "Then pick the plan that fits after they fall in love.",
+        "finePrint": "No charge today. Then {{price}}/mo after your free week. Cancel anytime in Settings. {{guarantee}}.",
+        "maybeLater": "Maybe later",
+        "rainbowPlan": "Rainbow Plan",
+        "reviews": "({{count}} reviews)",
+        "seeAllPlans": "See all plans",
+        "startTrial": "Start My Free Week",
+        "startTrialA11y": "Start my free week",
+        "title": "Unlimited coloring, free for a week",
+        "trustLead": "Loved by families",
+        "unavailable": "Plans aren't available right now. You can start coloring and upgrade later.",
+        "feature": {
+          "challenges": "Daily challenges and sticker rewards",
+          "magic": "Magic Brush and color-by-voice",
+          "unlimited": "Unlimited coloring pages, anytime"
+        },
+        "timeline": {
+          "day5": {
+            "text": "We'll remind you before your trial ends.",
+            "when": "Day 5"
+          },
+          "day7": {
+            "text": "Your free week ends. Cancel anytime before then, no charge.",
+            "when": "Day 7"
+          },
+          "today": {
+            "text": "Unlock everything. Color as much as you like.",
+            "when": "Today"
+          }
+        }
+      },
+      "sceneA11y": "{{label}} scene",
+      "skip": "Skip",
+      "slide": {
+        "colo": {
+          "description": "Colo evolves as your child colors! Earn stickers, complete daily challenges, and unlock new stages.",
+          "title": "Watch Them Grow with Colo"
+        },
+        "creativity": {
+          "description": "Your child dreams it up by talking, drawing, or snapping a photo. We turn it into a coloring page made just for them.",
+          "title": "Endless Creativity, Zero Mess"
+        },
+        "safety": {
+          "description": "No ads, no social features, no data collection. Designed for ages 3-8. You stay in control.",
+          "title": "Safe, Simple, Made for Little Hands"
+        }
+      },
+      "scene": {
+        "onboarding-jungle": "Jungle",
+        "onboarding-party": "Party",
+        "onboarding-space": "Space",
+        "onboarding-underwater": "Under the Sea"
+      }
+    },
+    "paywall": {
+      "annualSaveBadge": "2 months free",
+      "closeA11y": "Close",
+      "creditsPerMo": "{{credits}} credits/mo",
+      "ctaA11y": "Start 7-day free trial of {{plan}}",
+      "ctaMicrocopy": "Then {{price}}/{{period}}. Cancel any time before then.",
+      "ctaText": "Start 7-day free trial",
+      "guarantee": "30-day money-back guarantee",
+      "legalRenew": "Subscriptions renew automatically. Cancel any time in Settings.",
+      "loadingPlans": "Loading plans…",
+      "monthPeriod": "month",
+      "monthly": "Monthly",
+      "mostPopular": "Most Popular",
+      "perMonthShort": "mo",
+      "perYearShort": "yr",
+      "planRowA11y": "{{plan}}, {{credits}} credits a month, {{price}} per {{period}}",
+      "plansUnavailable": "Plans aren't available right now. Please try again later.",
+      "privacyPolicy": "Privacy Policy",
+      "processing": "Processing…",
+      "restore": "Restore purchases",
+      "restoreA11y": "Restore purchases",
+      "socialProof": {
+        "reviewCount": "from {{count}} reviews",
+        "title": "Loved by families everywhere"
+      },
+      "subtitle": "Make as many pages as they like. Print them or color on screen.",
+      "termsOfService": "Terms of Service",
+      "title": "Unlock unlimited coloring",
+      "yearPeriod": "year",
+      "yearly": "Yearly"
+    },
+    "profileSwitcher": {
+      "addProfile": "Add Profile",
+      "artworkCount": "{{count}} artwork",
+      "done": "Done",
+      "edit": "Edit",
+      "maxReached": "Maximum of {{count}} profiles reached",
+      "namePlaceholder": "Profile name",
+      "title": "Profiles",
+      "toast": {
+        "createFailed": "Couldn't create profile. Please try again.",
+        "deleteFailed": "Couldn't delete profile. Please try again.",
+        "minOneProfile": "You must have at least one profile.",
+        "switchFailed": "Couldn't switch profile. Please try again.",
+        "updateFailed": "Couldn't update profile. Please try again."
+      },
+      "deleteConfirm": {
+        "title": "Delete profile?",
+        "description": "This will erase \"{{name}}\" and all their saved pictures.",
+        "confirm": "Delete"
+      },
+      "artworkCount_other": "{{count}} artworks"
+    },
+    "settings": {
+      "backgroundMusic": {
+        "subtitle": "Ambient sounds while coloring",
+        "title": "Background Music"
+      },
+      "bannerA11y": "{{plan}} plan, {{credits}} credits. Manage subscription.",
+      "bannerCtaManage": "Manage",
+      "bannerCtaUpgrade": "Upgrade",
+      "bannerPlanTitle": "{{plan}} Plan",
+      "bannerSubtitleUpgrade": " · Upgrade to keep coloring",
+      "contact": {
+        "title": "Contact Us"
+      },
+      "creditCount": "{{formattedCount}} credit",
+      "help": {
+        "subtitle": "Get answers to common questions",
+        "title": "Help & FAQ"
+      },
+      "language": {
+        "title": "Language"
+      },
+      "madeWith": "Made with",
+      "madeWithIn": "in",
+      "madeWithLocation": "South London",
+      "magicLinkSent": {
+        "body": "We sent a sign-in link to {{email}}",
+        "subtext": "Click the link in the email to sign in. The link expires in 15 minutes.",
+        "title": "Check Your Email!",
+        "useDifferentEmail": "Use Different Email"
+      },
+      "onboarding": {
+        "subtitle": "Replay the welcome tour",
+        "title": "View Onboarding"
+      },
+      "planChip": "{{plan}} Plan",
+      "privacy": {
+        "title": "Privacy Policy"
+      },
+      "profiles": {
+        "add": "Add",
+        "addA11y": "Add a profile",
+        "currentProfileA11y": "{{name}}, current profile",
+        "manageA11y": "{{name}}, manage profiles"
+      },
+      "rate": {
+        "subtitle": "Share your feedback",
+        "title": "Rate the App"
+      },
+      "section": {
+        "account": "Account",
+        "appInfo": "App Information",
+        "legal": "Legal",
+        "preferences": "Preferences",
+        "profiles": "Profiles",
+        "support": "Support"
+      },
+      "signIn": {
+        "subtitle": "Sync artwork across devices",
+        "title": "Sign In"
+      },
+      "signInModal": {
+        "continueApple": "Continue with Apple",
+        "continueFacebook": "Continue with Facebook",
+        "continueGoogle": "Continue with Google",
+        "emailLabel": "Sign in with email",
+        "emailPlaceholder": "Enter your email",
+        "or": "or",
+        "privacyNote": "By signing in, you agree to our Terms of Service and Privacy Policy.",
+        "sendMagicLink": "Send Magic Link",
+        "subtitle": "Sign in to sync your artwork across devices and access your account on the web.",
+        "title": "Sign In"
+      },
+      "signOut": {
+        "subtitle": "Your artwork stays on this device",
+        "title": "Sign Out"
+      },
+      "signOutConfirm": {
+        "confirm": "Sign Out",
+        "description": "Your artwork will stay on this device.",
+        "title": "Sign out?"
+      },
+      "soundEffects": {
+        "subtitle": "Button taps and actions",
+        "title": "Sound Effects"
+      },
+      "terms": {
+        "title": "Terms of Service"
+      },
+      "toast": {
+        "accountLinked": "Account linked and artwork synced!",
+        "appleSignInFailed": "Couldn't sign in with Apple. Please try again.",
+        "facebookSignInFailed": "Couldn't sign in with Facebook. Please try again.",
+        "googleSignInFailed": "Couldn't sign in with Google. Please try again.",
+        "invalidEmail": "Please enter a valid email address.",
+        "magicLinkFailed": "Couldn't send magic link. Please try again.",
+        "signedIn": "You're signed in!",
+        "signedOut": "You're signed out. Your artwork stays on this device."
+      },
+      "version": {
+        "title": "Version"
+      },
+      "vibration": {
+        "subtitle": "Gentle buzz on taps and rewards",
+        "title": "Vibration"
+      },
+      "creditCount_other": "{{formattedCount}} credits"
+    },
+    "subscriptionManager": {
+      "accessUntil": "Access until",
+      "buyCredits": "Buy Credits",
+      "creditsAvailable": "{{count}} credit available",
+      "legal": "Subscriptions auto-renew unless cancelled at least 24 hours before the end of the current period. Manage or cancel anytime in your {{store}} settings.",
+      "manageSubscription": "Manage Subscription",
+      "noActiveSubscription": "No active subscription",
+      "planIncludes": "Your Plan Includes",
+      "planName": "{{plan}} Plan",
+      "renews": "Renews",
+      "restorePurchases": "Restore Purchases",
+      "status": {
+        "active": "Active",
+        "cancelled": "Cancelled",
+        "paymentIssue": "Payment Issue",
+        "trial": "Trial"
+      },
+      "subscribeNow": "Subscribe Now",
+      "title": "Subscription & Credits",
+      "upgradePlan": "Upgrade Plan",
+      "creditsAvailable_other": "{{count}} credits available"
+    },
+    "topUp": {
+      "closeA11y": "Close",
+      "legal": "Credits are added to your account immediately after purchase. Credits do not expire.",
+      "loading": "Loading credit packs…",
+      "subtitle": "Add more credits to keep creating, without changing your plan.",
+      "title": "Top up your credits",
+      "unavailable": "Credit packs are not available at the moment."
+    },
+    "avatar": {
+      "alien": "Alien",
+      "astronaut": "Astronaut",
+      "dragon": "Dragon",
+      "ghost": "Ghost",
+      "ice-cream": "Ice Cream",
+      "mermaid": "Mermaid",
+      "rainbow": "Rainbow",
+      "rocket": "Rocket",
+      "sun": "Sun",
+      "superhero": "Superhero",
+      "unicorn": "Unicorn",
+      "wizard": "Wizard"
+    },
+    "avatarPicker": {
+      "pickA11y": "Pick {{name}}"
+    },
+    "createProfile": {
+      "create": "Create",
+      "namePlaceholder": "What's your name?",
+      "pickCharacter": "Pick your character"
+    },
+    "parentalGate": {
+      "closeA11y": "Close",
+      "defaultSubtitle": "Tap the right answer to keep going.",
+      "defaultTitle": "Quick check",
+      "hint": "Adults: tap the right answer to continue.",
+      "purchaseSubtitle": "Please verify you are a parent to make this purchase",
+      "purchaseTitle": "Parent Verification",
+      "subscriptionSubtitle": "Please verify you are a parent to start a subscription"
+    },
+    "profileAvatar": {
+      "a11yFallback": "Profile avatar",
+      "a11yNamed": "{{name}}'s avatar"
     }
   },
   "createForm": {
@@ -199,6 +706,46 @@
       "errorQ2AudioFailed": "Couldn't play the question. Try again?",
       "errorTimeout": "Took too long! Let's start over.",
       "errorRequiresSignin": "Sign in to use voice mode."
+    },
+    "error": {
+      "characterNotReady": "That friend isn't ready yet. Try again in a moment.",
+      "generic": "Something went wrong. Please try again.",
+      "moderationBlocked": "Let's try a different idea for your picture!"
+    },
+    "friendPicker": {
+      "emptyInviteSuffix": " who shows up in your pages!",
+      "header": "Add a friend",
+      "includeFriendA11y": "Include {{name}}, a {{species}}",
+      "makeFriend": "Make a friend",
+      "makeNewFriend": "Make a new friend",
+      "newFriend": "New friend",
+      "noFriend": "No friend",
+      "optional": "(optional)"
+    },
+    "image": {
+      "camera": "Camera",
+      "cameraPermissionDenied": "Camera access is needed to take photos.",
+      "confirmInstructions": "Great picture! Is this the one you want?",
+      "createFailed": "Failed to create coloring page from photo.",
+      "createFailedToast": "Couldn't make a coloring page from your photo. Try again!",
+      "instructions": "Take a photo or upload a picture!",
+      "libraryPermissionDenied": "Photo library access is needed to pick a picture.",
+      "pickAnother": "Pick another",
+      "pickImageFailed": "Couldn't pick that image. Please try again.",
+      "processing": "Creating your coloring page...",
+      "takePhotoFailed": "Couldn't take photo. Please try again.",
+      "upload": "Upload"
+    },
+    "mode": {
+      "a11yLabel": "{{mode}} input mode",
+      "unlockSaveFailed": "Couldn't save that unlock. It may not stick, try again.",
+      "image": "Photo",
+      "scene": "Build",
+      "text": "Type",
+      "voice": "Talk"
+    },
+    "text": {
+      "placeholder": "What do you want to color?"
     }
   }
 }

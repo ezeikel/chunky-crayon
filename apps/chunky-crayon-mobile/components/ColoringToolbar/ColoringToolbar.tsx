@@ -30,6 +30,23 @@ import {
   COLORING_MAGIC_TOOLS,
   type ColoringToolConfig,
 } from "@/lib/coloring/tools";
+import { useT } from "@/lib/i18n/useT";
+
+// Tool slug (catalog id) -> i18n key under mobile.coloring.tool.*. The shared
+// tools catalog stays untouched; we resolve the localized label at the render
+// site, mirroring SceneInput's t(`subject.${key}`) pattern.
+const TOOL_LABEL_KEY: Record<string, string> = {
+  crayon: "crayon",
+  marker: "marker",
+  pencil: "pencil",
+  paintbrush: "paint",
+  glitter: "glitter",
+  fill: "fill",
+  eraser: "eraser",
+  sticker: "sticker",
+  "magic-reveal": "magicBrush",
+  "magic-auto": "autoColor",
+};
 
 type ColoringToolbarProps = {
   onZoomIn?: () => void;
@@ -75,6 +92,7 @@ const ColoringToolbar = ({
   onMyArtwork,
 }: ColoringToolbarProps) => {
   const insets = useSafeAreaInsets();
+  const t = useT("mobile.coloring");
   const { touchTargetSize } = useResponsiveLayout();
   const tile = touchTargetSize.medium;
   const { isFocusMode, toggleFocus } = useFocusMode();
@@ -186,7 +204,7 @@ const ColoringToolbar = ({
           <ToolTile
             key={config.id}
             icon={config.icon}
-            label={config.label}
+            label={t(`tool.${TOOL_LABEL_KEY[config.id] ?? config.id}`)}
             selected={isToolActive(config)}
             size={tile}
             onPress={() => handleToolSelect(config)}
@@ -196,7 +214,7 @@ const ColoringToolbar = ({
           <ToolTile
             key={config.id}
             icon={config.icon}
-            label={config.label}
+            label={t(`tool.${TOOL_LABEL_KEY[config.id] ?? config.id}`)}
             isMagic
             selected={isToolActive(config)}
             loading={!magicReady}
@@ -229,7 +247,7 @@ const ColoringToolbar = ({
             { width: tile, height: tile },
             !canUndo() && styles.disabled,
           ]}
-          accessibilityLabel="Undo"
+          accessibilityLabel={t("undo")}
         >
           <UndoIcon
             size={24}
@@ -244,7 +262,7 @@ const ColoringToolbar = ({
             { width: tile, height: tile },
             !canRedo() && styles.disabled,
           ]}
-          accessibilityLabel="Redo"
+          accessibilityLabel={t("redo")}
         >
           <RedoIcon
             size={24}
@@ -265,7 +283,7 @@ const ColoringToolbar = ({
               { width: tile, height: tile },
               zoom <= minZoom && styles.disabled,
             ]}
-            accessibilityLabel="Zoom out"
+            accessibilityLabel={t("zoomOut")}
           >
             <ZoomOutIcon
               size={22}
@@ -283,7 +301,7 @@ const ColoringToolbar = ({
               { width: tile, height: tile },
               zoom >= maxZoom && styles.disabled,
             ]}
-            accessibilityLabel="Zoom in"
+            accessibilityLabel={t("zoomIn")}
           >
             <ZoomInIcon
               size={22}
@@ -300,7 +318,7 @@ const ColoringToolbar = ({
               styles.controlButtonBorderless,
               { width: tile, height: tile },
             ]}
-            accessibilityLabel="See whole picture"
+            accessibilityLabel={t("seeWholePicture")}
           >
             <HomeIcon size={22} color={COLORS.textSecondary} />
           </Pressable>
@@ -317,7 +335,7 @@ const ColoringToolbar = ({
               { width: tile, height: tile },
             ]}
             accessibilityLabel={
-              isFocusMode ? "Exit focus mode" : "Enter focus mode"
+              isFocusMode ? t("exitFocusMode") : t("enterFocusMode")
             }
           >
             <ExpandIcon size={22} color={COLORS.textSecondary} />
@@ -337,7 +355,7 @@ const ColoringToolbar = ({
               onStartOver?.();
             }}
             style={[styles.actionTile, { width: tile, height: tile }]}
-            accessibilityLabel="Start Over"
+            accessibilityLabel={t("startOver")}
           >
             <FontAwesomeIcon
               icon={faArrowsRotate}
@@ -351,7 +369,7 @@ const ColoringToolbar = ({
               onPrint?.();
             }}
             style={[styles.actionTile, { width: tile, height: tile }]}
-            accessibilityLabel="Print"
+            accessibilityLabel={t("print")}
           >
             <FontAwesomeIcon
               icon={faPrint}
@@ -365,7 +383,7 @@ const ColoringToolbar = ({
               onSave?.();
             }}
             style={[styles.actionTile, { width: tile, height: tile }]}
-            accessibilityLabel="Save"
+            accessibilityLabel={t("save")}
           >
             <FontAwesomeIcon
               icon={faFloppyDisk}
@@ -379,7 +397,7 @@ const ColoringToolbar = ({
               onMyArtwork?.();
             }}
             style={[styles.actionTile, { width: tile, height: tile }]}
-            accessibilityLabel="My Artwork"
+            accessibilityLabel={t("myArtwork")}
           >
             <FontAwesomeIcon
               icon={faHeart}

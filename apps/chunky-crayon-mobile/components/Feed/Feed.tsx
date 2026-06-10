@@ -28,6 +28,7 @@ import SectionHeader, {
   type SectionTint,
 } from "@/components/SectionHeader/SectionHeader";
 import SeeAllButton from "@/components/SeeAllButton/SeeAllButton";
+import { useT } from "@/lib/i18n/useT";
 import { COLORS } from "@/lib/design";
 import { tapLight } from "@/utils/haptics";
 import { perfect } from "@/styles";
@@ -292,6 +293,7 @@ const InProgressSection = ({
   cardSize: number;
 }) => {
   const router = useRouter();
+  const t = useT("mobile.feed");
 
   const renderItem: ListRenderItem<FeedInProgressItem> = useCallback(
     ({ item }) => (
@@ -313,13 +315,13 @@ const InProgressSection = ({
   return (
     <View style={styles.section}>
       <FeedSectionHeader
-        title="Continue Coloring"
+        title={t("continueColoring")}
         icon={faPaintBrush}
         tint="pink"
         right={
           <SeeAllButton
             onPress={() => router.push("/my-artwork")}
-            accessibilityLabel="See all your coloring"
+            accessibilityLabel={t("seeAllYourColoring")}
           />
         }
       />
@@ -346,6 +348,7 @@ const RecentArtSection = ({
   cardSize: number;
 }) => {
   const router = useRouter();
+  const t = useT("mobile.feed");
 
   const renderItem: ListRenderItem<FeedSavedArtwork> = useCallback(
     ({ item }) => (
@@ -367,13 +370,13 @@ const RecentArtSection = ({
   return (
     <View style={styles.section}>
       <FeedSectionHeader
-        title="Your Art"
+        title={t("yourArt")}
         icon={faPalette}
         tint="purple"
         right={
           <SeeAllButton
             onPress={() => router.push("/my-artwork")}
-            accessibilityLabel="See all your art"
+            accessibilityLabel={t("seeAllYourArt")}
           />
         }
       />
@@ -398,13 +401,14 @@ const ChallengeSection = ({
   challenge: ChallengeWithProgress;
 }) => {
   const router = useRouter();
+  const t = useT("mobile.feed");
 
   return (
     <Pressable
       style={styles.section}
       onPress={() => router.push("/challenges")}
     >
-      <FeedSectionHeader title="Challenge" icon={faTrophy} tint="gold" />
+      <FeedSectionHeader title={t("challenge")} icon={faTrophy} tint="gold" />
       <View style={styles.challengeCard}>
         <View style={styles.challengeContent}>
           <Text style={styles.challengeIcon}>{challenge.challenge.icon}</Text>
@@ -427,7 +431,7 @@ const ChallengeSection = ({
         </View>
         {challenge.isCompleted && !challenge.rewardClaimed && (
           <View style={styles.claimBadge}>
-            <Text style={styles.claimBadgeText}>Claim!</Text>
+            <Text style={styles.claimBadgeText}>{t("claim")}</Text>
           </View>
         )}
       </View>
@@ -440,6 +444,8 @@ const Feed = () => {
   const { width: screenWidth } = useWindowDimensions();
   const cardSize = getCardSize(screenWidth);
   const router = useRouter();
+  const t = useT("mobile.feed");
+  const tButton = useT("mobile.button");
 
   const { data, isLoading, isError, refetch } = useFeed();
 
@@ -450,11 +456,9 @@ const Feed = () => {
   if (isError || !data) {
     return (
       <View style={styles.errorContainer}>
-        <Text style={styles.errorText}>
-          Oops! Something went wrong loading your feed.
-        </Text>
+        <Text style={styles.errorText}>{t("errorLoading")}</Text>
         <Pressable style={styles.retryButton} onPress={() => refetch()}>
-          <Text style={styles.retryText}>Try Again</Text>
+          <Text style={styles.retryText}>{tButton("tryAgain")}</Text>
         </Pressable>
       </View>
     );
@@ -481,9 +485,7 @@ const Feed = () => {
   if (!hasContent) {
     return (
       <View style={styles.emptyContainer}>
-        <Text style={styles.emptyText}>
-          No coloring pages available right now. Check back soon!
-        </Text>
+        <Text style={styles.emptyText}>{t("emptyNoPages")}</Text>
       </View>
     );
   }
@@ -493,7 +495,7 @@ const Feed = () => {
       {/* Today's Pick */}
       {todaysPick && (
         <HorizontalSection
-          title="Today"
+          title={t("today")}
           icon={faStar}
           items={[todaysPick]}
           cardSize={cardSize}
@@ -512,24 +514,24 @@ const Feed = () => {
 
       {/* User's generated coloring pages — see all → My Art (their collection) */}
       <HorizontalSection
-        title="Your Creations"
+        title={t("yourCreations")}
         icon={faWandMagicSparkles}
         items={myCreations}
         cardSize={cardSize}
         tint="teal"
         onSeeAll={() => router.push("/my-artwork")}
-        seeAllLabel="See all your creations"
+        seeAllLabel={t("seeAllYourCreations")}
       />
 
       {/* More to Color - Past daily images — see all → the full library */}
       <HorizontalSection
-        title="More to Color"
+        title={t("moreToColor")}
         icon={faCalendarWeek}
         items={moreToColor}
         cardSize={cardSize}
         tint="pink"
         onSeeAll={() => router.push("/category/all")}
-        seeAllLabel="Discover more pages"
+        seeAllLabel={t("discoverMorePages")}
       />
     </View>
   );

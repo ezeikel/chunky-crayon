@@ -29,6 +29,7 @@ import { perfect } from "@/styles";
 const GalleryScreen = () => {
   const headerData = useHeaderData();
   const t = useT("mobile.gallery");
+  const tHome = useT("mobile.home");
   // "For Grown-ups" door → parent gate → settings. Present on every tab so a
   // parent can reach Settings from anywhere (gate keeps kids out).
   const [isSettingsGateOpen, setIsSettingsGateOpen] = useState(false);
@@ -56,14 +57,14 @@ const GalleryScreen = () => {
               pattern. The header arrow → the full category grid; "Discover more"
               → the whole library (pages the kid hasn't seen yet). */}
           <SectionHeader
-            title="What do you like?"
+            title={tHome("whatDoYouLike")}
             icon={faShapes}
             tint="purple"
             style={styles.sectionHeader}
             right={
               <SeeAllButton
                 onPress={() => router.push("/categories")}
-                accessibilityLabel="See all categories"
+                accessibilityLabel={tHome("seeAllCategories")}
               />
             }
           />
@@ -80,7 +81,7 @@ const GalleryScreen = () => {
                 router.push("/category/all");
               }}
               accessibilityRole="button"
-              accessibilityLabel="Browse all coloring pages"
+              accessibilityLabel={tHome("browseAllA11y")}
             >
               <FontAwesomeIcon
                 icon={faImages}
@@ -89,7 +90,7 @@ const GalleryScreen = () => {
                 secondaryColor={COLORS.secondaryOrange}
                 secondaryOpacity={1}
               />
-              <Text style={styles.browseAllText}>Discover more</Text>
+              <Text style={styles.browseAllText}>{tHome("discoverMore")}</Text>
             </Pressable>
           </View>
 

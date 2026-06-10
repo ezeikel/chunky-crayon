@@ -71,6 +71,7 @@ import {
 } from "@/components/FocusMode";
 import { track } from "@/utils/analytics";
 import { ANALYTICS_EVENTS } from "@/constants/analytics";
+import { useT } from "@/lib/i18n/useT";
 // RN-safe subpath — tidies a combo-backfill title that leaked its raw prompt +
 // "(seed NNN)" suffix into the title field, so a kid never sees that artifact.
 import { cleanTitle } from "@one-colored-pixel/coloring-core/copy";
@@ -137,6 +138,7 @@ const DrawScrollView = ({
 
 const ColoringImage = () => {
   const { id, source } = useLocalSearchParams();
+  const t = useT("mobile.coloring");
   const router = useRouter();
   const { data, isLoading } = useColoringImage(id as string);
   // scroll state lives in DrawScrollProvider (see above) so a stroke's
@@ -236,9 +238,9 @@ const ColoringImage = () => {
   // handler, which does its async work and closes its own sheet on success.
   // Transient feedback goes to sonner toasts (never inline blocks). Ported
   // from the retired combined ActionModal + the legacy SaveButton PDF flow.
-  const SAVE_FAIL_MSG = "Couldn't save your artwork. Please try again.";
-  const PRINT_FAIL_MSG = "Couldn't make a PDF to print. Please try again.";
-  const CAPTURE_FAIL_MSG = "Couldn't capture your artwork.";
+  const SAVE_FAIL_MSG = t("saveFailed");
+  const PRINT_FAIL_MSG = t("printFailed");
+  const CAPTURE_FAIL_MSG = t("captureFailed");
 
   // Save to Photos — capture the canvas, write a PNG, save to the library.
   const handleSaveToPhotos = useCallback(async () => {
@@ -258,9 +260,7 @@ const ColoringImage = () => {
     try {
       const { status } = await MediaLibrary.requestPermissionsAsync();
       if (status !== "granted") {
-        toast.error(
-          "Please allow access to your photo library to save your artwork.",
-        );
+        toast.error(t("photoPermissionDenied"));
         return;
       }
       const dataUrl = captureCanvas();
@@ -276,7 +276,7 @@ const ColoringImage = () => {
       await MediaLibrary.saveToLibraryAsync(filePath);
       tapHeavy();
       notifySuccess();
-      toast.success("Saved to your photo library!");
+      toast.success(t("savedToPhotos"));
       setShowSaveSheet(false);
     } catch (error) {
       console.error("Save error:", error);
@@ -314,13 +314,13 @@ const ColoringImage = () => {
         title:
           data?.coloringImage?.displayTitle ??
           cleanTitle(data?.coloringImage?.title) ??
-          "My artwork",
+          t("untitledArtwork"),
         fileUri,
         createdAt: Date.now(),
       });
       tapHeavy();
       notifySuccess();
-      toast.success("Added to your collection!");
+      toast.success(t("addedToCollection"));
       setShowMyArtworkSheet(false);
     } catch (error) {
       console.error("My Artwork save error:", error);
@@ -382,7 +382,7 @@ const ColoringImage = () => {
                 ? `<div class="footer">
                      <img src="${qrCodeUrl}" width="120" height="120" />
                      <div class="cta">
-                       <p class="cta-text">Scan the QR code to discover more coloring pages!</p>
+                       <p class="cta-text">${t("printQrCta")}</p>
                        <a class="cta-link" href="https://chunkycrayon.com?utm_source=${id}&utm_medium=pdf-link&utm_campaign=coloring-image-pdf">www.chunkycrayon.com</a>
                      </div>
                    </div>`
@@ -451,7 +451,7 @@ const ColoringImage = () => {
   }
 
   if (!data) {
-    return <Text>No data</Text>;
+    return <Text>{t("noData")}</Text>;
   }
 
   const { coloringImage } = data;
@@ -473,7 +473,7 @@ const ColoringImage = () => {
           onPress={handleBack}
           style={[styles.generatingBack, { top: insets.top + 12 }]}
           accessibilityRole="button"
-          accessibilityLabel="Back"
+          accessibilityLabel={t("back")}
           hitSlop={8}
         >
           <FontAwesomeIcon
@@ -843,7 +843,7 @@ const ColoringImage = () => {
                         handleStartOver();
                       }}
                       style={styles.canvasActionTile}
-                      accessibilityLabel="Start Over"
+                      accessibilityLabel={t("startOver")}
                     >
                       <FontAwesomeIcon
                         icon={faArrowsRotateDuotone}
@@ -857,7 +857,7 @@ const ColoringImage = () => {
                         setShowPrintSheet(true);
                       }}
                       style={styles.canvasActionTile}
-                      accessibilityLabel="Print"
+                      accessibilityLabel={t("print")}
                     >
                       <FontAwesomeIcon
                         icon={faPrintDuotone}
@@ -871,7 +871,7 @@ const ColoringImage = () => {
                         setShowSaveSheet(true);
                       }}
                       style={styles.canvasActionTile}
-                      accessibilityLabel="Save"
+                      accessibilityLabel={t("save")}
                     >
                       <FontAwesomeIcon
                         icon={faFloppyDiskDuotone}
@@ -885,7 +885,7 @@ const ColoringImage = () => {
                         setShowMyArtworkSheet(true);
                       }}
                       style={styles.canvasActionTile}
-                      accessibilityLabel="My Artwork"
+                      accessibilityLabel={t("myArtwork")}
                     >
                       <FontAwesomeIcon
                         icon={faHeartDuotone}
@@ -909,8 +909,8 @@ const ColoringImage = () => {
           isOpen={showSaveSheet}
           onClose={() => setShowSaveSheet(false)}
           icon={faFloppyDisk}
-          title="Save your picture?"
-          confirmLabel="Save to photos"
+          title={t("saveSheetTitle")}
+          confirmLabel={t("saveSheetConfirm")}
           onConfirm={handleSaveToPhotos}
           loading={isSaving}
         />
@@ -920,8 +920,8 @@ const ColoringImage = () => {
           isOpen={showPrintSheet}
           onClose={() => setShowPrintSheet(false)}
           icon={faPrint}
-          title="Print this page?"
-          confirmLabel="Make a PDF to print"
+          title={t("printSheetTitle")}
+          confirmLabel={t("printSheetConfirm")}
           onConfirm={handlePrint}
           loading={isPrinting}
         />
@@ -933,8 +933,8 @@ const ColoringImage = () => {
           icon={faHeart}
           iconTint={COLORS.coral}
           iconCircleColor="rgba(230, 137, 145, 0.12)"
-          title="Add to My Artwork?"
-          confirmLabel="Add to my collection"
+          title={t("myArtworkSheetTitle")}
+          confirmLabel={t("myArtworkSheetConfirm")}
           onConfirm={handleMyArtwork}
           loading={isSaving}
         />
@@ -944,9 +944,9 @@ const ColoringImage = () => {
         <ConfirmSheet
           isOpen={showStartOverConfirm}
           onClose={() => setShowStartOverConfirm(false)}
-          title="Start over?"
-          confirmLabel="Yes, start over"
-          cancelLabel="No, keep my coloring"
+          title={t("startOverTitle")}
+          confirmLabel={t("startOverConfirm")}
+          cancelLabel={t("startOverCancel")}
           onConfirm={confirmStartOver}
           tone="destructive"
         />
@@ -981,7 +981,7 @@ const ColoringImage = () => {
               pressed && styles.headerButtonPressed,
             ]}
             onPress={handleBack}
-            accessibilityLabel="Back"
+            accessibilityLabel={t("back")}
           >
             <FontAwesomeIcon icon={faChevronLeft} size={18} color="#374151" />
           </Pressable>

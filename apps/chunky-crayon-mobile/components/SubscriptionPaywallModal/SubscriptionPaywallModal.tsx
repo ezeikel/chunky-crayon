@@ -31,7 +31,6 @@ import {
   PLAN_DISPLAY_ORDER,
   PLAN_DISPLAY_NAMES,
   RECOMMENDED_PLAN,
-  PAYWALL_TRUST,
   getCreditsForPlan,
   type PlanKey,
 } from "@/lib/paywall/plans";
@@ -39,6 +38,7 @@ import { formatPackagePrice } from "@/hooks/usePaywall";
 import ParentalGate from "@/components/ParentalGate";
 import { track } from "@/utils/analytics";
 import { ANALYTICS_EVENTS } from "@/constants/analytics";
+import { useT } from "@/lib/i18n/useT";
 import PaywallHero from "./PaywallHero";
 import PaywallSocialProof from "./PaywallSocialProof";
 import PlanRow from "./PlanRow";
@@ -89,6 +89,8 @@ const SubscriptionPaywallModal = ({
   source,
 }: SubscriptionPaywallModalProps) => {
   const insets = useSafeAreaInsets();
+  const t = useT("mobile.paywall");
+  const tRoot = useT();
   const { data: offering, isPending: isLoadingOfferings } = useOfferings();
   const purchaseMutation = usePurchase();
   const restoreMutation = useRestorePurchases();
@@ -251,7 +253,7 @@ const SubscriptionPaywallModal = ({
             onPress={handleClose}
             scaleTo={0.9}
             accessibilityRole="button"
-            accessibilityLabel="Close"
+            accessibilityLabel={t("closeA11y")}
             hitSlop={8}
             style={[styles.closeButton, { top: insets.top + 8 }]}
           >
@@ -268,10 +270,8 @@ const SubscriptionPaywallModal = ({
             <PaywallHero play={visible} />
 
             <Animated.View style={[styles.body, bodyStyle]}>
-              <Text style={styles.title}>Unlock unlimited coloring</Text>
-              <Text style={styles.subtitle}>
-                Make as many pages as they like. Print them or color on screen.
-              </Text>
+              <Text style={styles.title}>{t("title")}</Text>
+              <Text style={styles.subtitle}>{t("subtitle")}</Text>
 
               <PaywallSocialProof />
 
@@ -300,12 +300,12 @@ const SubscriptionPaywallModal = ({
                             active && styles.toggleTextActive,
                           ]}
                         >
-                          {key === "monthly" ? "Monthly" : "Yearly"}
+                          {key === "monthly" ? t("monthly") : t("yearly")}
                         </Text>
                         {key === "annual" && (
                           <View style={styles.saveBadge}>
                             <Text style={styles.saveBadgeText}>
-                              2 months free
+                              {t("annualSaveBadge")}
                             </Text>
                           </View>
                         )}
@@ -348,8 +348,7 @@ const SubscriptionPaywallModal = ({
                     color="#C9BEB4"
                   />
                   <Text style={styles.loadingText}>
-                    Plans aren&apos;t available right now. Please try again
-                    later.
+                    {t("plansUnavailable")}
                   </Text>
                 </View>
               ) : (
@@ -359,7 +358,7 @@ const SubscriptionPaywallModal = ({
                       forces monotone, collapsing the spinner-thirds to a plain
                       ring on the cream background. */}
                   <Spinner size={36} />
-                  <Text style={styles.loadingText}>Loading plans…</Text>
+                  <Text style={styles.loadingText}>{t("loadingPlans")}</Text>
                 </View>
               )}
 
@@ -371,17 +370,20 @@ const SubscriptionPaywallModal = ({
                     disabled={isPurchasing}
                     scaleTo={0.97}
                     accessibilityRole="button"
-                    accessibilityLabel={`Start 7-day free trial of ${PLAN_DISPLAY_NAMES[selectedPlan]}`}
+                    accessibilityLabel={t("ctaA11y", {
+                      plan: PLAN_DISPLAY_NAMES[selectedPlan],
+                    })}
                     style={styles.ctaPressable}
                   >
                     <View style={styles.cta}>
-                      <Text style={styles.ctaText}>Start 7-day free trial</Text>
+                      <Text style={styles.ctaText}>{t("ctaText")}</Text>
                     </View>
                   </SquishyPressable>
                   <Text style={styles.ctaMicrocopy}>
-                    Then {formatPackagePrice(selectedPkg)}/
-                    {cycle === "annual" ? "year" : "month"}. Cancel any time
-                    before then.
+                    {t("ctaMicrocopy", {
+                      price: formatPackagePrice(selectedPkg),
+                      period: cycle === "annual" ? t("yearPeriod") : t("monthPeriod"),
+                    })}
                   </Text>
                   <View style={styles.guaranteeRow}>
                     <FontAwesomeIcon
@@ -389,9 +391,7 @@ const SubscriptionPaywallModal = ({
                       size={14}
                       color="#E46444"
                     />
-                    <Text style={styles.guaranteeText}>
-                      {PAYWALL_TRUST.guarantee}
-                    </Text>
+                    <Text style={styles.guaranteeText}>{t("guarantee")}</Text>
                   </View>
                 </View>
               )}
@@ -401,20 +401,17 @@ const SubscriptionPaywallModal = ({
                 disabled={isRestoring}
                 scaleTo={0.96}
                 accessibilityRole="button"
-                accessibilityLabel="Restore purchases"
+                accessibilityLabel={t("restoreA11y")}
                 style={styles.restoreButton}
               >
                 {isRestoring ? (
                   <Spinner size={18} color="#7A6F66" />
                 ) : (
-                  <Text style={styles.restoreText}>Restore purchases</Text>
+                  <Text style={styles.restoreText}>{t("restore")}</Text>
                 )}
               </SquishyPressable>
 
-              <Text style={styles.legalText}>
-                Subscriptions renew automatically. Cancel any time in{" "}
-                <Text style={styles.legalBold}>Settings</Text>.
-              </Text>
+              <Text style={styles.legalText}>{t("legalRenew")}</Text>
 
               <View style={styles.legalLinks}>
                 <SquishyPressable
@@ -423,9 +420,9 @@ const SubscriptionPaywallModal = ({
                   }
                   scaleTo={0.94}
                   accessibilityRole="link"
-                  accessibilityLabel="Terms of Service"
+                  accessibilityLabel={t("termsOfService")}
                 >
-                  <Text style={styles.legalLink}>Terms of Service</Text>
+                  <Text style={styles.legalLink}>{t("termsOfService")}</Text>
                 </SquishyPressable>
                 <Text style={styles.legalDot}>·</Text>
                 <SquishyPressable
@@ -434,9 +431,9 @@ const SubscriptionPaywallModal = ({
                   }
                   scaleTo={0.94}
                   accessibilityRole="link"
-                  accessibilityLabel="Privacy Policy"
+                  accessibilityLabel={t("privacyPolicy")}
                 >
-                  <Text style={styles.legalLink}>Privacy Policy</Text>
+                  <Text style={styles.legalLink}>{t("privacyPolicy")}</Text>
                 </SquishyPressable>
               </View>
             </Animated.View>
@@ -445,7 +442,7 @@ const SubscriptionPaywallModal = ({
           {isPurchasing && (
             <View style={styles.loadingOverlay}>
               <Spinner size={36} color="#FFFFFF" />
-              <Text style={styles.loadingOverlayText}>Processing…</Text>
+              <Text style={styles.loadingOverlayText}>{t("processing")}</Text>
             </View>
           )}
         </View>
@@ -457,8 +454,8 @@ const SubscriptionPaywallModal = ({
         visible={gatePackage !== null}
         onClose={handleGateClose}
         onSuccess={handleGateSuccess}
-        title="Parent Verification"
-        subtitle="Please verify you are a parent to start a subscription"
+        title={tRoot("mobile.parentalGate.purchaseTitle")}
+        subtitle={tRoot("mobile.parentalGate.subscriptionSubtitle")}
       />
     </>
   );
@@ -629,10 +626,6 @@ const styles = StyleSheet.create({
     color: "#9CA3AF",
     textAlign: "center",
     paddingHorizontal: 8,
-  },
-  legalBold: {
-    fontFamily: "TondoTrial-Bold",
-    color: "#7A6F66",
   },
   legalLinks: {
     flexDirection: "row",

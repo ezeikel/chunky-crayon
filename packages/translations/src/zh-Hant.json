@@ -445,7 +445,8 @@
     "currentLanguage": "目前語言",
     "selectLanguage": "選擇語言",
     "language": "語言",
-    "switchTo": "切換至"
+    "switchTo": "切換至",
+    "title": "語言"
   },
   "difficulty": {
     "easy": "簡單",
@@ -454,6 +455,40 @@
   },
   "gallery": {
     "categoryNotFound": "找不到分類",
-    "difficultyNotFound": "找不到難度"
+    "difficultyNotFound": "找不到難度",
+    "category": {
+      "animals": "動物",
+      "dinosaurs": "恐龍",
+      "dragons": "龍",
+      "fantasy": "奇幻與魔法",
+      "food": "美食與甜點",
+      "holidays": "節慶與季節",
+      "nature": "自然與花卉",
+      "pirates": "海盜",
+      "princesses": "公主與皇室",
+      "robots": "機器人與科技",
+      "space": "太空與太空人",
+      "superheroes": "超級英雄",
+      "underwater": "海底與海洋",
+      "unicorns": "獨角獸",
+      "vehicles": "交通工具"
+    },
+    "categoryDescription": {
+      "animals": "適合兒童與大人的可愛與野生動物著色圖",
+      "dinosaurs": "適合所有年齡的史前恐龍著色圖",
+      "dragons": "從可愛到兇猛的史詩龍著色圖",
+      "fantasy": "魔法生物與奇幻世界著色圖",
+      "food": "美味美食、糖果與甜品著色圖",
+      "holidays": "聖誕節、復活節、萬聖節與季節主題著色圖",
+      "nature": "美麗自然景色與花卉著色圖",
+      "pirates": "刺激的海盜冒險著色圖",
+      "princesses": "公主、王子與城堡著色圖",
+      "robots": "未來感機器人與科技著色圖",
+      "space": "外太空、火箭與太空人著色圖",
+      "superheroes": "動作感十足的超級英雄著色圖",
+      "underwater": "海洋生物與海底冒險著色圖",
+      "unicorns": "美麗獨角獸與彩虹著色圖",
+      "vehicles": "汽車、卡車、飛機與火車著色圖"
+    }
   }
 }

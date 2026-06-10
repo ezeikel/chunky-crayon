@@ -445,7 +445,8 @@
     "currentLanguage": "Current language",
     "selectLanguage": "Select language",
     "language": "Language",
-    "switchTo": "Switch to"
+    "switchTo": "Switch to",
+    "title": "Language"
   },
   "difficulty": {
     "easy": "Easy",
@@ -454,6 +455,40 @@
   },
   "gallery": {
     "categoryNotFound": "Category not found",
-    "difficultyNotFound": "Difficulty not found"
+    "difficultyNotFound": "Difficulty not found",
+    "category": {
+      "animals": "Animals",
+      "dinosaurs": "Dinosaurs",
+      "dragons": "Dragons",
+      "fantasy": "Fantasy & Magic",
+      "food": "Food & Sweets",
+      "holidays": "Holidays & Seasons",
+      "nature": "Nature & Flowers",
+      "pirates": "Pirates",
+      "princesses": "Princesses & Royalty",
+      "robots": "Robots & Technology",
+      "space": "Space & Astronauts",
+      "superheroes": "Superheroes",
+      "underwater": "Underwater & Ocean",
+      "unicorns": "Unicorns",
+      "vehicles": "Vehicles & Transport"
+    },
+    "categoryDescription": {
+      "animals": "Cute and wild animal coloring pages for kids and adults",
+      "dinosaurs": "Prehistoric dinosaur coloring pages for all ages",
+      "dragons": "Epic dragon coloring pages from cute to fierce",
+      "fantasy": "Magical creatures and fantasy world coloring pages",
+      "food": "Delicious food, candy, and dessert coloring pages",
+      "holidays": "Christmas, Easter, Halloween and seasonal coloring pages",
+      "nature": "Beautiful nature scenes and flower coloring pages",
+      "pirates": "Swashbuckling pirate adventure coloring pages",
+      "princesses": "Princess, prince, and castle coloring pages",
+      "robots": "Futuristic robot and technology coloring pages",
+      "space": "Outer space, rockets, and astronaut coloring pages",
+      "superheroes": "Action-packed superhero coloring pages",
+      "underwater": "Ocean life and underwater adventure coloring pages",
+      "unicorns": "Beautiful unicorn and rainbow coloring pages",
+      "vehicles": "Cars, trucks, planes, and train coloring pages"
+    }
   }
 }

@@ -34,6 +34,7 @@ import {
 import { COLORS, CRAYON } from "@/lib/design";
 import { track } from "@/utils/analytics";
 import { ANALYTICS_EVENTS } from "@/constants/analytics";
+import { useT } from "@/lib/i18n/useT";
 import OnboardingSlide from "./OnboardingSlide";
 import OnboardingPaywallSlide from "./OnboardingPaywallSlide";
 import OnboardingColoringSlide from "./OnboardingColoringSlide";
@@ -56,6 +57,7 @@ type OnboardingCarouselProps = {
 };
 
 const OnboardingCarousel = ({ onComplete }: OnboardingCarouselProps) => {
+  const t = useT("mobile.onboarding");
   const { width } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const scrollRef = useRef<ScrollView>(null);
@@ -159,7 +161,9 @@ const OnboardingCarousel = ({ onComplete }: OnboardingCarouselProps) => {
           style={[styles.skipButton, { top: insets.top + 12 }]}
           onPress={handleSkip}
         >
-          <Animated.Text style={styles.skipButtonText}>Skip</Animated.Text>
+          <Animated.Text style={styles.skipButtonText}>
+            {t("skip")}
+          </Animated.Text>
         </Pressable>
       )}
 
@@ -178,16 +182,16 @@ const OnboardingCarousel = ({ onComplete }: OnboardingCarouselProps) => {
       >
         {/* Slide 1: Creativity — Floating Bob */}
         <OnboardingSlide
-          title="Endless Creativity, Zero Mess"
-          description="Your child dreams it up by talking, drawing, or snapping a photo. We turn it into a coloring page made just for them."
+          title={t("slide.creativity.title")}
+          description={t("slide.creativity.description")}
           renderVisual={() => <FloatingIcons />}
           isActive={activeIndex === 0}
         />
 
         {/* Slide 2: Safety — Staggered Entrance */}
         <OnboardingSlide
-          title="Safe, Simple, Made for Little Hands"
-          description="No ads, no social features, no data collection. Designed for ages 3-8. You stay in control."
+          title={t("slide.safety.title")}
+          description={t("slide.safety.description")}
           isActive={activeIndex === 1}
           renderVisual={() => (
             <View style={styles.safetyVisual}>
@@ -237,8 +241,8 @@ const OnboardingCarousel = ({ onComplete }: OnboardingCarouselProps) => {
 
         {/* Slide 3: Colo — Sequential Dot Fill */}
         <OnboardingSlide
-          title="Watch Them Grow with Colo"
-          description="Colo evolves as your child colors! Earn stickers, complete daily challenges, and unlock new stages."
+          title={t("slide.colo.title")}
+          description={t("slide.colo.description")}
           isActive={activeIndex === 2}
           renderVisual={() => (
             <View style={styles.coloVisual}>

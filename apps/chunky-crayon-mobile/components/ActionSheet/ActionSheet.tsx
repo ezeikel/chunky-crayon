@@ -8,6 +8,7 @@ import { faCheck, faXmark } from "@fortawesome/pro-solid-svg-icons";
 import { tapMedium } from "@/utils/haptics";
 import { FONTS, COLORS, SHEET_HANDLE } from "@/lib/design";
 import SquishyPressable from "@/components/SquishyPressable/SquishyPressable";
+import { useT } from "@/lib/i18n/useT";
 
 /**
  * Kid-friendly "do this action" bottom sheet — the non-destructive sibling of
@@ -75,6 +76,7 @@ const ActionSheet = ({
   extraAction,
   loading = false,
 }: ActionSheetProps) => {
+  const t = useT();
   const insets = useSafeAreaInsets();
 
   const handleIndexChange = useCallback(
@@ -122,7 +124,7 @@ const ActionSheet = ({
             <SquishyPressable
               onPress={onClose}
               scaleTo={0.9}
-              accessibilityLabel="Cancel"
+              accessibilityLabel={t("mobile.button.cancel")}
             >
               <View style={[styles.iconButton, styles.cancelButton]}>
                 <FontAwesomeIcon

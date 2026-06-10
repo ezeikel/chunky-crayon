@@ -13,11 +13,20 @@
       "createColoringPage": "Créer une page à colorier",
       "creating": "Création...",
       "tryAgain": "Réessayer",
-      "cancel": "Annuler"
+      "cancel": "Annuler",
+      "seeAll": "Voir tout"
     },
     "header": {
       "forGrownUps": "Pour les grands",
-      "grownUps": "Les grands"
+      "grownUps": "Les grands",
+      "creditsA11y": "{{value}} pièces crayon",
+      "openColoA11y": "Ouvrir Colo",
+      "profileA11y": "Profil : {{name}}",
+      "switchProfileA11y": "Changer de profil, actuel : {{name}}",
+      "back": "Retour",
+      "challengesTitle": "Défis",
+      "charactersTitle": "Mes personnages",
+      "settingsTitle": "Réglages"
     },
     "characterBuilder": {
       "step": {
@@ -35,11 +44,85 @@
       "next": "Suivant",
       "makeFriend": "Créer mon ami",
       "creating": "Dessin en cours...",
-      "createError": "Oups, un souci. Réessaie."
+      "createError": "Oups, un souci. Réessaie.",
+      "color": {
+        "green": "Vert",
+        "orange": "Orange",
+        "pink": "Rose",
+        "purple": "Violet",
+        "teal": "Sarcelle",
+        "yellow": "Jaune"
+      },
+      "species": {
+        "dragon": "Dragon",
+        "fairy": "Fée",
+        "kid": "Enfant",
+        "kitten": "Chaton",
+        "monster": "Monstre",
+        "puppy": "Chiot",
+        "robot": "Robot",
+        "unicorn": "Licorne"
+      },
+      "trait": {
+        "bouncy": "Rebondissant",
+        "brave": "Courageux",
+        "curious": "Curieux",
+        "loves-snacks": "Gourmand",
+        "shy": "Timide",
+        "silly": "Rigolo",
+        "sleepy": "Somnolent",
+        "sparkly": "Pétillant"
+      },
+      "voice": {
+        "brave-neutral": "Courageux",
+        "gentle-neutral": "Doux",
+        "playful-boy-5yo": "Joueur",
+        "playful-girl-5yo": "Rebondissant",
+        "silly-neutral": "Rigolo",
+        "sleepy-neutral": "Somnolent",
+        "warm-boy-7yo": "Cocooning",
+        "warm-girl-7yo": "Chaleureux"
+      }
     },
     "challenges": {
       "homeCardTitle": "Défis",
-      "homeCardSubtitle": "Colorie pour gagner des autocollants et faire grandir Colo !"
+      "homeCardSubtitle": "Colorie pour gagner des autocollants et faire grandir Colo !",
+      "achievements": {
+        "dedicatedArtist": {
+          "description": "Terminer 10 coloriages",
+          "title": "Artiste assidu"
+        },
+        "firstSteps": {
+          "description": "Terminer ton premier coloriage",
+          "title": "Premiers pas"
+        },
+        "gettingStarted": {
+          "description": "Terminer 5 coloriages",
+          "title": "Bien démarré"
+        },
+        "masterArtist": {
+          "description": "Terminer 50 coloriages",
+          "title": "Maître artiste"
+        }
+      },
+      "claimFailed": "Impossible de récupérer cette récompense. Réessaie.",
+      "claimReward": "Récupérer la récompense !",
+      "completedBang": "Terminé !",
+      "daysLeft": "Il reste {{count}} jour",
+      "lifetimeAchievements": "Succès de tous les temps",
+      "noChallengeSubtitle": "Reviens vite pour gagner d’autres récompenses.",
+      "noChallengeTitle": "Un tout nouveau défi arrive !",
+      "pastChallenges": "Défis passés",
+      "rewardAccessory": "Accessoire de Colo",
+      "rewardEarned": "Tu as gagné un(e) {{reward}} !",
+      "rewardSticker": "autocollant",
+      "screenSubtitle": "Réussis des défis pour gagner des récompenses !",
+      "screenTitle": "Défis",
+      "statusCompleted": "Terminé",
+      "statusIncomplete": "Incomplet",
+      "statusRewardUnclaimed": "Récompense non récupérée",
+      "thisWeek": "Défi de la semaine",
+      "daysLeft_other": "Il reste {{count}} jours"
     },
     "characters": {
       "loading": "Chargement de tes amis...",
@@ -72,7 +155,8 @@
     },
     "gallery": {
       "title": "Explorer",
-      "subtitle": "Choisis quelque chose de sympa à colorier"
+      "subtitle": "Choisis quelque chose de sympa à colorier",
+      "colorCategoryA11y": "Colorier {{name}}"
     },
     "stickers": {
       "title": "Collection d’autocollants",
@@ -97,7 +181,11 @@
       "savedCount_other": "{{count}} dessins enregistrés",
       "emptyTitle": "Tes dessins enregistrés",
       "emptySubtitle": "Tes créations préférées apparaîtront ici. Commence à colorier et sauvegarde tes chefs-d’œuvre !",
-      "emptyTip": "Appuie sur le cœur pendant le coloriage pour enregistrer"
+      "emptyTip": "Appuie sur le cœur pendant le coloriage pour enregistrer",
+      "coloringPageA11y": "Page de coloriage",
+      "recentEmpty": "Pas encore d’images. Appuie au-dessus pour créer la première !",
+      "recentTitle": "Mes images",
+      "seeAllRecent": "Voir toutes mes images"
     },
     "upsideDownHint": {
       "title": "Retourne-moi !",
@@ -106,6 +194,425 @@
     "create": {
       "greeting": "Qu’est-ce que tu veux colorier aujourd’hui ?",
       "subtitle": "Choisis comment commencer !"
+    },
+    "category": {
+      "allTitle": "Toutes les pages à colorier",
+      "fallbackTitle": "Catégorie",
+      "notFound": "Impossible de trouver cette catégorie."
+    },
+    "coloring": {
+      "enterFocusMode": "Mode concentration",
+      "exitFocusMode": "Quitter le mode concentration",
+      "generating": {
+        "title": "Création de ta page à colorier…",
+        "messages": {
+          "addingSparkles": "On ajoute un peu de paillettes…",
+          "almostThere": "On apporte les dernières touches…",
+          "coloringOutsideLines": "On essaie de ne pas dépasser…",
+          "creatingMasterpiece": "On ajuste tout comme il faut…",
+          "drawingLines": "On dessine les contours…",
+          "mixingColors": "On mélange de nouvelles couleurs…",
+          "sharpeningCrayons": "On taille les crayons…",
+          "wavingWand": "On vérifie que tout est parfait…"
+        }
+      },
+      "magicHint": {
+        "useColor": "Utiliser Couleur"
+      },
+      "musicOff": "Musique désactivée",
+      "musicOn": "Musique activée",
+      "myArtwork": "Mes créations",
+      "print": "Imprimer",
+      "redo": "Rétablir",
+      "save": "Enregistrer",
+      "seeWholePicture": "Voir l’image entière",
+      "sfxOff": "Effets sonores désactivés",
+      "sfxOn": "Effets sonores activés",
+      "startOver": "Recommencer",
+      "stickerPicker": {
+        "categoryA11y": "Autocollants {{label}}",
+        "heading": "Choisis un autocollant !",
+        "hint": "Maintenant, touche ton image !",
+        "stickerA11y": "Autocollant {{name}}",
+        "category": {
+          "animals": "Animaux",
+          "fun": "Rigolo",
+          "hearts": "Cœurs",
+          "nature": "Nature",
+          "shapes": "Formes",
+          "stars": "Étoiles"
+        }
+      },
+      "tool": {
+        "gettingReady": "{{label}} (préparation)",
+        "tapToTryAgain": "{{label}} (touche pour réessayer)",
+        "autoColor": "Coloriage auto",
+        "crayon": "Crayon",
+        "eraser": "Gomme",
+        "fill": "Remplir",
+        "glitter": "Paillettes",
+        "magicBrush": "Pinceau magique",
+        "marker": "Feutre",
+        "paint": "Peinture",
+        "pencil": "Crayon à papier",
+        "sticker": "Autocollant"
+      },
+      "undo": "Annuler",
+      "zoomIn": "Zoom avant",
+      "zoomOut": "Zoom arrière",
+      "addedToCollection": "Ajouté à ta collection !",
+      "back": "Retour",
+      "brushSize": {
+        "chunky": "Épais",
+        "fine": "Fin",
+        "regular": "Normal"
+      },
+      "captureFailed": "Impossible de capturer ta création.",
+      "myArtworkSheetConfirm": "Ajouter à ma collection",
+      "myArtworkSheetTitle": "Ajouter à Mes créations ?",
+      "noData": "Aucune donnée",
+      "palette": {
+        "cute": "Mignon",
+        "pastel": "Pastel",
+        "realistic": "Réaliste",
+        "surprise": "Surprise"
+      },
+      "panMode": "Se déplacer",
+      "photoPermissionDenied": "Autorise l’accès à ta photothèque pour enregistrer ta création.",
+      "printFailed": "Impossible de créer un PDF à imprimer. Réessaie.",
+      "printQrCta": "Scanne le QR code pour découvrir d’autres pages à colorier !",
+      "printSheetConfirm": "Créer un PDF à imprimer",
+      "printSheetTitle": "Imprimer cette page ?",
+      "saveFailed": "Impossible d’enregistrer ta création. Réessaie.",
+      "saveSheetConfirm": "Enregistrer dans Photos",
+      "saveSheetTitle": "Enregistrer ton image ?",
+      "savedToPhotos": "Enregistré dans ta photothèque !",
+      "startOverCancel": "Non, garder mon coloriage",
+      "startOverConfirm": "Oui, recommencer",
+      "startOverTitle": "Recommencer ?",
+      "untitledArtwork": "Ma création"
+    },
+    "creditPack": {
+      "bestValue": "Meilleure offre",
+      "creditsLabel": "crédits",
+      "rowA11y": "{{credits}} crédits pour {{price}}",
+      "rowA11yBestValue": "{{credits}} crédits pour {{price}}, meilleure offre"
+    },
+    "feed": {
+      "challenge": "Défi",
+      "claim": "Récupérer !",
+      "continueColoring": "Continuer à colorier",
+      "discoverMorePages": "Découvrir plus de pages",
+      "emptyNoPages": "Aucune page à colorier pour l’instant. Reviens bientôt !",
+      "errorLoading": "Oups ! Un problème est survenu au chargement.",
+      "moreToColor": "Plus à colorier",
+      "seeAllYourArt": "Voir toutes tes créations",
+      "seeAllYourColoring": "Voir tous tes coloriages",
+      "seeAllYourCreations": "Voir toutes tes créations",
+      "today": "Aujourd’hui",
+      "yourArt": "Tes créations",
+      "yourCreations": "Tes créations"
+    },
+    "home": {
+      "coloProud": "Ton {{stageName}} est si fier de toi !",
+      "coloWantsToGrow": "{{stageName}} veut grandir ! Enregistre encore {{count}} créations pour évoluer !",
+      "discoverMore": "Découvrir plus",
+      "discoverMoreA11y": "Découvrir plus de pages à colorier",
+      "greeting": "Que veux-tu colorier aujourd’hui ?",
+      "seeAllCategories": "Voir toutes les catégories",
+      "whatDoYouLike": "Qu’est-ce que tu aimes ?",
+      "browseAllA11y": "Parcourir toutes les pages à colorier"
+    },
+    "onboarding": {
+      "coloring": {
+        "celebrationSubtitle": "Tu es un artiste né",
+        "celebrationTitle": "Incroyable !",
+        "done": "J’ai fini",
+        "doneA11y": "Terminé",
+        "subtitle": "Choisis une scène et colorie Colo",
+        "title": "À toi de créer !"
+      },
+      "paywall": {
+        "continue": "Continuer",
+        "continueA11y": "Continuer vers l’app",
+        "description": "Puis choisis la formule qui vous convient, une fois qu’ils auront adoré.",
+        "finePrint": "Aucun paiement aujourd’hui. Puis {{price}}/mo après ta semaine gratuite. Annulation à tout moment dans Réglages. {{guarantee}}.",
+        "maybeLater": "Peut-être plus tard",
+        "rainbowPlan": "Formule Arc-en-ciel",
+        "reviews": "({{count}} avis)",
+        "seeAllPlans": "Voir toutes les formules",
+        "startTrial": "Démarrer ma semaine gratuite",
+        "startTrialA11y": "Démarrer ma semaine gratuite",
+        "title": "Coloriage illimité, gratuit pendant une semaine",
+        "trustLead": "Adoré par les familles",
+        "unavailable": "Les formules ne sont pas disponibles pour le moment. Tu peux colorier et passer à l’abonnement plus tard.",
+        "feature": {
+          "challenges": "Défis quotidiens et autocollants à gagner",
+          "magic": "Pinceau magique et coloriage par la voix",
+          "unlimited": "Pages à colorier illimitées, à tout moment"
+        },
+        "timeline": {
+          "day5": {
+            "text": "On te rappellera avant la fin de l’essai.",
+            "when": "Jour 5"
+          },
+          "day7": {
+            "text": "Ta semaine gratuite se termine. Annule avant, sans frais.",
+            "when": "Jour 7"
+          },
+          "today": {
+            "text": "Débloque tout. Colorie autant que tu veux.",
+            "when": "Aujourd’hui"
+          }
+        }
+      },
+      "sceneA11y": "Scène {{label}}",
+      "skip": "Passer",
+      "slide": {
+        "colo": {
+          "description": "Colo évolue à mesure que votre enfant colorie ! Gagnez des autocollants, relevez des défis quotidiens et débloquez de nouveaux stades.",
+          "title": "Regardez Colo grandir"
+        },
+        "creativity": {
+          "description": "Votre enfant l’imagine en parlant, en dessinant ou en prenant une photo. Nous le transformons en page à colorier rien que pour lui.",
+          "title": "Créativité infinie, zéro bazar"
+        },
+        "safety": {
+          "description": "Pas de pubs, pas de fonctions sociales, pas de collecte de données. Conçu pour les 3-8 ans. Vous gardez le contrôle.",
+          "title": "Sûr, simple, pour les petites mains"
+        }
+      },
+      "scene": {
+        "onboarding-jungle": "Jungle",
+        "onboarding-party": "Fête",
+        "onboarding-space": "Espace",
+        "onboarding-underwater": "Sous la mer"
+      }
+    },
+    "paywall": {
+      "annualSaveBadge": "2 mois offerts",
+      "closeA11y": "Fermer",
+      "creditsPerMo": "{{credits}} crédits/mo",
+      "ctaA11y": "Démarrer l’essai gratuit de 7 jours de {{plan}}",
+      "ctaMicrocopy": "Puis {{price}}/{{period}}. Annule à tout moment avant.",
+      "ctaText": "Démarrer l’essai gratuit de 7 jours",
+      "guarantee": "Garantie satisfait ou remboursé 30 jours",
+      "legalRenew": "Les abonnements se renouvellent automatiquement. Annulation à tout moment dans Réglages.",
+      "loadingPlans": "Chargement des formules…",
+      "monthPeriod": "mois",
+      "monthly": "Mensuel",
+      "mostPopular": "Le plus populaire",
+      "perMonthShort": "mois",
+      "perYearShort": "an",
+      "planRowA11y": "{{plan}}, {{credits}} crédits par mois, {{price}} par {{period}}",
+      "plansUnavailable": "Les formules ne sont pas disponibles pour le moment. Réessaie plus tard.",
+      "privacyPolicy": "Politique de confidentialité",
+      "processing": "Traitement…",
+      "restore": "Restaurer les achats",
+      "restoreA11y": "Restaurer les achats",
+      "socialProof": {
+        "reviewCount": "d’après {{count}} avis",
+        "title": "Adoré par les familles partout"
+      },
+      "subtitle": "Crée autant de pages qu’ils veulent. Imprime-les ou colorie à l’écran.",
+      "termsOfService": "Conditions d’utilisation",
+      "title": "Débloquer le coloriage illimité",
+      "yearPeriod": "an",
+      "yearly": "Annuel"
+    },
+    "profileSwitcher": {
+      "addProfile": "Ajouter un profil",
+      "artworkCount": "{{count}} création",
+      "done": "Terminé",
+      "edit": "Modifier",
+      "maxReached": "Maximum de {{count}} profils atteint",
+      "namePlaceholder": "Nom du profil",
+      "title": "Profils",
+      "toast": {
+        "createFailed": "Impossible de créer le profil. Réessaie.",
+        "deleteFailed": "Impossible de supprimer le profil. Réessaie.",
+        "minOneProfile": "Il faut au moins un profil.",
+        "switchFailed": "Impossible de changer de profil. Réessaie.",
+        "updateFailed": "Impossible de mettre à jour le profil. Réessaie."
+      },
+      "deleteConfirm": {
+        "title": "Supprimer le profil ?",
+        "description": "Cela effacera « {{name}} » et toutes ses images enregistrées.",
+        "confirm": "Supprimer"
+      },
+      "artworkCount_other": "{{count}} créations"
+    },
+    "settings": {
+      "backgroundMusic": {
+        "subtitle": "Sons d’ambiance pendant le coloriage",
+        "title": "Musique de fond"
+      },
+      "bannerA11y": "Formule {{plan}}, {{credits}} crédits. Gérer l’abonnement.",
+      "bannerCtaManage": "Gérer",
+      "bannerCtaUpgrade": "Passer à l’abonnement",
+      "bannerPlanTitle": "Formule {{plan}}",
+      "bannerSubtitleUpgrade": " · Passez à l’abonnement pour continuer à colorier",
+      "contact": {
+        "title": "Nous contacter"
+      },
+      "creditCount": "{{formattedCount}} crédit",
+      "help": {
+        "subtitle": "Réponses aux questions fréquentes",
+        "title": "Aide & FAQ"
+      },
+      "language": {
+        "title": "Langue"
+      },
+      "madeWith": "Fait avec",
+      "madeWithIn": "à",
+      "madeWithLocation": "South London",
+      "magicLinkSent": {
+        "body": "Nous avons envoyé un lien de connexion à {{email}}",
+        "subtext": "Clique sur le lien dans l’e-mail pour te connecter. Le lien expire dans 15 minutes.",
+        "title": "Vérifie tes e-mails !",
+        "useDifferentEmail": "Utiliser un autre e-mail"
+      },
+      "onboarding": {
+        "subtitle": "Revoir la visite d’accueil",
+        "title": "Voir l’onboarding"
+      },
+      "planChip": "Formule {{plan}}",
+      "privacy": {
+        "title": "Politique de confidentialité"
+      },
+      "profiles": {
+        "add": "Ajouter",
+        "addA11y": "Ajouter un profil",
+        "currentProfileA11y": "{{name}}, profil actuel",
+        "manageA11y": "{{name}}, gérer les profils"
+      },
+      "rate": {
+        "subtitle": "Partagez votre avis",
+        "title": "Noter l’app"
+      },
+      "section": {
+        "account": "Compte",
+        "appInfo": "Infos sur l’app",
+        "legal": "Mentions légales",
+        "preferences": "Préférences",
+        "profiles": "Profils",
+        "support": "Assistance"
+      },
+      "signIn": {
+        "subtitle": "Synchroniser les créations sur vos appareils",
+        "title": "Se connecter"
+      },
+      "signInModal": {
+        "continueApple": "Continuer avec Apple",
+        "continueFacebook": "Continuer avec Facebook",
+        "continueGoogle": "Continuer avec Google",
+        "emailLabel": "Se connecter avec e-mail",
+        "emailPlaceholder": "Saisis ton e-mail",
+        "or": "ou",
+        "privacyNote": "En te connectant, tu acceptes nos Conditions d’utilisation et notre Politique de confidentialité.",
+        "sendMagicLink": "Envoyer le lien magique",
+        "subtitle": "Connecte-toi pour synchroniser tes créations sur tes appareils et accéder à ton compte sur le web.",
+        "title": "Se connecter"
+      },
+      "signOut": {
+        "subtitle": "Tes créations restent sur cet appareil",
+        "title": "Se déconnecter"
+      },
+      "signOutConfirm": {
+        "confirm": "Se déconnecter",
+        "description": "Tes créations resteront sur cet appareil.",
+        "title": "Se déconnecter ?"
+      },
+      "soundEffects": {
+        "subtitle": "Appuis sur les boutons et actions",
+        "title": "Effets sonores"
+      },
+      "terms": {
+        "title": "Conditions d’utilisation"
+      },
+      "toast": {
+        "accountLinked": "Compte associé et créations synchronisées !",
+        "appleSignInFailed": "Impossible de se connecter avec Apple. Réessaie.",
+        "facebookSignInFailed": "Impossible de se connecter avec Facebook. Réessaie.",
+        "googleSignInFailed": "Impossible de se connecter avec Google. Réessaie.",
+        "invalidEmail": "Merci de saisir une adresse e-mail valide.",
+        "magicLinkFailed": "Impossible d’envoyer le lien magique. Réessaie.",
+        "signedIn": "Tu es connecté(e) !",
+        "signedOut": "Tu es déconnecté(e). Tes créations restent sur cet appareil."
+      },
+      "version": {
+        "title": "Version"
+      },
+      "vibration": {
+        "subtitle": "Légère vibration lors des appuis et des récompenses",
+        "title": "Vibration"
+      },
+      "creditCount_other": "{{formattedCount}} crédits"
+    },
+    "subscriptionManager": {
+      "accessUntil": "Accès jusqu’au",
+      "buyCredits": "Acheter des crédits",
+      "creditsAvailable": "{{count}} crédit disponible",
+      "legal": "Les abonnements se renouvellent automatiquement sauf annulation au moins 24 h avant la fin de la période en cours. Gérez ou annulez à tout moment dans les réglages de {{store}}.",
+      "manageSubscription": "Gérer l’abonnement",
+      "noActiveSubscription": "Aucun abonnement actif",
+      "planIncludes": "Votre formule inclut",
+      "planName": "Formule {{plan}}",
+      "renews": "Renouvelle le",
+      "restorePurchases": "Restaurer les achats",
+      "status": {
+        "active": "Actif",
+        "cancelled": "Annulé",
+        "paymentIssue": "Problème de paiement",
+        "trial": "Essai"
+      },
+      "subscribeNow": "S’abonner maintenant",
+      "title": "Abonnement & crédits",
+      "upgradePlan": "Changer de formule",
+      "creditsAvailable_other": "{{count}} crédits disponibles"
+    },
+    "topUp": {
+      "closeA11y": "Fermer",
+      "legal": "Les crédits sont ajoutés à votre compte immédiatement après l’achat. Les crédits n’expirent pas.",
+      "loading": "Chargement des packs de crédits…",
+      "subtitle": "Ajoute des crédits pour continuer à créer, sans changer de formule.",
+      "title": "Recharger tes crédits",
+      "unavailable": "Les packs de crédits ne sont pas disponibles pour le moment."
+    },
+    "avatar": {
+      "alien": "Alien",
+      "astronaut": "Astronaute",
+      "dragon": "Dragon",
+      "ghost": "Fantôme",
+      "ice-cream": "Glace",
+      "mermaid": "Sirène",
+      "rainbow": "Arc-en-ciel",
+      "rocket": "Fusée",
+      "sun": "Soleil",
+      "superhero": "Super-héros",
+      "unicorn": "Licorne",
+      "wizard": "Magicien"
+    },
+    "avatarPicker": {
+      "pickA11y": "Choisir {{name}}"
+    },
+    "createProfile": {
+      "create": "Créer",
+      "namePlaceholder": "Comment tu t’appelles ?",
+      "pickCharacter": "Choisis ton personnage"
+    },
+    "parentalGate": {
+      "closeA11y": "Fermer",
+      "defaultSubtitle": "Touche la bonne réponse pour continuer.",
+      "defaultTitle": "Petite vérification",
+      "hint": "Adultes : touchez la bonne réponse pour continuer.",
+      "purchaseSubtitle": "Merci de vérifier que vous êtes un parent pour effectuer cet achat",
+      "purchaseTitle": "Vérification parentale",
+      "subscriptionSubtitle": "Merci de vérifier que vous êtes un parent pour démarrer un abonnement"
+    },
+    "profileAvatar": {
+      "a11yFallback": "Avatar du profil",
+      "a11yNamed": "Avatar de {{name}}"
     }
   },
   "createForm": {
@@ -199,6 +706,46 @@
       "errorQ2AudioFailed": "Impossible de lire la question. Réessayer ?",
       "errorTimeout": "Trop long ! On recommence.",
       "errorRequiresSignin": "Connecte-toi pour utiliser le mode vocal."
+    },
+    "error": {
+      "characterNotReady": "Ce copain n’est pas encore prêt. Réessaie dans un instant.",
+      "generic": "Un souci est survenu. Réessaie.",
+      "moderationBlocked": "Essayons une autre idée pour ton dessin !"
+    },
+    "friendPicker": {
+      "emptyInviteSuffix": " qui apparaît dans tes pages !",
+      "header": "Ajouter un copain",
+      "includeFriendA11y": "Inclure {{name}}, un {{species}}",
+      "makeFriend": "Créer un copain",
+      "makeNewFriend": "Créer un nouveau copain",
+      "newFriend": "Nouveau copain",
+      "noFriend": "Aucun copain",
+      "optional": "(facultatif)"
+    },
+    "image": {
+      "camera": "Appareil photo",
+      "cameraPermissionDenied": "L’accès à l’appareil photo est nécessaire pour prendre des photos.",
+      "confirmInstructions": "Super photo ! C’est bien celle que tu veux ?",
+      "createFailed": "Impossible de créer une page à colorier à partir de la photo.",
+      "createFailedToast": "Impossible de créer une page à colorier avec ta photo. Réessaie !",
+      "instructions": "Prends une photo ou ajoute une image !",
+      "libraryPermissionDenied": "L’accès à la photothèque est nécessaire pour choisir une image.",
+      "pickAnother": "En choisir une autre",
+      "pickImageFailed": "Impossible de choisir cette image. Réessaie.",
+      "processing": "Création de ta page à colorier…",
+      "takePhotoFailed": "Impossible de prendre la photo. Réessaie.",
+      "upload": "Importer"
+    },
+    "mode": {
+      "a11yLabel": "Mode de saisie : {{mode}}",
+      "unlockSaveFailed": "Impossible d’enregistrer ce déblocage. Il se peut qu’il ne soit pas conservé, réessaie.",
+      "image": "Photo",
+      "scene": "Construire",
+      "text": "Écrire",
+      "voice": "Parler"
+    },
+    "text": {
+      "placeholder": "Qu’as-tu envie de colorier ?"
     }
   }
 }

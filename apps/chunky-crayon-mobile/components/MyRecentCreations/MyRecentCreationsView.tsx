@@ -12,6 +12,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faPalette, faImages } from "@fortawesome/pro-duotone-svg-icons";
 import SectionHeader from "@/components/SectionHeader/SectionHeader";
 import SeeAllButton from "@/components/SeeAllButton/SeeAllButton";
+import { useT } from "@/lib/i18n/useT";
 import { tapLight } from "@/utils/haptics";
 import { FONTS, COLORS } from "@/lib/design";
 
@@ -59,6 +60,7 @@ const MyRecentCreationsView = ({
   isLoading = false,
 }: MyRecentCreationsViewProps) => {
   const { width } = useWindowDimensions();
+  const t = useT("mobile.myArtwork");
   const cardSize = width >= TABLET_BREAKPOINT ? CARD_SIZE_TABLET : CARD_SIZE;
 
   // Loading + empty get the same compact card shape so the home
@@ -84,9 +86,7 @@ const MyRecentCreationsView = ({
             secondaryOpacity={1}
           />
         </View>
-        <Text style={styles.emptyText}>
-          No pictures yet. Tap above to create your first one!
-        </Text>
+        <Text style={styles.emptyText}>{t("recentEmpty")}</Text>
       </View>
     );
   }
@@ -94,14 +94,14 @@ const MyRecentCreationsView = ({
   return (
     <View style={styles.section}>
       <SectionHeader
-        title="My pictures"
+        title={t("recentTitle")}
         icon={faImages}
         tint="gold"
         style={styles.header}
         right={
           <SeeAllButton
             onPress={onSeeAllPress}
-            accessibilityLabel="See all my pictures"
+            accessibilityLabel={t("seeAllRecent")}
           />
         }
       />
@@ -123,7 +123,7 @@ const MyRecentCreationsView = ({
               tapLight();
               onItemPress(item);
             }}
-            accessibilityLabel={item.title || "Coloring page"}
+            accessibilityLabel={item.title || t("coloringPageA11y")}
           >
             <View style={styles.cardInner}>
               {item.previewUrl ? (

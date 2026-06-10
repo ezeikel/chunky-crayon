@@ -55,6 +55,7 @@ import ProfileAvatar from "@/components/ProfileAvatar/ProfileAvatar";
 import SubscriptionManager from "@/components/SubscriptionManager";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { useTranslation } from "react-i18next";
+import { useT } from "@/lib/i18n/useT";
 import { LOCALES } from "@one-colored-pixel/translations";
 import { usePlanName, useCredits } from "@/hooks/useEntitlements";
 import {
@@ -195,20 +196,31 @@ const PROFILE_RING = 4;
 const PROFILE_RING_GAP = 3;
 const PROFILE_DISC_BOX = PROFILE_DISC + 2 * (PROFILE_RING + PROFILE_RING_GAP);
 
+type SettingsT = (key: string, params?: Record<string, unknown>) => string;
+
 type ProfileDiscProps = {
   avatarId: string;
   name: string;
   active: boolean;
   onPress: () => void;
+  t: SettingsT;
 };
 
-const ProfileDisc = ({ avatarId, name, active, onPress }: ProfileDiscProps) => (
+const ProfileDisc = ({
+  avatarId,
+  name,
+  active,
+  onPress,
+  t,
+}: ProfileDiscProps) => (
   <Pressable
     style={styles.discWrap}
     onPress={onPress}
     accessibilityRole="button"
     accessibilityState={{ selected: active }}
-    accessibilityLabel={`${name}${active ? ", current profile" : ""}`}
+    accessibilityLabel={
+      active ? t("profiles.currentProfileA11y", { name }) : name
+    }
   >
     <View style={[styles.disc, active && styles.discActive]}>
       <ProfileAvatar avatarId={avatarId} name={name} size="md" />
@@ -224,12 +236,18 @@ const ProfileDisc = ({ avatarId, name, active, onPress }: ProfileDiscProps) => (
   </Pressable>
 );
 
-const AddProfileDisc = ({ onPress }: { onPress: () => void }) => (
+const AddProfileDisc = ({
+  onPress,
+  t,
+}: {
+  onPress: () => void;
+  t: SettingsT;
+}) => (
   <Pressable
     style={styles.discWrap}
     onPress={onPress}
     accessibilityRole="button"
-    accessibilityLabel="Add a profile"
+    accessibilityLabel={t("profiles.addA11y")}
   >
     <View style={[styles.disc, styles.discAdd]}>
       {/* Sized to the full disc box so the dashed ring lands where the solid
@@ -250,12 +268,14 @@ const AddProfileDisc = ({ onPress }: { onPress: () => void }) => (
       />
     </View>
     <Text style={styles.discName} numberOfLines={1}>
-      Add
+      {t("profiles.add")}
     </Text>
   </Pressable>
 );
 
 const SettingsScreen = () => {
+  const t = useT("mobile.settings");
+  const tButton = useT("mobile.button");
   const appVersion = Constants.expoConfig?.version || "1.0.0";
   const planName = usePlanName();
   const credits = useCredits();
@@ -382,7 +402,7 @@ const SettingsScreen = () => {
 
   const confirmSignOut = async () => {
     await signOut();
-    toast.success("You're signed out. Your artwork stays on this device.");
+    toast.success(t("toast.signedOut"));
   };
 
   // DEV-only: wipe ALL local device data (MMKV + AsyncStorage + auth +
@@ -408,12 +428,12 @@ const SettingsScreen = () => {
         setSignInModalVisible(false);
         toast.success(
           result.wasMerged
-            ? "Account linked and artwork synced!"
-            : "You're signed in!",
+            ? t("toast.accountLinked")
+            : t("toast.signedIn"),
         );
       }
     } catch {
-      toast.error("Couldn't sign in with Google. Please try again.");
+      toast.error(t("toast.googleSignInFailed"));
     } finally {
       setSignInLoading(false);
     }
@@ -427,12 +447,12 @@ const SettingsScreen = () => {
         setSignInModalVisible(false);
         toast.success(
           result.wasMerged
-            ? "Account linked and artwork synced!"
-            : "You're signed in!",
+            ? t("toast.accountLinked")
+            : t("toast.signedIn"),
         );
       }
     } catch {
-      toast.error("Couldn't sign in with Apple. Please try again.");
+      toast.error(t("toast.appleSignInFailed"));
     } finally {
       setSignInLoading(false);
     }
@@ -446,12 +466,12 @@ const SettingsScreen = () => {
         setSignInModalVisible(false);
         toast.success(
           result.wasMerged
-            ? "Account linked and artwork synced!"
-            : "You're signed in!",
+            ? t("toast.accountLinked")
+            : t("toast.signedIn"),
         );
       }
     } catch {
-      toast.error("Couldn't sign in with Facebook. Please try again.");
+      toast.error(t("toast.facebookSignInFailed"));
     } finally {
       setSignInLoading(false);
     }
@@ -459,7 +479,7 @@ const SettingsScreen = () => {
 
   const handleSendMagicLink = async () => {
     if (!magicLinkEmail || !magicLinkEmail.includes("@")) {
-      toast.error("Please enter a valid email address.");
+      toast.error(t("toast.invalidEmail"));
       return;
     }
 
@@ -469,10 +489,10 @@ const SettingsScreen = () => {
       if (success) {
         setMagicLinkSent(true);
       } else {
-        toast.error("Couldn't send magic link. Please try again.");
+        toast.error(t("toast.magicLinkFailed"));
       }
     } catch {
-      toast.error("Couldn't send magic link. Please try again.");
+      toast.error(t("toast.magicLinkFailed"));
     } finally {
       setSignInLoading(false);
     }
@@ -499,7 +519,9 @@ const SettingsScreen = () => {
               ]}
               onPress={handleManageProfiles}
               accessibilityRole="button"
-              accessibilityLabel={`${activeProfile.name}, manage profiles`}
+              accessibilityLabel={t("profiles.manageA11y", {
+                name: activeProfile.name,
+              })}
             >
               <ProfileAvatar
                 avatarId={activeProfile.avatarId}
@@ -524,7 +546,7 @@ const SettingsScreen = () => {
                     secondaryOpacity={0.4}
                   />
                   <Text style={[styles.planChipText, { color: planColor }]}>
-                    {planLabel} Plan
+                    {t("planChip", { plan: planLabel })}
                   </Text>
                 </View>
               </View>
@@ -541,7 +563,10 @@ const SettingsScreen = () => {
             style={({ pressed }) => [pressed && styles.bannerPressed]}
             onPress={handleSubscription}
             accessibilityRole="button"
-            accessibilityLabel={`${planLabel} plan, ${credits} credits. Manage subscription.`}
+            accessibilityLabel={t("bannerA11y", {
+              plan: planLabel,
+              credits,
+            })}
           >
             <LinearGradient
               colors={[`${planColor}E6`, planColor]}
@@ -559,15 +584,20 @@ const SettingsScreen = () => {
                 />
               </View>
               <View style={styles.bannerInfo}>
-                <Text style={styles.bannerTitle}>{planLabel} Plan</Text>
+                <Text style={styles.bannerTitle}>
+                  {t("bannerPlanTitle", { plan: planLabel })}
+                </Text>
                 <Text style={styles.bannerSubtitle}>
-                  {credits.toLocaleString()} credit{credits === 1 ? "" : "s"}
-                  {isPaidPlan ? "" : " · Upgrade to keep coloring"}
+                  {t("creditCount", {
+                    count: credits,
+                    formattedCount: credits.toLocaleString(),
+                  })}
+                  {isPaidPlan ? "" : t("bannerSubtitleUpgrade")}
                 </Text>
               </View>
               <View style={styles.bannerCta}>
                 <Text style={styles.bannerCtaText}>
-                  {isPaidPlan ? "Manage" : "Upgrade"}
+                  {isPaidPlan ? t("bannerCtaManage") : t("bannerCtaUpgrade")}
                 </Text>
                 <FontAwesomeIcon
                   icon={faChevronRight}
@@ -580,7 +610,7 @@ const SettingsScreen = () => {
 
           {/* Profiles Section — avatar-disc row */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Profiles</Text>
+            <Text style={styles.sectionTitle}>{t("section.profiles")}</Text>
             {/* Avatar-disc row — each child profile as a tappable disc, active
                 one ringed, plus an Add disc (opens the manager). */}
             <View style={styles.discRowCard}>
@@ -596,24 +626,25 @@ const SettingsScreen = () => {
                     name={profile.name}
                     active={profile.id === activeProfile?.id}
                     onPress={() => handleSelectProfile(profile.id)}
+                    t={t}
                   />
                 ))}
-                <AddProfileDisc onPress={handleManageProfiles} />
+                <AddProfileDisc onPress={handleManageProfiles} t={t} />
               </ScrollView>
             </View>
           </View>
 
           {/* Account Section */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Account</Text>
+            <Text style={styles.sectionTitle}>{t("section.account")}</Text>
             <View style={styles.sectionContent}>
               {isLinked ? (
                 <SettingsItem
                   icon={faRightFromBracket}
                   iconColor={COLORS.error}
                   iconSecondaryColor="#FCA5A5"
-                  title="Sign Out"
-                  subtitle={user?.email || "Your artwork stays on this device"}
+                  title={t("signOut.title")}
+                  subtitle={user?.email || t("signOut.subtitle")}
                   onPress={handleSignOut}
                 />
               ) : (
@@ -621,8 +652,8 @@ const SettingsScreen = () => {
                   icon={faLink}
                   iconColor={CRAYON.purple.base}
                   iconSecondaryColor={CRAYON.purple.light}
-                  title="Sign In"
-                  subtitle="Sync artwork across devices"
+                  title={t("signIn.title")}
+                  subtitle={t("signIn.subtitle")}
                   onPress={handleSignIn}
                 />
               )}
@@ -631,13 +662,13 @@ const SettingsScreen = () => {
 
           {/* Preferences Section */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Preferences</Text>
+            <Text style={styles.sectionTitle}>{t("section.preferences")}</Text>
             <View style={styles.sectionContent}>
               <SettingsItem
                 icon={faGlobe}
                 iconColor={CRAYON.blue.base}
                 iconSecondaryColor={CRAYON.blue.light}
-                title="Language"
+                title={t("language.title")}
                 subtitle={activeLanguageName}
                 onPress={handleLanguage}
               />
@@ -645,8 +676,8 @@ const SettingsScreen = () => {
                 icon={faVolumeHigh}
                 iconColor={CRAYON.yellow.dark}
                 iconSecondaryColor={CRAYON.yellow.base}
-                title="Sound Effects"
-                subtitle="Button taps and actions"
+                title={t("soundEffects.title")}
+                subtitle={t("soundEffects.subtitle")}
                 value={soundEffectsEnabled}
                 onValueChange={(next) => {
                   selectionChanged(); // toggle switch = selection-style haptic
@@ -657,8 +688,8 @@ const SettingsScreen = () => {
                 icon={faMusic}
                 iconColor={CRAYON.purple.base}
                 iconSecondaryColor={CRAYON.purple.light}
-                title="Background Music"
-                subtitle="Ambient sounds while coloring"
+                title={t("backgroundMusic.title")}
+                subtitle={t("backgroundMusic.subtitle")}
                 value={backgroundMusicEnabled}
                 onValueChange={(next) => {
                   selectionChanged(); // toggle switch = selection-style haptic
@@ -669,8 +700,8 @@ const SettingsScreen = () => {
                 icon={faMobileVibrate}
                 iconColor={CRAYON.blue.dark}
                 iconSecondaryColor={CRAYON.blue.base}
-                title="Vibration"
-                subtitle="Gentle buzz on taps and rewards"
+                title={t("vibration.title")}
+                subtitle={t("vibration.subtitle")}
                 value={hapticsEnabled}
                 onValueChange={(next) => {
                   // Flip the module gate synchronously (the _layout effect also
@@ -687,21 +718,21 @@ const SettingsScreen = () => {
 
           {/* Support Section */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Support</Text>
+            <Text style={styles.sectionTitle}>{t("section.support")}</Text>
             <View style={styles.sectionContent}>
               <SettingsItem
                 icon={faCircleQuestion}
                 iconColor={CRAYON.green.base}
                 iconSecondaryColor={CRAYON.green.light}
-                title="Help & FAQ"
-                subtitle="Get answers to common questions"
+                title={t("help.title")}
+                subtitle={t("help.subtitle")}
                 onPress={handleSupport}
               />
               <SettingsItem
                 icon={faEnvelope}
                 iconColor={COLORS.crayonOrange}
                 iconSecondaryColor={COLORS.secondaryOrange}
-                title="Contact Us"
+                title={t("contact.title")}
                 subtitle="support@chunkycrayon.com"
                 onPress={handleSupport}
               />
@@ -709,8 +740,8 @@ const SettingsScreen = () => {
                 icon={faStar}
                 iconColor={CRAYON.pink.base}
                 iconSecondaryColor={CRAYON.pink.light}
-                title="Rate the App"
-                subtitle="Share your feedback"
+                title={t("rate.title")}
+                subtitle={t("rate.subtitle")}
                 onPress={handleRateApp}
               />
             </View>
@@ -718,20 +749,20 @@ const SettingsScreen = () => {
 
           {/* Legal Section */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Legal</Text>
+            <Text style={styles.sectionTitle}>{t("section.legal")}</Text>
             <View style={styles.sectionContent}>
               <SettingsItem
                 icon={faShieldCheck}
                 iconColor={CRAYON.green.dark}
                 iconSecondaryColor={CRAYON.green.base}
-                title="Privacy Policy"
+                title={t("privacy.title")}
                 onPress={handlePrivacy}
               />
               <SettingsItem
                 icon={faFileLines}
                 iconColor={CRAYON.blue.base}
                 iconSecondaryColor={CRAYON.blue.light}
-                title="Terms of Service"
+                title={t("terms.title")}
                 onPress={handleTerms}
               />
             </View>
@@ -739,14 +770,14 @@ const SettingsScreen = () => {
 
           {/* App Information Section */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>App Information</Text>
+            <Text style={styles.sectionTitle}>{t("section.appInfo")}</Text>
             <View style={styles.sectionContent}>
               <SettingsItem
                 icon={faBookOpen}
                 iconColor={CRAYON.yellow.dark}
                 iconSecondaryColor={CRAYON.yellow.base}
-                title="View Onboarding"
-                subtitle="Replay the welcome tour"
+                title={t("onboarding.title")}
+                subtitle={t("onboarding.subtitle")}
                 onPress={() => {
                   useOnboardingStore.getState().reset();
                   router.replace("/onboarding");
@@ -768,7 +799,7 @@ const SettingsScreen = () => {
                   />
                 </View>
                 <View style={styles.itemContent}>
-                  <Text style={styles.itemTitle}>Version</Text>
+                  <Text style={styles.itemTitle}>{t("version.title")}</Text>
                   <Text style={styles.itemSubtitle}>
                     {Application.nativeApplicationVersion || appVersion}
                     {Application.nativeBuildVersion
@@ -800,10 +831,12 @@ const SettingsScreen = () => {
           {/* Made with love footer */}
           <View style={styles.footerContainer}>
             <View style={styles.madeWithRow}>
-              <Text style={styles.madeWithText}>Made with </Text>
+              <Text style={styles.madeWithText}>{t("madeWith")} </Text>
               <FontAwesomeIcon icon={faHeart} size={12} color="#EF4444" />
-              <Text style={styles.madeWithText}> in </Text>
-              <Text style={styles.madeWithLocation}>South London</Text>
+              <Text style={styles.madeWithText}> {t("madeWithIn")} </Text>
+              <Text style={styles.madeWithLocation}>
+                {t("madeWithLocation")}
+              </Text>
             </View>
           </View>
         </ScrollView>
@@ -818,12 +851,12 @@ const SettingsScreen = () => {
       >
         <View style={styles.modalContainer}>
           <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>Sign In</Text>
+            <Text style={styles.modalTitle}>{t("signInModal.title")}</Text>
             <Pressable
               style={styles.modalCloseButton}
               onPress={() => setSignInModalVisible(false)}
             >
-              <Text style={styles.modalCloseText}>Cancel</Text>
+              <Text style={styles.modalCloseText}>{tButton("cancel")}</Text>
             </Pressable>
           </View>
 
@@ -832,28 +865,28 @@ const SettingsScreen = () => {
               <View style={styles.magicLinkSentIcon}>
                 <FontAwesomeIcon icon={faEnvelope} size={48} color="#E46444" />
               </View>
-              <Text style={styles.magicLinkSentTitle}>Check Your Email!</Text>
+              <Text style={styles.magicLinkSentTitle}>
+                {t("magicLinkSent.title")}
+              </Text>
               <Text style={styles.magicLinkSentText}>
-                We sent a sign-in link to {magicLinkEmail}
+                {t("magicLinkSent.body", { email: magicLinkEmail })}
               </Text>
               <Text style={styles.magicLinkSentSubtext}>
-                Click the link in the email to sign in. The link expires in 15
-                minutes.
+                {t("magicLinkSent.subtext")}
               </Text>
               <Pressable
                 style={styles.magicLinkRetryButton}
                 onPress={() => setMagicLinkSent(false)}
               >
                 <Text style={styles.magicLinkRetryText}>
-                  Use Different Email
+                  {t("magicLinkSent.useDifferentEmail")}
                 </Text>
               </Pressable>
             </View>
           ) : (
             <ScrollView style={styles.modalContent}>
               <Text style={styles.modalSubtitle}>
-                Sign in to sync your artwork across devices and access your
-                account on the web.
+                {t("signInModal.subtitle")}
               </Text>
 
               {/* Social Sign In Buttons */}
@@ -868,7 +901,7 @@ const SettingsScreen = () => {
                     <Text
                       style={[styles.socialButtonText, { color: "#FFFFFF" }]}
                     >
-                      Continue with Apple
+                      {t("signInModal.continueApple")}
                     </Text>
                   </Pressable>
                 )}
@@ -880,7 +913,7 @@ const SettingsScreen = () => {
                 >
                   <FontAwesomeIcon icon={faGoogle} size={20} color="#EA4335" />
                   <Text style={styles.socialButtonText}>
-                    Continue with Google
+                    {t("signInModal.continueGoogle")}
                   </Text>
                 </Pressable>
 
@@ -896,7 +929,7 @@ const SettingsScreen = () => {
                       color="#1877F2"
                     />
                     <Text style={styles.socialButtonText}>
-                      Continue with Facebook
+                      {t("signInModal.continueFacebook")}
                     </Text>
                   </Pressable>
                 )}
@@ -904,16 +937,18 @@ const SettingsScreen = () => {
 
               <View style={styles.dividerContainer}>
                 <View style={styles.dividerLine} />
-                <Text style={styles.dividerText}>or</Text>
+                <Text style={styles.dividerText}>{t("signInModal.or")}</Text>
                 <View style={styles.dividerLine} />
               </View>
 
               {/* Magic Link */}
               <View style={styles.magicLinkContainer}>
-                <Text style={styles.magicLinkLabel}>Sign in with email</Text>
+                <Text style={styles.magicLinkLabel}>
+                  {t("signInModal.emailLabel")}
+                </Text>
                 <TextInput
                   style={styles.magicLinkInput}
-                  placeholder="Enter your email"
+                  placeholder={t("signInModal.emailPlaceholder")}
                   placeholderTextColor="#9CA3AF"
                   value={magicLinkEmail}
                   onChangeText={setMagicLinkEmail}
@@ -934,15 +969,14 @@ const SettingsScreen = () => {
                     <Spinner size={20} color="#FFFFFF" />
                   ) : (
                     <Text style={styles.magicLinkButtonText}>
-                      Send Magic Link
+                      {t("signInModal.sendMagicLink")}
                     </Text>
                   )}
                 </Pressable>
               </View>
 
               <Text style={styles.privacyNote}>
-                By signing in, you agree to our Terms of Service and Privacy
-                Policy.
+                {t("signInModal.privacyNote")}
               </Text>
             </ScrollView>
           )}
@@ -972,10 +1006,10 @@ const SettingsScreen = () => {
       <ConfirmSheet
         isOpen={signOutConfirmOpen}
         onClose={() => setSignOutConfirmOpen(false)}
-        title="Sign out?"
-        description="Your artwork will stay on this device."
+        title={t("signOutConfirm.title")}
+        description={t("signOutConfirm.description")}
         icon={faRightFromBracket}
-        confirmLabel="Sign Out"
+        confirmLabel={t("signOutConfirm.confirm")}
         onConfirm={confirmSignOut}
         tone="destructive"
       />

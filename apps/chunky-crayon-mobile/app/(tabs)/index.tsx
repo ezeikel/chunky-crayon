@@ -135,7 +135,7 @@ const HomeScreen = () => {
                 secondaryOpacity={1}
               />
               <Text style={styles.greeting}>
-                What do you want to color today?
+                {t("home.greeting")}
               </Text>
               <FontAwesomeIcon
                 icon={faSparkles}
@@ -153,10 +153,12 @@ const HomeScreen = () => {
             {!coloLoading && coloState.progressToNext && (
               <View style={styles.encouragementRow}>
                 <Text style={styles.encouragement}>
-                  {coloState.stageName} wants to grow! Save{" "}
-                  {coloState.progressToNext.required -
-                    coloState.progressToNext.current}{" "}
-                  more artworks to evolve!
+                  {t("home.coloWantsToGrow", {
+                    stageName: coloState.stageName,
+                    count:
+                      coloState.progressToNext.required -
+                      coloState.progressToNext.current,
+                  })}
                 </Text>
                 <FontAwesomeIcon
                   icon={faPalette}
@@ -168,7 +170,7 @@ const HomeScreen = () => {
             {!coloLoading && !coloState.progressToNext && (
               <View style={styles.encouragementRow}>
                 <Text style={styles.encouragement}>
-                  Your {coloState.stageName} is so proud of you!
+                  {t("home.coloProud", { stageName: coloState.stageName })}
                 </Text>
                 <FontAwesomeIcon
                   icon={faStar}
@@ -202,14 +204,14 @@ const HomeScreen = () => {
               needed. The create form above stays the co-equal hero; this is
               the lower-effort alternative, surfaced prominently. */}
           <SectionHeader
-            title="What do you like?"
+            title={t("home.whatDoYouLike")}
             icon={faShapes}
             tint="purple"
             style={styles.librarySectionHeader}
             right={
               <SeeAllButton
                 onPress={() => router.push("/categories")}
-                accessibilityLabel="See all categories"
+                accessibilityLabel={t("home.seeAllCategories")}
               />
             }
           />
@@ -229,7 +231,7 @@ const HomeScreen = () => {
                 router.push("/category/all");
               }}
               accessibilityRole="button"
-              accessibilityLabel="Discover more coloring pages"
+              accessibilityLabel={t("home.discoverMoreA11y")}
             >
               <FontAwesomeIcon
                 icon={faImages}
@@ -238,7 +240,9 @@ const HomeScreen = () => {
                 secondaryColor={COLORS.secondaryOrange}
                 secondaryOpacity={1}
               />
-              <Text style={styles.discoverMoreText}>Discover more</Text>
+              <Text style={styles.discoverMoreText}>
+                {t("home.discoverMore")}
+              </Text>
             </Pressable>
           </View>
 

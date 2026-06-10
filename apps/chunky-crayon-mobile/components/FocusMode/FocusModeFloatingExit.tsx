@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faXmark } from "@fortawesome/pro-solid-svg-icons";
 import { useFocusMode } from "./FocusModeProvider";
 import { tapLight } from "@/utils/haptics";
+import { useT } from "@/lib/i18n/useT";
 
 /**
  * Floating exit X shown only when focus mode is active. Pins to the
@@ -32,6 +33,7 @@ type FocusModeFloatingExitProps = {
 const FocusModeFloatingExit = ({
   rightInset = 0,
 }: FocusModeFloatingExitProps) => {
+  const t = useT("mobile.coloring");
   const { isFocusMode, exitFocus } = useFocusMode();
   const insets = useSafeAreaInsets();
 
@@ -51,7 +53,7 @@ const FocusModeFloatingExit = ({
         },
         pressed && styles.pressed,
       ]}
-      accessibilityLabel="Exit focus mode"
+      accessibilityLabel={t("exitFocusMode")}
     >
       <FontAwesomeIcon icon={faXmark} size={20} color="#3D2C1E" />
     </Pressable>

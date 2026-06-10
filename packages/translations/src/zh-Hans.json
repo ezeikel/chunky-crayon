@@ -445,7 +445,8 @@
     "currentLanguage": "当前语言",
     "selectLanguage": "选择语言",
     "language": "语言",
-    "switchTo": "切换到"
+    "switchTo": "切换到",
+    "title": "语言"
   },
   "difficulty": {
     "easy": "简单",
@@ -454,6 +455,40 @@
   },
   "gallery": {
     "categoryNotFound": "未找到分类",
-    "difficultyNotFound": "未找到难度"
+    "difficultyNotFound": "未找到难度",
+    "category": {
+      "animals": "动物",
+      "dinosaurs": "恐龙",
+      "dragons": "龙",
+      "fantasy": "奇幻与魔法",
+      "food": "美食与甜点",
+      "holidays": "节日与季节",
+      "nature": "自然与花卉",
+      "pirates": "海盗",
+      "princesses": "公主与王室",
+      "robots": "机器人与科技",
+      "space": "太空与宇航员",
+      "superheroes": "超级英雄",
+      "underwater": "海底与海洋",
+      "unicorns": "独角兽",
+      "vehicles": "车辆与交通"
+    },
+    "categoryDescription": {
+      "animals": "适合儿童和成人的可爱与野生动物涂色页",
+      "dinosaurs": "适合所有年龄的史前恐龙涂色页",
+      "dragons": "从可爱到凶猛的史诗巨龙涂色页",
+      "fantasy": "魔法生物与奇幻世界涂色页",
+      "food": "美味美食、糖果与甜品涂色页",
+      "holidays": "圣诞节、复活节、万圣节及四季涂色页",
+      "nature": "美丽自然风景与花卉涂色页",
+      "pirates": "惊险刺激的海盗冒险涂色页",
+      "princesses": "公主、王子与城堡涂色页",
+      "robots": "未来感机器人与科技涂色页",
+      "space": "外太空、火箭与宇航员涂色页",
+      "superheroes": "动作满满的超级英雄涂色页",
+      "underwater": "海洋生物与海底冒险涂色页",
+      "unicorns": "美丽独角兽与彩虹涂色页",
+      "vehicles": "汽车、卡车、飞机与火车涂色页"
+    }
   }
 }

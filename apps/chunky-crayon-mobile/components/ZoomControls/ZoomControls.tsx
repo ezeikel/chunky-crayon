@@ -12,6 +12,7 @@ import {
 import { faHand } from "@fortawesome/pro-duotone-svg-icons";
 import { useCanvasStore, Tool } from "@/stores/canvasStore";
 import { tapLight, tapMedium } from "@/utils/haptics";
+import { useT } from "@/lib/i18n/useT";
 import { COLORS } from "@/lib/design";
 
 const MIN_ZOOM = 1;
@@ -40,6 +41,7 @@ type ZoomControlsProps = {
  * - Coral color scheme (#E46444)
  */
 const ZoomControls = ({ style, trailing }: ZoomControlsProps) => {
+  const t = useT("mobile.coloring");
   // Narrow selectors (was whole-store useCanvasStore() → re-rendered on every
   // stroke). No history dep here.
   const scale = useCanvasStore((s) => s.scale);
@@ -100,6 +102,8 @@ const ZoomControls = ({ style, trailing }: ZoomControlsProps) => {
       <Pressable
         onPress={handleZoomOut}
         disabled={!canZoomOut}
+        accessibilityRole="button"
+        accessibilityLabel={t("zoomOut")}
         style={[styles.button, !canZoomOut && styles.buttonDisabled]}
       >
         <FontAwesomeIcon
@@ -117,6 +121,8 @@ const ZoomControls = ({ style, trailing }: ZoomControlsProps) => {
       <Pressable
         onPress={handleZoomIn}
         disabled={!canZoomIn}
+        accessibilityRole="button"
+        accessibilityLabel={t("zoomIn")}
         style={[styles.button, !canZoomIn && styles.buttonDisabled]}
       >
         <FontAwesomeIcon
@@ -130,6 +136,9 @@ const ZoomControls = ({ style, trailing }: ZoomControlsProps) => {
       {isZoomed && (
         <Pressable
           onPress={handlePanToggle}
+          accessibilityRole="button"
+          accessibilityLabel={t("panMode")}
+          accessibilityState={{ selected: isPanActive }}
           style={[styles.button, isPanActive && styles.buttonActive]}
         >
           <FontAwesomeIcon
@@ -142,7 +151,12 @@ const ZoomControls = ({ style, trailing }: ZoomControlsProps) => {
 
       {/* Reset view button - only shown when zoomed (accent-tinted, web parity) */}
       {isZoomed && (
-        <Pressable onPress={handleResetView} style={styles.resetButton}>
+        <Pressable
+          onPress={handleResetView}
+          accessibilityRole="button"
+          accessibilityLabel={t("seeWholePicture")}
+          style={styles.resetButton}
+        >
           <FontAwesomeIcon icon={faHouse} size={18} color={ACCENT} />
         </Pressable>
       )}

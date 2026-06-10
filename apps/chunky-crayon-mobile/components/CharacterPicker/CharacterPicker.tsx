@@ -13,6 +13,7 @@ import Animated, {
 import { useCharacters } from "@/hooks/api";
 import type { Character } from "@/api";
 import { tapLight } from "@/utils/haptics";
+import { useT } from "@/lib/i18n/useT";
 import { COLORS, FONTS } from "@/lib/design";
 
 /**
@@ -57,11 +58,13 @@ const FriendDisc = ({
   character,
   index,
   selected,
+  accessibilityLabel,
   onPress,
 }: {
   character: Character;
   index: number;
   selected: boolean;
+  accessibilityLabel: string;
   onPress: () => void;
 }) => {
   const scale = useSharedValue(selected ? 1.06 : 1);
@@ -86,7 +89,7 @@ const FriendDisc = ({
       }}
       accessibilityRole="button"
       accessibilityState={{ selected }}
-      accessibilityLabel={`Include ${character.name}, a ${character.species}`}
+      accessibilityLabel={accessibilityLabel}
       style={styles.item}
     >
       <Animated.View
@@ -126,6 +129,7 @@ const FriendDisc = ({
 };
 
 const CharacterPicker = ({ value, onChange }: Props) => {
+  const t = useT("createForm.friendPicker");
   const { data, isLoading } = useCharacters();
   const ready = (data?.characters ?? []).filter((c) => c.status === "READY");
 
@@ -138,7 +142,8 @@ const CharacterPicker = ({ value, onChange }: Props) => {
     return (
       <View style={styles.root}>
         <Text style={styles.header}>
-          Add a friend <Text style={styles.headerMuted}>(optional)</Text>
+          {t("header")}{" "}
+          <Text style={styles.headerMuted}>{t("optional")}</Text>
         </Text>
         <View style={styles.row}>
           {[0, 1, 2].map((i) => (
@@ -154,12 +159,13 @@ const CharacterPicker = ({ value, onChange }: Props) => {
     return (
       <View style={styles.root}>
         <Text style={styles.header}>
-          Add a friend <Text style={styles.headerMuted}>(optional)</Text>
+          {t("header")}{" "}
+          <Text style={styles.headerMuted}>{t("optional")}</Text>
         </Text>
         <Pressable
           onPress={goToCharacters}
           accessibilityRole="button"
-          accessibilityLabel="Make a friend"
+          accessibilityLabel={t("makeFriend")}
           style={styles.emptyRow}
         >
           <View style={styles.emptyIcon}>
@@ -172,8 +178,8 @@ const CharacterPicker = ({ value, onChange }: Props) => {
             />
           </View>
           <Text style={styles.emptyText}>
-            <Text style={styles.emptyTextBold}>Make a friend</Text> who shows up
-            in your pages!
+            <Text style={styles.emptyTextBold}>{t("makeFriend")}</Text>
+            {t("emptyInviteSuffix")}
           </Text>
         </Pressable>
       </View>
@@ -183,7 +189,7 @@ const CharacterPicker = ({ value, onChange }: Props) => {
   return (
     <View style={styles.root}>
       <Text style={styles.header}>
-        Add a friend <Text style={styles.headerMuted}>(optional)</Text>
+        {t("header")} <Text style={styles.headerMuted}>{t("optional")}</Text>
       </Text>
       <ScrollView
         horizontal
@@ -198,7 +204,7 @@ const CharacterPicker = ({ value, onChange }: Props) => {
           }}
           accessibilityRole="button"
           accessibilityState={{ selected: value === null }}
-          accessibilityLabel="No friend"
+          accessibilityLabel={t("noFriend")}
           style={styles.item}
         >
           <View
@@ -218,7 +224,7 @@ const CharacterPicker = ({ value, onChange }: Props) => {
             style={[styles.label, value === null && styles.labelSelected]}
             numberOfLines={1}
           >
-            No friend
+            {t("noFriend")}
           </Text>
         </Pressable>
 
@@ -228,6 +234,10 @@ const CharacterPicker = ({ value, onChange }: Props) => {
             character={c}
             index={i}
             selected={value === c.id}
+            accessibilityLabel={t("includeFriendA11y", {
+              name: c.name,
+              species: c.species,
+            })}
             onPress={() => onChange(c.id)}
           />
         ))}
@@ -236,7 +246,7 @@ const CharacterPicker = ({ value, onChange }: Props) => {
         <Pressable
           onPress={goToCharacters}
           accessibilityRole="button"
-          accessibilityLabel="Make a new friend"
+          accessibilityLabel={t("makeNewFriend")}
           style={styles.item}
         >
           <View style={[styles.disc, styles.discAdd]}>
@@ -254,7 +264,7 @@ const CharacterPicker = ({ value, onChange }: Props) => {
             />
           </View>
           <Text style={[styles.label, styles.labelAdd]} numberOfLines={1}>
-            New friend
+            {t("newFriend")}
           </Text>
         </Pressable>
       </ScrollView>

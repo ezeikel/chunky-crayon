@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faStar } from "@fortawesome/pro-solid-svg-icons";
 import SquishyPressable from "@/components/SquishyPressable";
 import { PAYWALL_COIN } from "@/lib/paywall/assets";
+import { useT } from "@/lib/i18n/useT";
 
 /**
  * One credit-pack row, shared by the two credit-pack paywalls
@@ -29,41 +30,49 @@ const CreditPackRow = ({
   isBestValue = false,
   disabled = false,
   onPress,
-}: CreditPackRowProps) => (
-  <SquishyPressable
-    onPress={onPress}
-    disabled={disabled}
-    scaleTo={0.97}
-    accessibilityRole="button"
-    accessibilityLabel={`${credits} credits for ${price}${isBestValue ? ", best value" : ""}`}
-    style={styles.pressable}
-  >
-    <View style={[styles.row, isBestValue && styles.rowBestValue]}>
-      {isBestValue && (
-        <View style={styles.badge}>
-          <FontAwesomeIcon icon={faStar} size={9} color="#FFFFFF" />
-          <Text style={styles.badgeText}>Best Value</Text>
+}: CreditPackRowProps) => {
+  const t = useT("mobile.creditPack");
+
+  return (
+    <SquishyPressable
+      onPress={onPress}
+      disabled={disabled}
+      scaleTo={0.97}
+      accessibilityRole="button"
+      accessibilityLabel={
+        isBestValue
+          ? t("rowA11yBestValue", { credits, price })
+          : t("rowA11y", { credits, price })
+      }
+      style={styles.pressable}
+    >
+      <View style={[styles.row, isBestValue && styles.rowBestValue]}>
+        {isBestValue && (
+          <View style={styles.badge}>
+            <FontAwesomeIcon icon={faStar} size={9} color="#FFFFFF" />
+            <Text style={styles.badgeText}>{t("bestValue")}</Text>
+          </View>
+        )}
+
+        <Image
+          source={PAYWALL_COIN}
+          style={styles.coin}
+          contentFit="contain"
+          transition={150}
+        />
+
+        <View style={styles.info}>
+          <Text style={styles.credits}>{credits}</Text>
+          <Text style={styles.creditsLabel}>{t("creditsLabel")}</Text>
         </View>
-      )}
 
-      <Image
-        source={PAYWALL_COIN}
-        style={styles.coin}
-        contentFit="contain"
-        transition={150}
-      />
-
-      <View style={styles.info}>
-        <Text style={styles.credits}>{credits}</Text>
-        <Text style={styles.creditsLabel}>credits</Text>
+        <View style={styles.pricePill}>
+          <Text style={styles.priceText}>{price}</Text>
+        </View>
       </View>
-
-      <View style={styles.pricePill}>
-        <Text style={styles.priceText}>{price}</Text>
-      </View>
-    </View>
-  </SquishyPressable>
-);
+    </SquishyPressable>
+  );
+};
 
 const styles = StyleSheet.create({
   pressable: {

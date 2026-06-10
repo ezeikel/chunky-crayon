@@ -28,6 +28,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faCheck } from "@fortawesome/pro-duotone-svg-icons";
 import { deleteCanvasState } from "@/utils/canvasPersistence";
 import { useResponsiveLayout } from "@/hooks/useResponsiveLayout";
+import { useT } from "@/lib/i18n/useT";
 import {
   ONBOARDING_SCENES,
   type OnboardingScene,
@@ -65,6 +66,7 @@ const OnboardingColoringSlide = ({
   setScroll,
   isActive = true,
 }: OnboardingColoringSlideProps) => {
+  const t = useT("mobile.onboarding");
   const insets = useSafeAreaInsets();
   const { coloringTier, deviceInfo } = useResponsiveLayout();
   const useSidebars = coloringTier === "three-column";
@@ -260,14 +262,14 @@ const OnboardingColoringSlide = ({
           style={[styles.skipButton, { top: insets.top + 4 }]}
           onPress={onSkip}
         >
-          <Text style={styles.skipButtonText}>Skip</Text>
+          <Text style={styles.skipButtonText}>{t("skip")}</Text>
         </Pressable>
       )}
 
       <Animated.View entering={FadeIn.duration(400)} style={styles.header}>
-        <Text style={styles.title}>Your Turn to Create!</Text>
+        <Text style={styles.title}>{t("coloring.title")}</Text>
         {showChrome && (
-          <Text style={styles.subtitle}>Pick a scene and color Colo in</Text>
+          <Text style={styles.subtitle}>{t("coloring.subtitle")}</Text>
         )}
       </Animated.View>
 
@@ -293,7 +295,7 @@ const OnboardingColoringSlide = ({
           style={[styles.doneFab, { bottom: insets.bottom + 20 }]}
           onPress={handleDone}
           accessibilityRole="button"
-          accessibilityLabel="Done"
+          accessibilityLabel={t("coloring.doneA11y")}
         >
           <FontAwesomeIcon icon={faCheck} size={24} color="#FFFFFF" />
         </Pressable>
@@ -313,10 +315,10 @@ const OnboardingColoringSlide = ({
             style={styles.donePill}
             onPress={handleDone}
             accessibilityRole="button"
-            accessibilityLabel="Done"
+            accessibilityLabel={t("coloring.doneA11y")}
           >
             <FontAwesomeIcon icon={faCheck} size={18} color="#FFFFFF" />
-            <Text style={styles.donePillText}>I&apos;m Done</Text>
+            <Text style={styles.donePillText}>{t("coloring.done")}</Text>
           </Pressable>
           {picker}
           {tools}
@@ -339,6 +341,7 @@ const OnboardingColoringSlide = ({
 
 /** "Amazing!" celebration text with a spring bounce. */
 const CelebrationText = () => {
+  const t = useT("mobile.onboarding");
   const scale = useSharedValue(0.5);
   useEffect(() => {
     scale.value = withSpring(1, { damping: 8, stiffness: 120 });
@@ -351,9 +354,11 @@ const CelebrationText = () => {
       entering={ZoomIn.duration(400)}
       style={[styles.celebration, animatedStyle]}
     >
-      <Text style={styles.celebrationText}>Amazing!</Text>
+      <Text style={styles.celebrationText}>
+        {t("coloring.celebrationTitle")}
+      </Text>
       <Text style={styles.celebrationSubtext}>
-        You&apos;re a natural artist
+        {t("coloring.celebrationSubtitle")}
       </Text>
     </Animated.View>
   );

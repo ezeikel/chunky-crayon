@@ -34,6 +34,7 @@ import {
 import SubscriptionPaywallModal from "../SubscriptionPaywallModal";
 import TopUpPackModal from "../TopUpPackModal";
 import Spinner from "../Spinner/Spinner";
+import { useT } from "@/lib/i18n/useT";
 
 type SubscriptionManagerProps = {
   visible: boolean;
@@ -49,6 +50,7 @@ const SubscriptionManager = ({
   visible,
   onClose,
 }: SubscriptionManagerProps) => {
+  const t = useT("mobile.subscriptionManager");
   const { data: entitlements, isPending } = useEntitlements();
   const refreshEntitlements = useRefreshEntitlements();
   const restorePurchases = useRestorePurchases();
@@ -100,20 +102,20 @@ const SubscriptionManager = ({
 
     let bgColor = "#DEF7EC";
     let textColor = "#03543F";
-    let label = "Active";
+    let label = t("status.active");
 
     if (entitlements?.isTrialing) {
       bgColor = "#E8DEFC";
       textColor = "#5B21B6";
-      label = "Trial";
+      label = t("status.trial");
     } else if (entitlements?.isCancelled) {
       bgColor = "#FEF3C7";
       textColor = "#92400E";
-      label = "Cancelled";
+      label = t("status.cancelled");
     } else if (entitlements?.status === "PAST_DUE") {
       bgColor = "#FEE2E2";
       textColor = "#991B1B";
-      label = "Payment Issue";
+      label = t("status.paymentIssue");
     }
 
     return (
@@ -145,19 +147,21 @@ const SubscriptionManager = ({
           <View style={styles.planInfo}>
             <View style={styles.planNameRow}>
               <Text style={styles.planName}>
-                {PLAN_DISPLAY_NAMES_WITH_FREE[plan]} Plan
+                {t("planName", { plan: PLAN_DISPLAY_NAMES_WITH_FREE[plan] })}
               </Text>
               {renderStatusBadge()}
             </View>
             {hasSubscription && expirationDate && (
               <Text style={styles.planDetail}>
-                {entitlements?.isCancelled ? "Access until" : "Renews"}{" "}
+                {entitlements?.isCancelled
+                  ? t("accessUntil")
+                  : t("renews")}{" "}
                 {expirationDate}
               </Text>
             )}
             {!hasSubscription && (
               <Text style={styles.planDetail}>
-                {entitlements ? "No active subscription" : ""}
+                {entitlements ? t("noActiveSubscription") : ""}
               </Text>
             )}
           </View>
@@ -166,7 +170,7 @@ const SubscriptionManager = ({
         <View style={styles.creditsRow}>
           <FontAwesomeIcon icon={faCoins} size={16} color="#F1AE7E" />
           <Text style={styles.creditsText}>
-            {credits} credit{credits !== 1 ? "s" : ""} available
+            {t("creditsAvailable", { count: credits })}
           </Text>
         </View>
       </View>
@@ -181,7 +185,7 @@ const SubscriptionManager = ({
 
     return (
       <View style={styles.featuresCard}>
-        <Text style={styles.featuresTitle}>Your Plan Includes</Text>
+        <Text style={styles.featuresTitle}>{t("planIncludes")}</Text>
         {features.map((feature) => (
           <View key={feature} style={styles.featureRow}>
             <FontAwesomeIcon icon={faCheck} size={14} color="#22C55E" />
@@ -202,7 +206,7 @@ const SubscriptionManager = ({
       <View style={styles.container}>
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>Subscription & Credits</Text>
+          <Text style={styles.headerTitle}>{t("title")}</Text>
           <Pressable style={styles.closeButton} onPress={handleClose}>
             <FontAwesomeIcon icon={faXmark} size={20} color="#6B7280" />
           </Pressable>
@@ -233,7 +237,9 @@ const SubscriptionManager = ({
                   onPress={handleSubscribe}
                 >
                   <FontAwesomeIcon icon={faGem} size={18} color="#FFFFFF" />
-                  <Text style={styles.primaryButtonText}>Subscribe Now</Text>
+                  <Text style={styles.primaryButtonText}>
+                    {t("subscribeNow")}
+                  </Text>
                 </Pressable>
               )}
 
@@ -250,7 +256,9 @@ const SubscriptionManager = ({
                     size={18}
                     color="#FFFFFF"
                   />
-                  <Text style={styles.primaryButtonText}>Upgrade Plan</Text>
+                  <Text style={styles.primaryButtonText}>
+                    {t("upgradePlan")}
+                  </Text>
                 </Pressable>
               )}
 
@@ -262,7 +270,9 @@ const SubscriptionManager = ({
                 onPress={handleBuyCredits}
               >
                 <FontAwesomeIcon icon={faCoins} size={18} color="#E46444" />
-                <Text style={styles.secondaryButtonText}>Buy Credits</Text>
+                <Text style={styles.secondaryButtonText}>
+                  {t("buyCredits")}
+                </Text>
               </Pressable>
 
               {hasSubscription && (
@@ -279,7 +289,7 @@ const SubscriptionManager = ({
                     color="#E46444"
                   />
                   <Text style={styles.secondaryButtonText}>
-                    Manage Subscription
+                    {t("manageSubscription")}
                   </Text>
                 </Pressable>
               )}
@@ -296,16 +306,16 @@ const SubscriptionManager = ({
               ) : (
                 <>
                   <FontAwesomeIcon icon={faRotate} size={14} color="#9CA3AF" />
-                  <Text style={styles.restoreText}>Restore Purchases</Text>
+                  <Text style={styles.restoreText}>{t("restorePurchases")}</Text>
                 </>
               )}
             </Pressable>
 
             {/* Legal Footer */}
             <Text style={styles.legalText}>
-              Subscriptions auto-renew unless cancelled at least 24 hours before
-              the end of the current period. Manage or cancel anytime in your{" "}
-              {Platform.OS === "ios" ? "App Store" : "Play Store"} settings.
+              {t("legal", {
+                store: Platform.OS === "ios" ? "App Store" : "Play Store",
+              })}
             </Text>
           </ScrollView>
         )}

@@ -25,6 +25,7 @@ import { toast } from "@/components/Toaster";
 import PaywallRouter from "@/components/PaywallRouter";
 import { track } from "@/utils/analytics";
 import { ANALYTICS_EVENTS } from "@/constants/analytics";
+import { useT } from "@/lib/i18n/useT";
 
 type ColoringImage = {
   id: string;
@@ -40,6 +41,7 @@ const CREDITS_PER_GENERATION = 5;
 const VOICE_CREDIT_COST = 10;
 
 const CreateColoringImageFormContent = () => {
+  const t = useT("createForm.error");
   const { mode, description, isProcessing, reset } = useInputMode();
   const [isSubmitting, setIsSubmitting] = useState(false);
   // Text-mode "Add a friend": the selected character to feature in the page,
@@ -102,11 +104,11 @@ const CreateColoringImageFormContent = () => {
         ) {
           setShowPaywall(true);
         } else if (result.error === "moderation_blocked") {
-          toast.error("Let's try a different idea for your picture!");
+          toast.error(t("moderationBlocked"));
         } else if (result.error === "character_not_ready") {
-          toast.error("That friend isn't ready yet. Try again in a moment.");
+          toast.error(t("characterNotReady"));
         } else {
-          toast.error("Something went wrong. Please try again.");
+          toast.error(t("generic"));
         }
         return;
       }
@@ -133,7 +135,7 @@ const CreateColoringImageFormContent = () => {
     } catch (error) {
       track(ANALYTICS_EVENTS.CREATION_FAILED, { error: String(error) });
       console.error("Failed to create coloring image:", error);
-      toast.error("Something went wrong. Please try again.");
+      toast.error(t("generic"));
     } finally {
       setIsSubmitting(false);
     }
@@ -146,6 +148,7 @@ const CreateColoringImageFormContent = () => {
     credits,
     refreshEntitlements,
     isSubscriber,
+    t,
   ]);
 
   const handleColoringImageCreated = useCallback(

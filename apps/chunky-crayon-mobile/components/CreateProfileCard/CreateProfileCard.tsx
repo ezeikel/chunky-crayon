@@ -3,6 +3,7 @@ import { View, Text, Pressable, TextInput, StyleSheet } from "react-native";
 import Spinner from "@/components/Spinner/Spinner";
 import ProfileAvatar from "@/components/ProfileAvatar";
 import AvatarPicker from "@/components/AvatarPicker";
+import { useT } from "@/lib/i18n/useT";
 import { DEFAULT_AVATAR_ID } from "@/lib/avatars";
 
 /**
@@ -39,6 +40,8 @@ const CreateProfileCard = ({
   initialName = "",
   initialAvatarId = DEFAULT_AVATAR_ID,
 }: CreateProfileCardProps) => {
+  const t = useT("mobile.createProfile");
+  const tButton = useT("mobile.button");
   const [name, setName] = useState(initialName);
   const [avatarId, setAvatarId] = useState(initialAvatarId);
 
@@ -57,7 +60,7 @@ const CreateProfileCard = ({
           size="xl"
           showBorder
         />
-        <Text style={styles.previewLabel}>Pick your character</Text>
+        <Text style={styles.previewLabel}>{t("pickCharacter")}</Text>
       </View>
 
       <AvatarPicker selectedAvatarId={avatarId} onSelect={setAvatarId} />
@@ -66,7 +69,7 @@ const CreateProfileCard = ({
         style={styles.nameInput}
         value={name}
         onChangeText={setName}
-        placeholder="What's your name?"
+        placeholder={t("namePlaceholder")}
         placeholderTextColor="#9CA3AF"
         autoFocus
         maxLength={20}
@@ -74,7 +77,7 @@ const CreateProfileCard = ({
 
       <View style={styles.actions}>
         <Pressable style={styles.cancelButton} onPress={onCancel}>
-          <Text style={styles.cancelText}>Cancel</Text>
+          <Text style={styles.cancelText}>{tButton("cancel")}</Text>
         </Pressable>
         <Pressable
           style={[
@@ -90,7 +93,7 @@ const CreateProfileCard = ({
           {isSubmitting ? (
             <Spinner size={18} color="#FFFFFF" />
           ) : (
-            <Text style={styles.submitText}>Create</Text>
+            <Text style={styles.submitText}>{t("create")}</Text>
           )}
         </Pressable>
       </View>

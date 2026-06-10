@@ -12,6 +12,7 @@ import Animated, {
   Easing,
 } from "react-native-reanimated";
 import Spinner from "@/components/Spinner/Spinner";
+import { useT } from "@/lib/i18n/useT";
 import { COLORS, FONTS } from "@/lib/design";
 
 /**
@@ -23,31 +24,30 @@ import { COLORS, FONTS } from "@/lib/design";
  * Kid-friendly: a gently pulsing wand medallion + a reassuring line + spinner,
  * on the app's warm cream gradient. No emoji (FA duotone per the brand).
  */
-// The 8 rotating loading messages, copied from web's `coloLoading.messages`
-// (apps/chunky-crayon-web/messages/en.json). Cycled on a slow 4s beat — gentle
-// for ages 3-8. English-only for now; web keeps them in its messages files
-// under coloLoading.
-// TODO(i18n): fold into the shared translations when the i18n rework lands
-// (the CC/CH shared-translations setup is being reworked, so not promoting now).
-const LOADING_MESSAGES = [
-  "Sharpening the crayons",
-  "Mixing some new colors",
-  "Drawing the outlines",
-  "Sneaking in some sparkles",
-  "Putting on the finishing touches",
-  "Making it just right",
-  "Checking everything looks good",
-  "Trying not to color outside the lines",
-];
+// The 8 rotating loading messages, ported verbatim from web's
+// `coloLoading.messages` (apps/chunky-crayon-web/messages/en.json) into
+// mobile.coloring.generating.messages.*. Cycled on a slow 4s beat — gentle
+// for ages 3-8.
+const LOADING_MESSAGE_KEYS = [
+  "generating.messages.sharpeningCrayons",
+  "generating.messages.mixingColors",
+  "generating.messages.drawingLines",
+  "generating.messages.addingSparkles",
+  "generating.messages.almostThere",
+  "generating.messages.creatingMasterpiece",
+  "generating.messages.wavingWand",
+  "generating.messages.coloringOutsideLines",
+] as const;
 const MESSAGE_INTERVAL_MS = 4000;
 
 const GeneratingScreen = () => {
+  const t = useT("mobile.coloring");
   const pulse = useSharedValue(1);
   const [messageIndex, setMessageIndex] = useState(0);
 
   useEffect(() => {
     const id = setInterval(() => {
-      setMessageIndex((i) => (i + 1) % LOADING_MESSAGES.length);
+      setMessageIndex((i) => (i + 1) % LOADING_MESSAGE_KEYS.length);
     }, MESSAGE_INTERVAL_MS);
     return () => clearInterval(id);
   }, []);
@@ -79,8 +79,10 @@ const GeneratingScreen = () => {
             secondaryOpacity={1}
           />
         </Animated.View>
-        <Text style={styles.title}>Making your coloring page…</Text>
-        <Text style={styles.subtitle}>{LOADING_MESSAGES[messageIndex]}</Text>
+        <Text style={styles.title}>{t("generating.title")}</Text>
+        <Text style={styles.subtitle}>
+          {t(LOADING_MESSAGE_KEYS[messageIndex])}
+        </Text>
         {/* No color prop → brand duotone faSpinnerThird (orange + teal @ 0.6).
             Passing an explicit color forced it monotone (the plain ring look). */}
         <Spinner size={28} />

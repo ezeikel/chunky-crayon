@@ -6,6 +6,7 @@ import { UndoIcon, RedoIcon } from "@/components/coloring/StrokeIcons";
 import { COLORING_MAGIC_TOOLS, COLORING_TOOLS } from "@/lib/coloring/tools";
 import { useCanvasStore } from "@/stores/canvasStore";
 import { COLORS } from "@/lib/design";
+import { useT } from "@/lib/i18n/useT";
 import { selectionChanged, tapMedium, notifyWarning } from "@/utils/haptics";
 
 // The basic tools surfaced in onboarding (the real configs from the live
@@ -36,6 +37,7 @@ type SlimColoringToolsProps = {
 };
 
 const SlimColoringTools = ({ direction = "row" }: SlimColoringToolsProps) => {
+  const t = useT("mobile.coloring");
   const selectedTool = useCanvasStore((s) => s.selectedTool);
   const brushType = useCanvasStore((s) => s.brushType);
   const magicMode = useCanvasStore((s) => s.magicMode);
@@ -191,8 +193,8 @@ const SlimColoringTools = ({ direction = "row" }: SlimColoringToolsProps) => {
 
   const undoRedo = (
     <View style={[styles.toolRow, { gap: rowGap }]}>
-      {historyTile(undoEnabled, handleUndo, UndoIcon, "Undo")}
-      {historyTile(redoEnabled, handleRedo, RedoIcon, "Redo")}
+      {historyTile(undoEnabled, handleUndo, UndoIcon, t("undo"))}
+      {historyTile(redoEnabled, handleRedo, RedoIcon, t("redo"))}
     </View>
   );
 

@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { getCategoryBySlug } from "@one-colored-pixel/coloring-core/gallery";
 import ColoringImages from "@/components/ColoringImages/ColoringImages";
 import { getCategoryPresentation } from "@/lib/gallery/categoryPresentation";
+import { useT } from "@/lib/i18n/useT";
 import { COLORS } from "@/lib/design";
 
 /**
@@ -14,6 +15,13 @@ import { COLORS } from "@/lib/design";
  */
 const CategoryScreen = () => {
   const { slug } = useLocalSearchParams<{ slug: string }>();
+  const t = useT("mobile.category");
+  // Category names + descriptions come from the shared catalog (slug-keyed);
+  // we resolve their translations at the render site via a slug -> key lookup
+  // (gallery.category.<slug> / gallery.categoryDescription.<slug>) rather than
+  // editing the shared catalog source.
+  const tCategoryName = useT("gallery.category");
+  const tCategoryDescription = useT("gallery.categoryDescription");
 
   // "all" is the browse-everything surface (unfiltered full library) — the
   // Gallery tab's "Browse all pages" entry. Reuses this same screen so there's
@@ -21,7 +29,7 @@ const CategoryScreen = () => {
   if (slug === "all") {
     return (
       <>
-        <Stack.Screen options={{ headerTitle: "All coloring pages" }} />
+        <Stack.Screen options={{ headerTitle: t("allTitle") }} />
         <View style={styles.root}>
           <LinearGradient
             colors={["#FDFAF5", "#F5EEE5"]}
@@ -41,21 +49,21 @@ const CategoryScreen = () => {
   if (!category) {
     return (
       <>
-        <Stack.Screen options={{ headerTitle: "Category" }} />
+        <Stack.Screen options={{ headerTitle: t("fallbackTitle") }} />
         <View style={styles.emptyRoot}>
-          <Text style={styles.emptyText}>
-            We couldn&apos;t find that category.
-          </Text>
+          <Text style={styles.emptyText}>{t("notFound")}</Text>
         </View>
       </>
     );
   }
 
   const { icon, primary } = getCategoryPresentation(category.slug);
+  const categoryName = tCategoryName(category.slug);
+  const categoryDescription = tCategoryDescription(category.slug);
 
   return (
     <>
-      <Stack.Screen options={{ headerTitle: category.name }} />
+      <Stack.Screen options={{ headerTitle: categoryName }} />
       <View style={styles.root}>
         <LinearGradient colors={["#FDFAF5", "#F5EEE5"]} style={styles.gradient}>
           <View style={styles.header}>
@@ -66,8 +74,8 @@ const CategoryScreen = () => {
               secondaryColor={primary}
               secondaryOpacity={0.35}
             />
-            <Text style={styles.title}>{category.name}</Text>
-            <Text style={styles.subtitle}>{category.description}</Text>
+            <Text style={styles.title}>{categoryName}</Text>
+            <Text style={styles.subtitle}>{categoryDescription}</Text>
           </View>
           <View style={styles.gridWrap}>
             <ColoringImages category={category.slug} fullScreen />

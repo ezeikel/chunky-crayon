@@ -9,6 +9,7 @@ import { useInputMode } from "./InputModeContext";
 import Spinner from "@/components/Spinner/Spinner";
 import { track } from "@/utils/analytics";
 import { ANALYTICS_EVENTS } from "@/constants/analytics";
+import { useT } from "@/lib/i18n/useT";
 
 // =============================================================================
 // Design Tokens (matching web tailwind config)
@@ -51,6 +52,9 @@ const ImageInputPanel = ({
   credits,
   onShowPaywall,
 }: ImageInputPanelProps) => {
+  const t = useT("createForm.image");
+  const tButton = useT("mobile.button");
+  const tError = useT("createForm.error");
   const { setIsProcessing, setError, isProcessing } = useInputMode();
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [base64Image, setBase64Image] = useState<string | null>(null);
@@ -62,7 +66,7 @@ const ImageInputPanel = ({
     try {
       const { status } = await ImagePicker.requestCameraPermissionsAsync();
       if (status !== "granted") {
-        toast.error("Camera access is needed to take photos.");
+        toast.error(t("cameraPermissionDenied"));
         return;
       }
 
@@ -83,16 +87,16 @@ const ImageInputPanel = ({
       }
     } catch (error) {
       console.error("Failed to take photo:", error);
-      toast.error("Couldn't take photo. Please try again.");
+      toast.error(t("takePhotoFailed"));
     }
-  }, []);
+  }, [t]);
 
   const pickImage = useCallback(async () => {
     try {
       const { status } =
         await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (status !== "granted") {
-        toast.error("Photo library access is needed to pick a picture.");
+        toast.error(t("libraryPermissionDenied"));
         return;
       }
 
@@ -113,9 +117,9 @@ const ImageInputPanel = ({
       }
     } catch (error) {
       console.error("Failed to pick image:", error);
-      toast.error("Couldn't pick that image. Please try again.");
+      toast.error(t("pickImageFailed"));
     }
-  }, []);
+  }, [t]);
 
   const processImage = useCallback(async () => {
     if (!base64Image) return;
@@ -158,16 +162,14 @@ const ImageInputPanel = ({
         track(ANALYTICS_EVENTS.CREATION_FAILED, {
           error: "no_coloring_image_returned",
         });
-        setError("Failed to create coloring page from photo.");
-        toast.error(
-          "Couldn't make a coloring page from your photo. Try again!",
-        );
+        setError(t("createFailed"));
+        toast.error(t("createFailedToast"));
       }
     } catch (error) {
       track(ANALYTICS_EVENTS.CREATION_FAILED, { error: String(error) });
       console.error("Failed to generate coloring page:", error);
-      setError("Something went wrong. Please try again.");
-      toast.error("Something went wrong. Please try again.");
+      setError(tError("generic"));
+      toast.error(tError("generic"));
     } finally {
       setIsProcessing(false);
     }
@@ -178,6 +180,8 @@ const ImageInputPanel = ({
     setError,
     hasEnoughCredits,
     onShowPaywall,
+    t,
+    tError,
   ]);
 
   const clearImage = useCallback(() => {
@@ -191,9 +195,7 @@ const ImageInputPanel = ({
     <View style={styles.container}>
       {/* Instructions */}
       <Text style={styles.instructions}>
-        {selectedImage
-          ? "Great picture! Is this the one you want?"
-          : "Take a photo or upload a picture!"}
+        {selectedImage ? t("confirmInstructions") : t("instructions")}
       </Text>
 
       {/* Image preview or capture buttons */}
@@ -209,9 +211,7 @@ const ImageInputPanel = ({
           {isProcessing && (
             <View style={styles.processingOverlay}>
               <Spinner color="#FFF" size={32} />
-              <Text style={styles.processingText}>
-                Creating your coloring page...
-              </Text>
+              <Text style={styles.processingText}>{t("processing")}</Text>
             </View>
           )}
 
@@ -223,7 +223,7 @@ const ImageInputPanel = ({
                 onPress={clearImage}
                 disabled={busy}
               >
-                <Text style={styles.changeButtonText}>Pick another</Text>
+                <Text style={styles.changeButtonText}>{t("pickAnother")}</Text>
               </TouchableOpacity>
             </View>
           )}
@@ -236,7 +236,9 @@ const ImageInputPanel = ({
               disabled={busy}
               activeOpacity={0.8}
             >
-              <Text style={styles.buttonText}>Create coloring page</Text>
+              <Text style={styles.buttonText}>
+                {tButton("createColoringPage")}
+              </Text>
             </TouchableOpacity>
           )}
         </View>
@@ -256,7 +258,7 @@ const ImageInputPanel = ({
               secondaryColor={COLORS.crayonPeach}
               secondaryOpacity={1}
             />
-            <Text style={styles.captureButtonText}>Camera</Text>
+            <Text style={styles.captureButtonText}>{t("camera")}</Text>
           </TouchableOpacity>
 
           {/* Choose from Gallery button */}
@@ -273,7 +275,7 @@ const ImageInputPanel = ({
               secondaryColor="rgba(255, 255, 255, 0.8)"
               secondaryOpacity={1}
             />
-            <Text style={styles.captureButtonText}>Upload</Text>
+            <Text style={styles.captureButtonText}>{t("upload")}</Text>
           </TouchableOpacity>
         </View>
       )}

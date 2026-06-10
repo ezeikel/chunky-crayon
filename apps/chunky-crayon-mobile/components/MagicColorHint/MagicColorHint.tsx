@@ -26,6 +26,7 @@ import { faLightbulb, faXmark } from "@fortawesome/pro-duotone-svg-icons";
 import type { GridColorCell } from "@/types";
 import { tapLight, notifySuccess } from "@/utils/haptics";
 import { useCanvasStore } from "@/stores/canvasStore";
+import { useT } from "@/lib/i18n/useT";
 
 type MagicColorHintProps = {
   colorCell: GridColorCell | null;
@@ -40,6 +41,7 @@ const MagicColorHint = ({
   onDismiss,
   onUseColor,
 }: MagicColorHintProps) => {
+  const t = useT("mobile.coloring.magicHint");
   const opacity = useSharedValue(0);
   const scale = useSharedValue(0.8);
   // Both are stable action fns, only called inside handleUseColor — read once,
@@ -143,7 +145,7 @@ const MagicColorHint = ({
             onPress={handleUseColor}
             className="flex-1 py-2 px-4 rounded-lg bg-primary-light items-center justify-center"
           >
-            <Text style={styles.useColorText}>Use Color</Text>
+            <Text style={styles.useColorText}>{t("useColor")}</Text>
           </Pressable>
           <Pressable
             onPress={handleDismiss}

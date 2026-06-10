@@ -13,6 +13,7 @@ import { GALLERY_CATEGORIES } from "@one-colored-pixel/coloring-core/gallery";
 import type { GalleryCategory } from "@one-colored-pixel/coloring-core/gallery";
 import SafeSvgUri from "@/components/SafeSvgUri/SafeSvgUri";
 import { getCategoryPresentation } from "@/lib/gallery/categoryPresentation";
+import { useT } from "@/lib/i18n/useT";
 import useCategoryCovers from "@/hooks/api/useCategoryCovers";
 import { tapMedium } from "@/utils/haptics";
 import { track } from "@/utils/analytics";
@@ -51,6 +52,12 @@ const Tile = ({
   size: number;
 }) => {
   const { icon, primary, bg } = getCategoryPresentation(category.slug);
+  // Category names come from the shared catalog (slug-keyed); translate at the
+  // render site via slug -> key lookup (gallery.category.<slug>) so we never
+  // edit the shared catalog source.
+  const tCategoryName = useT("gallery.category");
+  const tGallery = useT("mobile.gallery");
+  const categoryName = tCategoryName(category.slug);
   return (
     <Pressable
       style={({ pressed }) => [
@@ -64,7 +71,7 @@ const Tile = ({
         router.push(`/category/${category.slug}`);
       }}
       accessibilityRole="button"
-      accessibilityLabel={`Color ${category.name}`}
+      accessibilityLabel={tGallery("colorCategoryA11y", { name: categoryName })}
     >
       {cover ? (
         <View style={styles.art}>
@@ -100,7 +107,7 @@ const Tile = ({
           />
         </View>
         <Text style={styles.name} numberOfLines={1}>
-          {category.name}
+          {categoryName}
         </Text>
       </LinearGradient>
     </Pressable>

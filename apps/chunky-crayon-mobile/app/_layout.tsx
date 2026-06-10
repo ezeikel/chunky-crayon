@@ -13,6 +13,7 @@ import Providers from "@/providers";
 import { useOnboardingStore } from "@/stores/onboardingStore";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { setHapticsEnabled } from "@/utils/haptics";
+import { useT } from "@/lib/i18n/useT";
 
 // release/dist must match the source maps uploaded at build time (the
 // @sentry/react-native EAS plugin uploads them keyed on this), so a crash from
@@ -62,6 +63,9 @@ const RootLayout = () => {
     "TondoTrial-Light": require("../assets/fonts/TondoTrial-Light.ttf"),
     "TondoTrial-Regular": require("../assets/fonts/TondoTrial-Regular.ttf"),
   });
+
+  const t = useT("mobile.header");
+  const tHome = useT("mobile.home");
 
   const hasCompleted = useOnboardingStore((s) => s.hasCompleted);
   const [hydrated, setHydrated] = useState(false);
@@ -155,7 +159,7 @@ const RootLayout = () => {
           options={{
             headerShown: true,
             headerTitle: "",
-            headerBackTitle: "Back",
+            headerBackTitle: t("back"),
             headerStyle: {
               backgroundColor: "#FFFFFF",
             },
@@ -173,8 +177,8 @@ const RootLayout = () => {
           name="challenges"
           options={{
             headerShown: true,
-            headerTitle: "Challenges",
-            headerBackTitle: "Back",
+            headerTitle: t("challengesTitle"),
+            headerBackTitle: t("back"),
             headerStyle: { backgroundColor: "#FDFAF5" },
             headerShadowVisible: false,
             headerTintColor: "#E46444",
@@ -186,8 +190,8 @@ const RootLayout = () => {
           name="characters"
           options={{
             headerShown: true,
-            headerTitle: "My Characters",
-            headerBackTitle: "Back",
+            headerTitle: t("charactersTitle"),
+            headerBackTitle: t("back"),
             headerStyle: { backgroundColor: "#FDFAF5" },
             headerShadowVisible: false,
             headerTintColor: "#E46444",
@@ -199,8 +203,8 @@ const RootLayout = () => {
           name="settings"
           options={{
             headerShown: true,
-            headerTitle: "Settings",
-            headerBackTitle: "Back",
+            headerTitle: t("settingsTitle"),
+            headerBackTitle: t("back"),
             headerStyle: { backgroundColor: "#FDFAF5" },
             headerShadowVisible: false,
             headerTintColor: "#E46444",
@@ -215,8 +219,8 @@ const RootLayout = () => {
           name="categories"
           options={{
             headerShown: true,
-            headerTitle: "What do you like?",
-            headerBackTitle: "Back",
+            headerTitle: tHome("whatDoYouLike"),
+            headerBackTitle: t("back"),
             headerStyle: { backgroundColor: "#FDFAF5" },
             headerShadowVisible: false,
             headerTintColor: "#E46444",
@@ -228,7 +232,7 @@ const RootLayout = () => {
           name="category/[slug]"
           options={{
             headerShown: true,
-            headerBackTitle: "Back",
+            headerBackTitle: t("back"),
             headerStyle: { backgroundColor: "#FDFAF5" },
             headerShadowVisible: false,
             headerTintColor: "#E46444",

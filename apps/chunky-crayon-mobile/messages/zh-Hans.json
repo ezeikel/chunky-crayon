@@ -13,11 +13,20 @@
       "createColoringPage": "生成涂色页",
       "creating": "生成中…",
       "tryAgain": "再试一次",
-      "cancel": "取消"
+      "cancel": "取消",
+      "seeAll": "查看全部"
     },
     "header": {
       "forGrownUps": "给大人",
-      "grownUps": "大人专区"
+      "grownUps": "大人专区",
+      "creditsA11y": "{{value}} 蜡笔金币",
+      "openColoA11y": "打开 Colo",
+      "profileA11y": "个人资料：{{name}}",
+      "switchProfileA11y": "切换个人资料，当前：{{name}}",
+      "back": "返回",
+      "challengesTitle": "挑战",
+      "charactersTitle": "我的角色",
+      "settingsTitle": "设置"
     },
     "characterBuilder": {
       "step": {
@@ -35,11 +44,85 @@
       "next": "下一步",
       "makeFriend": "制作我的小伙伴",
       "creating": "绘制中…",
-      "createError": "出错了，请再试一次。"
+      "createError": "出错了，请再试一次。",
+      "color": {
+        "green": "绿色",
+        "orange": "橙色",
+        "pink": "粉色",
+        "purple": "紫色",
+        "teal": "蓝绿色",
+        "yellow": "黄色"
+      },
+      "species": {
+        "dragon": "龙",
+        "fairy": "小仙子",
+        "kid": "小朋友",
+        "kitten": "小猫咪",
+        "monster": "小怪兽",
+        "puppy": "小狗狗",
+        "robot": "机器人",
+        "unicorn": "独角兽"
+      },
+      "trait": {
+        "bouncy": "爱蹦跶",
+        "brave": "勇敢",
+        "curious": "好奇",
+        "loves-snacks": "爱零食",
+        "shy": "害羞",
+        "silly": "搞怪",
+        "sleepy": "困困的",
+        "sparkly": "闪闪的"
+      },
+      "voice": {
+        "brave-neutral": "勇敢",
+        "gentle-neutral": "温柔",
+        "playful-boy-5yo": "爱玩",
+        "playful-girl-5yo": "爱蹦跶",
+        "silly-neutral": "搞怪",
+        "sleepy-neutral": "困困的",
+        "warm-boy-7yo": "暖乎乎",
+        "warm-girl-7yo": "温暖"
+      }
     },
     "challenges": {
       "homeCardTitle": "挑战",
-      "homeCardSubtitle": "涂色赢贴纸，帮助 Colo 成长！"
+      "homeCardSubtitle": "涂色赢贴纸，帮助 Colo 成长！",
+      "achievements": {
+        "dedicatedArtist": {
+          "description": "完成 10 张涂色页",
+          "title": "专注小画家"
+        },
+        "firstSteps": {
+          "description": "完成你的第一张涂色页",
+          "title": "第一步"
+        },
+        "gettingStarted": {
+          "description": "完成 5 张涂色页",
+          "title": "新手起步"
+        },
+        "masterArtist": {
+          "description": "完成 50 张涂色页",
+          "title": "大师小画家"
+        }
+      },
+      "claimFailed": "领取奖励失败，请再试一次。",
+      "claimReward": "领取奖励！",
+      "completedBang": "完成啦！",
+      "daysLeft": "还剩 {{count}} 天",
+      "lifetimeAchievements": "终身成就",
+      "noChallengeSubtitle": "过段时间再来，赢取更多奖励吧。",
+      "noChallengeTitle": "全新挑战马上就到！",
+      "pastChallenges": "往期挑战",
+      "rewardAccessory": "Colo 配饰",
+      "rewardEarned": "你获得了新的{{reward}}！",
+      "rewardSticker": "贴纸",
+      "screenSubtitle": "完成挑战，赢取奖励！",
+      "screenTitle": "挑战",
+      "statusCompleted": "已完成",
+      "statusIncomplete": "未完成",
+      "statusRewardUnclaimed": "奖励未领取",
+      "thisWeek": "本周挑战",
+      "daysLeft_other": "还剩 {{count}} 天"
     },
     "characters": {
       "loading": "正在加载你的小伙伴…",
@@ -72,7 +155,8 @@
     },
     "gallery": {
       "title": "探索",
-      "subtitle": "挑个好玩的来涂色"
+      "subtitle": "挑个好玩的来涂色",
+      "colorCategoryA11y": "为 {{name}} 上色"
     },
     "stickers": {
       "title": "贴纸收藏",
@@ -97,7 +181,11 @@
       "savedCount_other": "已保存 {{count}} 幅作品",
       "emptyTitle": "已保存的作品",
       "emptySubtitle": "你最喜欢的作品会出现在这里。开始涂色并保存你的杰作吧！",
-      "emptyTip": "涂色时点按爱心即可保存"
+      "emptyTip": "涂色时点按爱心即可保存",
+      "coloringPageA11y": "涂色页",
+      "recentEmpty": "还没有作品呢。点上方创建第一张吧！",
+      "recentTitle": "我的作品",
+      "seeAllRecent": "查看我的全部作品"
     },
     "upsideDownHint": {
       "title": "把我转过来！",
@@ -106,6 +194,425 @@
     "create": {
       "greeting": "今天想涂什么？",
       "subtitle": "选一种开始方式！"
+    },
+    "category": {
+      "allTitle": "全部涂色页",
+      "fallbackTitle": "分类",
+      "notFound": "找不到这个分类。"
+    },
+    "coloring": {
+      "enterFocusMode": "进入专注模式",
+      "exitFocusMode": "退出专注模式",
+      "generating": {
+        "title": "正在制作你的涂色页…",
+        "messages": {
+          "addingSparkles": "悄悄加点闪光…",
+          "almostThere": "马上就好啦…",
+          "coloringOutsideLines": "努力不涂出线…",
+          "creatingMasterpiece": "把它做得刚刚好…",
+          "drawingLines": "正在画轮廓线…",
+          "mixingColors": "调出新颜色…",
+          "sharpeningCrayons": "正在削蜡笔…",
+          "wavingWand": "检查一下都没问题…"
+        }
+      },
+      "magicHint": {
+        "useColor": "使用颜色"
+      },
+      "musicOff": "音乐关",
+      "musicOn": "音乐开",
+      "myArtwork": "我的作品",
+      "print": "打印",
+      "redo": "重做",
+      "save": "保存",
+      "seeWholePicture": "查看整张图",
+      "sfxOff": "音效关",
+      "sfxOn": "音效开",
+      "startOver": "重新开始",
+      "stickerPicker": {
+        "categoryA11y": "{{label}}贴纸",
+        "heading": "选一个贴纸！",
+        "hint": "现在点点你的图片！",
+        "stickerA11y": "贴纸 {{name}}",
+        "category": {
+          "animals": "动物",
+          "fun": "好玩",
+          "hearts": "爱心",
+          "nature": "自然",
+          "shapes": "形状",
+          "stars": "星星"
+        }
+      },
+      "tool": {
+        "gettingReady": "{{label}}（准备中）",
+        "tapToTryAgain": "{{label}}（点按重试）",
+        "autoColor": "自动上色",
+        "crayon": "蜡笔",
+        "eraser": "橡皮擦",
+        "fill": "填充",
+        "glitter": "亮晶晶",
+        "magicBrush": "魔法画笔",
+        "marker": "记号笔",
+        "paint": "颜料",
+        "pencil": "铅笔",
+        "sticker": "贴纸"
+      },
+      "undo": "撤销",
+      "zoomIn": "放大",
+      "zoomOut": "缩小",
+      "addedToCollection": "已加入你的收藏！",
+      "back": "返回",
+      "brushSize": {
+        "chunky": "粗粗的",
+        "fine": "细细的",
+        "regular": "普通"
+      },
+      "captureFailed": "无法保存你的作品截图。",
+      "myArtworkSheetConfirm": "加入我的收藏",
+      "myArtworkSheetTitle": "加入我的作品？",
+      "noData": "暂无数据",
+      "palette": {
+        "cute": "可爱",
+        "pastel": "马卡龙",
+        "realistic": "写实",
+        "surprise": "惊喜"
+      },
+      "panMode": "移动画面",
+      "photoPermissionDenied": "请允许访问相册，以保存你的作品。",
+      "printFailed": "无法生成可打印的 PDF，请再试一次。",
+      "printQrCta": "扫描二维码，发现更多涂色页！",
+      "printSheetConfirm": "生成可打印的 PDF",
+      "printSheetTitle": "打印这页？",
+      "saveFailed": "保存失败，请再试一次。",
+      "saveSheetConfirm": "保存到相册",
+      "saveSheetTitle": "保存这张图片？",
+      "savedToPhotos": "已保存到相册！",
+      "startOverCancel": "不，保留我的涂色",
+      "startOverConfirm": "是的，重新开始",
+      "startOverTitle": "重新开始？",
+      "untitledArtwork": "我的作品"
+    },
+    "creditPack": {
+      "bestValue": "最划算",
+      "creditsLabel": "点数",
+      "rowA11y": "{{price}} 可得 {{credits}} 点数",
+      "rowA11yBestValue": "{{price}} 可得 {{credits}} 点数，最划算"
+    },
+    "feed": {
+      "challenge": "挑战",
+      "claim": "领取！",
+      "continueColoring": "继续涂色",
+      "discoverMorePages": "发现更多页面",
+      "emptyNoPages": "现在没有可用的涂色页，过会儿再来看看！",
+      "errorLoading": "哎呀！加载内容时出了点问题。",
+      "moreToColor": "更多可涂色",
+      "seeAllYourArt": "查看你的全部作品",
+      "seeAllYourColoring": "查看你的全部涂色",
+      "seeAllYourCreations": "查看你的全部创作",
+      "today": "今天",
+      "yourArt": "你的作品",
+      "yourCreations": "你的创作"
+    },
+    "home": {
+      "coloProud": "你的 {{stageName}} 为你骄傲！",
+      "coloWantsToGrow": "{{stageName}} 想长大！再保存 {{count}} 个作品就能进化！",
+      "discoverMore": "发现更多",
+      "discoverMoreA11y": "发现更多涂色页",
+      "greeting": "今天想涂什么呢？",
+      "seeAllCategories": "查看全部分类",
+      "whatDoYouLike": "你喜欢什么？",
+      "browseAllA11y": "浏览全部涂色页"
+    },
+    "onboarding": {
+      "coloring": {
+        "celebrationSubtitle": "你天生就是小画家",
+        "celebrationTitle": "太棒啦！",
+        "done": "我完成啦",
+        "doneA11y": "完成",
+        "subtitle": "选个场景，给 Colo 涂上颜色",
+        "title": "轮到你创作啦！"
+      },
+      "paywall": {
+        "continue": "继续",
+        "continueA11y": "继续进入应用",
+        "description": "先试试，喜欢上了再选合适的方案。",
+        "finePrint": "今天不收费。免费一周后为 {{price}}/月。可在设置中随时取消。{{guarantee}}。",
+        "maybeLater": "稍后再说",
+        "rainbowPlan": "彩虹方案",
+        "reviews": "（{{count}} 条评价）",
+        "seeAllPlans": "查看全部方案",
+        "startTrial": "开启我的免费一周",
+        "startTrialA11y": "开启我的免费一周",
+        "title": "无限涂色，免费一周",
+        "trustLead": "万千家庭喜爱",
+        "unavailable": "当前暂无可用方案。你可以先开始涂色，之后再升级。",
+        "feature": {
+          "challenges": "每日挑战与贴纸奖励",
+          "magic": "魔法画笔与语音上色",
+          "unlimited": "随时畅涂，无限涂色页"
+        },
+        "timeline": {
+          "day5": {
+            "text": "试用结束前我们会提醒你。",
+            "when": "第 5 天"
+          },
+          "day7": {
+            "text": "免费一周结束。之前随时取消，不会收费。",
+            "when": "第 7 天"
+          },
+          "today": {
+            "text": "解锁全部内容，想涂多少就涂多少。",
+            "when": "今天"
+          }
+        }
+      },
+      "sceneA11y": "{{label}}场景",
+      "skip": "跳过",
+      "slide": {
+        "colo": {
+          "description": "孩子涂色时，Colo 会不断进化！收集贴纸、完成每日挑战，解锁新阶段。",
+          "title": "陪 Colo 一起长大"
+        },
+        "creativity": {
+          "description": "孩子可以用说一说、画一画或拍张照片来实现小脑洞，我们会把它变成专属涂色页。",
+          "title": "创意无限，零凌乱"
+        },
+        "safety": {
+          "description": "无广告、无社交、无数据收集。专为 3–8 岁设计，家长全程掌控。",
+          "title": "安全简单，小手也能轻松用"
+        }
+      },
+      "scene": {
+        "onboarding-jungle": "丛林",
+        "onboarding-party": "派对",
+        "onboarding-space": "太空",
+        "onboarding-underwater": "海底世界"
+      }
+    },
+    "paywall": {
+      "annualSaveBadge": "省 2 个月",
+      "closeA11y": "关闭",
+      "creditsPerMo": "每月 {{credits}} 点数",
+      "ctaA11y": "开始 {{plan}} 的 7 天免费试用",
+      "ctaMicrocopy": "之后为 {{price}}/{{period}}。在此之前随时取消。",
+      "ctaText": "开始 7 天免费试用",
+      "guarantee": "30 天退款保障",
+      "legalRenew": "订阅将自动续费，可在设置中随时取消。",
+      "loadingPlans": "正在加载方案…",
+      "monthPeriod": "月",
+      "monthly": "月付",
+      "mostPopular": "最受欢迎",
+      "perMonthShort": "月",
+      "perYearShort": "年",
+      "planRowA11y": "{{plan}}，每月 {{credits}} 点数，每{{period}} {{price}}",
+      "plansUnavailable": "当前暂无可用方案，请稍后再试。",
+      "privacyPolicy": "隐私政策",
+      "processing": "处理中…",
+      "restore": "恢复购买",
+      "restoreA11y": "恢复购买",
+      "socialProof": {
+        "reviewCount": "来自 {{count}} 条评价",
+        "title": "深受各地家庭喜爱"
+      },
+      "subtitle": "想做多少页都行。可打印，也可在屏幕上涂色。",
+      "termsOfService": "服务条款",
+      "title": "解锁无限涂色",
+      "yearPeriod": "年",
+      "yearly": "年付"
+    },
+    "profileSwitcher": {
+      "addProfile": "添加资料",
+      "artworkCount": "{{count}} 个作品",
+      "done": "完成",
+      "edit": "编辑",
+      "maxReached": "最多只能有 {{count}} 个资料",
+      "namePlaceholder": "资料名称",
+      "title": "个人资料",
+      "toast": {
+        "createFailed": "创建资料失败，请再试一次。",
+        "deleteFailed": "删除资料失败，请再试一次。",
+        "minOneProfile": "至少需要保留一个资料。",
+        "switchFailed": "切换资料失败，请再试一次。",
+        "updateFailed": "更新资料失败，请再试一次。"
+      },
+      "deleteConfirm": {
+        "title": "删除资料？",
+        "description": "这会删除“{{name}}”及其所有已保存图片。",
+        "confirm": "删除"
+      },
+      "artworkCount_other": "{{count}} 个作品"
+    },
+    "settings": {
+      "backgroundMusic": {
+        "subtitle": "涂色时的环境声音",
+        "title": "背景音乐"
+      },
+      "bannerA11y": "{{plan}} 方案，{{credits}} 点数。管理订阅。",
+      "bannerCtaManage": "管理",
+      "bannerCtaUpgrade": "升级",
+      "bannerPlanTitle": "{{plan}} 方案",
+      "bannerSubtitleUpgrade": " · 升级以继续涂色",
+      "contact": {
+        "title": "联系我们"
+      },
+      "creditCount": "{{formattedCount}} 点数",
+      "help": {
+        "subtitle": "常见问题快速解答",
+        "title": "帮助与常见问题"
+      },
+      "language": {
+        "title": "语言"
+      },
+      "madeWith": "用心制作于",
+      "madeWithIn": "",
+      "madeWithLocation": "伦敦南部",
+      "magicLinkSent": {
+        "body": "我们已将登录链接发送至 {{email}}",
+        "subtext": "点击邮件中的链接即可登录。链接 15 分钟后失效。",
+        "title": "请查收邮件！",
+        "useDifferentEmail": "使用其他邮箱"
+      },
+      "onboarding": {
+        "subtitle": "重新播放欢迎引导",
+        "title": "查看新手引导"
+      },
+      "planChip": "{{plan}} 方案",
+      "privacy": {
+        "title": "隐私政策"
+      },
+      "profiles": {
+        "add": "添加",
+        "addA11y": "添加个人资料",
+        "currentProfileA11y": "{{name}}，当前资料",
+        "manageA11y": "{{name}}，管理资料"
+      },
+      "rate": {
+        "subtitle": "分享你的反馈",
+        "title": "给应用评分"
+      },
+      "section": {
+        "account": "账号",
+        "appInfo": "应用信息",
+        "legal": "法律条款",
+        "preferences": "偏好设置",
+        "profiles": "个人资料",
+        "support": "支持"
+      },
+      "signIn": {
+        "subtitle": "在设备间同步作品",
+        "title": "登录"
+      },
+      "signInModal": {
+        "continueApple": "使用 Apple 继续",
+        "continueFacebook": "使用 Facebook 继续",
+        "continueGoogle": "使用 Google 继续",
+        "emailLabel": "使用邮箱登录",
+        "emailPlaceholder": "请输入邮箱",
+        "or": "或",
+        "privacyNote": "登录即表示你同意我们的服务条款与隐私政策。",
+        "sendMagicLink": "发送登录链接",
+        "subtitle": "登录后可在设备间同步作品，并在网页端访问你的账号。",
+        "title": "登录"
+      },
+      "signOut": {
+        "subtitle": "你的作品会保留在此设备上",
+        "title": "退出登录"
+      },
+      "signOutConfirm": {
+        "confirm": "退出登录",
+        "description": "你的作品会保留在此设备上。",
+        "title": "退出登录？"
+      },
+      "soundEffects": {
+        "subtitle": "按钮点击与操作音效",
+        "title": "音效"
+      },
+      "terms": {
+        "title": "服务条款"
+      },
+      "toast": {
+        "accountLinked": "账号已关联，作品已同步！",
+        "appleSignInFailed": "无法使用 Apple 登录，请再试一次。",
+        "facebookSignInFailed": "无法使用 Facebook 登录，请再试一次。",
+        "googleSignInFailed": "无法使用 Google 登录，请再试一次。",
+        "invalidEmail": "请输入有效的邮箱地址。",
+        "magicLinkFailed": "发送登录链接失败，请再试一次。",
+        "signedIn": "已登录！",
+        "signedOut": "已退出登录。你的作品会保留在此设备上。"
+      },
+      "version": {
+        "title": "版本"
+      },
+      "vibration": {
+        "subtitle": "点击与奖励时轻轻震动",
+        "title": "震动"
+      },
+      "creditCount_other": "{{formattedCount}} 点数"
+    },
+    "subscriptionManager": {
+      "accessUntil": "可用至",
+      "buyCredits": "购买点数",
+      "creditsAvailable": "可用 {{count}} 点数",
+      "legal": "除非在当前周期结束前至少 24 小时取消，否则订阅将自动续费。你可在 {{store}} 设置中随时管理或取消。",
+      "manageSubscription": "管理订阅",
+      "noActiveSubscription": "无有效订阅",
+      "planIncludes": "方案包含",
+      "planName": "{{plan}} 方案",
+      "renews": "续费时间",
+      "restorePurchases": "恢复购买",
+      "status": {
+        "active": "有效",
+        "cancelled": "已取消",
+        "paymentIssue": "付款问题",
+        "trial": "试用中"
+      },
+      "subscribeNow": "立即订阅",
+      "title": "订阅与点数",
+      "upgradePlan": "升级方案",
+      "creditsAvailable_other": "可用 {{count}} 点数"
+    },
+    "topUp": {
+      "closeA11y": "关闭",
+      "legal": "购买后点数会立即加入你的账号。点数永不过期。",
+      "loading": "正在加载点数包…",
+      "subtitle": "不更改方案也能补充点数，继续创作。",
+      "title": "充值点数",
+      "unavailable": "点数包暂时不可用。"
+    },
+    "avatar": {
+      "alien": "外星人",
+      "astronaut": "宇航员",
+      "dragon": "龙",
+      "ghost": "小幽灵",
+      "ice-cream": "冰淇淋",
+      "mermaid": "美人鱼",
+      "rainbow": "彩虹",
+      "rocket": "火箭",
+      "sun": "太阳",
+      "superhero": "超级英雄",
+      "unicorn": "独角兽",
+      "wizard": "魔法师"
+    },
+    "avatarPicker": {
+      "pickA11y": "选择 {{name}}"
+    },
+    "createProfile": {
+      "create": "创建",
+      "namePlaceholder": "你叫什么名字？",
+      "pickCharacter": "选择你的角色"
+    },
+    "parentalGate": {
+      "closeA11y": "关闭",
+      "defaultSubtitle": "点选正确答案继续。",
+      "defaultTitle": "小小验证",
+      "hint": "家长：请点选正确答案继续。",
+      "purchaseSubtitle": "购买前请验证你是家长",
+      "purchaseTitle": "家长验证",
+      "subscriptionSubtitle": "订阅前请验证你是家长"
+    },
+    "profileAvatar": {
+      "a11yFallback": "个人头像",
+      "a11yNamed": "{{name}}的头像"
     }
   },
   "createForm": {
@@ -199,6 +706,46 @@
       "errorQ2AudioFailed": "问题没播放出来。再试一次？",
       "errorTimeout": "等太久啦！我们重新开始吧。",
       "errorRequiresSignin": "登录后才能使用语音模式。"
+    },
+    "error": {
+      "characterNotReady": "那个小伙伴还没准备好。稍等再试试吧。",
+      "generic": "出了点小问题。请再试一次。",
+      "moderationBlocked": "换个画面点子试试吧！"
+    },
+    "friendPicker": {
+      "emptyInviteSuffix": " 会出现在你的涂色页里！",
+      "header": "添加小伙伴",
+      "includeFriendA11y": "加入{{name}}（{{species}}）",
+      "makeFriend": "创建小伙伴",
+      "makeNewFriend": "创建新小伙伴",
+      "newFriend": "新小伙伴",
+      "noFriend": "不加小伙伴",
+      "optional": "（可选）"
+    },
+    "image": {
+      "camera": "相机",
+      "cameraPermissionDenied": "需要相机权限才能拍照。",
+      "confirmInstructions": "照片真棒！要用这张吗？",
+      "createFailed": "无法用照片生成涂色页。",
+      "createFailedToast": "没能用你的照片做出涂色页。再试一次！",
+      "instructions": "拍张照片或上传图片！",
+      "libraryPermissionDenied": "需要相册权限才能选取图片。",
+      "pickAnother": "换一张",
+      "pickImageFailed": "无法选择这张图片。请再试一次。",
+      "processing": "正在生成你的涂色页...",
+      "takePhotoFailed": "拍照失败。请再试一次。",
+      "upload": "上传"
+    },
+    "mode": {
+      "a11yLabel": "{{mode}}输入模式",
+      "unlockSaveFailed": "保存解锁失败，可能不会生效，请再试一次。",
+      "image": "照片",
+      "scene": "搭建",
+      "text": "输入",
+      "voice": "说一说"
+    },
+    "text": {
+      "placeholder": "你想涂什么呢？"
     }
   }
 }

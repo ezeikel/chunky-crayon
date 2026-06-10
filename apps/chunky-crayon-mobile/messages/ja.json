@@ -13,11 +13,20 @@
       "createColoringPage": "ぬりえをつくる",
       "creating": "つくっています…",
       "tryAgain": "もう一度",
-      "cancel": "キャンセル"
+      "cancel": "キャンセル",
+      "seeAll": "すべて見る"
     },
     "header": {
       "forGrownUps": "保護者の方へ",
-      "grownUps": "保護者の方"
+      "grownUps": "保護者の方",
+      "creditsA11y": "{{value}} クレヨンコイン",
+      "openColoA11y": "Coloをひらく",
+      "profileA11y": "プロフィール：{{name}}",
+      "switchProfileA11y": "プロフィール切り替え（現在：{{name}}）",
+      "back": "戻る",
+      "challengesTitle": "チャレンジ",
+      "charactersTitle": "マイキャラクター",
+      "settingsTitle": "設定"
     },
     "characterBuilder": {
       "step": {
@@ -35,11 +44,85 @@
       "next": "つぎへ",
       "makeFriend": "おともだちをつくる",
       "creating": "かいています…",
-      "createError": "うまくいかなかったよ。もう一度ためしてね。"
+      "createError": "うまくいかなかったよ。もう一度ためしてね。",
+      "color": {
+        "green": "みどり",
+        "orange": "オレンジ",
+        "pink": "ピンク",
+        "purple": "むらさき",
+        "teal": "ターコイズ",
+        "yellow": "きいろ"
+      },
+      "species": {
+        "dragon": "ドラゴン",
+        "fairy": "ようせい",
+        "kid": "こども",
+        "kitten": "こねこ",
+        "monster": "モンスター",
+        "puppy": "こいぬ",
+        "robot": "ロボット",
+        "unicorn": "ユニコーン"
+      },
+      "trait": {
+        "bouncy": "ぴょんぴょん",
+        "brave": "ゆうかん",
+        "curious": "こうきしんおうせい",
+        "loves-snacks": "おやつだいすき",
+        "shy": "はずかしがり",
+        "silly": "おちゃめ",
+        "sleepy": "ねむねむ",
+        "sparkly": "キラキラ"
+      },
+      "voice": {
+        "brave-neutral": "ゆうかん",
+        "gentle-neutral": "やさしい",
+        "playful-boy-5yo": "あそび好き",
+        "playful-girl-5yo": "ぴょんぴょん",
+        "silly-neutral": "おちゃめ",
+        "sleepy-neutral": "ねむねむ",
+        "warm-boy-7yo": "ほっこり",
+        "warm-girl-7yo": "あったか"
+      }
     },
     "challenges": {
       "homeCardTitle": "チャレンジ",
-      "homeCardSubtitle": "ぬってシールをゲット！Coloもそだつよ！"
+      "homeCardSubtitle": "ぬってシールをゲット！Coloもそだつよ！",
+      "achievements": {
+        "dedicatedArtist": {
+          "description": "ぬりえを10枚完成しよう",
+          "title": "がんばり屋さん"
+        },
+        "firstSteps": {
+          "description": "はじめてのぬりえを完成しよう",
+          "title": "はじめのいっぽ"
+        },
+        "gettingStarted": {
+          "description": "ぬりえを5枚完成しよう",
+          "title": "スタート！"
+        },
+        "masterArtist": {
+          "description": "ぬりえを50枚完成しよう",
+          "title": "ぬりえマスター"
+        }
+      },
+      "claimFailed": "報酬を受け取れませんでした。もう一度お試しください。",
+      "claimReward": "報酬を受け取る！",
+      "completedBang": "クリア！",
+      "daysLeft": "あと{{count}}日",
+      "lifetimeAchievements": "これまでの実績",
+      "noChallengeSubtitle": "もうすぐ新しい報酬がもらえるよ。お楽しみに！",
+      "noChallengeTitle": "新しいチャレンジがもうすぐ登場！",
+      "pastChallenges": "これまでのチャレンジ",
+      "rewardAccessory": "Coloアクセサリー",
+      "rewardEarned": "新しい{{reward}}をゲット！",
+      "rewardSticker": "ステッカー",
+      "screenSubtitle": "チャレンジをクリアして報酬をもらおう！",
+      "screenTitle": "チャレンジ",
+      "statusCompleted": "クリア",
+      "statusIncomplete": "未クリア",
+      "statusRewardUnclaimed": "報酬未受け取り",
+      "thisWeek": "今週のチャレンジ",
+      "daysLeft_other": "あと{{count}}日"
     },
     "characters": {
       "loading": "おともだちをよみこみ中…",
@@ -72,7 +155,8 @@
     },
     "gallery": {
       "title": "さがす",
-      "subtitle": "たのしいぬりえをえらぼう"
+      "subtitle": "たのしいぬりえをえらぼう",
+      "colorCategoryA11y": "{{name}}に色をぬる"
     },
     "stickers": {
       "title": "シールコレクション",
@@ -97,7 +181,11 @@
       "savedCount_other": "保存した作品 {{count}}件",
       "emptyTitle": "保存した作品",
       "emptySubtitle": "お気に入りの作品がここに表示されるよ。ぬって、すてきな作品を保存しよう！",
-      "emptyTip": "ぬりえ中にハートをタップで保存"
+      "emptyTip": "ぬりえ中にハートをタップで保存",
+      "coloringPageA11y": "ぬりえ",
+      "recentEmpty": "まだ絵がありません。上をタップして、はじめての1枚を作ろう！",
+      "recentTitle": "マイピクチャ",
+      "seeAllRecent": "マイピクチャをすべて見る"
     },
     "upsideDownHint": {
       "title": "くるっと回して！",
@@ -106,6 +194,425 @@
     "create": {
       "greeting": "今日はなにをぬりたい？",
       "subtitle": "はじめかたをえらぼう！"
+    },
+    "category": {
+      "allTitle": "すべてのぬりえ",
+      "fallbackTitle": "カテゴリ",
+      "notFound": "そのカテゴリが見つかりませんでした。"
+    },
+    "coloring": {
+      "enterFocusMode": "集中モード",
+      "exitFocusMode": "集中モードを終了",
+      "generating": {
+        "title": "ぬりえを作っているよ…",
+        "messages": {
+          "addingSparkles": "キラキラをこっそり追加中…",
+          "almostThere": "仕上げ中…",
+          "coloringOutsideLines": "はみ出さないようにがんばってるよ…",
+          "creatingMasterpiece": "ちょうどよく整えているよ…",
+          "drawingLines": "線を描いているよ…",
+          "mixingColors": "新しい色をまぜまぜ中…",
+          "sharpeningCrayons": "クレヨンをとがらせてるよ…",
+          "wavingWand": "いい感じかチェック中…"
+        }
+      },
+      "magicHint": {
+        "useColor": "この色を使う"
+      },
+      "musicOff": "音楽オフ",
+      "musicOn": "音楽オン",
+      "myArtwork": "マイアート",
+      "print": "印刷",
+      "redo": "やり直し",
+      "save": "保存",
+      "seeWholePicture": "全体を見る",
+      "sfxOff": "効果音オフ",
+      "sfxOn": "効果音オン",
+      "startOver": "最初から",
+      "stickerPicker": {
+        "categoryA11y": "{{label}}のステッカー",
+        "heading": "ステッカーをえらんでね！",
+        "hint": "つぎは絵をタップしてね！",
+        "stickerA11y": "ステッカー：{{name}}",
+        "category": {
+          "animals": "どうぶつ",
+          "fun": "たのしい",
+          "hearts": "ハート",
+          "nature": "しぜん",
+          "shapes": "かたち",
+          "stars": "ほし"
+        }
+      },
+      "tool": {
+        "gettingReady": "{{label}}（準備中）",
+        "tapToTryAgain": "{{label}}（タップして再試行）",
+        "autoColor": "おまかせで色ぬり",
+        "crayon": "クレヨン",
+        "eraser": "けしゴム",
+        "fill": "ぬりつぶし",
+        "glitter": "ラメ",
+        "magicBrush": "まほうのブラシ",
+        "marker": "マーカー",
+        "paint": "ペイント",
+        "pencil": "えんぴつ",
+        "sticker": "ステッカー"
+      },
+      "undo": "もどす",
+      "zoomIn": "拡大",
+      "zoomOut": "縮小",
+      "addedToCollection": "コレクションに追加したよ！",
+      "back": "戻る",
+      "brushSize": {
+        "chunky": "太め",
+        "fine": "細め",
+        "regular": "ふつう"
+      },
+      "captureFailed": "作品をキャプチャできませんでした。",
+      "myArtworkSheetConfirm": "コレクションに追加",
+      "myArtworkSheetTitle": "マイアートに追加する？",
+      "noData": "データがありません",
+      "palette": {
+        "cute": "かわいい",
+        "pastel": "パステル",
+        "realistic": "リアル",
+        "surprise": "おたのしみ"
+      },
+      "panMode": "うごかす",
+      "photoPermissionDenied": "作品を保存するには、写真へのアクセスを許可してください。",
+      "printFailed": "印刷用PDFを作れませんでした。もう一度お試しください。",
+      "printQrCta": "QRコードを読み取って、もっとぬりえを見つけよう！",
+      "printSheetConfirm": "印刷用PDFを作る",
+      "printSheetTitle": "このページを印刷する？",
+      "saveFailed": "作品を保存できませんでした。もう一度お試しください。",
+      "saveSheetConfirm": "写真に保存",
+      "saveSheetTitle": "絵を保存する？",
+      "savedToPhotos": "写真に保存したよ！",
+      "startOverCancel": "いいえ、このまま続ける",
+      "startOverConfirm": "はい、最初から",
+      "startOverTitle": "最初からにする？",
+      "untitledArtwork": "マイアート"
+    },
+    "creditPack": {
+      "bestValue": "いちばんお得",
+      "creditsLabel": "クレジット",
+      "rowA11y": "{{price}}で{{credits}}クレジット",
+      "rowA11yBestValue": "{{price}}で{{credits}}クレジット（いちばんお得）"
+    },
+    "feed": {
+      "challenge": "チャレンジ",
+      "claim": "受け取る！",
+      "continueColoring": "つづきをぬる",
+      "discoverMorePages": "もっとさがす",
+      "emptyNoPages": "今はぬりえがありません。しばらくしてから見てね！",
+      "errorLoading": "読み込み中にエラーが起きました。",
+      "moreToColor": "もっとぬる",
+      "seeAllYourArt": "あなたのアートをすべて見る",
+      "seeAllYourColoring": "ぬりえをすべて見る",
+      "seeAllYourCreations": "作ったものをすべて見る",
+      "today": "今日",
+      "yourArt": "あなたのアート",
+      "yourCreations": "あなたの作品"
+    },
+    "home": {
+      "coloProud": "{{stageName}}は、あなたのことがとっても誇らしいよ！",
+      "coloWantsToGrow": "{{stageName}}は成長したいみたい！あと{{count}}枚保存して進化しよう！",
+      "discoverMore": "もっとさがす",
+      "discoverMoreA11y": "もっとぬりえをさがす",
+      "greeting": "今日は何をぬる？",
+      "seeAllCategories": "カテゴリをすべて見る",
+      "whatDoYouLike": "なにが好き？",
+      "browseAllA11y": "すべてのぬりえを見る"
+    },
+    "onboarding": {
+      "coloring": {
+        "celebrationSubtitle": "すてきなアーティストだね",
+        "celebrationTitle": "すごい！",
+        "done": "できた！",
+        "doneA11y": "完了",
+        "subtitle": "シーンをえらんで、Coloをぬってね",
+        "title": "あなたの番！"
+      },
+      "paywall": {
+        "continue": "つづける",
+        "continueA11y": "アプリへ進む",
+        "description": "気に入ったら、ぴったりのプランをえらんでね。",
+        "finePrint": "今日は無料。その後、無料期間1週間のあと{{price}}/月。設定でいつでも解約できます。{{guarantee}}。",
+        "maybeLater": "あとで",
+        "rainbowPlan": "レインボープラン",
+        "reviews": "（{{count}}件のレビュー）",
+        "seeAllPlans": "プランをすべて見る",
+        "startTrial": "無料1週間をはじめる",
+        "startTrialA11y": "無料1週間をはじめる",
+        "title": "ぬり放題、1週間無料",
+        "trustLead": "家族みんなに人気",
+        "unavailable": "今はプランを利用できません。まずはぬりえを楽しんで、あとでアップグレードできます。",
+        "feature": {
+          "challenges": "毎日のチャレンジ＆ステッカー報酬",
+          "magic": "まほうのブラシ＆声で色ぬり",
+          "unlimited": "ぬりえがいつでも作り放題"
+        },
+        "timeline": {
+          "day5": {
+            "text": "無料期間が終わる前にお知らせします。",
+            "when": "5日目"
+          },
+          "day7": {
+            "text": "無料期間が終了。前日までならいつでも解約OK、料金はかかりません。",
+            "when": "7日目"
+          },
+          "today": {
+            "text": "ぜんぶ解放。好きなだけぬろう。",
+            "when": "今日"
+          }
+        }
+      },
+      "sceneA11y": "{{label}}のシーン",
+      "skip": "スキップ",
+      "slide": {
+        "colo": {
+          "description": "ぬりえをするたびにColoが進化！ステッカーを集めたり、毎日のチャレンジをクリアして、新しい姿をアンロックしよう。",
+          "title": "Coloといっしょに成長しよう"
+        },
+        "creativity": {
+          "description": "おしゃべりしたり、おえかきしたり、写真をとったり。思いついたものが、あなただけのぬりえになるよ。",
+          "title": "創造力は無限、散らからない"
+        },
+        "safety": {
+          "description": "広告なし、SNS機能なし、データ収集なし。対象年齢3〜8歳。保護者がしっかり管理できます。",
+          "title": "安全・かんたん・小さな手にぴったり"
+        }
+      },
+      "scene": {
+        "onboarding-jungle": "ジャングル",
+        "onboarding-party": "パーティー",
+        "onboarding-space": "宇宙",
+        "onboarding-underwater": "海の中"
+      }
+    },
+    "paywall": {
+      "annualSaveBadge": "2か月分お得",
+      "closeA11y": "閉じる",
+      "creditsPerMo": "{{credits}} クレジット/月",
+      "ctaA11y": "{{plan}}の7日間無料体験を開始",
+      "ctaMicrocopy": "その後{{price}}/{{period}}。それまでに解約すれば料金はかかりません。",
+      "ctaText": "7日間無料体験を始める",
+      "guarantee": "30日間返金保証",
+      "legalRenew": "サブスクリプションは自動更新されます。設定でいつでも解約できます。",
+      "loadingPlans": "プランを読み込み中…",
+      "monthPeriod": "月",
+      "monthly": "月額",
+      "mostPopular": "人気No.1",
+      "perMonthShort": "月",
+      "perYearShort": "年",
+      "planRowA11y": "{{plan}}、月{{credits}}クレジット、{{period}}ごとに{{price}}",
+      "plansUnavailable": "現在プランを利用できません。しばらくしてからお試しください。",
+      "privacyPolicy": "プライバシーポリシー",
+      "processing": "処理中…",
+      "restore": "購入を復元",
+      "restoreA11y": "購入を復元",
+      "socialProof": {
+        "reviewCount": "{{count}}件のレビューより",
+        "title": "たくさんの家族に選ばれています"
+      },
+      "subtitle": "好きなだけページを作れる。印刷も画面でぬるのもOK。",
+      "termsOfService": "利用規約",
+      "title": "ぬりえを無制限に",
+      "yearPeriod": "年",
+      "yearly": "年額"
+    },
+    "profileSwitcher": {
+      "addProfile": "プロフィール追加",
+      "artworkCount": "{{count}}枚の作品",
+      "done": "完了",
+      "edit": "編集",
+      "maxReached": "プロフィールは最大{{count}}個までです",
+      "namePlaceholder": "プロフィール名",
+      "title": "プロフィール",
+      "toast": {
+        "createFailed": "プロフィールを作れませんでした。もう一度お試しください。",
+        "deleteFailed": "プロフィールを削除できませんでした。もう一度お試しください。",
+        "minOneProfile": "プロフィールは1つ以上必要です。",
+        "switchFailed": "プロフィールを切り替えできませんでした。もう一度お試しください。",
+        "updateFailed": "プロフィールを更新できませんでした。もう一度お試しください。"
+      },
+      "deleteConfirm": {
+        "title": "プロフィールを削除する？",
+        "description": "「{{name}}」と保存した絵がすべて消えます。",
+        "confirm": "削除"
+      },
+      "artworkCount_other": "{{count}}枚の作品"
+    },
+    "settings": {
+      "backgroundMusic": {
+        "subtitle": "ぬりえ中の環境音",
+        "title": "BGM"
+      },
+      "bannerA11y": "{{plan}}プラン、{{credits}}クレジット。サブスクを管理。",
+      "bannerCtaManage": "管理",
+      "bannerCtaUpgrade": "アップグレード",
+      "bannerPlanTitle": "{{plan}}プラン",
+      "bannerSubtitleUpgrade": " · アップグレードして続けよう",
+      "contact": {
+        "title": "お問い合わせ"
+      },
+      "creditCount": "{{formattedCount}} クレジット",
+      "help": {
+        "subtitle": "よくある質問への回答",
+        "title": "ヘルプ＆FAQ"
+      },
+      "language": {
+        "title": "言語"
+      },
+      "madeWith": "Made with",
+      "madeWithIn": "in",
+      "madeWithLocation": "サウスロンドン",
+      "magicLinkSent": {
+        "body": "{{email}}にサインイン用リンクを送信しました",
+        "subtext": "メール内のリンクをクリックしてサインインしてください。リンクは15分で無効になります。",
+        "title": "メールを確認してね！",
+        "useDifferentEmail": "別のメールを使う"
+      },
+      "onboarding": {
+        "subtitle": "ウェルカムツアーをもう一度",
+        "title": "オンボーディングを見る"
+      },
+      "planChip": "{{plan}}プラン",
+      "privacy": {
+        "title": "プライバシーポリシー"
+      },
+      "profiles": {
+        "add": "追加",
+        "addA11y": "プロフィールを追加",
+        "currentProfileA11y": "{{name}}、現在のプロフィール",
+        "manageA11y": "{{name}}、プロフィール管理"
+      },
+      "rate": {
+        "subtitle": "感想を聞かせてね",
+        "title": "アプリを評価"
+      },
+      "section": {
+        "account": "アカウント",
+        "appInfo": "アプリ情報",
+        "legal": "法律情報",
+        "preferences": "設定",
+        "profiles": "プロフィール",
+        "support": "サポート"
+      },
+      "signIn": {
+        "subtitle": "端末間で作品を同期",
+        "title": "サインイン"
+      },
+      "signInModal": {
+        "continueApple": "Appleで続ける",
+        "continueFacebook": "Facebookで続ける",
+        "continueGoogle": "Googleで続ける",
+        "emailLabel": "メールでサインイン",
+        "emailPlaceholder": "メールアドレスを入力",
+        "or": "または",
+        "privacyNote": "サインインすると、利用規約とプライバシーポリシーに同意したことになります。",
+        "sendMagicLink": "サインインリンクを送る",
+        "subtitle": "サインインして、端末間で作品を同期したり、Webでアカウントにアクセスできます。",
+        "title": "サインイン"
+      },
+      "signOut": {
+        "subtitle": "作品はこの端末に残ります",
+        "title": "サインアウト"
+      },
+      "signOutConfirm": {
+        "confirm": "サインアウト",
+        "description": "作品はこの端末に残ります。",
+        "title": "サインアウトする？"
+      },
+      "soundEffects": {
+        "subtitle": "ボタンや操作の音",
+        "title": "効果音"
+      },
+      "terms": {
+        "title": "利用規約"
+      },
+      "toast": {
+        "accountLinked": "アカウント連携して作品を同期したよ！",
+        "appleSignInFailed": "Appleでサインインできませんでした。もう一度お試しください。",
+        "facebookSignInFailed": "Facebookでサインインできませんでした。もう一度お試しください。",
+        "googleSignInFailed": "Googleでサインインできませんでした。もう一度お試しください。",
+        "invalidEmail": "有効なメールアドレスを入力してください。",
+        "magicLinkFailed": "サインインリンクを送信できませんでした。もう一度お試しください。",
+        "signedIn": "サインインしました！",
+        "signedOut": "サインアウトしました。作品はこの端末に残ります。"
+      },
+      "version": {
+        "title": "バージョン"
+      },
+      "vibration": {
+        "subtitle": "タップや報酬でやさしくブルッ",
+        "title": "バイブ"
+      },
+      "creditCount_other": "{{formattedCount}} クレジット"
+    },
+    "subscriptionManager": {
+      "accessUntil": "利用期限",
+      "buyCredits": "クレジットを購入",
+      "creditsAvailable": "残り{{count}}クレジット",
+      "legal": "サブスクリプションは、現在の期間終了の24時間前までに解約しない限り自動更新されます。{{store}}の設定でいつでも管理・解約できます。",
+      "manageSubscription": "サブスクを管理",
+      "noActiveSubscription": "有効なサブスクはありません",
+      "planIncludes": "プラン内容",
+      "planName": "{{plan}}プラン",
+      "renews": "更新日",
+      "restorePurchases": "購入を復元",
+      "status": {
+        "active": "有効",
+        "cancelled": "解約済み",
+        "paymentIssue": "お支払いの問題",
+        "trial": "無料体験"
+      },
+      "subscribeNow": "今すぐ登録",
+      "title": "サブスク＆クレジット",
+      "upgradePlan": "プランを変更",
+      "creditsAvailable_other": "残り{{count}}クレジット"
+    },
+    "topUp": {
+      "closeA11y": "閉じる",
+      "legal": "クレジットは購入後すぐにアカウントに追加されます。クレジットに有効期限はありません。",
+      "loading": "クレジットパックを読み込み中…",
+      "subtitle": "プランはそのまま、クレジットを追加して作り続けよう。",
+      "title": "クレジットを追加",
+      "unavailable": "現在クレジットパックは利用できません。"
+    },
+    "avatar": {
+      "alien": "エイリアン",
+      "astronaut": "うちゅうひこうし",
+      "dragon": "ドラゴン",
+      "ghost": "おばけ",
+      "ice-cream": "アイスクリーム",
+      "mermaid": "マーメイド",
+      "rainbow": "にじ",
+      "rocket": "ロケット",
+      "sun": "たいよう",
+      "superhero": "スーパーヒーロー",
+      "unicorn": "ユニコーン",
+      "wizard": "まほうつかい"
+    },
+    "avatarPicker": {
+      "pickA11y": "{{name}}をえらぶ"
+    },
+    "createProfile": {
+      "create": "作成",
+      "namePlaceholder": "おなまえは？",
+      "pickCharacter": "キャラクターをえらんでね"
+    },
+    "parentalGate": {
+      "closeA11y": "閉じる",
+      "defaultSubtitle": "正しい答えをタップしてね。",
+      "defaultTitle": "かんたんチェック",
+      "hint": "保護者の方：正しい答えをタップして続けてください。",
+      "purchaseSubtitle": "購入するには、保護者であることを確認してください",
+      "purchaseTitle": "保護者確認",
+      "subscriptionSubtitle": "サブスクリプション開始には、保護者であることを確認してください"
+    },
+    "profileAvatar": {
+      "a11yFallback": "プロフィールのアバター",
+      "a11yNamed": "{{name}}のアバター"
     }
   },
   "createForm": {
@@ -199,6 +706,46 @@
       "errorQ2AudioFailed": "しつもんをさいせいできなかったよ。もういちど？",
       "errorTimeout": "じかんがかかりすぎたよ！さいしょからやりなおそう。",
       "errorRequiresSignin": "おんせいモードをつかうにはログインしてね。"
+    },
+    "error": {
+      "characterNotReady": "そのおともだちはまだ準備中だよ。少ししてもう一度ね。",
+      "generic": "うまくいかなかったよ。もう一度ためしてね。",
+      "moderationBlocked": "ちがうアイデアで絵をつくってみよう！"
+    },
+    "friendPicker": {
+      "emptyInviteSuffix": " がページに登場するよ！",
+      "header": "おともだちを追加",
+      "includeFriendA11y": "{{name}}（{{species}}）を入れる",
+      "makeFriend": "おともだちをつくる",
+      "makeNewFriend": "新しいおともだちをつくる",
+      "newFriend": "新しいおともだち",
+      "noFriend": "おともだちなし",
+      "optional": "（任意）"
+    },
+    "image": {
+      "camera": "カメラ",
+      "cameraPermissionDenied": "写真を撮るにはカメラへのアクセスが必要です。",
+      "confirmInstructions": "いい写真！これでいい？",
+      "createFailed": "写真からぬりえを作れませんでした。",
+      "createFailedToast": "写真からぬりえにできなかったよ。もう一度！",
+      "instructions": "写真を撮るか、画像をアップロードしてね！",
+      "libraryPermissionDenied": "画像を選ぶには写真ライブラリへのアクセスが必要です。",
+      "pickAnother": "別のを選ぶ",
+      "pickImageFailed": "その画像は選べなかったよ。もう一度ためしてね。",
+      "processing": "ぬりえを作っているよ…",
+      "takePhotoFailed": "写真を撮れなかったよ。もう一度ためしてね。",
+      "upload": "アップロード"
+    },
+    "mode": {
+      "a11yLabel": "{{mode}} 入力モード",
+      "unlockSaveFailed": "その解除を保存できなかったよ。反映されないかも、もう一度ためしてね。",
+      "image": "写真",
+      "scene": "組み立て",
+      "text": "入力",
+      "voice": "おしゃべり"
+    },
+    "text": {
+      "placeholder": "何をぬりたい？"
     }
   }
 }

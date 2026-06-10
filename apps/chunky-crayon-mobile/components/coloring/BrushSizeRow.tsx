@@ -1,6 +1,16 @@
 import { View, StyleSheet } from "react-native";
 import SquishyPressable from "@/components/SquishyPressable";
 import { COLORING_BRUSH_SIZES } from "@/lib/coloring/palette";
+import { useT } from "@/lib/i18n/useT";
+
+// Slug -> i18n key for the brush-size a11y labels (the shared catalog stays
+// untouched; we map its stable `key` to the translation key at the render
+// site, mirroring SceneInput's t(`subject.${key}`) pattern).
+const BRUSH_SIZE_KEY: Record<string, string> = {
+  small: "fine",
+  medium: "regular",
+  large: "chunky",
+};
 
 /**
  * A row of 3 brush-size tiles, matching CC web's MobileColoringDrawer +
@@ -39,41 +49,44 @@ const BrushSizeRow = ({
   onSelect,
   color = TEXT_PRIMARY,
   tileSize = 56,
-}: BrushSizeRowProps) => (
-  <View style={styles.row}>
-    {COLORING_BRUSH_SIZES.map((brush) => {
-      const selected = brush.radius === selectedRadius;
-      const dotSize = dotSizeForRadius(brush.radius);
-      return (
-        <SquishyPressable
-          key={brush.key}
-          onPress={() => onSelect(brush.radius)}
-          scaleTo={0.95}
-          accessibilityRole="button"
-          accessibilityLabel={brush.name}
-          accessibilityState={{ selected }}
-          style={{ width: tileSize, height: tileSize }}
-        >
-          <View
-            style={[
-              styles.tileBase,
-              selected ? styles.selected : styles.unselected,
-            ]}
+}: BrushSizeRowProps) => {
+  const t = useT("mobile.coloring.brushSize");
+  return (
+    <View style={styles.row}>
+      {COLORING_BRUSH_SIZES.map((brush) => {
+        const selected = brush.radius === selectedRadius;
+        const dotSize = dotSizeForRadius(brush.radius);
+        return (
+          <SquishyPressable
+            key={brush.key}
+            onPress={() => onSelect(brush.radius)}
+            scaleTo={0.95}
+            accessibilityRole="button"
+            accessibilityLabel={t(BRUSH_SIZE_KEY[brush.key] ?? brush.key)}
+            accessibilityState={{ selected }}
+            style={{ width: tileSize, height: tileSize }}
           >
             <View
-              style={{
-                width: dotSize,
-                height: dotSize,
-                borderRadius: dotSize / 2,
-                backgroundColor: selected ? "#FFFFFF" : color,
-              }}
-            />
-          </View>
-        </SquishyPressable>
-      );
-    })}
-  </View>
-);
+              style={[
+                styles.tileBase,
+                selected ? styles.selected : styles.unselected,
+              ]}
+            >
+              <View
+                style={{
+                  width: dotSize,
+                  height: dotSize,
+                  borderRadius: dotSize / 2,
+                  backgroundColor: selected ? "#FFFFFF" : color,
+                }}
+              />
+            </View>
+          </SquishyPressable>
+        );
+      })}
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
   row: {

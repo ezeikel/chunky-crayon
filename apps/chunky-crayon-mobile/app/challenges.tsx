@@ -20,6 +20,7 @@ import SectionHeader from "@/components/SectionHeader/SectionHeader";
 import { tapMedium } from "@/utils/haptics";
 import { track } from "@/utils/analytics";
 import { ANALYTICS_EVENTS } from "@/constants/analytics";
+import { useT } from "@/lib/i18n/useT";
 import { COLORS } from "@/lib/design";
 import type { ChallengeWithProgress } from "@/api";
 
@@ -35,6 +36,7 @@ const WeeklyChallengeCard = ({
   onClaimReward,
   isClaimingReward,
 }: WeeklyChallengeCardProps) => {
+  const t = useT("mobile.challenges");
   const {
     challenge: def,
     progress,
@@ -47,12 +49,12 @@ const WeeklyChallengeCard = ({
   return (
     <View style={styles.weeklyCard}>
       <View style={styles.weeklyHeader}>
-        <Text style={styles.weeklyLabel}>This Week's Challenge</Text>
+        <Text style={styles.weeklyLabel}>{t("thisWeek")}</Text>
         {daysRemaining > 0 && (
           <View style={styles.daysRemaining}>
             <FontAwesomeIcon icon={faClock} size={12} color="#9CA3AF" />
             <Text style={styles.daysRemainingText}>
-              {daysRemaining} day{daysRemaining !== 1 ? "s" : ""} left
+              {t("daysLeft", { count: daysRemaining })}
             </Text>
           </View>
         )}
@@ -99,7 +101,7 @@ const WeeklyChallengeCard = ({
           ) : (
             <>
               <FontAwesomeIcon icon={faGift} size={18} color="#FFFFFF" />
-              <Text style={styles.claimButtonText}>Claim Reward!</Text>
+              <Text style={styles.claimButtonText}>{t("claimReward")}</Text>
             </>
           )}
         </Pressable>
@@ -108,7 +110,7 @@ const WeeklyChallengeCard = ({
       {isCompleted && rewardClaimed && (
         <View style={styles.completedBadge}>
           <FontAwesomeIcon icon={faCheck} size={16} color="#22C55E" />
-          <Text style={styles.completedText}>Completed!</Text>
+          <Text style={styles.completedText}>{t("completedBang")}</Text>
         </View>
       )}
     </View>
@@ -121,6 +123,7 @@ type PastChallengeCardProps = {
 };
 
 const PastChallengeCard = ({ challenge }: PastChallengeCardProps) => {
+  const t = useT("mobile.challenges");
   const { challenge: def, isCompleted, rewardClaimed } = challenge;
 
   return (
@@ -133,9 +136,9 @@ const PastChallengeCard = ({ challenge }: PastChallengeCardProps) => {
         <Text style={styles.pastStatus}>
           {isCompleted
             ? rewardClaimed
-              ? "Completed"
-              : "Reward unclaimed"
-            : "Incomplete"}
+              ? t("statusCompleted")
+              : t("statusRewardUnclaimed")
+            : t("statusIncomplete")}
         </Text>
       </View>
       {isCompleted && (
@@ -209,6 +212,7 @@ const AchievementCard = ({
 );
 
 const ChallengesScreen = () => {
+  const t = useT("mobile.challenges");
   const { activeProfile } = useUserContext();
   const { data: challengesData, isLoading } = useChallenges();
   const claimReward = useClaimChallengeReward();
@@ -227,32 +231,32 @@ const ChallengesScreen = () => {
   const achievements = [
     {
       id: "first-steps",
-      title: "First Steps",
-      description: "Complete your first coloring page",
+      title: t("achievements.firstSteps.title"),
+      description: t("achievements.firstSteps.description"),
       progress: artworkCount,
       total: 1,
       isLocked: false,
     },
     {
       id: "getting-started",
-      title: "Getting Started",
-      description: "Complete 5 coloring pages",
+      title: t("achievements.gettingStarted.title"),
+      description: t("achievements.gettingStarted.description"),
       progress: artworkCount,
       total: 5,
       isLocked: false,
     },
     {
       id: "dedicated-artist",
-      title: "Dedicated Artist",
-      description: "Complete 10 coloring pages",
+      title: t("achievements.dedicatedArtist.title"),
+      description: t("achievements.dedicatedArtist.description"),
       progress: artworkCount,
       total: 10,
       isLocked: artworkCount < 5,
     },
     {
       id: "master-artist",
-      title: "Master Artist",
-      description: "Complete 50 coloring pages",
+      title: t("achievements.masterArtist.title"),
+      description: t("achievements.masterArtist.description"),
       progress: artworkCount,
       total: 50,
       isLocked: artworkCount < 10,
@@ -275,11 +279,16 @@ const ChallengesScreen = () => {
       );
       if (result.success) {
         toast.success(
-          `You earned a new ${result.reward?.type === "sticker" ? "sticker" : "Colo accessory"}!`,
+          t("rewardEarned", {
+            reward:
+              result.reward?.type === "sticker"
+                ? t("rewardSticker")
+                : t("rewardAccessory"),
+          }),
         );
       }
     } catch {
-      toast.error("Couldn't claim that reward. Please try again.");
+      toast.error(t("claimFailed"));
     }
   };
 
@@ -293,10 +302,10 @@ const ChallengesScreen = () => {
         >
           {/* Header — medallion + title + warm subtitle (shared language). */}
           <SectionHeader
-            title="Challenges"
+            title={t("screenTitle")}
             icon={faTrophy}
             tint="gold"
-            subtitle="Complete challenges to earn rewards!"
+            subtitle={t("screenSubtitle")}
             style={styles.header}
           />
 
@@ -327,10 +336,10 @@ const ChallengesScreen = () => {
                     />
                   </View>
                   <Text style={styles.noChallengeText}>
-                    A brand-new challenge is on its way!
+                    {t("noChallengeTitle")}
                   </Text>
                   <Text style={styles.noChallengeSubtext}>
-                    Check back soon to earn more rewards.
+                    {t("noChallengeSubtitle")}
                   </Text>
                 </View>
               )}
@@ -339,7 +348,7 @@ const ChallengesScreen = () => {
               {history.length > 0 && (
                 <View style={styles.section}>
                   <SectionHeader
-                    title="Past Challenges"
+                    title={t("pastChallenges")}
                     icon={faClock}
                     tint="purple"
                   />
@@ -357,7 +366,7 @@ const ChallengesScreen = () => {
               {/* Lifetime Achievements */}
               <View style={styles.section}>
                 <SectionHeader
-                  title="Lifetime Achievements"
+                  title={t("lifetimeAchievements")}
                   icon={faStar}
                   tint="gold"
                 />

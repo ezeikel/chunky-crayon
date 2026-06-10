@@ -447,7 +447,8 @@
     "currentLanguage": "現在の言語",
     "selectLanguage": "言語を選択",
     "language": "言語",
-    "switchTo": "切り替え先"
+    "switchTo": "切り替え先",
+    "title": "言語"
   },
   "difficulty": {
     "easy": "かんたん",
@@ -456,6 +457,40 @@
   },
   "gallery": {
     "categoryNotFound": "カテゴリーが見つかりません",
-    "difficultyNotFound": "難易度が見つかりません"
+    "difficultyNotFound": "難易度が見つかりません",
+    "category": {
+      "animals": "動物",
+      "dinosaurs": "恐竜",
+      "dragons": "ドラゴン",
+      "fantasy": "ファンタジー＆魔法",
+      "food": "食べ物＆スイーツ",
+      "holidays": "行事＆季節",
+      "nature": "自然＆花",
+      "pirates": "海賊",
+      "princesses": "プリンセス＆王室",
+      "robots": "ロボット＆テクノロジー",
+      "space": "宇宙＆宇宙飛行士",
+      "superheroes": "スーパーヒーロー",
+      "underwater": "海の中＆海",
+      "unicorns": "ユニコーン",
+      "vehicles": "乗り物＆交通"
+    },
+    "categoryDescription": {
+      "animals": "子どもから大人まで楽しめる、かわいい＆ワイルドな動物のぬりえ",
+      "dinosaurs": "全年齢向けの太古の恐竜ぬりえ",
+      "dragons": "かわいいものから迫力あるものまで、ドラゴンのぬりえ",
+      "fantasy": "魔法の生き物とファンタジー世界のぬりえ",
+      "food": "おいしい食べ物、キャンディ、デザートのぬりえ",
+      "holidays": "クリスマス、イースター、ハロウィンなど季節のぬりえ",
+      "nature": "美しい自然の風景と花のぬりえ",
+      "pirates": "冒険心あふれる海賊アドベンチャーのぬりえ",
+      "princesses": "プリンセス、王子、お城のぬりえ",
+      "robots": "未来的なロボットとテクノロジーのぬりえ",
+      "space": "宇宙、ロケット、宇宙飛行士のぬりえ",
+      "superheroes": "迫力満点のスーパーヒーローぬりえ",
+      "underwater": "海の生き物と海中アドベンチャーのぬりえ",
+      "unicorns": "美しいユニコーンと虹のぬりえ",
+      "vehicles": "車、トラック、飛行機、電車のぬりえ"
+    }
   }
 }

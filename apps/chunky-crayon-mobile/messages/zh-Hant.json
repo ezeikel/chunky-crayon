@@ -13,11 +13,20 @@
       "createColoringPage": "建立著色頁",
       "creating": "建立中…",
       "tryAgain": "再試一次",
-      "cancel": "取消"
+      "cancel": "取消",
+      "seeAll": "查看全部"
     },
     "header": {
       "forGrownUps": "給大人看的",
-      "grownUps": "大人專區"
+      "grownUps": "大人專區",
+      "creditsA11y": "{{value}} 蜡筆金幣",
+      "openColoA11y": "開啟 Colo",
+      "profileA11y": "個人檔案：{{name}}",
+      "switchProfileA11y": "切換個人檔案，目前：{{name}}",
+      "back": "返回",
+      "challengesTitle": "挑戰",
+      "charactersTitle": "我的角色",
+      "settingsTitle": "設定"
     },
     "characterBuilder": {
       "step": {
@@ -35,11 +44,85 @@
       "next": "下一步",
       "makeFriend": "做出我的朋友",
       "creating": "繪製中…",
-      "createError": "出了一點問題，請再試一次。"
+      "createError": "出了一點問題，請再試一次。",
+      "color": {
+        "green": "綠色",
+        "orange": "橘色",
+        "pink": "粉紅色",
+        "purple": "紫色",
+        "teal": "藍綠色",
+        "yellow": "黃色"
+      },
+      "species": {
+        "dragon": "龍",
+        "fairy": "小仙子",
+        "kid": "小孩",
+        "kitten": "小貓",
+        "monster": "小怪獸",
+        "puppy": "小狗",
+        "robot": "機器人",
+        "unicorn": "獨角獸"
+      },
+      "trait": {
+        "bouncy": "活力十足",
+        "brave": "勇敢",
+        "curious": "好奇",
+        "loves-snacks": "愛吃零食",
+        "shy": "害羞",
+        "silly": "搞怪",
+        "sleepy": "愛睏",
+        "sparkly": "閃閃發亮"
+      },
+      "voice": {
+        "brave-neutral": "勇敢",
+        "gentle-neutral": "溫柔",
+        "playful-boy-5yo": "愛玩",
+        "playful-girl-5yo": "活力十足",
+        "silly-neutral": "搞怪",
+        "sleepy-neutral": "愛睏",
+        "warm-boy-7yo": "溫馨",
+        "warm-girl-7yo": "溫暖"
+      }
     },
     "challenges": {
       "homeCardTitle": "挑戰",
-      "homeCardSubtitle": "著色拿貼紙，讓 Colo 長大！"
+      "homeCardSubtitle": "著色拿貼紙，讓 Colo 長大！",
+      "achievements": {
+        "dedicatedArtist": {
+          "description": "完成 10 張著色頁",
+          "title": "專注小畫家"
+        },
+        "firstSteps": {
+          "description": "完成第一張著色頁",
+          "title": "第一步"
+        },
+        "gettingStarted": {
+          "description": "完成 5 張著色頁",
+          "title": "開始上手"
+        },
+        "masterArtist": {
+          "description": "完成 50 張著色頁",
+          "title": "大師小畫家"
+        }
+      },
+      "claimFailed": "無法領取獎勵，請再試一次。",
+      "claimReward": "領取獎勵！",
+      "completedBang": "完成！",
+      "daysLeft": "剩下 {{count}} 天",
+      "lifetimeAchievements": "終身成就",
+      "noChallengeSubtitle": "稍後再來看看，領更多獎勵。",
+      "noChallengeTitle": "全新挑戰即將登場！",
+      "pastChallenges": "過往挑戰",
+      "rewardAccessory": "Colo 配件",
+      "rewardEarned": "你獲得了新的{{reward}}！",
+      "rewardSticker": "貼紙",
+      "screenSubtitle": "完成挑戰就能拿獎勵！",
+      "screenTitle": "挑戰",
+      "statusCompleted": "已完成",
+      "statusIncomplete": "未完成",
+      "statusRewardUnclaimed": "獎勵未領取",
+      "thisWeek": "本週挑戰",
+      "daysLeft_other": "剩下 {{count}} 天"
     },
     "characters": {
       "loading": "正在載入你的朋友…",
@@ -72,7 +155,8 @@
     },
     "gallery": {
       "title": "探索",
-      "subtitle": "挑個有趣的來著色吧"
+      "subtitle": "挑個有趣的來著色吧",
+      "colorCategoryA11y": "為 {{name}} 上色"
     },
     "stickers": {
       "title": "貼紙收藏",
@@ -97,7 +181,11 @@
       "savedCount_other": "已儲存 {{count}} 件作品",
       "emptyTitle": "你已儲存的作品",
       "emptySubtitle": "你最喜歡的創作會出現在這裡。開始著色並儲存你的傑作吧！",
-      "emptyTip": "著色時點愛心圖示即可儲存"
+      "emptyTip": "著色時點愛心圖示即可儲存",
+      "coloringPageA11y": "著色頁",
+      "recentEmpty": "還沒有作品喔！點上方創作第一張吧！",
+      "recentTitle": "我的圖片",
+      "seeAllRecent": "查看我的所有圖片"
     },
     "upsideDownHint": {
       "title": "把我轉過來！",
@@ -106,6 +194,425 @@
     "create": {
       "greeting": "今天想畫什麼呢？",
       "subtitle": "選一種開始方式！"
+    },
+    "category": {
+      "allTitle": "所有著色頁",
+      "fallbackTitle": "分類",
+      "notFound": "找不到這個分類。"
+    },
+    "coloring": {
+      "enterFocusMode": "進入專注模式",
+      "exitFocusMode": "退出專注模式",
+      "generating": {
+        "title": "正在製作你的著色頁…",
+        "messages": {
+          "addingSparkles": "偷偷加點亮晶晶...",
+          "almostThere": "快完成了，做最後整理...",
+          "coloringOutsideLines": "努力不塗出線外...",
+          "creatingMasterpiece": "調整到剛剛好...",
+          "drawingLines": "正在畫出輪廓線...",
+          "mixingColors": "正在調出新顏色...",
+          "sharpeningCrayons": "正在削蠟筆...",
+          "wavingWand": "檢查看看都很完美..."
+        }
+      },
+      "magicHint": {
+        "useColor": "使用顏色"
+      },
+      "musicOff": "音樂關閉",
+      "musicOn": "音樂開啟",
+      "myArtwork": "我的作品",
+      "print": "列印",
+      "redo": "重做",
+      "save": "儲存",
+      "seeWholePicture": "看完整圖片",
+      "sfxOff": "音效關閉",
+      "sfxOn": "音效開啟",
+      "startOver": "重新開始",
+      "stickerPicker": {
+        "categoryA11y": "{{label}} 貼紙",
+        "heading": "挑一張貼紙！",
+        "hint": "現在點一下你的圖片！",
+        "stickerA11y": "貼紙 {{name}}",
+        "category": {
+          "animals": "動物",
+          "fun": "好玩",
+          "hearts": "愛心",
+          "nature": "大自然",
+          "shapes": "形狀",
+          "stars": "星星"
+        }
+      },
+      "tool": {
+        "gettingReady": "{{label}}（準備中）",
+        "tapToTryAgain": "{{label}}（點一下再試）",
+        "autoColor": "自動上色",
+        "crayon": "蠟筆",
+        "eraser": "橡皮擦",
+        "fill": "填色",
+        "glitter": "亮粉",
+        "magicBrush": "魔法筆刷",
+        "marker": "麥克筆",
+        "paint": "顏料",
+        "pencil": "鉛筆",
+        "sticker": "貼紙"
+      },
+      "undo": "復原",
+      "zoomIn": "放大",
+      "zoomOut": "縮小",
+      "addedToCollection": "已加入你的收藏！",
+      "back": "返回",
+      "brushSize": {
+        "chunky": "粗粗",
+        "fine": "細細",
+        "regular": "一般"
+      },
+      "captureFailed": "無法擷取你的作品。",
+      "myArtworkSheetConfirm": "加入我的收藏",
+      "myArtworkSheetTitle": "加入我的作品？",
+      "noData": "沒有資料",
+      "palette": {
+        "cute": "可愛",
+        "pastel": "粉彩",
+        "realistic": "寫實",
+        "surprise": "驚喜"
+      },
+      "panMode": "移動畫面",
+      "photoPermissionDenied": "請允許存取相片圖庫，才能儲存你的作品。",
+      "printFailed": "無法製作可列印的 PDF，請再試一次。",
+      "printQrCta": "掃描 QR code，發現更多著色頁！",
+      "printSheetConfirm": "製作可列印的 PDF",
+      "printSheetTitle": "要列印這一頁嗎？",
+      "saveFailed": "無法儲存你的作品，請再試一次。",
+      "saveSheetConfirm": "儲存到相片",
+      "saveSheetTitle": "要儲存這張圖片嗎？",
+      "savedToPhotos": "已儲存到你的相片圖庫！",
+      "startOverCancel": "不要，保留我的著色",
+      "startOverConfirm": "是的，重新開始",
+      "startOverTitle": "要重新開始嗎？",
+      "untitledArtwork": "我的作品"
+    },
+    "creditPack": {
+      "bestValue": "最划算",
+      "creditsLabel": "點數",
+      "rowA11y": "{{credits}} 點數，{{price}}",
+      "rowA11yBestValue": "{{credits}} 點數，{{price}}，最划算"
+    },
+    "feed": {
+      "challenge": "挑戰",
+      "claim": "領取！",
+      "continueColoring": "繼續上色",
+      "discoverMorePages": "探索更多頁面",
+      "emptyNoPages": "目前沒有著色頁可用，稍後再來看看！",
+      "errorLoading": "糟糕！載入動態時出了點問題。",
+      "moreToColor": "更多可上色",
+      "seeAllYourArt": "查看你的所有作品",
+      "seeAllYourColoring": "查看你所有的著色",
+      "seeAllYourCreations": "查看你所有的創作",
+      "today": "今天",
+      "yourArt": "你的作品",
+      "yourCreations": "你的創作"
+    },
+    "home": {
+      "coloProud": "你的 {{stageName}} 為你感到驕傲！",
+      "coloWantsToGrow": "{{stageName}} 想長大！再儲存 {{count}} 件作品就能進化！",
+      "discoverMore": "探索更多",
+      "discoverMoreA11y": "探索更多著色頁",
+      "greeting": "今天想畫什麼呢？",
+      "seeAllCategories": "查看所有分類",
+      "whatDoYouLike": "你喜歡什麼？",
+      "browseAllA11y": "瀏覽所有著色頁"
+    },
+    "onboarding": {
+      "coloring": {
+        "celebrationSubtitle": "你天生就是小小藝術家",
+        "celebrationTitle": "太棒了！",
+        "done": "我完成了",
+        "doneA11y": "完成",
+        "subtitle": "選個場景，把 Colo 上色吧",
+        "title": "輪到你創作啦！"
+      },
+      "paywall": {
+        "continue": "繼續",
+        "continueA11y": "繼續使用 App",
+        "description": "等孩子愛上之後，再選最適合的方案。",
+        "finePrint": "今天不收費。免費一週後每月 {{price}}。可隨時在設定中取消。{{guarantee}}。",
+        "maybeLater": "稍後再說",
+        "rainbowPlan": "彩虹方案",
+        "reviews": "（{{count}} 則評價）",
+        "seeAllPlans": "查看所有方案",
+        "startTrial": "開始免費一週",
+        "startTrialA11y": "開始免費一週",
+        "title": "無限著色，免費一週",
+        "trustLead": "深受家庭喜愛",
+        "unavailable": "目前無法提供方案。你可以先開始著色，之後再升級。",
+        "feature": {
+          "challenges": "每日挑戰與貼紙獎勵",
+          "magic": "魔法筆刷與語音上色",
+          "unlimited": "隨時無限著色頁"
+        },
+        "timeline": {
+          "day5": {
+            "text": "試用快結束前，我們會提醒你。",
+            "when": "第 5 天"
+          },
+          "day7": {
+            "text": "免費一週結束。之前隨時取消都不會收費。",
+            "when": "第 7 天"
+          },
+          "today": {
+            "text": "解鎖全部功能，想畫多久就畫多久。",
+            "when": "今天"
+          }
+        }
+      },
+      "sceneA11y": "{{label}} 場景",
+      "skip": "跳過",
+      "slide": {
+        "colo": {
+          "description": "孩子每次著色，Colo 都會進化！收集貼紙、完成每日挑戰，解鎖新階段。",
+          "title": "和 Colo 一起成長"
+        },
+        "creativity": {
+          "description": "孩子可以用說的、畫的，或拍張照片。我們把它變成專屬的著色頁。",
+          "title": "無限創意，零髒亂"
+        },
+        "safety": {
+          "description": "無廣告、無社交功能、不收集資料。為 3–8 歲設計，你掌握一切。",
+          "title": "安全、簡單、為小手打造"
+        }
+      },
+      "scene": {
+        "onboarding-jungle": "叢林",
+        "onboarding-party": "派對",
+        "onboarding-space": "太空",
+        "onboarding-underwater": "海底世界"
+      }
+    },
+    "paywall": {
+      "annualSaveBadge": "送 2 個月",
+      "closeA11y": "關閉",
+      "creditsPerMo": "每月 {{credits}} 點數",
+      "ctaA11y": "開始 {{plan}} 的 7 天免費試用",
+      "ctaMicrocopy": "之後為 {{price}}/{{period}}。期間前可隨時取消。",
+      "ctaText": "開始 7 天免費試用",
+      "guarantee": "30 天退款保證",
+      "legalRenew": "訂閱會自動續費，可隨時在設定中取消。",
+      "loadingPlans": "正在載入方案…",
+      "monthPeriod": "月",
+      "monthly": "每月",
+      "mostPopular": "最受歡迎",
+      "perMonthShort": "月",
+      "perYearShort": "年",
+      "planRowA11y": "{{plan}}，每月 {{credits}} 點數，{{price}}／{{period}}",
+      "plansUnavailable": "目前無法提供方案，請稍後再試。",
+      "privacyPolicy": "隱私權政策",
+      "processing": "處理中…",
+      "restore": "恢復購買",
+      "restoreA11y": "恢復購買",
+      "socialProof": {
+        "reviewCount": "來自 {{count}} 則評價",
+        "title": "深受各地家庭喜愛"
+      },
+      "subtitle": "想做多少頁都行。可列印或在螢幕上著色。",
+      "termsOfService": "服務條款",
+      "title": "解鎖無限著色",
+      "yearPeriod": "年",
+      "yearly": "每年"
+    },
+    "profileSwitcher": {
+      "addProfile": "新增個人檔案",
+      "artworkCount": "{{count}} 件作品",
+      "done": "完成",
+      "edit": "編輯",
+      "maxReached": "最多可建立 {{count}} 個個人檔案",
+      "namePlaceholder": "個人檔案名稱",
+      "title": "個人檔案",
+      "toast": {
+        "createFailed": "無法建立個人檔案，請再試一次。",
+        "deleteFailed": "無法刪除個人檔案，請再試一次。",
+        "minOneProfile": "至少需要一個個人檔案。",
+        "switchFailed": "無法切換個人檔案，請再試一次。",
+        "updateFailed": "無法更新個人檔案，請再試一次。"
+      },
+      "deleteConfirm": {
+        "title": "要刪除個人檔案嗎？",
+        "description": "這會刪除「{{name}}」及所有已儲存的圖片。",
+        "confirm": "刪除"
+      },
+      "artworkCount_other": "{{count}} 件作品"
+    },
+    "settings": {
+      "backgroundMusic": {
+        "subtitle": "著色時的環境音",
+        "title": "背景音樂"
+      },
+      "bannerA11y": "{{plan}} 方案，{{credits}} 點數。管理訂閱。",
+      "bannerCtaManage": "管理",
+      "bannerCtaUpgrade": "升級",
+      "bannerPlanTitle": "{{plan}} 方案",
+      "bannerSubtitleUpgrade": " · 升級以繼續著色",
+      "contact": {
+        "title": "聯絡我們"
+      },
+      "creditCount": "{{formattedCount}} 點數",
+      "help": {
+        "subtitle": "常見問題解答",
+        "title": "說明與常見問題"
+      },
+      "language": {
+        "title": "語言"
+      },
+      "madeWith": "製作於",
+      "madeWithIn": "在",
+      "madeWithLocation": "倫敦南部",
+      "magicLinkSent": {
+        "body": "我們已將登入連結寄到 {{email}}",
+        "subtext": "點擊信件中的連結即可登入。連結將於 15 分鐘後失效。",
+        "title": "請查看信箱！",
+        "useDifferentEmail": "使用其他 Email"
+      },
+      "onboarding": {
+        "subtitle": "重看歡迎導覽",
+        "title": "查看新手導覽"
+      },
+      "planChip": "{{plan}} 方案",
+      "privacy": {
+        "title": "隱私權政策"
+      },
+      "profiles": {
+        "add": "新增",
+        "addA11y": "新增個人檔案",
+        "currentProfileA11y": "{{name}}，目前個人檔案",
+        "manageA11y": "{{name}}，管理個人檔案"
+      },
+      "rate": {
+        "subtitle": "分享你的意見",
+        "title": "為 App 評分"
+      },
+      "section": {
+        "account": "帳號",
+        "appInfo": "App 資訊",
+        "legal": "法律資訊",
+        "preferences": "偏好設定",
+        "profiles": "個人檔案",
+        "support": "支援"
+      },
+      "signIn": {
+        "subtitle": "在裝置間同步作品",
+        "title": "登入"
+      },
+      "signInModal": {
+        "continueApple": "使用 Apple 繼續",
+        "continueFacebook": "使用 Facebook 繼續",
+        "continueGoogle": "使用 Google 繼續",
+        "emailLabel": "使用 Email 登入",
+        "emailPlaceholder": "輸入你的 Email",
+        "or": "或",
+        "privacyNote": "登入即表示你同意我們的服務條款與隱私權政策。",
+        "sendMagicLink": "寄出登入連結",
+        "subtitle": "登入以在裝置間同步作品，並在網頁上存取你的帳號。",
+        "title": "登入"
+      },
+      "signOut": {
+        "subtitle": "作品會留在這台裝置上",
+        "title": "登出"
+      },
+      "signOutConfirm": {
+        "confirm": "登出",
+        "description": "你的作品會留在這台裝置上。",
+        "title": "要登出嗎？"
+      },
+      "soundEffects": {
+        "subtitle": "按鈕與操作音效",
+        "title": "音效"
+      },
+      "terms": {
+        "title": "服務條款"
+      },
+      "toast": {
+        "accountLinked": "帳號已連結，作品已同步！",
+        "appleSignInFailed": "無法使用 Apple 登入，請再試一次。",
+        "facebookSignInFailed": "無法使用 Facebook 登入，請再試一次。",
+        "googleSignInFailed": "無法使用 Google 登入，請再試一次。",
+        "invalidEmail": "請輸入有效的 Email。",
+        "magicLinkFailed": "無法寄出登入連結，請再試一次。",
+        "signedIn": "你已登入！",
+        "signedOut": "你已登出。作品會留在這台裝置上。"
+      },
+      "version": {
+        "title": "版本"
+      },
+      "vibration": {
+        "subtitle": "點擊與獎勵時輕微震動",
+        "title": "震動"
+      },
+      "creditCount_other": "{{formattedCount}} 點數"
+    },
+    "subscriptionManager": {
+      "accessUntil": "可使用至",
+      "buyCredits": "購買點數",
+      "creditsAvailable": "可用 {{count}} 點數",
+      "legal": "除非在目前期間結束前至少 24 小時取消，訂閱將自動續費。你可隨時在 {{store}} 設定中管理或取消。",
+      "manageSubscription": "管理訂閱",
+      "noActiveSubscription": "沒有啟用中的訂閱",
+      "planIncludes": "方案包含",
+      "planName": "{{plan}} 方案",
+      "renews": "續訂日",
+      "restorePurchases": "恢復購買",
+      "status": {
+        "active": "啟用中",
+        "cancelled": "已取消",
+        "paymentIssue": "付款問題",
+        "trial": "試用中"
+      },
+      "subscribeNow": "立即訂閱",
+      "title": "訂閱與點數",
+      "upgradePlan": "升級方案",
+      "creditsAvailable_other": "可用 {{count}} 點數"
+    },
+    "topUp": {
+      "closeA11y": "關閉",
+      "legal": "購買後點數會立即加到你的帳號。點數不會過期。",
+      "loading": "正在載入點數方案…",
+      "subtitle": "不更改方案也能補充點數，繼續創作。",
+      "title": "補充點數",
+      "unavailable": "目前無法購買點數方案。"
+    },
+    "avatar": {
+      "alien": "外星人",
+      "astronaut": "太空人",
+      "dragon": "龍",
+      "ghost": "幽靈",
+      "ice-cream": "冰淇淋",
+      "mermaid": "美人魚",
+      "rainbow": "彩虹",
+      "rocket": "火箭",
+      "sun": "太陽",
+      "superhero": "超級英雄",
+      "unicorn": "獨角獸",
+      "wizard": "魔法師"
+    },
+    "avatarPicker": {
+      "pickA11y": "選擇 {{name}}"
+    },
+    "createProfile": {
+      "create": "建立",
+      "namePlaceholder": "你叫什麼名字？",
+      "pickCharacter": "選擇你的角色"
+    },
+    "parentalGate": {
+      "closeA11y": "關閉",
+      "defaultSubtitle": "點選正確答案繼續。",
+      "defaultTitle": "小小確認",
+      "hint": "大人請點選正確答案以繼續。",
+      "purchaseSubtitle": "請確認你是家長才能購買",
+      "purchaseTitle": "家長驗證",
+      "subscriptionSubtitle": "請確認你是家長才能開始訂閱"
+    },
+    "profileAvatar": {
+      "a11yFallback": "個人頭像",
+      "a11yNamed": "{{name}} 的頭像"
     }
   },
   "createForm": {
@@ -199,6 +706,46 @@
       "errorQ2AudioFailed": "無法播放問題。要再試一次嗎？",
       "errorTimeout": "等太久啦！我們重新開始。",
       "errorRequiresSignin": "登入後才能使用語音模式。"
+    },
+    "error": {
+      "characterNotReady": "那位小夥伴還沒準備好。等等再試一次吧。",
+      "generic": "出了點小狀況。請再試一次。",
+      "moderationBlocked": "我們換個點子來畫畫吧！"
+    },
+    "friendPicker": {
+      "emptyInviteSuffix": " 一起出現在你的頁面裡！",
+      "header": "加入小夥伴",
+      "includeFriendA11y": "加入 {{name}}（{{species}}）",
+      "makeFriend": "做個小夥伴",
+      "makeNewFriend": "做個新小夥伴",
+      "newFriend": "新小夥伴",
+      "noFriend": "不加小夥伴",
+      "optional": "（選填）"
+    },
+    "image": {
+      "camera": "相機",
+      "cameraPermissionDenied": "需要相機權限才能拍照。",
+      "confirmInstructions": "好棒的照片！這張就是你要的嗎？",
+      "createFailed": "無法用照片製作著色頁。",
+      "createFailedToast": "沒辦法把你的照片變成著色頁。再試一次！",
+      "instructions": "拍張照片或上傳圖片！",
+      "libraryPermissionDenied": "需要相簿權限才能選取圖片。",
+      "pickAnother": "換一張",
+      "pickImageFailed": "無法選取這張圖片。請再試一次。",
+      "processing": "正在製作你的著色頁…",
+      "takePhotoFailed": "無法拍照。請再試一次。",
+      "upload": "上傳"
+    },
+    "mode": {
+      "a11yLabel": "{{mode}} 輸入模式",
+      "unlockSaveFailed": "無法儲存這次解鎖。可能沒成功，請再試一次。",
+      "image": "照片",
+      "scene": "組合",
+      "text": "輸入",
+      "voice": "說話"
+    },
+    "text": {
+      "placeholder": "你想著色什麼呢？"
     }
   }
 }

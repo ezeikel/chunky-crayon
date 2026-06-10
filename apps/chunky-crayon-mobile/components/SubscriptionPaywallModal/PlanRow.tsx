@@ -9,6 +9,7 @@ import {
   type PlanKey,
 } from "@/lib/paywall/plans";
 import { formatPackagePrice } from "@/hooks/usePaywall";
+import { useT } from "@/lib/i18n/useT";
 
 /**
  * One compact, selectable subscription plan row (Duolingo-style): name +
@@ -39,6 +40,7 @@ const PlanRow = ({
   isSelected,
   onPress,
 }: PlanRowProps) => {
+  const t = useT("mobile.paywall");
   const price = formatPackagePrice(pkg);
 
   return (
@@ -47,7 +49,12 @@ const PlanRow = ({
       scaleTo={0.97}
       accessibilityRole="button"
       accessibilityState={{ selected: isSelected }}
-      accessibilityLabel={`${PLAN_DISPLAY_NAMES[planKey]}, ${credits} credits a month, ${price} per ${cycle === "annual" ? "year" : "month"}`}
+      accessibilityLabel={t("planRowA11y", {
+        plan: PLAN_DISPLAY_NAMES[planKey],
+        credits,
+        price,
+        period: cycle === "annual" ? t("yearPeriod") : t("monthPeriod"),
+      })}
       style={styles.pressable}
     >
       <View
@@ -60,7 +67,7 @@ const PlanRow = ({
         {isBestValue && (
           <View style={styles.badge}>
             <FontAwesomeIcon icon={faStar} size={9} color="#FFFFFF" />
-            <Text style={styles.badgeText}>Most Popular</Text>
+            <Text style={styles.badgeText}>{t("mostPopular")}</Text>
           </View>
         )}
 
@@ -72,13 +79,15 @@ const PlanRow = ({
         <View style={styles.info}>
           <Text style={styles.name}>{PLAN_DISPLAY_NAMES[planKey]}</Text>
           <Text style={styles.tagline} numberOfLines={1}>
-            {credits} credits/mo · {PLAN_TAGLINES[planKey]}
+            {t("creditsPerMo", { credits })} · {PLAN_TAGLINES[planKey]}
           </Text>
         </View>
 
         <View style={styles.priceCol}>
           <Text style={styles.price}>{price}</Text>
-          <Text style={styles.cycle}>/{cycle === "annual" ? "yr" : "mo"}</Text>
+          <Text style={styles.cycle}>
+            /{cycle === "annual" ? t("perYearShort") : t("perMonthShort")}
+          </Text>
         </View>
       </View>
     </SquishyPressable>

@@ -2,6 +2,7 @@ import { View, Text, StyleSheet } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faStar } from "@fortawesome/pro-solid-svg-icons";
 import { PAYWALL_TRUST } from "@/lib/paywall/plans";
+import { useT } from "@/lib/i18n/useT";
 
 /**
  * Social proof, mirroring CC web's homepage/pricing Testimonials header
@@ -50,54 +51,58 @@ const getInitialsBg = (name: string): string => {
   return INITIALS_BG[hash % INITIALS_BG.length];
 };
 
-const PaywallSocialProof = () => (
-  <View style={styles.container}>
-    <Text style={styles.title}>Loved by families everywhere</Text>
+const PaywallSocialProof = () => {
+  const t = useT("mobile.paywall.socialProof");
 
-    <View style={styles.statsRow}>
-      {/* Overlapping initials cluster — reads as "real people who didn't
-          upload a photo", matching web's SocialProofHeader. */}
-      <View style={styles.cluster}>
-        {CLUSTER_NAMES.map((name, i) => (
-          <View
-            key={name}
-            style={[
-              styles.avatar,
-              {
-                backgroundColor: getInitialsBg(name),
-                zIndex: CLUSTER_NAMES.length - i,
-              },
-              i > 0 && styles.avatarOverlap,
-            ]}
-          >
-            <Text style={styles.avatarInitials}>{getInitials(name)}</Text>
-          </View>
-        ))}
-      </View>
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>{t("title")}</Text>
 
-      <View style={styles.rating}>
-        <View style={styles.stars}>
-          {[0, 1, 2, 3, 4].map((i) => (
-            <FontAwesomeIcon
-              key={i}
-              icon={faStar}
-              size={13}
-              color={
-                i < Math.floor(PAYWALL_TRUST.averageRating)
-                  ? "#FBBF24"
-                  : "#E5E0D8"
-              }
-            />
+      <View style={styles.statsRow}>
+        {/* Overlapping initials cluster — reads as "real people who didn't
+            upload a photo", matching web's SocialProofHeader. */}
+        <View style={styles.cluster}>
+          {CLUSTER_NAMES.map((name, i) => (
+            <View
+              key={name}
+              style={[
+                styles.avatar,
+                {
+                  backgroundColor: getInitialsBg(name),
+                  zIndex: CLUSTER_NAMES.length - i,
+                },
+                i > 0 && styles.avatarOverlap,
+              ]}
+            >
+              <Text style={styles.avatarInitials}>{getInitials(name)}</Text>
+            </View>
           ))}
         </View>
-        <Text style={styles.ratingValue}>{PAYWALL_TRUST.averageRating}</Text>
-        <Text style={styles.ratingCount}>
-          from {PAYWALL_TRUST.reviewCount} reviews
-        </Text>
+
+        <View style={styles.rating}>
+          <View style={styles.stars}>
+            {[0, 1, 2, 3, 4].map((i) => (
+              <FontAwesomeIcon
+                key={i}
+                icon={faStar}
+                size={13}
+                color={
+                  i < Math.floor(PAYWALL_TRUST.averageRating)
+                    ? "#FBBF24"
+                    : "#E5E0D8"
+                }
+              />
+            ))}
+          </View>
+          <Text style={styles.ratingValue}>{PAYWALL_TRUST.averageRating}</Text>
+          <Text style={styles.ratingCount}>
+            {t("reviewCount", { count: PAYWALL_TRUST.reviewCount })}
+          </Text>
+        </View>
       </View>
     </View>
-  </View>
-);
+  );
+};
 
 const styles = StyleSheet.create({
   container: {

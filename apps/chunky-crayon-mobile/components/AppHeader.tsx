@@ -26,14 +26,16 @@ type CreditsChipProps = {
 
 // Vivid crayon-coin chip. Reads as intentional even at 0 — the coin is
 // the hero, the number rides shotgun. Whole chip is a ≥44pt tap target.
-const CreditsChip = ({ value, onPress }: CreditsChipProps) => (
+const CreditsChip = ({ value, onPress }: CreditsChipProps) => {
+  const t = useT("mobile.header");
+  return (
   <Pressable
     style={({ pressed }) => [styles.creditsChip, pressed && styles.pressed]}
     onPress={onPress}
     disabled={!onPress}
     hitSlop={8}
     accessibilityRole="button"
-    accessibilityLabel={`${value} crayon coins`}
+    accessibilityLabel={t("creditsA11y", { value })}
   >
     <View style={styles.coinBadge}>
       <FontAwesomeIcon
@@ -45,7 +47,8 @@ const CreditsChip = ({ value, onPress }: CreditsChipProps) => (
     </View>
     <Text style={styles.creditsValue}>{value}</Text>
   </Pressable>
-);
+  );
+};
 
 type ProfilePillProps = {
   name: string;
@@ -69,6 +72,7 @@ const ProfilePill = ({
   onColoPress,
   onProfilePress,
 }: ProfilePillProps) => {
+  const t = useT("mobile.header");
   // Split-tap when callers give separate handlers; otherwise the whole
   // chunky pill is one big target (the old single-Pressable shape).
   const hasSplit = onColoPress != null || onProfilePress != null;
@@ -79,7 +83,7 @@ const ProfilePill = ({
         style={({ pressed }) => [styles.profilePill, pressed && styles.pressed]}
         onPress={onPress}
         accessibilityRole="button"
-        accessibilityLabel={`Profile: ${name}`}
+        accessibilityLabel={t("profileA11y", { name })}
       >
         <ProfileAvatar avatarId={avatarId} name={name} size="sm" />
         <Text style={styles.profileName} numberOfLines={1}>
@@ -95,7 +99,7 @@ const ProfilePill = ({
         style={({ pressed }) => [styles.coloTap, pressed && styles.pressed]}
         onPress={onColoPress}
         accessibilityRole="button"
-        accessibilityLabel="Open Colo"
+        accessibilityLabel={t("openColoA11y")}
       >
         <ProfileAvatar avatarId={avatarId} name={name} size="sm" />
       </Pressable>
@@ -103,7 +107,7 @@ const ProfilePill = ({
         style={({ pressed }) => [styles.nameTap, pressed && styles.pressed]}
         onPress={onProfilePress}
         accessibilityRole="button"
-        accessibilityLabel={`Switch profile, current: ${name}`}
+        accessibilityLabel={t("switchProfileA11y", { name })}
       >
         <Text style={styles.profileName} numberOfLines={1}>
           {name}

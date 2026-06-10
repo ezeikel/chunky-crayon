@@ -13,11 +13,20 @@
       "createColoringPage": "Ausmalbild erstellen",
       "creating": "Wird erstellt...",
       "tryAgain": "Nochmal versuchen",
-      "cancel": "Abbrechen"
+      "cancel": "Abbrechen",
+      "seeAll": "Alle ansehen"
     },
     "header": {
       "forGrownUps": "Für Erwachsene",
-      "grownUps": "Erwachsene"
+      "grownUps": "Erwachsene",
+      "creditsA11y": "{{value}} Buntstift-Münzen",
+      "openColoA11y": "Colo öffnen",
+      "profileA11y": "Profil: {{name}}",
+      "switchProfileA11y": "Profil wechseln, aktuell: {{name}}",
+      "back": "Zurück",
+      "challengesTitle": "Challenges",
+      "charactersTitle": "Meine Charaktere",
+      "settingsTitle": "Einstellungen"
     },
     "characterBuilder": {
       "step": {
@@ -35,11 +44,85 @@
       "next": "Weiter",
       "makeFriend": "Meinen Freund machen",
       "creating": "Wird gezeichnet...",
-      "createError": "Etwas ist schiefgelaufen. Bitte versuch es noch einmal."
+      "createError": "Etwas ist schiefgelaufen. Bitte versuch es noch einmal.",
+      "color": {
+        "green": "Grün",
+        "orange": "Orange",
+        "pink": "Pink",
+        "purple": "Lila",
+        "teal": "Türkis",
+        "yellow": "Gelb"
+      },
+      "species": {
+        "dragon": "Drache",
+        "fairy": "Fee",
+        "kid": "Kind",
+        "kitten": "Kätzchen",
+        "monster": "Monster",
+        "puppy": "Welpe",
+        "robot": "Roboter",
+        "unicorn": "Einhorn"
+      },
+      "trait": {
+        "bouncy": "Hüpfend",
+        "brave": "Mutig",
+        "curious": "Neugierig",
+        "loves-snacks": "Naschig",
+        "shy": "Schüchtern",
+        "silly": "Albern",
+        "sleepy": "Müde",
+        "sparkly": "Glitzernd"
+      },
+      "voice": {
+        "brave-neutral": "Mutig",
+        "gentle-neutral": "Sanft",
+        "playful-boy-5yo": "Verspielt",
+        "playful-girl-5yo": "Hüpfend",
+        "silly-neutral": "Albern",
+        "sleepy-neutral": "Müde",
+        "warm-boy-7yo": "Kuschelig",
+        "warm-girl-7yo": "Warm"
+      }
     },
     "challenges": {
       "homeCardTitle": "Aufgaben",
-      "homeCardSubtitle": "Male aus, sammle Sticker und lass Colo wachsen!"
+      "homeCardSubtitle": "Male aus, sammle Sticker und lass Colo wachsen!",
+      "achievements": {
+        "dedicatedArtist": {
+          "description": "Schließe 10 Ausmalbilder ab",
+          "title": "Fleißige:r Künstler:in"
+        },
+        "firstSteps": {
+          "description": "Schließe dein erstes Ausmalbild ab",
+          "title": "Erste Schritte"
+        },
+        "gettingStarted": {
+          "description": "Schließe 5 Ausmalbilder ab",
+          "title": "Los geht’s"
+        },
+        "masterArtist": {
+          "description": "Schließe 50 Ausmalbilder ab",
+          "title": "Meisterkünstler:in"
+        }
+      },
+      "claimFailed": "Belohnung konnte nicht abgeholt werden. Bitte versuch es erneut.",
+      "claimReward": "Belohnung abholen!",
+      "completedBang": "Geschafft!",
+      "daysLeft": "Noch {{count}} Tag",
+      "lifetimeAchievements": "Erfolge insgesamt",
+      "noChallengeSubtitle": "Schau bald wieder vorbei, um mehr Belohnungen zu verdienen.",
+      "noChallengeTitle": "Eine neue Challenge ist unterwegs!",
+      "pastChallenges": "Vergangene Challenges",
+      "rewardAccessory": "Colo-Accessoire",
+      "rewardEarned": "Du hast ein neues {{reward}} bekommen!",
+      "rewardSticker": "Sticker",
+      "screenSubtitle": "Meistere Challenges und verdiene Belohnungen!",
+      "screenTitle": "Challenges",
+      "statusCompleted": "Abgeschlossen",
+      "statusIncomplete": "Nicht abgeschlossen",
+      "statusRewardUnclaimed": "Belohnung nicht abgeholt",
+      "thisWeek": "Challenge dieser Woche",
+      "daysLeft_other": "Noch {{count}} Tage"
     },
     "characters": {
       "loading": "Deine Freunde werden geladen...",
@@ -72,7 +155,8 @@
     },
     "gallery": {
       "title": "Entdecken",
-      "subtitle": "Such dir etwas Lustiges zum Ausmalen aus"
+      "subtitle": "Such dir etwas Lustiges zum Ausmalen aus",
+      "colorCategoryA11y": "{{name}} ausmalen"
     },
     "stickers": {
       "title": "Sticker-Sammlung",
@@ -97,7 +181,11 @@
       "savedCount_other": "{{count}} gespeicherte Kunstwerke",
       "emptyTitle": "Deine gespeicherten Kunstwerke",
       "emptySubtitle": "Deine Lieblingswerke erscheinen hier. Fang an zu malen und speichere deine Meisterwerke!",
-      "emptyTip": "Tippe beim Ausmalen auf das Herz, um zu speichern"
+      "emptyTip": "Tippe beim Ausmalen auf das Herz, um zu speichern",
+      "coloringPageA11y": "Ausmalbild",
+      "recentEmpty": "Noch keine Bilder. Tippe oben, um dein erstes zu erstellen!",
+      "recentTitle": "Meine Bilder",
+      "seeAllRecent": "Alle meine Bilder ansehen"
     },
     "upsideDownHint": {
       "title": "Dreh mich um!",
@@ -106,6 +194,425 @@
     "create": {
       "greeting": "Was möchtest du heute ausmalen?",
       "subtitle": "Wähle einen Start!"
+    },
+    "category": {
+      "allTitle": "Alle Ausmalbilder",
+      "fallbackTitle": "Kategorie",
+      "notFound": "Diese Kategorie konnten wir nicht finden."
+    },
+    "coloring": {
+      "enterFocusMode": "Fokusmodus starten",
+      "exitFocusMode": "Fokusmodus beenden",
+      "generating": {
+        "title": "Dein Ausmalbild wird erstellt…",
+        "messages": {
+          "addingSparkles": "Ein bisschen Glitzer kommt dazu...",
+          "almostThere": "Die letzten Details werden ergänzt...",
+          "coloringOutsideLines": "Wir versuchen, nicht über die Linien zu malen...",
+          "creatingMasterpiece": "Wir machen es ganz genau richtig...",
+          "drawingLines": "Die Umrisse werden gezeichnet...",
+          "mixingColors": "Neue Farben werden gemischt...",
+          "sharpeningCrayons": "Die Stifte werden gespitzt...",
+          "wavingWand": "Wir prüfen, ob alles gut aussieht..."
+        }
+      },
+      "magicHint": {
+        "useColor": "Farbe verwenden"
+      },
+      "musicOff": "Musik aus",
+      "musicOn": "Musik an",
+      "myArtwork": "Meine Kunstwerke",
+      "print": "Drucken",
+      "redo": "Wiederholen",
+      "save": "Speichern",
+      "seeWholePicture": "Ganzes Bild ansehen",
+      "sfxOff": "Soundeffekte aus",
+      "sfxOn": "Soundeffekte an",
+      "startOver": "Neu anfangen",
+      "stickerPicker": {
+        "categoryA11y": "{{label}}-Sticker",
+        "heading": "Such dir einen Sticker aus!",
+        "hint": "Jetzt auf dein Bild tippen!",
+        "stickerA11y": "Sticker {{name}}",
+        "category": {
+          "animals": "Tiere",
+          "fun": "Spaß",
+          "hearts": "Herzen",
+          "nature": "Natur",
+          "shapes": "Formen",
+          "stars": "Sterne"
+        }
+      },
+      "tool": {
+        "gettingReady": "{{label}} (wird vorbereitet)",
+        "tapToTryAgain": "{{label}} (tippe zum Wiederholen)",
+        "autoColor": "Auto-Farbe",
+        "crayon": "Buntstift",
+        "eraser": "Radierer",
+        "fill": "Füllen",
+        "glitter": "Glitzer",
+        "magicBrush": "Zauberpinsel",
+        "marker": "Filzstift",
+        "paint": "Farbe",
+        "pencil": "Bleistift",
+        "sticker": "Sticker"
+      },
+      "undo": "Rückgängig",
+      "zoomIn": "Vergrößern",
+      "zoomOut": "Verkleinern",
+      "addedToCollection": "Zur Sammlung hinzugefügt!",
+      "back": "Zurück",
+      "brushSize": {
+        "chunky": "Dick",
+        "fine": "Fein",
+        "regular": "Normal"
+      },
+      "captureFailed": "Dein Kunstwerk konnte nicht erfasst werden.",
+      "myArtworkSheetConfirm": "Zu meiner Sammlung hinzufügen",
+      "myArtworkSheetTitle": "Zu „Meine Kunstwerke“ hinzufügen?",
+      "noData": "Keine Daten",
+      "palette": {
+        "cute": "Süß",
+        "pastel": "Pastell",
+        "realistic": "Realistisch",
+        "surprise": "Überraschung"
+      },
+      "panMode": "Verschieben",
+      "photoPermissionDenied": "Bitte erlaube den Zugriff auf deine Fotos, um dein Kunstwerk zu speichern.",
+      "printFailed": "PDF zum Drucken konnte nicht erstellt werden. Bitte versuch es erneut.",
+      "printQrCta": "Scanne den QR-Code und entdecke mehr Ausmalbilder!",
+      "printSheetConfirm": "PDF zum Drucken erstellen",
+      "printSheetTitle": "Diese Seite drucken?",
+      "saveFailed": "Dein Kunstwerk konnte nicht gespeichert werden. Bitte versuch es erneut.",
+      "saveSheetConfirm": "In Fotos speichern",
+      "saveSheetTitle": "Dein Bild speichern?",
+      "savedToPhotos": "In deiner Fotomediathek gespeichert!",
+      "startOverCancel": "Nein, weiter ausmalen",
+      "startOverConfirm": "Ja, neu anfangen",
+      "startOverTitle": "Neu anfangen?",
+      "untitledArtwork": "Mein Kunstwerk"
+    },
+    "creditPack": {
+      "bestValue": "Bestes Angebot",
+      "creditsLabel": "Credits",
+      "rowA11y": "{{credits}} Credits für {{price}}",
+      "rowA11yBestValue": "{{credits}} Credits für {{price}}, bestes Angebot"
+    },
+    "feed": {
+      "challenge": "Challenge",
+      "claim": "Abholen!",
+      "continueColoring": "Weiter ausmalen",
+      "discoverMorePages": "Mehr Seiten entdecken",
+      "emptyNoPages": "Im Moment sind keine Ausmalbilder verfügbar. Schau bald wieder vorbei!",
+      "errorLoading": "Oh nein! Beim Laden deines Feeds ist etwas schiefgelaufen.",
+      "moreToColor": "Mehr zum Ausmalen",
+      "seeAllYourArt": "Alle deine Bilder ansehen",
+      "seeAllYourColoring": "Alle deine Ausmalbilder ansehen",
+      "seeAllYourCreations": "Alle deine Kreationen ansehen",
+      "today": "Heute",
+      "yourArt": "Deine Bilder",
+      "yourCreations": "Deine Kreationen"
+    },
+    "home": {
+      "coloProud": "Dein {{stageName}} ist so stolz auf dich!",
+      "coloWantsToGrow": "{{stageName}} möchte wachsen! Speichere noch {{count}} Kunstwerke, damit es sich weiterentwickelt!",
+      "discoverMore": "Mehr entdecken",
+      "discoverMoreA11y": "Mehr Ausmalbilder entdecken",
+      "greeting": "Was möchtest du heute ausmalen?",
+      "seeAllCategories": "Alle Kategorien ansehen",
+      "whatDoYouLike": "Was magst du?",
+      "browseAllA11y": "Alle Ausmalbilder durchstöbern"
+    },
+    "onboarding": {
+      "coloring": {
+        "celebrationSubtitle": "Du bist ein Naturtalent",
+        "celebrationTitle": "Super!",
+        "done": "Fertig",
+        "doneA11y": "Fertig",
+        "subtitle": "Wähle eine Szene und male Colo aus",
+        "title": "Du bist dran!"
+      },
+      "paywall": {
+        "continue": "Weiter",
+        "continueA11y": "Weiter zur App",
+        "description": "Danach wählst du den passenden Plan, sobald ihr begeistert seid.",
+        "finePrint": "Heute keine Kosten. Danach {{price}}/Monat nach deiner Gratiswoche. Jederzeit in den Einstellungen kündbar. {{guarantee}}.",
+        "maybeLater": "Vielleicht später",
+        "rainbowPlan": "Regenbogen-Plan",
+        "reviews": "({{count}} Bewertungen)",
+        "seeAllPlans": "Alle Pläne ansehen",
+        "startTrial": "Gratiswoche starten",
+        "startTrialA11y": "Gratiswoche starten",
+        "title": "Unbegrenzt ausmalen – eine Woche gratis",
+        "trustLead": "Von Familien geliebt",
+        "unavailable": "Pläne sind gerade nicht verfügbar. Du kannst schon loslegen und später upgraden.",
+        "feature": {
+          "challenges": "Tägliche Challenges und Sticker-Belohnungen",
+          "magic": "Zauberpinsel und Ausmalen per Stimme",
+          "unlimited": "Unbegrenzt Ausmalbilder – jederzeit"
+        },
+        "timeline": {
+          "day5": {
+            "text": "Wir erinnern dich, bevor deine Testphase endet.",
+            "when": "Tag 5"
+          },
+          "day7": {
+            "text": "Deine Gratiswoche endet. Kündige jederzeit vorher – keine Kosten.",
+            "when": "Tag 7"
+          },
+          "today": {
+            "text": "Schalte alles frei. Male so viel aus, wie du möchtest.",
+            "when": "Heute"
+          }
+        }
+      },
+      "sceneA11y": "Szene: {{label}}",
+      "skip": "Überspringen",
+      "slide": {
+        "colo": {
+          "description": "Colo entwickelt sich weiter, wenn dein Kind ausmalt! Verdiene Sticker, schaffe tägliche Challenges und schalte neue Stufen frei.",
+          "title": "Sieh Colo wachsen"
+        },
+        "creativity": {
+          "description": "Dein Kind erzählt, zeichnet oder macht ein Foto. Wir machen daraus ein Ausmalbild – nur für euch.",
+          "title": "Unendlich kreativ, ohne Chaos"
+        },
+        "safety": {
+          "description": "Keine Werbung, keine Social-Funktionen, keine Datensammlung. Für 3–8 Jahre. Du behältst die Kontrolle.",
+          "title": "Sicher, einfach, für kleine Hände"
+        }
+      },
+      "scene": {
+        "onboarding-jungle": "Dschungel",
+        "onboarding-party": "Party",
+        "onboarding-space": "Weltraum",
+        "onboarding-underwater": "Unter dem Meer"
+      }
+    },
+    "paywall": {
+      "annualSaveBadge": "2 Monate gratis",
+      "closeA11y": "Schließen",
+      "creditsPerMo": "{{credits}} Credits/Monat",
+      "ctaA11y": "7 Tage gratis testen: {{plan}}",
+      "ctaMicrocopy": "Danach {{price}}/{{period}}. Jederzeit vorher kündbar.",
+      "ctaText": "7 Tage gratis testen",
+      "guarantee": "30 Tage Geld-zurück-Garantie",
+      "legalRenew": "Abos verlängern sich automatisch. Jederzeit in den Einstellungen kündbar.",
+      "loadingPlans": "Pläne werden geladen…",
+      "monthPeriod": "Monat",
+      "monthly": "Monatlich",
+      "mostPopular": "Am beliebtesten",
+      "perMonthShort": "Mon.",
+      "perYearShort": "J.",
+      "planRowA11y": "{{plan}}, {{credits}} Credits pro Monat, {{price}} pro {{period}}",
+      "plansUnavailable": "Pläne sind gerade nicht verfügbar. Bitte versuch es später noch einmal.",
+      "privacyPolicy": "Datenschutzrichtlinie",
+      "processing": "Wird verarbeitet…",
+      "restore": "Käufe wiederherstellen",
+      "restoreA11y": "Käufe wiederherstellen",
+      "socialProof": {
+        "reviewCount": "aus {{count}} Bewertungen",
+        "title": "Von Familien überall geliebt"
+      },
+      "subtitle": "Erstellt so viele Seiten, wie ihr mögt. Druckt sie aus oder malt am Bildschirm aus.",
+      "termsOfService": "Nutzungsbedingungen",
+      "title": "Unbegrenztes Ausmalen freischalten",
+      "yearPeriod": "Jahr",
+      "yearly": "Jährlich"
+    },
+    "profileSwitcher": {
+      "addProfile": "Profil hinzufügen",
+      "artworkCount": "{{count}} Kunstwerk",
+      "done": "Fertig",
+      "edit": "Bearbeiten",
+      "maxReached": "Maximal {{count}} Profile erreicht",
+      "namePlaceholder": "Profilname",
+      "title": "Profile",
+      "toast": {
+        "createFailed": "Profil konnte nicht erstellt werden. Bitte versuch es erneut.",
+        "deleteFailed": "Profil konnte nicht gelöscht werden. Bitte versuch es erneut.",
+        "minOneProfile": "Du musst mindestens ein Profil haben.",
+        "switchFailed": "Profil konnte nicht gewechselt werden. Bitte versuch es erneut.",
+        "updateFailed": "Profil konnte nicht aktualisiert werden. Bitte versuch es erneut."
+      },
+      "deleteConfirm": {
+        "title": "Profil löschen?",
+        "description": "„{{name}}“ und alle gespeicherten Bilder werden gelöscht.",
+        "confirm": "Löschen"
+      },
+      "artworkCount_other": "{{count}} Kunstwerke"
+    },
+    "settings": {
+      "backgroundMusic": {
+        "subtitle": "Sanfte Klänge beim Ausmalen",
+        "title": "Hintergrundmusik"
+      },
+      "bannerA11y": "{{plan}}-Plan, {{credits}} Credits. Abo verwalten.",
+      "bannerCtaManage": "Verwalten",
+      "bannerCtaUpgrade": "Upgrade",
+      "bannerPlanTitle": "{{plan}}-Plan",
+      "bannerSubtitleUpgrade": " · Upgrade, um weiter auszumalen",
+      "contact": {
+        "title": "Kontakt"
+      },
+      "creditCount": "{{formattedCount}} Credit",
+      "help": {
+        "subtitle": "Antworten auf häufige Fragen",
+        "title": "Hilfe & FAQ"
+      },
+      "language": {
+        "title": "Sprache"
+      },
+      "madeWith": "Gemacht mit",
+      "madeWithIn": "in",
+      "madeWithLocation": "Süd-London",
+      "magicLinkSent": {
+        "body": "Wir haben einen Anmeldelink an {{email}} gesendet",
+        "subtext": "Klicke den Link in der E-Mail, um dich anzumelden. Er läuft in 15 Minuten ab.",
+        "title": "E-Mail prüfen!",
+        "useDifferentEmail": "Andere E-Mail verwenden"
+      },
+      "onboarding": {
+        "subtitle": "Die Willkommens-Tour erneut ansehen",
+        "title": "Onboarding ansehen"
+      },
+      "planChip": "{{plan}}-Plan",
+      "privacy": {
+        "title": "Datenschutzrichtlinie"
+      },
+      "profiles": {
+        "add": "Hinzufügen",
+        "addA11y": "Profil hinzufügen",
+        "currentProfileA11y": "{{name}}, aktuelles Profil",
+        "manageA11y": "{{name}}, Profile verwalten"
+      },
+      "rate": {
+        "subtitle": "Teile dein Feedback",
+        "title": "App bewerten"
+      },
+      "section": {
+        "account": "Konto",
+        "appInfo": "App-Infos",
+        "legal": "Rechtliches",
+        "preferences": "Einstellungen",
+        "profiles": "Profile",
+        "support": "Support"
+      },
+      "signIn": {
+        "subtitle": "Kunstwerke auf Geräten synchronisieren",
+        "title": "Anmelden"
+      },
+      "signInModal": {
+        "continueApple": "Mit Apple fortfahren",
+        "continueFacebook": "Mit Facebook fortfahren",
+        "continueGoogle": "Mit Google fortfahren",
+        "emailLabel": "Mit E-Mail anmelden",
+        "emailPlaceholder": "E-Mail eingeben",
+        "or": "oder",
+        "privacyNote": "Mit der Anmeldung stimmst du unseren Nutzungsbedingungen und der Datenschutzrichtlinie zu.",
+        "sendMagicLink": "Anmeldelink senden",
+        "subtitle": "Melde dich an, um deine Kunstwerke auf Geräten zu synchronisieren und dein Konto im Web zu nutzen.",
+        "title": "Anmelden"
+      },
+      "signOut": {
+        "subtitle": "Deine Kunstwerke bleiben auf diesem Gerät",
+        "title": "Abmelden"
+      },
+      "signOutConfirm": {
+        "confirm": "Abmelden",
+        "description": "Deine Kunstwerke bleiben auf diesem Gerät.",
+        "title": "Abmelden?"
+      },
+      "soundEffects": {
+        "subtitle": "Button-Tipps und Aktionen",
+        "title": "Soundeffekte"
+      },
+      "terms": {
+        "title": "Nutzungsbedingungen"
+      },
+      "toast": {
+        "accountLinked": "Konto verbunden und Kunstwerke synchronisiert!",
+        "appleSignInFailed": "Anmeldung mit Apple nicht möglich. Bitte versuch es erneut.",
+        "facebookSignInFailed": "Anmeldung mit Facebook nicht möglich. Bitte versuch es erneut.",
+        "googleSignInFailed": "Anmeldung mit Google nicht möglich. Bitte versuch es erneut.",
+        "invalidEmail": "Bitte gib eine gültige E-Mail-Adresse ein.",
+        "magicLinkFailed": "Anmeldelink konnte nicht gesendet werden. Bitte versuch es erneut.",
+        "signedIn": "Du bist angemeldet!",
+        "signedOut": "Du bist abgemeldet. Deine Kunstwerke bleiben auf diesem Gerät."
+      },
+      "version": {
+        "title": "Version"
+      },
+      "vibration": {
+        "subtitle": "Sanftes Vibrieren bei Tipps und Belohnungen",
+        "title": "Vibration"
+      },
+      "creditCount_other": "{{formattedCount}} Credits"
+    },
+    "subscriptionManager": {
+      "accessUntil": "Zugriff bis",
+      "buyCredits": "Credits kaufen",
+      "creditsAvailable": "{{count}} Credit verfügbar",
+      "legal": "Abos verlängern sich automatisch, sofern sie nicht mindestens 24 Stunden vor Ende des aktuellen Zeitraums gekündigt werden. Verwalte oder kündige jederzeit in den Einstellungen deines {{store}}.",
+      "manageSubscription": "Abo verwalten",
+      "noActiveSubscription": "Kein aktives Abo",
+      "planIncludes": "Dein Plan enthält",
+      "planName": "{{plan}}-Plan",
+      "renews": "Verlängert sich",
+      "restorePurchases": "Käufe wiederherstellen",
+      "status": {
+        "active": "Aktiv",
+        "cancelled": "Gekündigt",
+        "paymentIssue": "Zahlungsproblem",
+        "trial": "Testphase"
+      },
+      "subscribeNow": "Jetzt abonnieren",
+      "title": "Abo & Credits",
+      "upgradePlan": "Plan upgraden",
+      "creditsAvailable_other": "{{count}} Credits verfügbar"
+    },
+    "topUp": {
+      "closeA11y": "Schließen",
+      "legal": "Credits werden direkt nach dem Kauf deinem Konto hinzugefügt. Credits verfallen nicht.",
+      "loading": "Credit-Pakete werden geladen…",
+      "subtitle": "Hol dir mehr Credits, um weiter zu erstellen – ohne deinen Plan zu ändern.",
+      "title": "Credits aufladen",
+      "unavailable": "Credit-Pakete sind im Moment nicht verfügbar."
+    },
+    "avatar": {
+      "alien": "Alien",
+      "astronaut": "Astronaut",
+      "dragon": "Drache",
+      "ghost": "Gespenst",
+      "ice-cream": "Eis",
+      "mermaid": "Meerjungfrau",
+      "rainbow": "Regenbogen",
+      "rocket": "Rakete",
+      "sun": "Sonne",
+      "superhero": "Superheld:in",
+      "unicorn": "Einhorn",
+      "wizard": "Zauberer:in"
+    },
+    "avatarPicker": {
+      "pickA11y": "{{name}} auswählen"
+    },
+    "createProfile": {
+      "create": "Erstellen",
+      "namePlaceholder": "Wie heißt du?",
+      "pickCharacter": "Wähle deinen Charakter"
+    },
+    "parentalGate": {
+      "closeA11y": "Schließen",
+      "defaultSubtitle": "Tippe die richtige Antwort an, um weiterzumachen.",
+      "defaultTitle": "Kurzer Check",
+      "hint": "Erwachsene: Tippt die richtige Antwort an, um fortzufahren.",
+      "purchaseSubtitle": "Bitte bestätige, dass du ein Elternteil bist, um diesen Kauf zu tätigen",
+      "purchaseTitle": "Elternbestätigung",
+      "subscriptionSubtitle": "Bitte bestätige, dass du ein Elternteil bist, um ein Abo zu starten"
+    },
+    "profileAvatar": {
+      "a11yFallback": "Profil-Avatar",
+      "a11yNamed": "Avatar von {{name}}"
     }
   },
   "createForm": {
@@ -199,6 +706,46 @@
       "errorQ2AudioFailed": "Die Frage konnte nicht abgespielt werden. Nochmal?",
       "errorTimeout": "Hat zu lange gedauert! Starten wir neu.",
       "errorRequiresSignin": "Melde dich an, um den Sprachmodus zu nutzen."
+    },
+    "error": {
+      "characterNotReady": "Dieser Freund ist noch nicht bereit. Versuch’s gleich noch mal.",
+      "generic": "Etwas ist schiefgelaufen. Bitte versuch’s noch mal.",
+      "moderationBlocked": "Probieren wir eine andere Idee für dein Bild!"
+    },
+    "friendPicker": {
+      "emptyInviteSuffix": " der in deinen Seiten auftaucht!",
+      "header": "Freund hinzufügen",
+      "includeFriendA11y": "{{name}}, ein {{species}}, hinzufügen",
+      "makeFriend": "Freund erstellen",
+      "makeNewFriend": "Neuen Freund erstellen",
+      "newFriend": "Neuer Freund",
+      "noFriend": "Kein Freund",
+      "optional": "(optional)"
+    },
+    "image": {
+      "camera": "Kamera",
+      "cameraPermissionDenied": "Kamerazugriff wird benötigt, um Fotos zu machen.",
+      "confirmInstructions": "Tolles Bild! Ist das das richtige?",
+      "createFailed": "Aus dem Foto konnte keine Ausmalseite erstellt werden.",
+      "createFailedToast": "Aus deinem Foto konnte keine Ausmalseite gemacht werden. Versuch’s noch mal!",
+      "instructions": "Mach ein Foto oder lade ein Bild hoch!",
+      "libraryPermissionDenied": "Zugriff auf die Fotomediathek wird benötigt, um ein Bild auszuwählen.",
+      "pickAnother": "Anderes auswählen",
+      "pickImageFailed": "Dieses Bild konnte nicht ausgewählt werden. Bitte versuch’s noch mal.",
+      "processing": "Deine Ausmalseite wird erstellt...",
+      "takePhotoFailed": "Foto konnte nicht aufgenommen werden. Bitte versuch’s noch mal.",
+      "upload": "Hochladen"
+    },
+    "mode": {
+      "a11yLabel": "Eingabemodus {{mode}}",
+      "unlockSaveFailed": "Freischaltung konnte nicht gespeichert werden. Vielleicht bleibt sie nicht — versuch’s noch mal.",
+      "image": "Foto",
+      "scene": "Bauen",
+      "text": "Tippen",
+      "voice": "Sprechen"
+    },
+    "text": {
+      "placeholder": "Was möchtest du ausmalen?"
     }
   }
 }

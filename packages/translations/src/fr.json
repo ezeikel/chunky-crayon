@@ -447,7 +447,8 @@
     "currentLanguage": "Langue actuelle",
     "selectLanguage": "Choisir une langue",
     "language": "Langue",
-    "switchTo": "Passer à"
+    "switchTo": "Passer à",
+    "title": "Langue"
   },
   "difficulty": {
     "easy": "Facile",
@@ -456,6 +457,40 @@
   },
   "gallery": {
     "categoryNotFound": "Catégorie introuvable",
-    "difficultyNotFound": "Difficulté introuvable"
+    "difficultyNotFound": "Difficulté introuvable",
+    "category": {
+      "animals": "Animaux",
+      "dinosaurs": "Dinosaures",
+      "dragons": "Dragons",
+      "fantasy": "Fantaisie et magie",
+      "food": "Nourriture et sucreries",
+      "holidays": "Fêtes et saisons",
+      "nature": "Nature et fleurs",
+      "pirates": "Pirates",
+      "princesses": "Princesses et royauté",
+      "robots": "Robots et technologie",
+      "space": "Espace et astronautes",
+      "superheroes": "Super-héros",
+      "underwater": "Sous l’eau et océan",
+      "unicorns": "Licornes",
+      "vehicles": "Véhicules et transports"
+    },
+    "categoryDescription": {
+      "animals": "Coloriages d’animaux mignons et sauvages, pour enfants et adultes",
+      "dinosaurs": "Coloriages de dinosaures préhistoriques pour tous les âges",
+      "dragons": "Coloriages de dragons épiques, du plus mignon au plus féroce",
+      "fantasy": "Coloriages de créatures magiques et d’univers fantastiques",
+      "food": "Coloriages de plats, bonbons et desserts gourmands",
+      "holidays": "Coloriages de Noël, Pâques, Halloween et des saisons",
+      "nature": "Belles scènes de nature et coloriages de fleurs",
+      "pirates": "Coloriages d’aventures de pirates pleines d’action",
+      "princesses": "Coloriages de princesses, princes et châteaux",
+      "robots": "Coloriages futuristes de robots et de technologie",
+      "space": "Coloriages sur l’espace, les fusées et les astronautes",
+      "superheroes": "Coloriages de super-héros pleins d’action",
+      "underwater": "Coloriages sur la vie marine et les aventures sous-marines",
+      "unicorns": "Coloriages de belles licornes et d’arcs-en-ciel",
+      "vehicles": "Coloriages de voitures, camions, avions et trains"
+    }
   }
 }

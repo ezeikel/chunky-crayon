@@ -18,6 +18,7 @@ import {
   CANVAS_STICKER_IMAGES,
 } from "@/lib/canvasStickers";
 import { tapLight, selectionChanged } from "@/utils/haptics";
+import { useT } from "@/lib/i18n/useT";
 import { COLORS, FONTS } from "@/lib/design";
 
 /**
@@ -38,17 +39,19 @@ import { COLORS, FONTS } from "@/lib/design";
  * 51px) and the wider phone sheet (bigger cells, more columns).
  */
 
+// Category labels are resolved at the render site via a slug -> key lookup
+// (t(`stickerPicker.category.${category}`)) so they translate without the
+// label living in this catalog.
 const CATEGORY_INFO: {
   category: StickerCategory;
-  label: string;
   icon: IconDefinition;
 }[] = [
-  { category: "stars", label: "Stars", icon: faStar },
-  { category: "hearts", label: "Hearts", icon: faHeart },
-  { category: "shapes", label: "Shapes", icon: faShapes },
-  { category: "nature", label: "Nature", icon: faLeaf },
-  { category: "animals", label: "Animals", icon: faDog },
-  { category: "fun", label: "Fun", icon: faPartyHorn },
+  { category: "stars", icon: faStar },
+  { category: "hearts", icon: faHeart },
+  { category: "shapes", icon: faShapes },
+  { category: "nature", icon: faLeaf },
+  { category: "animals", icon: faDog },
+  { category: "fun", icon: faPartyHorn },
 ];
 
 const ACCENT = "#E46444";
@@ -72,6 +75,7 @@ const StickerPickerGrid = ({
   columns = 3,
   showLabels = false,
 }: StickerPickerGridProps) => {
+  const t = useT("mobile.coloring.stickerPicker");
   // Narrow selectors (was whole-store useCanvasStore() → re-rendered on every
   // stroke). No history dep here.
   const selectedSticker = useCanvasStore((s) => s.selectedSticker);
@@ -83,12 +87,13 @@ const StickerPickerGrid = ({
   return (
     <View style={styles.container}>
       {/* Friendly heading — makes "you're picking a sticker" obvious. */}
-      <Text style={styles.heading}>Pick a sticker!</Text>
+      <Text style={styles.heading}>{t("heading")}</Text>
 
       {/* Category pills — icon (+ label when there's room), wrap to fit. */}
       <View style={styles.categoryRow}>
-        {CATEGORY_INFO.map(({ category, label, icon }) => {
+        {CATEGORY_INFO.map(({ category, icon }) => {
           const isActive = stickerCategory === category;
+          const label = t(`category.${category}`);
           return (
             <Pressable
               key={category}
@@ -101,7 +106,7 @@ const StickerPickerGrid = ({
                 if (first) setSticker(first.id);
               }}
               accessibilityRole="button"
-              accessibilityLabel={`${label} stickers`}
+              accessibilityLabel={t("categoryA11y", { label })}
               accessibilityState={{ selected: isActive }}
               style={[
                 showLabels ? styles.categoryPillWide : styles.categoryPill,
@@ -141,7 +146,7 @@ const StickerPickerGrid = ({
                 setSticker(sticker.id);
               }}
               accessibilityRole="button"
-              accessibilityLabel={`Sticker ${sticker.name}`}
+              accessibilityLabel={t("stickerA11y", { name: sticker.name })}
               accessibilityState={{ selected: isSelected }}
               style={[
                 styles.cell,
@@ -179,7 +184,7 @@ const StickerPickerGrid = ({
       {/* Two-step hint — the thing kids miss: picking ≠ placing. */}
       <View style={styles.hintRow}>
         <FontAwesomeIcon icon={faHandPointer} size={14} color={ACCENT} />
-        <Text style={styles.hintText}>Now tap your picture!</Text>
+        <Text style={styles.hintText}>{t("hint")}</Text>
       </View>
     </View>
   );

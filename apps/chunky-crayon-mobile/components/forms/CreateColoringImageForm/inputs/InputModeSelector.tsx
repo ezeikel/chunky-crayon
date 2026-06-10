@@ -17,6 +17,7 @@ import Button from "@/components/Button/Button";
 import ParentalGate from "@/components/ParentalGate";
 import { useUnlockedModes } from "@/hooks/api";
 import { isGateableMode, type GateableMode } from "@/lib/scene/modes";
+import { useT } from "@/lib/i18n/useT";
 import { useInputMode, type InputMode } from "./InputModeContext";
 
 // =============================================================================
@@ -25,7 +26,6 @@ import { useInputMode, type InputMode } from "./InputModeContext";
 
 type InputOption = {
   mode: InputMode;
-  label: string;
   icon: IconDefinition;
   /** Scene Builder is never gateable; the other three are. */
   gateable: boolean;
@@ -42,10 +42,10 @@ type InputOption = {
 // gate fires on TAP — a visible lock reads as a paywall and kills the adult
 // trial tap (matches web; feedback_cc_create_mode_parent_gating).
 const INPUT_OPTIONS: InputOption[] = [
-  { mode: "scene", label: "Build", icon: faShapes, gateable: false },
-  { mode: "text", label: "Type", icon: faPencil, gateable: true },
-  { mode: "voice", label: "Talk", icon: faMicrophoneLines, gateable: true },
-  { mode: "image", label: "Photo", icon: faCameraRetro, gateable: true },
+  { mode: "scene", icon: faShapes, gateable: false },
+  { mode: "text", icon: faPencil, gateable: true },
+  { mode: "voice", icon: faMicrophoneLines, gateable: true },
+  { mode: "image", icon: faCameraRetro, gateable: true },
 ];
 
 // =============================================================================
@@ -54,6 +54,7 @@ const INPUT_OPTIONS: InputOption[] = [
 
 type TileProps = {
   option: InputOption;
+  accessibilityLabel: string;
   isActive: boolean;
   isDisabled: boolean;
   onPress: () => void;
@@ -66,6 +67,7 @@ type TileProps = {
 // square holding the duotone icon, no label.
 const InputModeTile = ({
   option,
+  accessibilityLabel,
   isActive,
   isDisabled,
   onPress,
@@ -75,7 +77,7 @@ const InputModeTile = ({
     size="icon"
     disabled={isDisabled}
     onPress={onPress}
-    accessibilityLabel={`${option.label} input mode`}
+    accessibilityLabel={accessibilityLabel}
     faceStyle={styles.tile}
   >
     <FontAwesomeIcon
@@ -100,6 +102,7 @@ type InputModeSelectorProps = {
 };
 
 const InputModeSelector = ({ disabled }: InputModeSelectorProps) => {
+  const t = useT("createForm.mode");
   const { mode: currentMode, setMode, isProcessing } = useInputMode();
   const { isUnlocked, unlockMode } = useUnlockedModes();
 
@@ -139,7 +142,7 @@ const InputModeSelector = ({ disabled }: InputModeSelectorProps) => {
     if (!ok) {
       // Local cache still flipped (best-effort), but warn the parent the
       // server didn't confirm so they know it may not stick across devices.
-      toast.error("Couldn't save that unlock. It may not stick — try again.");
+      toast.error(t("unlockSaveFailed"));
     }
     track(ANALYTICS_EVENTS.INPUT_MODE_CHANGED, {
       from: currentMode,
@@ -157,6 +160,7 @@ const InputModeSelector = ({ disabled }: InputModeSelectorProps) => {
           <InputModeTile
             key={option.mode}
             option={option}
+            accessibilityLabel={t("a11yLabel", { mode: t(option.mode) })}
             isActive={option.mode === currentMode}
             isDisabled={!!disabled || isProcessing}
             onPress={() => handleModeChange(option)}

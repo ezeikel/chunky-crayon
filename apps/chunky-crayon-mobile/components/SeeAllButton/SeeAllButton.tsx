@@ -2,6 +2,7 @@ import { Pressable, StyleSheet } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faArrowRight } from "@fortawesome/pro-solid-svg-icons";
 import { tapMedium } from "@/utils/haptics";
+import { useT } from "@/lib/i18n/useT";
 import { COLORS } from "@/lib/design";
 
 /**
@@ -15,7 +16,9 @@ type SeeAllButtonProps = {
   accessibilityLabel?: string;
 };
 
-const SeeAllButton = ({ onPress, accessibilityLabel }: SeeAllButtonProps) => (
+const SeeAllButton = ({ onPress, accessibilityLabel }: SeeAllButtonProps) => {
+  const t = useT("mobile.button");
+  return (
   <Pressable
     onPress={() => {
       tapMedium();
@@ -23,7 +26,7 @@ const SeeAllButton = ({ onPress, accessibilityLabel }: SeeAllButtonProps) => (
     }}
     hitSlop={8}
     accessibilityRole="button"
-    accessibilityLabel={accessibilityLabel ?? "See all"}
+    accessibilityLabel={accessibilityLabel ?? t("seeAll")}
     style={({ pressed }) => [styles.circle, pressed && styles.pressed]}
   >
     <FontAwesomeIcon
@@ -32,7 +35,8 @@ const SeeAllButton = ({ onPress, accessibilityLabel }: SeeAllButtonProps) => (
       color={COLORS.crayonOrange}
     />
   </Pressable>
-);
+  );
+};
 
 const SIZE = 44;
 
