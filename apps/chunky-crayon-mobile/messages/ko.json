@@ -171,7 +171,36 @@
       "progressGreatStart": "좋은 시작이에요!",
       "progressHalfway": "반쯤 왔어요! 계속해요!",
       "progressAlmost": "거의 다 됐어요! 정말 잘하고 있어요!",
-      "progressComplete": "대단해요! 스티커를 모두 모았어요!"
+      "progressComplete": "대단해요! 스티커를 모두 모았어요!",
+      "category": {
+        "milestone": "이정표",
+        "category": "카테고리",
+        "exploration": "탐험"
+      },
+      "achievement": {
+        "first-steps": "첫걸음",
+        "getting-started": "시작하기",
+        "high-five": "하이파이브",
+        "perfect-ten": "완벽한 10",
+        "super-artist": "슈퍼 아티스트",
+        "master-creator": "마스터 크리에이터",
+        "century-club": "100 클럽",
+        "animal-friend": "동물 친구",
+        "fantasy-dreamer": "판타지 꿈꾸미",
+        "space-explorer": "우주 탐험가",
+        "nature-lover": "자연 사랑꾼",
+        "vehicle-driver": "탈것 운전사",
+        "dino-hunter": "공룡 사냥꾼",
+        "ocean-diver": "바다 다이버",
+        "food-lover": "음식 사랑꾼",
+        "sports-star": "스포츠 스타",
+        "holiday-spirit": "홀리데이 기분",
+        "animal-master": "동물 마스터",
+        "fantasy-master": "판타지 마스터",
+        "space-master": "우주 마스터",
+        "category-explorer": "카테고리 탐험가",
+        "world-traveler": "세계 여행자"
+      }
     },
     "myArtwork": {
       "loading": "작품 불러오는 중...",
@@ -364,7 +393,8 @@
             "text": "모든 기능을 열어요. 마음껏 색칠해요.",
             "when": "오늘"
           }
-        }
+        },
+        "guarantee": "30일 환불 보장"
       },
       "sceneA11y": "{{label}} 장면",
       "skip": "건너뛰기",
@@ -418,7 +448,18 @@
       "termsOfService": "이용약관",
       "title": "무제한 색칠 잠금 해제",
       "yearPeriod": "년",
-      "yearly": "연간"
+      "yearly": "연간",
+      "plan": {
+        "splash": {
+          "tagline": "최대 2명 아이에게 딱!"
+        },
+        "rainbow": {
+          "tagline": "최대 4명 아이에게 딱!"
+        },
+        "sparkle": {
+          "tagline": "최대 10명 아이에게 딱!"
+        }
+      }
     },
     "profileSwitcher": {
       "addProfile": "프로필 추가",
@@ -569,7 +610,30 @@
       "subscribeNow": "지금 구독하기",
       "title": "구독 & 크레딧",
       "upgradePlan": "플랜 업그레이드",
-      "creditsAvailable_other": "사용 가능한 크레딧 {{count}}개"
+      "creditsAvailable_other": "사용 가능한 크레딧 {{count}}개",
+      "planFeatures": {
+        "splash": {
+          "0": "월 250 크레딧",
+          "1": "프로필 3개",
+          "2": "마법 브러시",
+          "3": "음성 입력",
+          "4": "카메라 입력"
+        },
+        "rainbow": {
+          "0": "월 500 크레딧",
+          "1": "프로필 5개",
+          "2": "Splash의 모든 기능",
+          "3": "우선 지원",
+          "4": "크레딧 이월"
+        },
+        "sparkle": {
+          "0": "월 1,000 크레딧",
+          "1": "프로필 10개",
+          "2": "Rainbow의 모든 기능",
+          "3": "상업적 사용",
+          "4": "크레딧 2배 이월"
+        }
+      }
     },
     "topUp": {
       "closeA11y": "닫기",

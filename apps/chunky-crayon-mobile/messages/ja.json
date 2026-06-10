@@ -171,7 +171,36 @@
       "progressGreatStart": "いいスタート！",
       "progressHalfway": "半分まできたよ！その調子！",
       "progressAlmost": "もうすぐ！がんばってるね！",
-      "progressComplete": "すごい！全部のシールをゲット！"
+      "progressComplete": "すごい！全部のシールをゲット！",
+      "category": {
+        "milestone": "マイルストーン",
+        "category": "カテゴリー",
+        "exploration": "たんけん"
+      },
+      "achievement": {
+        "first-steps": "はじめのいっぽ",
+        "getting-started": "スタート！",
+        "high-five": "ハイタッチ！",
+        "perfect-ten": "パーフェクト10",
+        "super-artist": "スーパーおえかき",
+        "master-creator": "つくる名人",
+        "century-club": "100クラブ",
+        "animal-friend": "どうぶつのおともだち",
+        "fantasy-dreamer": "ゆめのファンタジー",
+        "space-explorer": "うちゅうたんけんたい",
+        "nature-lover": "しぜんだいすき",
+        "vehicle-driver": "のりものドライバー",
+        "dino-hunter": "きょうりゅうハンター",
+        "ocean-diver": "うみのダイバー",
+        "food-lover": "たべものだいすき",
+        "sports-star": "スポーツスター",
+        "holiday-spirit": "ホリデーきぶん",
+        "animal-master": "どうぶつマスター",
+        "fantasy-master": "ファンタジーマスター",
+        "space-master": "うちゅうマスター",
+        "category-explorer": "カテゴリーたんけん",
+        "world-traveler": "せかいりょこう"
+      }
     },
     "myArtwork": {
       "loading": "作品をよみこみ中…",
@@ -364,7 +393,8 @@
             "text": "ぜんぶ解放。好きなだけぬろう。",
             "when": "今日"
           }
-        }
+        },
+        "guarantee": "30日間返金保証"
       },
       "sceneA11y": "{{label}}のシーン",
       "skip": "スキップ",
@@ -418,7 +448,18 @@
       "termsOfService": "利用規約",
       "title": "ぬりえを無制限に",
       "yearPeriod": "年",
-      "yearly": "年額"
+      "yearly": "年額",
+      "plan": {
+        "splash": {
+          "tagline": "お子さま2人までにおすすめ"
+        },
+        "rainbow": {
+          "tagline": "お子さま4人までにおすすめ"
+        },
+        "sparkle": {
+          "tagline": "お子さま10人までにおすすめ"
+        }
+      }
     },
     "profileSwitcher": {
       "addProfile": "プロフィール追加",
@@ -569,7 +610,30 @@
       "subscribeNow": "今すぐ登録",
       "title": "サブスク＆クレジット",
       "upgradePlan": "プランを変更",
-      "creditsAvailable_other": "残り{{count}}クレジット"
+      "creditsAvailable_other": "残り{{count}}クレジット",
+      "planFeatures": {
+        "splash": {
+          "0": "毎月250クレジット",
+          "1": "プロフィール3つ",
+          "2": "まほうのブラシ",
+          "3": "音声入力",
+          "4": "カメラ入力"
+        },
+        "rainbow": {
+          "0": "毎月500クレジット",
+          "1": "プロフィール5つ",
+          "2": "Splashの全機能",
+          "3": "優先サポート",
+          "4": "クレジット繰り越し"
+        },
+        "sparkle": {
+          "0": "毎月1,000クレジット",
+          "1": "プロフィール10こ",
+          "2": "Rainbowの全機能",
+          "3": "商用利用",
+          "4": "クレジット2倍繰り越し"
+        }
+      }
     },
     "topUp": {
       "closeA11y": "閉じる",

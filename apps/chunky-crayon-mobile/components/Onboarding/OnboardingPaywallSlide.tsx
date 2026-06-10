@@ -413,7 +413,7 @@ const OnboardingPaywallSlide = ({
       <Text style={styles.finePrint}>
         {t("finePrint", {
           price: pricePerMonth,
-          guarantee: PAYWALL_TRUST.guarantee,
+          guarantee: t("guarantee"),
         })}
       </Text>
     </>

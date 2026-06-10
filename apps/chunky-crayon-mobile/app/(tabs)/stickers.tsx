@@ -50,11 +50,14 @@ const RARITY_BORDER: Record<string, string> = {
 };
 
 const StickerItem = ({ sticker, onPress }: StickerItemProps) => {
+  const t = useT("mobile.stickers");
   const image = STICKER_IMAGES[sticker.id];
   const unlocked = sticker.isUnlocked;
-  // The API already returns a human-readable sticker name (web resolves it via
-  // a stickerCatalog i18n bundle that mobile doesn't ship — use the name field).
-  const name = sticker.name;
+  // The API returns an English sticker name. Web resolves it via a stickerCatalog
+  // i18n bundle; mobile bundles a local id→name lookup (the 22 catalog stickers).
+  // Fall back to the API name for any sticker not in the local map (future API
+  // additions still show their English name rather than the raw key).
+  const name = t(`achievement.${sticker.id}`, { defaultValue: sticker.name });
   const ringColor = unlocked
     ? (RARITY_BORDER[sticker.rarity] ?? COLORS.bgCreamDark)
     : COLORS.bgCreamDark;
@@ -277,7 +280,9 @@ const StickersScreen = () => {
                       </View>
                       <View>
                         <Text style={styles.categoryTitle}>
-                          {category.name}
+                          {t(`category.${category.id}`, {
+                            defaultValue: category.name,
+                          })}
                         </Text>
                         <Text style={styles.sectionCount}>
                           {sectionUnlocked} / {category.stickers.length}

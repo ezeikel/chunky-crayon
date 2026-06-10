@@ -171,7 +171,36 @@
       "progressGreatStart": "开局很棒！",
       "progressHalfway": "完成一半啦！继续加油！",
       "progressAlmost": "快到了！你做得真棒！",
-      "progressComplete": "太棒了！贴纸全收集！"
+      "progressComplete": "太棒了！贴纸全收集！",
+      "category": {
+        "milestone": "里程碑",
+        "category": "分类",
+        "exploration": "探索"
+      },
+      "achievement": {
+        "first-steps": "第一步",
+        "getting-started": "开始啦",
+        "high-five": "击掌！",
+        "perfect-ten": "完美10次",
+        "super-artist": "超级小画家",
+        "master-creator": "创作大师",
+        "century-club": "百次俱乐部",
+        "animal-friend": "动物朋友",
+        "fantasy-dreamer": "奇幻梦想家",
+        "space-explorer": "太空探险家",
+        "nature-lover": "自然爱好者",
+        "vehicle-driver": "小小驾驶员",
+        "dino-hunter": "恐龙猎人",
+        "ocean-diver": "海洋潜水员",
+        "food-lover": "美食爱好者",
+        "sports-star": "运动小明星",
+        "holiday-spirit": "节日氛围",
+        "animal-master": "动物大师",
+        "fantasy-master": "奇幻大师",
+        "space-master": "太空大师",
+        "category-explorer": "分类探险家",
+        "world-traveler": "环游世界"
+      }
     },
     "myArtwork": {
       "loading": "正在加载你的作品…",
@@ -364,7 +393,8 @@
             "text": "解锁全部内容，想涂多少就涂多少。",
             "when": "今天"
           }
-        }
+        },
+        "guarantee": "30天退款保障"
       },
       "sceneA11y": "{{label}}场景",
       "skip": "跳过",
@@ -418,7 +448,18 @@
       "termsOfService": "服务条款",
       "title": "解锁无限涂色",
       "yearPeriod": "年",
-      "yearly": "年付"
+      "yearly": "年付",
+      "plan": {
+        "splash": {
+          "tagline": "最多适合2个孩子。"
+        },
+        "rainbow": {
+          "tagline": "最多适合4个孩子。"
+        },
+        "sparkle": {
+          "tagline": "最多适合10个孩子。"
+        }
+      }
     },
     "profileSwitcher": {
       "addProfile": "添加资料",
@@ -569,7 +610,30 @@
       "subscribeNow": "立即订阅",
       "title": "订阅与点数",
       "upgradePlan": "升级方案",
-      "creditsAvailable_other": "可用 {{count}} 点数"
+      "creditsAvailable_other": "可用 {{count}} 点数",
+      "planFeatures": {
+        "splash": {
+          "0": "每月250点数",
+          "1": "3个档案",
+          "2": "魔法画笔",
+          "3": "语音输入",
+          "4": "拍照输入"
+        },
+        "rainbow": {
+          "0": "每月500点数",
+          "1": "5个档案",
+          "2": "包含Splash全部内容",
+          "3": "优先支持",
+          "4": "点数结转"
+        },
+        "sparkle": {
+          "0": "每月1,000点数",
+          "1": "10个档案",
+          "2": "包含Rainbow全部内容",
+          "3": "可商用",
+          "4": "2倍点数结转"
+        }
+      }
     },
     "topUp": {
       "closeA11y": "关闭",

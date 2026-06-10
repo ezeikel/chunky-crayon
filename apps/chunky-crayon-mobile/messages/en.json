@@ -171,7 +171,36 @@
       "progressGreatStart": "Great start!",
       "progressHalfway": "Halfway there! Keep going!",
       "progressAlmost": "Almost there! You're doing great!",
-      "progressComplete": "Amazing! All stickers collected!"
+      "progressComplete": "Amazing! All stickers collected!",
+      "category": {
+        "milestone": "Milestones",
+        "category": "Categories",
+        "exploration": "Explore"
+      },
+      "achievement": {
+        "first-steps": "First Steps",
+        "getting-started": "Getting Started",
+        "high-five": "High Five",
+        "perfect-ten": "Perfect Ten",
+        "super-artist": "Super Artist",
+        "master-creator": "Master Creator",
+        "century-club": "Century Club",
+        "animal-friend": "Animal Friend",
+        "fantasy-dreamer": "Fantasy Dreamer",
+        "space-explorer": "Space Explorer",
+        "nature-lover": "Nature Lover",
+        "vehicle-driver": "Vehicle Driver",
+        "dino-hunter": "Dino Hunter",
+        "ocean-diver": "Ocean Diver",
+        "food-lover": "Food Lover",
+        "sports-star": "Sports Star",
+        "holiday-spirit": "Holiday Spirit",
+        "animal-master": "Animal Master",
+        "fantasy-master": "Fantasy Master",
+        "space-master": "Space Master",
+        "category-explorer": "Category Explorer",
+        "world-traveler": "World Traveler"
+      }
     },
     "myArtwork": {
       "loading": "Loading your artwork...",
@@ -364,7 +393,8 @@
             "text": "Unlock everything. Color as much as you like.",
             "when": "Today"
           }
-        }
+        },
+        "guarantee": "30-day money-back guarantee"
       },
       "sceneA11y": "{{label}} scene",
       "skip": "Skip",
@@ -418,7 +448,18 @@
       "termsOfService": "Terms of Service",
       "title": "Unlock unlimited coloring",
       "yearPeriod": "year",
-      "yearly": "Yearly"
+      "yearly": "Yearly",
+      "plan": {
+        "splash": {
+          "tagline": "Best for up to 2 kids."
+        },
+        "rainbow": {
+          "tagline": "Best for up to 4 kids."
+        },
+        "sparkle": {
+          "tagline": "Best for up to 10 kids."
+        }
+      }
     },
     "profileSwitcher": {
       "addProfile": "Add Profile",
@@ -569,7 +610,30 @@
       "subscribeNow": "Subscribe Now",
       "title": "Subscription & Credits",
       "upgradePlan": "Upgrade Plan",
-      "creditsAvailable_other": "{{count}} credits available"
+      "creditsAvailable_other": "{{count}} credits available",
+      "planFeatures": {
+        "splash": {
+          "0": "250 credits/month",
+          "1": "3 profiles",
+          "2": "Magic Brush",
+          "3": "Voice input",
+          "4": "Camera input"
+        },
+        "rainbow": {
+          "0": "500 credits/month",
+          "1": "5 profiles",
+          "2": "Everything in Splash",
+          "3": "Priority support",
+          "4": "Credit rollover"
+        },
+        "sparkle": {
+          "0": "1,000 credits/month",
+          "1": "10 profiles",
+          "2": "Everything in Rainbow",
+          "3": "Commercial use",
+          "4": "2x credit rollover"
+        }
+      }
     },
     "topUp": {
       "closeA11y": "Close",

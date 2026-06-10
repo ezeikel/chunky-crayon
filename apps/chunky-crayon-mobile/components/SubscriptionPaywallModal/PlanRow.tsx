@@ -3,11 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faStar } from "@fortawesome/pro-solid-svg-icons";
 import type { PurchasesPackage } from "react-native-purchases";
 import SquishyPressable from "@/components/SquishyPressable";
-import {
-  PLAN_DISPLAY_NAMES,
-  PLAN_TAGLINES,
-  type PlanKey,
-} from "@/lib/paywall/plans";
+import { PLAN_DISPLAY_NAMES, type PlanKey } from "@/lib/paywall/plans";
 import { formatPackagePrice } from "@/hooks/usePaywall";
 import { useT } from "@/lib/i18n/useT";
 
@@ -79,7 +75,8 @@ const PlanRow = ({
         <View style={styles.info}>
           <Text style={styles.name}>{PLAN_DISPLAY_NAMES[planKey]}</Text>
           <Text style={styles.tagline} numberOfLines={1}>
-            {t("creditsPerMo", { credits })} · {PLAN_TAGLINES[planKey]}
+            {t("creditsPerMo", { credits })} ·{" "}
+            {t(`plan.${planKey.toLowerCase()}.tagline`)}
           </Text>
         </View>
 

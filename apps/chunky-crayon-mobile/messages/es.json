@@ -171,7 +171,36 @@
       "progressGreatStart": "¡Buen comienzo!",
       "progressHalfway": "¡Ya vas por la mitad! ¡Sigue así!",
       "progressAlmost": "¡Casi lo tienes! ¡Lo estás haciendo genial!",
-      "progressComplete": "¡Increíble! ¡Todas las pegatinas conseguidas!"
+      "progressComplete": "¡Increíble! ¡Todas las pegatinas conseguidas!",
+      "category": {
+        "milestone": "Logros",
+        "category": "Categorías",
+        "exploration": "Explorar"
+      },
+      "achievement": {
+        "first-steps": "Primeros pasos",
+        "getting-started": "Para empezar",
+        "high-five": "Choca esos cinco",
+        "perfect-ten": "Diez perfecto",
+        "super-artist": "Súper artista",
+        "master-creator": "Creador maestro",
+        "century-club": "Club de los 100",
+        "animal-friend": "Amigo de los animales",
+        "fantasy-dreamer": "Soñador de fantasía",
+        "space-explorer": "Explorador espacial",
+        "nature-lover": "Amante de la naturaleza",
+        "vehicle-driver": "Conductor de vehículos",
+        "dino-hunter": "Cazador de dinos",
+        "ocean-diver": "Buceador del océano",
+        "food-lover": "Amante de la comida",
+        "sports-star": "Estrella del deporte",
+        "holiday-spirit": "Espíritu festivo",
+        "animal-master": "Maestro de animales",
+        "fantasy-master": "Maestro de fantasía",
+        "space-master": "Maestro del espacio",
+        "category-explorer": "Explorador de categorías",
+        "world-traveler": "Viajero del mundo"
+      }
     },
     "myArtwork": {
       "loading": "Cargando tu arte...",
@@ -364,7 +393,8 @@
             "text": "Desbloquea todo. Colorea todo lo que quieras.",
             "when": "Hoy"
           }
-        }
+        },
+        "guarantee": "Garantía de devolución de 30 días"
       },
       "sceneA11y": "Escena: {{label}}",
       "skip": "Saltar",
@@ -418,7 +448,18 @@
       "termsOfService": "Términos del servicio",
       "title": "Desbloquea coloreo ilimitado",
       "yearPeriod": "año",
-      "yearly": "Anual"
+      "yearly": "Anual",
+      "plan": {
+        "splash": {
+          "tagline": "Ideal para hasta 2 peques."
+        },
+        "rainbow": {
+          "tagline": "Ideal para hasta 4 peques."
+        },
+        "sparkle": {
+          "tagline": "Ideal para hasta 10 peques."
+        }
+      }
     },
     "profileSwitcher": {
       "addProfile": "Añadir perfil",
@@ -569,7 +610,30 @@
       "subscribeNow": "Suscribirme ahora",
       "title": "Suscripción y créditos",
       "upgradePlan": "Mejorar plan",
-      "creditsAvailable_other": "{{count}} créditos disponibles"
+      "creditsAvailable_other": "{{count}} créditos disponibles",
+      "planFeatures": {
+        "splash": {
+          "0": "250 créditos/mes",
+          "1": "3 perfiles",
+          "2": "Pincel mágico",
+          "3": "Entrada por voz",
+          "4": "Entrada con cámara"
+        },
+        "rainbow": {
+          "0": "500 créditos/mes",
+          "1": "5 perfiles",
+          "2": "Todo lo de Splash",
+          "3": "Soporte prioritario",
+          "4": "Acumulación de créditos"
+        },
+        "sparkle": {
+          "0": "1,000 créditos/mes",
+          "1": "10 perfiles",
+          "2": "Todo lo de Rainbow",
+          "3": "Uso comercial",
+          "4": "Acumulación de créditos x2"
+        }
+      }
     },
     "topUp": {
       "closeA11y": "Cerrar",

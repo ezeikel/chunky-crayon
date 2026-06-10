@@ -84,7 +84,11 @@ const StickerDetailSheet = ({
           {!sticker ? null : (
             <>
               <Text style={styles.title}>
-                {isUnlocked ? sticker.name : t("lockedTitle")}
+                {isUnlocked
+                  ? t(`achievement.${sticker.id}`, {
+                      defaultValue: sticker.name,
+                    })
+                  : t("lockedTitle")}
               </Text>
 
               {/* Big sticker — real bundled PNG (web parity). Locked = a TRUE

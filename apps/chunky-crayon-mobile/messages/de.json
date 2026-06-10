@@ -171,7 +171,36 @@
       "progressGreatStart": "Toller Start!",
       "progressHalfway": "Halb geschafft! Weiter so!",
       "progressAlmost": "Fast geschafft! Du machst das super!",
-      "progressComplete": "Wahnsinn! Alle Sticker gesammelt!"
+      "progressComplete": "Wahnsinn! Alle Sticker gesammelt!",
+      "category": {
+        "milestone": "Meilensteine",
+        "category": "Kategorien",
+        "exploration": "Entdecken"
+      },
+      "achievement": {
+        "first-steps": "Erste Schritte",
+        "getting-started": "Los geht’s",
+        "high-five": "High Five",
+        "perfect-ten": "Perfekte Zehn",
+        "super-artist": "Super-Künstler*in",
+        "master-creator": "Meister*in der Kreativität",
+        "century-club": "100er-Club",
+        "animal-friend": "Tierfreund*in",
+        "fantasy-dreamer": "Fantasie-Träumer*in",
+        "space-explorer": "Weltraum-Entdecker*in",
+        "nature-lover": "Naturfreund*in",
+        "vehicle-driver": "Fahrzeug-Fan",
+        "dino-hunter": "Dino-Jäger*in",
+        "ocean-diver": "Ozean-Taucher*in",
+        "food-lover": "Lecker-Schmecker-Fan",
+        "sports-star": "Sportstar",
+        "holiday-spirit": "Festtagsstimmung",
+        "animal-master": "Tier-Meister*in",
+        "fantasy-master": "Fantasie-Meister*in",
+        "space-master": "Weltraum-Meister*in",
+        "category-explorer": "Kategorien-Entdecker*in",
+        "world-traveler": "Weltreisende*r"
+      }
     },
     "myArtwork": {
       "loading": "Deine Kunstwerke werden geladen...",
@@ -364,7 +393,8 @@
             "text": "Schalte alles frei. Male so viel aus, wie du möchtest.",
             "when": "Heute"
           }
-        }
+        },
+        "guarantee": "30 Tage Geld-zurück-Garantie"
       },
       "sceneA11y": "Szene: {{label}}",
       "skip": "Überspringen",
@@ -418,7 +448,18 @@
       "termsOfService": "Nutzungsbedingungen",
       "title": "Unbegrenztes Ausmalen freischalten",
       "yearPeriod": "Jahr",
-      "yearly": "Jährlich"
+      "yearly": "Jährlich",
+      "plan": {
+        "splash": {
+          "tagline": "Am besten für bis zu 2 Kinder."
+        },
+        "rainbow": {
+          "tagline": "Am besten für bis zu 4 Kinder."
+        },
+        "sparkle": {
+          "tagline": "Am besten für bis zu 10 Kinder."
+        }
+      }
     },
     "profileSwitcher": {
       "addProfile": "Profil hinzufügen",
@@ -569,7 +610,30 @@
       "subscribeNow": "Jetzt abonnieren",
       "title": "Abo & Credits",
       "upgradePlan": "Plan upgraden",
-      "creditsAvailable_other": "{{count}} Credits verfügbar"
+      "creditsAvailable_other": "{{count}} Credits verfügbar",
+      "planFeatures": {
+        "splash": {
+          "0": "250 Credits/Monat",
+          "1": "3 Profile",
+          "2": "Zauberpinsel",
+          "3": "Spracheingabe",
+          "4": "Kameraeingabe"
+        },
+        "rainbow": {
+          "0": "500 Credits/Monat",
+          "1": "5 Profile",
+          "2": "Alles aus Splash",
+          "3": "Vorrangiger Support",
+          "4": "Credit-Übertrag"
+        },
+        "sparkle": {
+          "0": "1.000 Credits/Monat",
+          "1": "10 Profile",
+          "2": "Alles aus Rainbow",
+          "3": "Kommerzielle Nutzung",
+          "4": "2x Credit-Übertrag"
+        }
+      }
     },
     "topUp": {
       "closeA11y": "Schließen",

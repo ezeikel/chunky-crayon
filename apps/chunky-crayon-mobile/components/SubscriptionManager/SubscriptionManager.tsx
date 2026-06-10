@@ -179,17 +179,25 @@ const SubscriptionManager = ({
 
   const renderFeaturesList = () => {
     if (!hasSubscription || plan === "FREE") return null;
-    const features =
-      PLAN_FEATURES_DETAILED[plan as keyof typeof PLAN_FEATURES_DETAILED];
+    const planKey = plan as keyof typeof PLAN_FEATURES_DETAILED;
+    const features = PLAN_FEATURES_DETAILED[planKey];
     if (!features) return null;
+    const planSlug = planKey.toLowerCase();
 
     return (
       <View style={styles.featuresCard}>
         <Text style={styles.featuresTitle}>{t("planIncludes")}</Text>
-        {features.map((feature) => (
+        {features.map((feature, index) => (
           <View key={feature} style={styles.featureRow}>
             <FontAwesomeIcon icon={faCheck} size={14} color="#22C55E" />
-            <Text style={styles.featureText}>{feature}</Text>
+            {/* The catalog (lib/paywall/plans) is shared English; resolve each
+                bullet via an index-keyed translation, falling back to the
+                catalog string if a key is missing (e.g. a future bullet). */}
+            <Text style={styles.featureText}>
+              {t(`planFeatures.${planSlug}.${index}`, {
+                defaultValue: feature,
+              })}
+            </Text>
           </View>
         ))}
       </View>
