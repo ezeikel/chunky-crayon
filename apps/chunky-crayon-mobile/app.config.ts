@@ -39,31 +39,15 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         .join(".")
     : "";
 
-  // Facebook Login config. Guard like googleIosClientId above: if the vars are
-  // absent the SDK plugin + URL scheme are omitted entirely, rather than baking
-  // the literal "fbundefined" scheme / appID "undefined" (which silently breaks
-  // FB auth in a build that otherwise looks fine). When EXPO_PUBLIC_FACEBOOK_APP_ID
-  // and EXPO_PUBLIC_FACEBOOK_CLIENT_TOKEN are present (EAS env), FB login wires up.
-  const facebookAppId = process.env.EXPO_PUBLIC_FACEBOOK_APP_ID;
-  const facebookClientToken = process.env.EXPO_PUBLIC_FACEBOOK_CLIENT_TOKEN;
-  const facebookEnabled = Boolean(facebookAppId && facebookClientToken);
-
-  // Built as a typed plugin entry so the conditional spread below keeps the
-  // [name, options] tuple shape (a bare spread of [[...]] widens to string[] and
-  // breaks tuple inference for every plugin after it).
-  const facebookPlugin: NonNullable<ExpoConfig["plugins"]> = facebookEnabled
-    ? [
-        [
-          "react-native-fbsdk-next",
-          {
-            appID: facebookAppId,
-            displayName: "Chunky Crayon",
-            clientToken: facebookClientToken,
-            scheme: "chunkycrayon",
-          },
-        ],
-      ]
-    : [];
+  // Facebook Login was removed before store submission: the Meta SDK
+  // (react-native-fbsdk-next → facebook-core) injects the AD_ID permission into
+  // the Android manifest, which conflicts with Google Play's Designed for
+  // Families program (no advertising id) and forces a dishonest "uses ad id"
+  // declaration on a zero-ads kids app. FB login is feature-flag-gated off and
+  // wasn't shipping at launch, so the dependency + native plugin are dropped
+  // entirely. Re-add the plugin here (gated on EXPO_PUBLIC_FACEBOOK_* env) if FB
+  // login is ever brought back — but reassess the Families AD_ID implication
+  // first. See project_cc_mobile_store_submission.
 
   // Per-variant app identity (matches PTP). EXPO_PUBLIC_ENVIRONMENT is set per
   // EAS build profile (eas.json) so dev / preview / prod produce DIFFERENT
@@ -137,10 +121,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         ITSAppUsesNonExemptEncryption: false,
         CFBundleURLTypes: [
           {
-            CFBundleURLSchemes: [
-              googleIosClientId,
-              ...(facebookEnabled ? [`fb${facebookAppId}`] : []),
-            ],
+            CFBundleURLSchemes: [googleIosClientId],
           },
         ],
       },
@@ -186,7 +167,6 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       "expo-image",
       "expo-localization",
       "@react-native-google-signin/google-signin",
-      ...facebookPlugin,
       [
         "expo-image-picker",
         {

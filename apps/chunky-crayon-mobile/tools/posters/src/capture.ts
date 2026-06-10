@@ -89,7 +89,8 @@ export const CC_CAPTURE_PLAN: CaptureStep[] = [
   },
   {
     file: "08-scene-builder.png",
-    label: "Scene builder — curated scene picker (request/voice card source ref)",
+    label:
+      "Scene builder — curated scene picker (request/voice card source ref)",
     deepLink: null,
     settleMs: 1500,
     notes:
@@ -143,7 +144,7 @@ export const grab = (opts: GrabOptions): string => {
     require("node:fs").writeFileSync(outPath, png);
   }
 
-  if (rotateDeg && rotateDeg !== 0) {
+  if (rotateDeg) {
     // sips rotates clockwise; 180 is orientation-agnostic.
     execFileSync("sips", ["-r", String(rotateDeg), outPath], {
       stdio: ["ignore", "ignore", "inherit"],

@@ -1,0 +1,26 @@
+{
+  "name": "@cc/posters",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Headless App Store / Play Store poster generator for Chunky Crayon. Composites native-res capture screenshots into store-resolution marketing posters (device frame, brand headline, bleed) via Playwright chromium. Local CLI, not a skill, not a GUI.",
+  "bin": {
+    "posters": "./src/cli.ts"
+  },
+  "scripts": {
+    "posters": "tsx src/cli.ts",
+    "gen": "tsx src/cli.ts gen",
+    "headlines": "tsx src/cli.ts headlines",
+    "list-devices": "tsx src/cli.ts list-devices",
+    "playwright:install": "playwright install chromium"
+  },
+  "dependencies": {
+    "@ai-sdk/anthropic": "^3.0.64",
+    "ai": "^6.0.27",
+    "playwright": "^1.59.0",
+    "zod": "^3.25.0"
+  },
+  "devDependencies": {
+    "tsx": "^4.0.0"
+  }
+}

@@ -19,20 +19,14 @@ import {
 import { ANALYTICS_EVENTS } from "@/constants/analytics";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import * as AppleAuthentication from "expo-apple-authentication";
-// NOTE: react-native-fbsdk-next is imported lazily inside the Facebook handler,
-// NOT at the top level. Its FBAccessToken module runs `NativeModules.FBAccessToken`
-// (a native HostObject getter) at import-eval time, which throws
-// "FacebookSdk.sdkInitialize() first" on any build where the FB SDK isn't
-// initialized. That happens whenever the react-native-fbsdk-next config plugin is
-// omitted — which app.config.ts does when EXPO_PUBLIC_FACEBOOK_APP_ID /
-// EXPO_PUBLIC_FACEBOOK_CLIENT_TOKEN are absent (e.g. local dev without FB creds).
-// A static import would crash the whole app at startup; requiring it only when FB
-// sign-in is actually invoked keeps the app loading and degrades FB login gracefully.
-type FbsdkModule = typeof import("react-native-fbsdk-next");
+// Facebook login was removed before store submission (the Meta SDK injects the
+// Android AD_ID permission, which conflicts with Play's Designed for Families on
+// a zero-ads kids app). The handler is kept as a no-op so call sites don't churn;
+// re-add react-native-fbsdk-next here if FB login returns. See
+// project_cc_mobile_store_submission.
 import {
   signInWithGoogle,
   signInWithApple,
-  signInWithFacebook,
   sendMagicLink,
   verifyMagicLink,
   getAuthMe,
@@ -287,81 +281,17 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       }
     }, [refreshAuth]);
 
-  // Facebook Sign-In
+  // Facebook Sign-In — REMOVED before store submission (the Meta SDK injected
+  // the Android AD_ID permission, conflicting with Play's Designed for Families
+  // on this zero-ads kids app). The FB button is feature-flag-gated off so this
+  // never runs in production; kept as a no-op to preserve the context shape
+  // without churning call sites. Restore the real handler (and the dependency)
+  // if FB login returns. `signInWithFacebook` (api.ts) stays for that future.
   const signInWithFacebookHandler =
     useCallback(async (): Promise<OAuthSignInResponse | null> => {
-      try {
-        setIsLoading(true);
-
-        // Lazily load the FB SDK only when the user actually taps "Sign in with
-        // Facebook". See the import-site note above: a top-level import crashes
-        // at startup on builds without FB creds. require() defers the native
-        // HostObject access to here, where FB is expected to be configured.
-        let LoginManager: FbsdkModule["LoginManager"];
-        let AccessToken: FbsdkModule["AccessToken"];
-        try {
-          ({ LoginManager, AccessToken } =
-            require("react-native-fbsdk-next") as FbsdkModule);
-        } catch (sdkError) {
-          // FB SDK not initialized in this build (plugin omitted because no FB
-          // env vars). Surface a friendly message instead of a hard crash.
-          Sentry.captureException(sdkError);
-          toast.error("Facebook sign-in isn't available right now");
-          return null;
-        }
-
-        // Request permissions from Facebook
-        const result = await LoginManager.logInWithPermissions([
-          "public_profile",
-          "email",
-        ]);
-
-        if (result.isCancelled) {
-          return null;
-        }
-
-        // Get the access token
-        const data = await AccessToken.getCurrentAccessToken();
-
-        if (!data?.accessToken) {
-          throw new Error("No access token returned from Facebook");
-        }
-
-        // Send to our server
-        const response = await signInWithFacebook(data.accessToken);
-
-        track(ANALYTICS_EVENTS.AUTH_SIGN_IN_COMPLETED, { method: "facebook" });
-
-        // After successful OAuth, the user is authenticated and linked (has email)
-        // Update state directly to avoid race conditions with refreshAuth
-        setIsAuthenticated(true);
-        setIsLinked(true);
-
-        // Also refresh to get full user data (but state is already correct)
-        await refreshAuth();
-
-        // Invalidate profile queries so ProfileSwitcher loads fresh data
-        queryClient.invalidateQueries({ queryKey: ["profiles"] });
-        queryClient.invalidateQueries({ queryKey: ["activeProfile"] });
-        // Re-pull saved artworks: the server merge (handleMobileOAuthSignIn) just
-        // re-pointed the anon user's artworks onto this email account, so the
-        // My Art tab must refetch to show the reconciled DB rows. (Phase 3's
-        // login trigger also flushes any still-local drawings to DB right now.)
-        queryClient.invalidateQueries({ queryKey: ["savedArtworks"] });
-
-        return response;
-      } catch (error: unknown) {
-        console.error("Facebook sign-in error:", error);
-        const message =
-          error instanceof Error
-            ? error.message
-            : "Failed to sign in with Facebook";
-        toast.error(message);
-        return null;
-      } finally {
-        setIsLoading(false);
-      }
-    }, [refreshAuth]);
+      toast.error("Facebook sign-in isn't available right now");
+      return null;
+    }, []);
 
   // Send Magic Link
   const sendMagicLinkHandler = useCallback(
