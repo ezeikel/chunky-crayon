@@ -588,7 +588,18 @@
         "subtitle": "Légère vibration lors des appuis et des récompenses",
         "title": "Vibration"
       },
-      "creditCount_other": "{{formattedCount}} crédits"
+      "creditCount_other": "{{formattedCount}} crédits",
+      "deleteAccount": {
+        "title": "Supprimer le compte",
+        "subtitle": "Effacer votre compte et vos données",
+        "success": "Votre compte a été supprimé",
+        "error": "Impossible de supprimer votre compte. Veuillez réessayer."
+      },
+      "deleteAccountConfirm": {
+        "confirm": "Supprimer",
+        "description": "Cela efface définitivement votre compte, vos dessins enregistrés, vos personnages et votre progression. Impossible d’annuler. Si vous avez un abonnement, annulez-le dans les réglages de votre boutique pour arrêter la facturation.",
+        "title": "Supprimer le compte ?"
+      }
     },
     "subscriptionManager": {
       "accessUntil": "Accès jusqu’au",

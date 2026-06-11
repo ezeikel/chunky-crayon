@@ -588,7 +588,18 @@
         "subtitle": "Vibración suave en toques y recompensas",
         "title": "Vibración"
       },
-      "creditCount_other": "{{formattedCount}} créditos"
+      "creditCount_other": "{{formattedCount}} créditos",
+      "deleteAccount": {
+        "title": "Eliminar cuenta",
+        "subtitle": "Borra tu cuenta y tus datos",
+        "success": "Tu cuenta se eliminó",
+        "error": "No se pudo eliminar tu cuenta. Inténtalo de nuevo."
+      },
+      "deleteAccountConfirm": {
+        "confirm": "Eliminar",
+        "description": "Esto borra para siempre tu cuenta, dibujos guardados, personajes y progreso. No se puede deshacer. Si tienes una suscripción, cancélala en la configuración de tu tienda para dejar de pagar.",
+        "title": "¿Eliminar cuenta?"
+      }
     },
     "subscriptionManager": {
       "accessUntil": "Acceso hasta",

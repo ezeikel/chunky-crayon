@@ -588,7 +588,18 @@
         "subtitle": "Sanftes Vibrieren bei Tipps und Belohnungen",
         "title": "Vibration"
       },
-      "creditCount_other": "{{formattedCount}} Credits"
+      "creditCount_other": "{{formattedCount}} Credits",
+      "deleteAccount": {
+        "title": "Konto löschen",
+        "subtitle": "Konto und Daten löschen",
+        "success": "Dein Konto wurde gelöscht",
+        "error": "Konto konnte nicht gelöscht werden. Bitte versuche es erneut."
+      },
+      "deleteAccountConfirm": {
+        "confirm": "Löschen",
+        "description": "Damit werden dein Konto, gespeicherte Bilder, Figuren und Fortschritt dauerhaft gelöscht. Das kann nicht rückgängig gemacht werden. Wenn du ein Abo hast, kündige es in den Store-Einstellungen, damit keine weiteren Kosten entstehen.",
+        "title": "Konto löschen?"
+      }
     },
     "subscriptionManager": {
       "accessUntil": "Zugriff bis",

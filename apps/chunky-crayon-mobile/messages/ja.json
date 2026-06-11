@@ -588,7 +588,18 @@
         "subtitle": "タップや報酬でやさしくブルッ",
         "title": "バイブ"
       },
-      "creditCount_other": "{{formattedCount}} クレジット"
+      "creditCount_other": "{{formattedCount}} クレジット",
+      "deleteAccount": {
+        "title": "アカウントを削除",
+        "subtitle": "アカウントとデータを消去します",
+        "success": "アカウントを削除しました",
+        "error": "アカウントを削除できませんでした。もう一度お試しください。"
+      },
+      "deleteAccountConfirm": {
+        "confirm": "削除",
+        "description": "アカウント、保存した作品、キャラクター、進み具合が完全に消去されます。元に戻せません。サブスクリプションがある場合は、請求を止めるためにストアの設定で解約してください。",
+        "title": "アカウントを削除しますか？"
+      }
     },
     "subscriptionManager": {
       "accessUntil": "利用期限",

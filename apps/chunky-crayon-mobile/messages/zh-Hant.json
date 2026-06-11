@@ -588,7 +588,18 @@
         "subtitle": "點擊與獎勵時輕微震動",
         "title": "震動"
       },
-      "creditCount_other": "{{formattedCount}} 點數"
+      "creditCount_other": "{{formattedCount}} 點數",
+      "deleteAccount": {
+        "title": "刪除帳號",
+        "subtitle": "清除你的帳號與資料",
+        "success": "你的帳號已刪除",
+        "error": "無法刪除你的帳號。請再試一次。"
+      },
+      "deleteAccountConfirm": {
+        "confirm": "刪除",
+        "description": "這會永久清除你的帳號、已儲存的作品、角色與進度，無法復原。若你有訂閱，請到商店設定中取消以停止扣款。",
+        "title": "要刪除帳號嗎？"
+      }
     },
     "subscriptionManager": {
       "accessUntil": "可使用至",

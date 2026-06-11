@@ -588,7 +588,18 @@
         "subtitle": "点击与奖励时轻轻震动",
         "title": "震动"
       },
-      "creditCount_other": "{{formattedCount}} 点数"
+      "creditCount_other": "{{formattedCount}} 点数",
+      "deleteAccount": {
+        "title": "删除账号",
+        "subtitle": "清除你的账号和数据",
+        "success": "你的账号已删除",
+        "error": "无法删除你的账号，请重试。"
+      },
+      "deleteAccountConfirm": {
+        "confirm": "删除",
+        "description": "这将永久清除你的账号、已保存的作品、角色和进度，且无法撤销。如有订阅，请在应用商店设置中取消以停止扣费。",
+        "title": "要删除账号吗？"
+      }
     },
     "subscriptionManager": {
       "accessUntil": "可用至",

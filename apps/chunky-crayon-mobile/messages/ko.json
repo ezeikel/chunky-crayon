@@ -588,7 +588,18 @@
         "subtitle": "터치와 보상에 부드러운 진동",
         "title": "진동"
       },
-      "creditCount_other": "{{formattedCount}} 크레딧"
+      "creditCount_other": "{{formattedCount}} 크레딧",
+      "deleteAccount": {
+        "title": "계정 삭제",
+        "subtitle": "계정과 데이터를 지웁니다",
+        "success": "계정이 삭제되었어요",
+        "error": "계정을 삭제할 수 없어요. 다시 시도해 주세요."
+      },
+      "deleteAccountConfirm": {
+        "confirm": "삭제",
+        "description": "계정, 저장된 그림, 캐릭터, 진행 상황이 영구적으로 삭제돼요. 되돌릴 수 없어요. 구독 중이라면 결제가 멈추도록 스토어 설정에서 구독을 취소해 주세요.",
+        "title": "계정을 삭제할까요?"
+      }
     },
     "subscriptionManager": {
       "accessUntil": "이용 기간",
