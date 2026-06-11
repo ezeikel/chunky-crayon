@@ -16,6 +16,8 @@ import {
 import Spinner from "@/components/Spinner/Spinner";
 import { toast } from "@/components/Toaster";
 import ConfirmSheet from "@/components/ConfirmSheet";
+import ParentalGate from "@/components/ParentalGate";
+import { deleteAccount } from "@/api";
 import { resetLocalDeviceData } from "@/lib/dev/resetLocalData";
 import { LinearGradient } from "expo-linear-gradient";
 import DashedRing from "@/components/DashedRing/DashedRing";
@@ -405,6 +407,38 @@ const SettingsScreen = () => {
     toast.success(t("toast.signedOut"));
   };
 
+  // Account deletion (Apple 5.1.1(v) / Play data-safety / GDPR-K). Two gates:
+  // the parental math gate (destructive action), then a confirm sheet. On
+  // confirm we hit the server, then signOut() — which clears tokens, resets
+  // RevenueCat + analytics identity, and drops the device back to anonymous.
+  const [deleteGateOpen, setDeleteGateOpen] = useState(false);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  const handleDeleteAccount = () => setDeleteGateOpen(true);
+
+  const confirmDeleteAccount = async () => {
+    if (deleting) return;
+    setDeleting(true);
+    try {
+      const result = await deleteAccount();
+      if (!result.ok) {
+        toast.error(t("deleteAccount.error"));
+        return;
+      }
+      // signOut orchestrates token clear + RevenueCat logout + identity reset.
+      await signOut();
+      toast.success(t("deleteAccount.success"));
+      // Reset to the anonymous onboarding landing (same as replay-onboarding).
+      useOnboardingStore.getState().reset();
+      router.replace("/onboarding");
+    } catch {
+      toast.error(t("deleteAccount.error"));
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   // DEV-only: wipe ALL local device data (MMKV + AsyncStorage + auth +
   // on-disk artwork), then prompt to restart so the cleared stores rehydrate
   // empty. Guarded by __DEV__ so it never ships in a release build.
@@ -427,9 +461,7 @@ const SettingsScreen = () => {
       if (result) {
         setSignInModalVisible(false);
         toast.success(
-          result.wasMerged
-            ? t("toast.accountLinked")
-            : t("toast.signedIn"),
+          result.wasMerged ? t("toast.accountLinked") : t("toast.signedIn"),
         );
       }
     } catch {
@@ -446,9 +478,7 @@ const SettingsScreen = () => {
       if (result) {
         setSignInModalVisible(false);
         toast.success(
-          result.wasMerged
-            ? t("toast.accountLinked")
-            : t("toast.signedIn"),
+          result.wasMerged ? t("toast.accountLinked") : t("toast.signedIn"),
         );
       }
     } catch {
@@ -465,9 +495,7 @@ const SettingsScreen = () => {
       if (result) {
         setSignInModalVisible(false);
         toast.success(
-          result.wasMerged
-            ? t("toast.accountLinked")
-            : t("toast.signedIn"),
+          result.wasMerged ? t("toast.accountLinked") : t("toast.signedIn"),
         );
       }
     } catch {
@@ -639,14 +667,27 @@ const SettingsScreen = () => {
             <Text style={styles.sectionTitle}>{t("section.account")}</Text>
             <View style={styles.sectionContent}>
               {isLinked ? (
-                <SettingsItem
-                  icon={faRightFromBracket}
-                  iconColor={COLORS.error}
-                  iconSecondaryColor="#FCA5A5"
-                  title={t("signOut.title")}
-                  subtitle={user?.email || t("signOut.subtitle")}
-                  onPress={handleSignOut}
-                />
+                <>
+                  <SettingsItem
+                    icon={faRightFromBracket}
+                    iconColor={COLORS.error}
+                    iconSecondaryColor="#FCA5A5"
+                    title={t("signOut.title")}
+                    subtitle={user?.email || t("signOut.subtitle")}
+                    onPress={handleSignOut}
+                  />
+                  {/* Delete account — required by Apple 5.1.1(v) + Play for any
+                      app with sign-in. Behind its own parental gate + confirm
+                      because it permanently erases the account and data. */}
+                  <SettingsItem
+                    icon={faTrashCan}
+                    iconColor={COLORS.error}
+                    iconSecondaryColor="#FCA5A5"
+                    title={t("deleteAccount.title")}
+                    subtitle={t("deleteAccount.subtitle")}
+                    onPress={handleDeleteAccount}
+                  />
+                </>
               ) : (
                 <SettingsItem
                   icon={faLink}
@@ -1011,6 +1052,28 @@ const SettingsScreen = () => {
         icon={faRightFromBracket}
         confirmLabel={t("signOutConfirm.confirm")}
         onConfirm={confirmSignOut}
+        tone="destructive"
+      />
+
+      {/* Delete account: parent gate → confirm sheet → server delete + signOut.
+          The gear gate guards ENTERING settings; this per-action gate guards the
+          irreversible erase. */}
+      <ParentalGate
+        visible={deleteGateOpen}
+        onClose={() => setDeleteGateOpen(false)}
+        onSuccess={() => {
+          setDeleteGateOpen(false);
+          setDeleteConfirmOpen(true);
+        }}
+      />
+      <ConfirmSheet
+        isOpen={deleteConfirmOpen}
+        onClose={() => setDeleteConfirmOpen(false)}
+        title={t("deleteAccountConfirm.title")}
+        description={t("deleteAccountConfirm.description")}
+        icon={faTrashCan}
+        confirmLabel={t("deleteAccountConfirm.confirm")}
+        onConfirm={confirmDeleteAccount}
         tone="destructive"
       />
 

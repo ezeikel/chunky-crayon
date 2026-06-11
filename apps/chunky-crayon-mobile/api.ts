@@ -539,6 +539,25 @@ export const deleteProfile = async (
 };
 
 // ============================================================================
+// Account deletion
+// ============================================================================
+
+export type DeleteAccountResult =
+  | { ok: true }
+  | { ok: false; error: "unauthorized" | "not_found" | "unknown" };
+
+/**
+ * Permanently delete the signed-in user's account and all of their data
+ * (Apple 5.1.1(v) / Google Play data-safety / GDPR-K). Must be under /mobile so
+ * proxy.ts injects x-user-id. After this returns ok, the caller signs out so the
+ * device reverts to a fresh anonymous identity.
+ */
+export const deleteAccount = async (): Promise<DeleteAccountResult> => {
+  const response = await api.post("/mobile/auth/delete-account");
+  return response.data as DeleteAccountResult;
+};
+
+// ============================================================================
 // Saved Artworks
 // ============================================================================
 

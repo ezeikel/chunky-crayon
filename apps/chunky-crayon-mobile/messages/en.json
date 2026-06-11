@@ -564,6 +564,17 @@
         "description": "Your artwork will stay on this device.",
         "title": "Sign out?"
       },
+      "deleteAccount": {
+        "title": "Delete Account",
+        "subtitle": "Erase your account and data",
+        "success": "Your account was deleted",
+        "error": "Couldn't delete your account. Please try again."
+      },
+      "deleteAccountConfirm": {
+        "confirm": "Delete",
+        "description": "This permanently erases your account, saved artwork, characters, and progress. It can't be undone. If you have a subscription, cancel it in your store settings to stop billing.",
+        "title": "Delete account?"
+      },
       "soundEffects": {
         "subtitle": "Button taps and actions",
         "title": "Sound Effects"
