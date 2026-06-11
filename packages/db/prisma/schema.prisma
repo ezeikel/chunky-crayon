@@ -127,7 +127,9 @@ model SubscriptionEvent {
 model CreditTransaction {
   id        String                @id @default(cuid())
   userId    String
-  user      User                  @relation(fields: [userId], references: [id])
+  // onDelete: Cascade so deleting a user removes their credit ledger (required
+  // for account deletion / GDPR-K; without it user.delete() throws P2003).
+  user      User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
   amount    Int // positive for credit, negative for usage
   type      CreditTransactionType
   reference String? // Stripe payment intent, etc.
@@ -193,7 +195,11 @@ model ColoringImage {
   // In-memory id the worker uses to track this generation. Useful for
   // debugging + cancellation; not part of any API contract.
   workerJobId         String?
-  User                User?               @relation(fields: [userId], references: [id])
+  // onDelete: SetNull on account deletion — coloring images outlive their
+  // creator (DAILY/SYSTEM/community pages are intentionally user-agnostic and
+  // userId is already optional). Deleting the user nulls userId, preserving the
+  // page; without this user.delete() throws P2003.
+  User                User?               @relation(fields: [userId], references: [id], onDelete: SetNull)
   userId              String?
   profile             Profile?            @relation(fields: [profileId], references: [id])
   profileId           String? // Which profile created this image
