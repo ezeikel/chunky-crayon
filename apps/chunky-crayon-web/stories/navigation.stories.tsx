@@ -73,6 +73,7 @@ const footerCopy: FooterContentCopy = {
   links: {
     privacyPolicy: 'Privacy Policy',
     termsOfService: 'Terms of Service',
+    support: 'Support',
     colorAsYouGo: 'Color as you go',
   },
   freeTools: {

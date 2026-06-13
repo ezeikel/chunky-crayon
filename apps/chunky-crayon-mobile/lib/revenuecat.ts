@@ -41,6 +41,20 @@ export async function initializeRevenueCat(userId?: string): Promise<void> {
     return;
   }
 
+  // A production/preview build that falls back to a `test_`-prefixed key is
+  // pointed at the RevenueCat *test store* — purchases would never reach the
+  // real store. The hardcoded fallback only exists for local dev, so make a
+  // non-dev build with a test key fail LOUDLY (console.error is captured by
+  // Sentry's console integration in prod) rather than ship a dead paywall.
+  const environment = process.env.EXPO_PUBLIC_ENVIRONMENT ?? "development";
+  if (environment !== "development" && apiKey.startsWith("test_")) {
+    console.error(
+      `[RevenueCat] FATAL: ${environment} build is using a TEST API key for ${Platform.OS}. ` +
+        `Set EXPO_PUBLIC_REVENUECAT_${Platform.OS === "ios" ? "IOS" : "ANDROID"}_KEY ` +
+        `in the EAS ${environment} environment — purchases are pointed at the test store and will not work.`,
+    );
+  }
+
   try {
     // Enable debug logs in development
     if (__DEV__) {

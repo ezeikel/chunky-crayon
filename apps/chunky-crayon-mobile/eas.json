@@ -56,6 +56,10 @@
         "appleId": "developer@chewybytes.com",
         "appleTeamId": "HGX827L49J",
         "ascAppId": "6757487905"
+      },
+      "android": {
+        "serviceAccountKeyPath": "./google-service-account.json",
+        "track": "internal"
       }
     }
   }

@@ -44,6 +44,7 @@ export type FooterContentCopy = {
   links: {
     privacyPolicy: string;
     termsOfService: string;
+    support: string;
     colorAsYouGo: string;
   };
   freeTools: {
@@ -252,6 +253,12 @@ export const FooterContent = ({
             <Link href="/terms" className="hover:text-white transition-colors">
               {copy.links.termsOfService}
             </Link>
+            <Link
+              href="/support"
+              className="hover:text-white transition-colors"
+            >
+              {copy.links.support}
+            </Link>
           </div>
         </div>
         <div className="flex items-center gap-3">
@@ -311,6 +318,7 @@ const Footer = async ({ className }: FooterProps) => {
         links: {
           privacyPolicy: t('links.privacyPolicy'),
           termsOfService: t('links.termsOfService'),
+          support: t('links.support'),
           colorAsYouGo: t('links.colorAsYouGo'),
         },
         freeTools: {

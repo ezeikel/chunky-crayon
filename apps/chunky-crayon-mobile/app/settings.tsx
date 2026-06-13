@@ -376,8 +376,9 @@ const SettingsScreen = () => {
 
   const handleRateApp = () => {
     const storeUrl = Platform.select({
-      ios: "https://apps.apple.com/app/chunky-crayon",
-      android: "https://play.google.com/store/apps/details?id=com.chunkycrayon",
+      ios: "https://apps.apple.com/app/id6757487905",
+      android:
+        "https://play.google.com/store/apps/details?id=com.chewybytes.chunkycrayon.app",
     });
     if (storeUrl) {
       Linking.openURL(storeUrl);
@@ -385,11 +386,11 @@ const SettingsScreen = () => {
   };
 
   const handlePrivacy = () => {
-    Linking.openURL("https://chunkycrayon.com/privacy");
+    Linking.openURL("https://www.chunkycrayon.com/en/privacy");
   };
 
   const handleTerms = () => {
-    Linking.openURL("https://chunkycrayon.com/terms");
+    Linking.openURL("https://www.chunkycrayon.com/en/terms");
   };
 
   const handleSignIn = () => {

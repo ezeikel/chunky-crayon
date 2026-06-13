@@ -16,6 +16,10 @@ web-build/
 *.key
 *.mobileprovision
 
+# Google Play service-account key (used by eas.json submit.production.android).
+# Drop the JSON from RevenueCat's Cloud Shell credentials script here; never commit it.
+google-service-account.json
+
 # Metro
 .metro-health-check*
 
