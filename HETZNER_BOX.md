@@ -10,6 +10,7 @@ Projects currently sharing this file:
 - [`ezeikel/parking-ticket-pal-worker`](https://github.com/ezeikel/parking-ticket-pal-worker)
 - [`ezeikel/chunky-crayon`](https://github.com/ezeikel/chunky-crayon) → this repo
 - [`ezeikel/ezeikel`](https://github.com/ezeikel/ezeikel)
+- [`ezeikel/go-unbeaten`](https://github.com/ezeikel/go-unbeaten)
 
 ---
 
@@ -36,6 +37,7 @@ Projects currently sharing this file:
 | **Auntie Marlene's content worker**  | `ezeikel/auntie-marlenes`           | `/opt/auntie-marlenes` | (live)           | `content-worker.service`                        | **3020** | Hono HTTP server for daily social posts, blog auto-generation, product image updates. Also hosts one-off CLI scripts for hero asset regeneration (`pnpm gen:hero`, `pnpm gen:hero-videos-*`) that run on-demand via SSH, not via HTTP.                                                                                                                                                                                                                                                                                                  |
 | **Chunky Crayon social demo worker** | `ezeikel/chunky-crayon`             | `/opt/chunky-crayon`   | (pending deploy) | `chunky-crayon-worker.service`                  | **3030** | Hono HTTP server that drives the live CC web app via Playwright + `xvfb-run` to record a Magic Brush reveal video, composites it with Remotion + ElevenLabs voiceover/music, and posts to IG Reels / FB Reels / TikTok / Pinterest on a Vercel-cron-triggered schedule.                                                                                                                                                                                                                                                                 |
 | **Ezeikel dev-content reel worker**  | `ezeikel/ezeikel`                   | `/opt/ezeikel`         | (pending deploy) | `ezeikel-worker.service`                        | 3040     | Hono HTTP server that posts dev-content Reels (JS/TS/AI/tooling tips) to Ezeikel's personal IG Business + FB Page on a Vercel-cron-triggered schedule. Pipeline: Perplexity research → LLM script compression → ElevenLabs voice (cloned) → Remotion render with Shiki-highlighted code → R2 upload → Graph API publish. Mirrors the chunky-crayon-worker shape, minus Playwright.                                                                                                                                                      |
+| **Go Unbeaten promo reel worker**    | `ezeikel/go-unbeaten`               | `/opt/go-unbeaten`     | (pending deploy) | `go-unbeaten-worker.service`                    | 3050     | Hono HTTP server that renders the Go Unbeaten promo reels (Promo + MultiSport compositions) with Remotion + ElevenLabs voiceover/music via `POST /generate/promo` (bearer-auth). Monorepo worker at `apps/worker/`; imports the shared `@go-unbeaten/game` core (raw TS, no build step). No Playwright. Run via pnpm (workspace:* deps).                                                                                                                                                                                                |
 
 **Disk usage as of last audit (April 2026):** ~9 GB total across both projects, 52 GB free on `/dev/sda1`.
 
@@ -103,6 +105,7 @@ Each project gets a unique port on `127.0.0.1` (or `*` if it needs to be externa
 | 3020        | AM `content-worker`                                                           |
 | **3030**    | **CC `chunky-crayon-worker`**                                                 |
 | 3040        | EZ `ezeikel-worker`                                                           |
+| **3050**    | **GU `go-unbeaten-worker`**                                                   |
 | 30000–50000 | Chrome debug ports spawned by PTP's Playwright workers (do not allocate here) |
 
 **When adding a new project: pick the next available 10-slot in the 30xx range** (3030, 3040, 3050, ...). Leave gaps between projects for future sub-services.
