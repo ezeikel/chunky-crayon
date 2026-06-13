@@ -86,7 +86,8 @@
     "links": {
       "privacyPolicy": "Datenschutzerklärung",
       "termsOfService": "Nutzungsbedingungen",
-      "colorAsYouGo": "Unterwegs ausmalen"
+      "colorAsYouGo": "Unterwegs ausmalen",
+      "support": "Hilfe"
     },
     "freeTools": {
       "allTools": "Alle Tools",
