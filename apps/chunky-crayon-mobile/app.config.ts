@@ -176,6 +176,19 @@ export default ({ config }: ConfigContext): ExpoConfig => {
             "Allow Chunky Crayon to access your photos to select sketches",
         },
       ],
+      // expo-media-library auto-links with the default granular permission set
+      // ['photo','video','audio'], which adds READ_MEDIA_VIDEO + READ_MEDIA_AUDIO
+      // to the Android manifest. We only ever read/save IMAGES (pick a photo to
+      // colorize + save finished artwork to the gallery), never video or audio.
+      // Declaring unused media permissions is a Designed-for-Families review flag,
+      // so restrict the plugin to ['photo'] — drops READ_MEDIA_VIDEO/AUDIO from the
+      // merged manifest, leaving only READ_MEDIA_IMAGES (the one we actually use).
+      [
+        "expo-media-library",
+        {
+          granularPermissions: ["photo"],
+        },
+      ],
       [
         "@sentry/react-native",
         {
