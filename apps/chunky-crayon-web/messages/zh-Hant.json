@@ -684,7 +684,7 @@
         "answer": "Splash 的點數每月重置。Rainbow 會多累積 1 個月。Sparkle 會多累積 2 個月。所以這個月沒用完，下個月還在。"
       },
       "creditsPerPage": {
-        "question": "我到底能做幾張頁面？",
+        "question": "每頁需要多少點數？",
         "answer": "輸入文字或拍張照片需要 5 點數。對 Chunky Crayon 說話需要 10 點數（因為它會聽、轉成文字，還會畫出來）。Splash 每月約 50 張文字頁。Rainbow 約 100。Sparkle 約 200。想怎麼搭配都行。"
       },
       "audience": {
