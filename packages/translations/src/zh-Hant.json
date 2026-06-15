@@ -41,13 +41,13 @@
   "coloringPage": {
     "title": "著色頁",
     "relatedPages": "更多著色頁",
-    "defaultDescription": "來自 Chunky Crayon 的免費可列印著色頁",
+    "defaultDescription": "免費可列印著色頁",
     "progress": {
       "colored": "已上色",
       "percentage": "{percent}%",
       "allDone": "完成！",
       "milestones": {
-        "25": "開頭不錯！",
+        "25": "起步很好！",
         "50": "完成一半！",
         "75": "快完成了！",
         "100": "太棒了！"
@@ -138,7 +138,7 @@
       "pan": "移動",
       "panAria": "在圖片中移動",
       "reset": "查看完整圖片",
-      "resetAria": "回到完整圖片"
+      "resetAria": "返回完整檢視"
     },
     "muteToggle": {
       "mute": "靜音",
@@ -377,7 +377,7 @@
     "termsAgreement": "繼續即表示你同意我們的<terms>服務條款</terms>與<privacy>隱私權政策</privacy>。",
     "verifyRequest": {
       "title": "請查看電子郵件！",
-      "description": "我們已寄出魔法連結讓你登入。請點擊郵件中的連結以繼續。",
+      "description": "我們已寄出登入連結給你。請點擊郵件中的連結以繼續。",
       "checkSpam": "沒看到嗎？請檢查垃圾郵件資料夾。",
       "linkExpiry": "連結將於 24 小時後失效。",
       "tryDifferentEmail": "使用其他電子郵件"
@@ -478,7 +478,7 @@
       "dinosaurs": "適合所有年齡的史前恐龍著色圖",
       "dragons": "從可愛到兇猛的史詩龍著色圖",
       "fantasy": "魔法生物與奇幻世界著色圖",
-      "food": "美味美食、糖果與甜品著色圖",
+      "food": "食物、糖果與甜品著色圖",
       "holidays": "聖誕節、復活節、萬聖節與季節主題著色圖",
       "nature": "美麗自然景色與花卉著色圖",
       "pirates": "刺激的海盜冒險著色圖",
