@@ -90,7 +90,7 @@
       "achievements": {
         "dedicatedArtist": {
           "description": "Schließe 10 Ausmalbilder ab",
-          "title": "Fleißige:r Künstler:in"
+          "title": "Fleißiger Künstler"
         },
         "firstSteps": {
           "description": "Schließe dein erstes Ausmalbild ab",
@@ -102,7 +102,7 @@
         },
         "masterArtist": {
           "description": "Schließe 50 Ausmalbilder ab",
-          "title": "Meisterkünstler:in"
+          "title": "Meisterkünstler"
         }
       },
       "claimFailed": "Belohnung konnte nicht abgeholt werden. Bitte versuch es erneut.",
@@ -664,9 +664,9 @@
       "rainbow": "Regenbogen",
       "rocket": "Rakete",
       "sun": "Sonne",
-      "superhero": "Superheld:in",
+      "superhero": "Superheld",
       "unicorn": "Einhorn",
-      "wizard": "Zauberer:in"
+      "wizard": "Zauberer"
     },
     "avatarPicker": {
       "pickA11y": "{{name}} auswählen"
@@ -727,7 +727,7 @@
         "sea": "Auf See",
         "football-game": "Fußball",
         "busy-street": "Belebte Straße",
-        "shopping-mall": "Einkaufszentrum",
+        "shopping-mall": "Mall",
         "desert-island": "Insel",
         "forest": "Wald",
         "mountains": "Berge",
@@ -746,7 +746,7 @@
         "sleeping": "Schlafen",
         "running": "Rennen",
         "swimming": "Schwimmen",
-        "flying-a-kite": "Drachen steigen",
+        "flying-a-kite": "Drachen",
         "riding-a-bike": "Radfahren",
         "having-a-picnic": "Picknick",
         "dancing": "Tanzen"
