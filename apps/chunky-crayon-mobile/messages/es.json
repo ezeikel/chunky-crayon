@@ -56,7 +56,7 @@
       "species": {
         "dragon": "Dragón",
         "fairy": "Hada",
-        "kid": "Niño/a",
+        "kid": "Niño",
         "kitten": "Gatito",
         "monster": "Monstruo",
         "puppy": "Cachorro",
@@ -64,10 +64,10 @@
         "unicorn": "Unicornio"
       },
       "trait": {
-        "bouncy": "Saltarin/a",
+        "bouncy": "Saltarín",
         "brave": "Valiente",
         "curious": "Curioso/a",
-        "loves-snacks": "Muy comilón/a",
+        "loves-snacks": "Goloso",
         "shy": "Tímido/a",
         "silly": "Gracioso/a",
         "sleepy": "Soñoliento/a",
@@ -726,8 +726,8 @@
         "beach": "Playa",
         "sea": "En el mar",
         "football-game": "Fútbol",
-        "busy-street": "Calle concurrida",
-        "shopping-mall": "Centro comercial",
+        "busy-street": "Calle",
+        "shopping-mall": "Mall",
         "desert-island": "Isla",
         "forest": "Bosque",
         "mountains": "Montañas",
@@ -790,7 +790,7 @@
     "friendPicker": {
       "emptyInviteSuffix": " que aparece en tus páginas.",
       "header": "Añadir un amigo",
-      "includeFriendA11y": "Incluir a {{name}}, un(a) {{species}}",
+      "includeFriendA11y": "Incluir a {{name}}, {{species}}",
       "makeFriend": "Crear un amigo",
       "makeNewFriend": "Crear un nuevo amigo",
       "newFriend": "Nuevo amigo",
@@ -799,7 +799,7 @@
     },
     "image": {
       "camera": "Cámara",
-      "cameraPermissionDenied": "Se necesita acceso a la cámara para sacar fotos.",
+      "cameraPermissionDenied": "Se necesita acceso a la cámara para tomar fotos.",
       "confirmInstructions": "¡Qué foto tan genial! ¿Es esta la que quieres?",
       "createFailed": "No se pudo crear la página para colorear a partir de la foto.",
       "createFailedToast": "No pudimos crear una página para colorear con tu foto. ¡Inténtalo de nuevo!",
@@ -808,7 +808,7 @@
       "pickAnother": "Elegir otra",
       "pickImageFailed": "No se pudo seleccionar esa imagen. Inténtalo de nuevo.",
       "processing": "Creando tu página para colorear...",
-      "takePhotoFailed": "No se pudo sacar la foto. Inténtalo de nuevo.",
+      "takePhotoFailed": "No se pudo tomar la foto. Inténtalo de nuevo.",
       "upload": "Subir"
     },
     "mode": {
