@@ -374,7 +374,7 @@
     "sendingLink": "リンクを送信中...",
     "chooseMethod": "ログイン方法を選択してください",
     "orContinueWith": "または次で続行",
-    "emailPlaceholder": "name@example.com",
+    "emailPlaceholder": "name@example.co.jp",
     "termsAgreement": "続行することで、<terms>利用規約</terms>と<privacy>プライバシーポリシー</privacy>に同意することになります。",
     "verifyRequest": {
       "title": "メールを確認してください！",
