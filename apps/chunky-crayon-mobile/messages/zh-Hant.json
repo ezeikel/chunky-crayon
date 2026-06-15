@@ -86,7 +86,7 @@
     },
     "challenges": {
       "homeCardTitle": "挑戰",
-      "homeCardSubtitle": "著色拿貼紙，讓 Colo 長大！",
+      "homeCardSubtitle": "快來著色，賺貼紙讓 Colo 長大！",
       "achievements": {
         "dedicatedArtist": {
           "description": "完成 10 張著色頁",
@@ -114,7 +114,7 @@
       "noChallengeTitle": "全新挑戰即將登場！",
       "pastChallenges": "過往挑戰",
       "rewardAccessory": "Colo 配件",
-      "rewardEarned": "你獲得了新的{{reward}}！",
+      "rewardEarned": "你得到了新的{{reward}}！",
       "rewardSticker": "貼紙",
       "screenSubtitle": "完成挑戰就能拿獎勵！",
       "screenTitle": "挑戰",
@@ -692,12 +692,12 @@
   },
   "createForm": {
     "scene": {
-      "ariaLabel": "建立你的圖片",
+      "ariaLabel": "組合你的圖片",
       "surpriseMe": "給我驚喜！",
       "back": "返回",
       "next": "下一步",
       "create": "創作！",
-      "extrasTitle": "加碼元素",
+      "extrasTitle": "裝飾",
       "skip": "略過",
       "subjectTitle": "誰？",
       "subjectAddCharacter": "新增角色",
@@ -707,7 +707,7 @@
       "locationTitle": "在哪裡？",
       "weatherTitle": "天氣",
       "activityTitle": "在做什麼？",
-      "accentTitle": "加碼元素",
+      "accentTitle": "裝飾",
       "subject": {
         "horse": "馬",
         "cow": "牛",
@@ -725,7 +725,7 @@
       "location": {
         "beach": "海灘",
         "sea": "海上",
-        "football-game": "足球場",
+        "football-game": "踢足球",
         "busy-street": "熱鬧街道",
         "shopping-mall": "購物中心",
         "desert-island": "小島",
