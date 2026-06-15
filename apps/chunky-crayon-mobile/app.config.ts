@@ -214,16 +214,22 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         },
       ],
       // expo-media-library auto-links with the default granular permission set
-      // ['photo','video','audio'], which adds READ_MEDIA_VIDEO + READ_MEDIA_AUDIO
-      // to the Android manifest. We only ever read/save IMAGES (pick a photo to
-      // colorize + save finished artwork to the gallery), never video or audio.
-      // Declaring unused media permissions is a Designed-for-Families review flag,
-      // so restrict the plugin to ['photo'] — drops READ_MEDIA_VIDEO/AUDIO from the
-      // merged manifest, leaving only READ_MEDIA_IMAGES (the one we actually use).
+      // ['photo','video','audio'], which adds READ_MEDIA_IMAGES/VIDEO/AUDIO to the
+      // Android manifest. We use it ONLY to save a finished coloring page to the
+      // gallery (saveToLibraryAsync) and to pick a photo to colorize — both are
+      // one-time/infrequent actions. Google Play REJECTS READ_MEDIA_IMAGES for
+      // that access pattern ("must need persistent access"), so we request NO
+      // granular READ_MEDIA_* permissions at all. saveToLibraryAsync still works:
+      // on Android 13+ the native module skips the READ_MEDIA_* check entirely,
+      // and on Android 10-12 only WRITE_EXTERNAL_STORAGE is needed (the plugin
+      // always adds that). Photo picking uses the system photo picker on
+      // Android 13+, which needs no permission. granularPermissions:[] keeps
+      // WRITE_EXTERNAL_STORAGE + READ_MEDIA_VISUAL_USER_SELECTED but drops all
+      // three READ_MEDIA_* perms from the merged manifest.
       [
         "expo-media-library",
         {
-          granularPermissions: ["photo"],
+          granularPermissions: [],
         },
       ],
       [
