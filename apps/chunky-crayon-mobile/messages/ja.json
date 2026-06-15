@@ -66,7 +66,7 @@
       "trait": {
         "bouncy": "ぴょんぴょん",
         "brave": "ゆうかん",
-        "curious": "こうきしんおうせい",
+        "curious": "好奇心旺盛",
         "loves-snacks": "おやつだいすき",
         "shy": "はずかしがり",
         "silly": "おちゃめ",
@@ -774,13 +774,13 @@
       "startLabel": "おんせいでおしゃべりをはじめる",
       "stopLabel": "ろくおんをとめる",
       "errorPermissionDenied": "マイクをつかうきょかがひつようです。",
-      "errorQ1AudioFailed": "しつもんをさいせいできなかったよ。もういちど？",
-      "errorSttFailed": "うまくきこえなかったよ。もういちどやってみよう。",
-      "errorFollowUpFailed": "うまくいかなかったよ。もういちど？",
+      "errorQ1AudioFailed": "質問を再生できなかったよ。もう一度？",
+      "errorSttFailed": "うまく聞こえなかったよ。もう一度やってみよう。",
+      "errorFollowUpFailed": "うまくいかなかったよ。もう一度？",
       "errorFollowUpBlocked": "ちがうアイデアにしてみよう！",
-      "errorQ2AudioFailed": "しつもんをさいせいできなかったよ。もういちど？",
-      "errorTimeout": "じかんがかかりすぎたよ！さいしょからやりなおそう。",
-      "errorRequiresSignin": "おんせいモードをつかうにはログインしてね。"
+      "errorQ2AudioFailed": "質問を再生できなかったよ。もう一度？",
+      "errorTimeout": "時間がかかりすぎたよ！最初からやり直そう。",
+      "errorRequiresSignin": "音声モードを使うにはログインしてね。"
     },
     "error": {
       "characterNotReady": "そのおともだちはまだ準備中だよ。少ししてもう一度ね。",
