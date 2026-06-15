@@ -32,7 +32,7 @@
       "step": {
         "species": "选一个小伙伴",
         "color": "选个颜色",
-        "traits": "它是什么性格？",
+        "traits": "它是什么样的？",
         "name": "给它起个名字",
         "voice": "选个声音"
       },
@@ -86,7 +86,7 @@
     },
     "challenges": {
       "homeCardTitle": "挑战",
-      "homeCardSubtitle": "涂色赢贴纸，帮助 Colo 成长！",
+      "homeCardSubtitle": "快来涂色，赚贴纸，让 Colo 长大！",
       "achievements": {
         "dedicatedArtist": {
           "description": "完成 10 张涂色页",
@@ -114,7 +114,7 @@
       "noChallengeTitle": "全新挑战马上就到！",
       "pastChallenges": "往期挑战",
       "rewardAccessory": "Colo 配饰",
-      "rewardEarned": "你获得了新的{{reward}}！",
+      "rewardEarned": "你赚到了新的{{reward}}！",
       "rewardSticker": "贴纸",
       "screenSubtitle": "完成挑战，赢取奖励！",
       "screenTitle": "挑战",
@@ -707,7 +707,7 @@
       "locationTitle": "在哪里？",
       "weatherTitle": "天气",
       "activityTitle": "在做什么？",
-      "accentTitle": "小装饰",
+      "accentTitle": "小惊喜",
       "subject": {
         "horse": "马",
         "cow": "奶牛",
@@ -766,7 +766,7 @@
       "listening": "正在听…",
       "anythingElse": "还想加点什么？",
       "thinking": "嗯，让我想想…",
-      "painting": "正在准备你的涂色页…",
+      "painting": "正在绘制你的涂色页…",
       "doneTalking": "说完啦",
       "imDone": "我说完了",
       "cancel": "取消",
