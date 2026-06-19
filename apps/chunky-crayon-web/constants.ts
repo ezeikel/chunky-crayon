@@ -949,7 +949,10 @@ export const SOCIAL_LINKS = [
 // Update these with actual URLs when apps are live
 export const APP_STORE_LINKS = {
   APPLE: null as string | null, // e.g., 'https://apps.apple.com/gb/app/chunky-crayon/id...'
-  GOOGLE: null as string | null, // e.g., 'https://play.google.com/store/apps/details?id=com.chunkycrayon.app'
+  GOOGLE:
+    'https://play.google.com/store/apps/details?id=com.chewybytes.chunkycrayon.app' as
+      | string
+      | null,
 } as const;
 
 export const APP_STORE_IMAGES = {
