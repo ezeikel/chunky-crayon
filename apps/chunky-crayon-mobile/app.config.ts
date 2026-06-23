@@ -233,7 +233,14 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       "expo-dev-client",
       "expo-font",
       "expo-web-browser",
-      "expo-audio",
+      // expo-audio defaults to enableBackgroundPlayback: true, which injects
+      // UIBackgroundModes: ["audio"] into Info.plist (and on Android adds a
+      // mediaPlayback foreground service + FOREGROUND_SERVICE_MEDIA_PLAYBACK).
+      // CC only plays short ambient/UI sound while the app is FOREGROUND — it
+      // has no background-audio feature. App Review rejected build 33 under
+      // Guideline 2.5.4 for declaring the audio background mode without a
+      // feature that needs it. Turn it off so the key is never added.
+      ["expo-audio", { enableBackgroundPlayback: false }],
       "expo-apple-authentication",
       "expo-secure-store",
       "expo-sharing",

@@ -7,6 +7,7 @@ import React, {
   useMemo,
   ReactNode,
 } from "react";
+import { Platform } from "react-native";
 import * as Sentry from "@sentry/react-native";
 import { getLocales } from "expo-localization";
 import { toast } from "@/components/Toaster";
@@ -139,11 +140,19 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       // anonymous-vs-signed-in discriminator — segment on THAT, never the label.
       const hasAccount = !!user.email;
 
-      Sentry.setUser({
-        id: user.id,
-        email: user.email ?? undefined,
-        username: user.name ?? undefined,
-      });
+      // iOS (Kids Category 1.3): send ONLY the DB user id to Sentry — never a
+      // child's email or name to a third party, even on a crash. Crashes stay
+      // attributable (look the id up in our own DB). Android keeps the richer
+      // id+email+username context (Play app already shipped with it).
+      Sentry.setUser(
+        Platform.OS === "ios"
+          ? { id: user.id }
+          : {
+              id: user.id,
+              email: user.email ?? undefined,
+              username: user.name ?? undefined,
+            },
+      );
       identifyAnalytics(user.id, {
         // null (not undefined) so the analytics helper actively $unsets these on
         // the PostHog person when absent — clears the legacy "Mobile User" name

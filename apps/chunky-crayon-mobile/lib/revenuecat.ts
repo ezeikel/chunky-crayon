@@ -17,6 +17,12 @@ const REVENUECAT_API_KEYS = {
 };
 
 let isConfigured = false;
+// The app_user_id RevenueCat is currently configured with (null = anonymous).
+// Tracked so that if the lazy `ensureConfigured()` guard configured RC
+// anonymously BEFORE SubscriptionContext could anchor it on the DB user id, a
+// later initializeRevenueCat(userId) still aliases the anonymous customer to
+// that id via logIn instead of silently no-opping on the early-return.
+let configuredUserId: string | null = null;
 
 /**
  * Initialize RevenueCat SDK
@@ -24,7 +30,21 @@ let isConfigured = false;
  */
 export async function initializeRevenueCat(userId?: string): Promise<void> {
   if (isConfigured) {
-    console.log("[RevenueCat] Already configured");
+    // Already configured. If we now know a user id but RC is still anonymous
+    // (or on a different id) — e.g. the paywall's ensureConfigured() ran first
+    // and configured anonymously — alias the existing customer to it so a
+    // purchase keys to the DB user, not an orphan $RCAnonymousID.
+    if (userId && configuredUserId !== userId) {
+      try {
+        await Purchases.logIn(userId);
+        configuredUserId = userId;
+        console.log("[RevenueCat] Aliased existing customer to user:", userId);
+      } catch (error) {
+        console.error("[RevenueCat] Failed to alias to user:", error);
+      }
+    } else {
+      console.log("[RevenueCat] Already configured");
+    }
     return;
   }
 
@@ -67,6 +87,7 @@ export async function initializeRevenueCat(userId?: string): Promise<void> {
     });
 
     isConfigured = true;
+    configuredUserId = userId ?? null;
     console.log(
       "[RevenueCat] Configured successfully",
       userId ? `for user: ${userId}` : "anonymously",
@@ -78,12 +99,36 @@ export async function initializeRevenueCat(userId?: string): Promise<void> {
 }
 
 /**
+ * Lazy guard: ensure RevenueCat is configured before ANY SDK call. Mirrors the
+ * live PTP app's PurchaseService pattern — every accessor self-heals by calling
+ * initialize() if it hasn't run yet.
+ *
+ * Why: SubscriptionContext kicks off `initializeRevenueCat(userId)` from an
+ * effect AFTER a cold-start device-register network round-trip resolves
+ * `user.id`. The paywall's offerings/purchase calls are NOT sequenced after
+ * that. On a fresh install with slow network (App Review's exact scenario), a
+ * tap on "buy" before configure() resolves would call into an unconfigured SDK
+ * and throw "There is no singleton instance…", which the paywall surfaces as a
+ * generic "Couldn't process your purchase" — the reviewer read this as the
+ * Guideline 2.1(b) purchase error. Gating every accessor on this guard removes
+ * the race and also retries a one-time configure failure (no more permanently
+ * dead paywall for the session). Configures anonymously if no user id is known
+ * yet; SubscriptionContext later aliases to the DB user id via logIn.
+ */
+async function ensureConfigured(): Promise<void> {
+  if (isConfigured) return;
+  await initializeRevenueCat();
+}
+
+/**
  * Identify user with RevenueCat
  * Call this after user signs in to link purchases to their account
  */
 export async function identifyUser(userId: string): Promise<CustomerInfo> {
   try {
+    await ensureConfigured();
     const { customerInfo } = await Purchases.logIn(userId);
+    configuredUserId = userId;
     console.log("[RevenueCat] User identified:", userId);
     return customerInfo;
   } catch (error) {
@@ -98,7 +143,9 @@ export async function identifyUser(userId: string): Promise<CustomerInfo> {
  */
 export async function logoutUser(): Promise<CustomerInfo> {
   try {
+    await ensureConfigured();
     const customerInfo = await Purchases.logOut();
+    configuredUserId = null;
     console.log("[RevenueCat] User logged out");
     return customerInfo;
   } catch (error) {
@@ -112,6 +159,7 @@ export async function logoutUser(): Promise<CustomerInfo> {
  */
 export async function getCustomerInfo(): Promise<CustomerInfo> {
   try {
+    await ensureConfigured();
     const customerInfo = await Purchases.getCustomerInfo();
     return customerInfo;
   } catch (error) {
@@ -125,6 +173,7 @@ export async function getCustomerInfo(): Promise<CustomerInfo> {
  */
 export async function getOfferings(): Promise<PurchasesOffering | null> {
   try {
+    await ensureConfigured();
     const offerings = await Purchases.getOfferings();
     return offerings.current;
   } catch (error) {
@@ -140,6 +189,7 @@ export async function purchasePackage(
   packageToPurchase: PurchasesPackage,
 ): Promise<CustomerInfo> {
   try {
+    await ensureConfigured();
     const { customerInfo } = await Purchases.purchasePackage(packageToPurchase);
     console.log("[RevenueCat] Purchase successful");
     return customerInfo;
@@ -164,6 +214,7 @@ export async function purchasePackage(
  */
 export async function restorePurchases(): Promise<CustomerInfo> {
   try {
+    await ensureConfigured();
     const customerInfo = await Purchases.restorePurchases();
     console.log("[RevenueCat] Purchases restored");
     return customerInfo;

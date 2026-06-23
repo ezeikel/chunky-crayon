@@ -26,46 +26,59 @@ const ArtworkSyncMount = () => {
 };
 
 const Providers = ({ children }: { children: React.ReactNode }) => {
+  // The shared data/UI provider stack. PostHogProvider wraps this on Android;
+  // on iOS it doesn't exist at all (see below).
+  const tree = (
+    /* QueryClientProvider (+ the auth/user/colo data providers) must wrap
+       BottomSheetProvider, NOT the other way around. @swmansion's
+       ModalBottomSheet PORTALS its content up to the BottomSheetProvider
+       host — so any sheet that renders React-Query / context consumers
+       (e.g. the Create sheet's form → useEntitlements) needs those providers
+       ABOVE the sheet host, or it crashes with "No QueryClient set". */
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <SubscriptionProvider>
+          <UserProvider>
+            <ArtworkSyncMount />
+            <ColoProvider>
+              <FocusModeProvider>
+                <BottomSheetProvider>
+                  {children}
+                  {/* Toast host — under BottomSheetProvider so toasts render
+                    above any open sheet. ALL transient feedback lives here
+                    (no Alert.alert). Destructive confirms use ConfirmSheet. */}
+                  <Toaster />
+                  {/* "Turn me around" overlay for a physically-inverted
+                    iPhone. Last child so it covers every screen + sheet. */}
+                  <UpsideDownHint />
+                </BottomSheetProvider>
+              </FocusModeProvider>
+            </ColoProvider>
+          </UserProvider>
+        </SubscriptionProvider>
+      </AuthProvider>
+    </QueryClientProvider>
+  );
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      {/* PostHogProvider wraps everything so usePostHog() works app-wide
-          (incl. AuthContext, which identifies the user). Uses the shared
-          configured client from lib/posthog (autocapture: $screen per route +
-          app lifecycle, touches OFF; session replay ON, fully masked). */}
-      <PostHogProvider
-        client={posthog}
-        autocapture={{ captureScreens: true, captureTouches: false }}
-      >
-        {/* QueryClientProvider (+ the auth/user/colo data providers) must wrap
-          BottomSheetProvider, NOT the other way around. @swmansion's
-          ModalBottomSheet PORTALS its content up to the BottomSheetProvider
-          host — so any sheet that renders React-Query / context consumers
-          (e.g. the Create sheet's form → useEntitlements) needs those providers
-          ABOVE the sheet host, or it crashes with "No QueryClient set". */}
-        <QueryClientProvider client={queryClient}>
-          <AuthProvider>
-            <SubscriptionProvider>
-              <UserProvider>
-                <ArtworkSyncMount />
-                <ColoProvider>
-                  <FocusModeProvider>
-                    <BottomSheetProvider>
-                      {children}
-                      {/* Toast host — under BottomSheetProvider so toasts render
-                        above any open sheet. ALL transient feedback lives here
-                        (no Alert.alert). Destructive confirms use ConfirmSheet. */}
-                      <Toaster />
-                      {/* "Turn me around" overlay for a physically-inverted
-                        iPhone. Last child so it covers every screen + sheet. */}
-                      <UpsideDownHint />
-                    </BottomSheetProvider>
-                  </FocusModeProvider>
-                </ColoProvider>
-              </UserProvider>
-            </SubscriptionProvider>
-          </AuthProvider>
-        </QueryClientProvider>
-      </PostHogProvider>
+      {/* iOS: NO PostHogProvider. Apple's Kids Category (Guideline 1.3) bars a
+          Kids app from third-party analytics SDKs that can collect/transmit
+          device or identifiable info, so on iOS `posthog` is null (see
+          lib/posthog) and we mount the tree without any analytics provider —
+          no autocapture, no session replay, nothing leaves the device.
+          Android keeps the provider (autocapture: $screen per route + app
+          lifecycle, touches OFF; session replay ON, fully masked). */}
+      {posthog ? (
+        <PostHogProvider
+          client={posthog}
+          autocapture={{ captureScreens: true, captureTouches: false }}
+        >
+          {tree}
+        </PostHogProvider>
+      ) : (
+        tree
+      )}
     </GestureHandlerRootView>
   );
 };

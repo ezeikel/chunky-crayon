@@ -310,7 +310,9 @@ const SettingsScreen = () => {
 
   // Default-off: only an explicit `true` shows the FB button (undefined while
   // loading / missing flag → hidden). Keeps the unconfigured FB native module
-  // from being reachable and crashing the app.
+  // from being reachable and crashing the app. On iOS there's no PostHog client
+  // (Kids Category 1.3 — analytics disabled), so the flag resolves to undefined
+  // and the button stays hidden, which is the intended state there anyway.
   const isFacebookLoginEnabled = useFeatureFlag(FACEBOOK_LOGIN_FLAG) === true;
 
   // Audio preference states
