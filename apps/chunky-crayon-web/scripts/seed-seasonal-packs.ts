@@ -3,6 +3,23 @@
  * pipeline (createColoringImage). Each generated page is tagged with
  * `seasonal-pack:{pack}` so `/api/tools/seasonal-pack` can query them.
  *
+ * ─── 🚨 RUN-BEFORE CHECKLIST ────────────────────────────────────────
+ * The route has a fallback that pulls existing gallery images by topic
+ * tag (halloween, christmas, …) so the tool still works without this
+ * script. Run this seed when you want CURATED, on-brand pages for a
+ * promotional push:
+ *
+ *   • Halloween push       → seed by mid-September
+ *   • Thanksgiving push    → seed by early November
+ *   • Christmas push       → seed by mid-November
+ *   • Valentine's push     → seed by mid-January
+ *   • Easter push          → seed ~6 weeks before Easter Sunday
+ *   • Back-to-school push  → seed by late July
+ *
+ * After dev seed:  run scripts/clone-seasonal-packs-to-prod.ts so prod
+ * gets the same R2 assets without paying AI credits twice.
+ * ────────────────────────────────────────────────────────────────────
+ *
  * Safe to re-run — entries are skipped if a coloring image already
  * exists with the same `seasonal-pack:{pack}` + slug tags. Failed
  * generations are logged and skipped (the next run will retry them).
