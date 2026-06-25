@@ -72,13 +72,13 @@
       "magicAuto": "Auto magique",
       "magicBrush": "Pinceau magique",
       "magicFill": "Remplissage magique",
-      "autoColor": "Coloriage auto",
+      "autoColor": "Coloriage automatique",
       "magic": "Magie"
     },
     "brushTypes": {
-      "crayon": "Crayon",
+      "crayon": "Crayon de couleur",
       "marker": "Feutre",
-      "pencil": "Crayon",
+      "pencil": "Crayon de papier",
       "paintbrush": "Pinceau",
       "eraser": "Gomme",
       "glitter": "Paillettes",
