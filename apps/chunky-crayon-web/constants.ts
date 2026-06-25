@@ -948,7 +948,9 @@ export const SOCIAL_LINKS = [
 // Mobile app store links - set to null until apps are published
 // Update these with actual URLs when apps are live
 export const APP_STORE_LINKS = {
-  APPLE: null as string | null, // e.g., 'https://apps.apple.com/gb/app/chunky-crayon/id...'
+  APPLE: 'https://apps.apple.com/gb/app/chunky-crayon/id6757487905' as
+    | string
+    | null,
   GOOGLE:
     'https://play.google.com/store/apps/details?id=com.chewybytes.chunkycrayon.app' as
       | string
