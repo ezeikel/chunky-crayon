@@ -43,7 +43,7 @@
   "coloringPage": {
     "title": "색칠 페이지",
     "relatedPages": "더 많은 색칠 페이지",
-    "defaultDescription": "Chunky Crayon의 무료 인쇄용 색칠 페이지",
+    "defaultDescription": "무료 인쇄용 색칠 페이지",
     "progress": {
       "colored": "색칠됨",
       "percentage": "{percent}%",
@@ -138,7 +138,7 @@
       "zoomIn": "확대",
       "zoomInAria": "확대 (가까이 보기)",
       "pan": "이동",
-      "panAria": "그림을 이리저리 이동",
+      "panAria": "그림을 자유롭게 이동",
       "reset": "전체 보기",
       "resetAria": "전체 화면으로 돌아가기"
     },
@@ -379,7 +379,7 @@
     "verifyRequest": {
       "title": "이메일을 확인하세요!",
       "description": "로그인용 매직 링크를 보냈습니다. 이메일의 링크를 클릭하여 계속하십시오.",
-      "checkSpam": "보이지 않나요? 스팸함을 확인해 보십시오.",
+      "checkSpam": "보이지 않나요? 스팸함을 확인해 보세요.",
       "linkExpiry": "링크는 24시간 후 만료됩니다.",
       "tryDifferentEmail": "다른 이메일 사용"
     },
@@ -476,7 +476,7 @@
       "vehicles": "탈것 & 교통수단"
     },
     "categoryDescription": {
-      "animals": "아이와 어른 모두를 위한 귀엽고 야생적인 동물 색칠공부",
+      "animals": "귀엽고 야생적인 동물 색칠공부 - 아이와 어른 모두를 위한",
       "dinosaurs": "모든 연령을 위한 선사시대 공룡 색칠공부",
       "dragons": "귀여운 것부터 강렬한 것까지, 멋진 드래곤 색칠공부",
       "fantasy": "마법 생물과 판타지 세계 색칠공부",
