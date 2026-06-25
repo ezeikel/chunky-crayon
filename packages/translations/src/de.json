@@ -82,9 +82,9 @@
       "paintbrush": "Pinsel",
       "eraser": "Radiergummi",
       "glitter": "Glitzer",
-      "sparkle": "Glitzern",
+      "sparkle": "Glitzereffekt",
       "rainbow": "Regenbogen",
-      "glow": "Glühen",
+      "glow": "Glüheffekt",
       "neon": "Neon"
     },
     "brushSizes": {
@@ -425,7 +425,7 @@
     "forTeens": "Für Teenager",
     "forAdults": "Für Erwachsene",
     "holidays": "Feiertage & Jahreszeiten",
-    "ariaLabel": "Breadcrumb-Navigation"
+    "ariaLabel": "Navigation"
   },
   "jumpToNav": {
     "jumpToSection": "Zum Abschnitt springen",
