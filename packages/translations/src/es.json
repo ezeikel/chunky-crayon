@@ -94,10 +94,10 @@
     },
     "fillPatterns": {
       "solid": "Sólido",
-      "dots": "Lunares",
+      "dots": "Puntos",
       "stripes": "Rayas",
       "diagonal": "Diagonal",
-      "checkerboard": "Cuadros",
+      "checkerboard": "Damero",
       "hearts": "Corazones",
       "stars": "Estrellas",
       "zigzag": "Zigzag"
@@ -108,7 +108,7 @@
       "share": "Compartir",
       "print": "Imprimir",
       "preparing": "Preparando...",
-      "doneSharing": "Listo para compartir",
+      "doneSharing": "Compartido",
       "colorAgain": "Colorear de nuevo",
       "startOver": "Empezar de nuevo"
     },
@@ -462,7 +462,7 @@
       "animals": "Animales",
       "dinosaurs": "Dinosaurios",
       "dragons": "Dragones",
-      "fantasy": "Fantasía y magia",
+      "fantasy": "Fantasía y Magia",
       "food": "Comida y dulces",
       "holidays": "Fiestas y estaciones",
       "nature": "Naturaleza y flores",
